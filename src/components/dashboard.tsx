@@ -209,7 +209,10 @@ function Featured({ group }: { group: Group }) {
 
 const featured = [
   { id: "chachi", relay: "wss://groups.0xchat.com" },
-  { id: "825f1ed57f20d06d43e93f3cb8207d61ce8cdfff9d9f6722540329c00fba1b44", relay: "wss://groups.0xchat.com" },
+  {
+    id: "825f1ed57f20d06d43e93f3cb8207d61ce8cdfff9d9f6722540329c00fba1b44",
+    relay: "wss://groups.0xchat.com",
+  },
   { id: "nip-29", relay: "wss://groups.0xchat.com" },
 ];
 

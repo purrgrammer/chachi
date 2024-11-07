@@ -16,7 +16,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     ref,
   ) => {
     return (
-      <div className="flex flex-row relative hidden">
+      <div className="flex flex-row relative">
         {leftIcon ? (
           <div className="text-muted-foreground absolute left-2 top-3">
             {leftIcon}

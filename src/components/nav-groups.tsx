@@ -203,7 +203,9 @@ export function NavGroups() {
     <MyGroupList />
   ) : (
     <div className="flex items-center justify-center">
-      <span className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden text-sm text-muted-foreground">No groups</span>
+      <span className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden text-sm text-muted-foreground">
+        No groups
+      </span>
     </div>
   );
 }
