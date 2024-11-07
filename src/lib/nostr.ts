@@ -81,7 +81,10 @@ export function useAddress({
       return ndk
         .fetchEvent(
           { kinds: [kind], authors: [pubkey], "#d": [identifier] },
-          { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
+          {
+            closeOnEose: true,
+            cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST,
+          },
           relaySet,
         )
         .then((ev) => {
@@ -281,9 +284,11 @@ function fetchProfile(ndk: NDK, pubkey: string, relays: string[]) {
         kinds: [NDKKind.Metadata],
         authors: [pubkey],
       },
-      { closeOnEose: true },
+      { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
       NDKRelaySet.fromRelayUrls(
-        relays.length > 0 ? relays : ["wss://purplepag.es", "wss://relay.nostr.band"],
+        relays.length > 0
+          ? relays
+          : ["wss://purplepag.es", "wss://relay.nostr.band"],
         ndk,
       ),
     )
