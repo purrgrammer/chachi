@@ -145,7 +145,14 @@ function GroupItem({ group }: { group: Group }) {
                     inline: true,
                     emojis: true,
                     mentions: true,
+                    events: false,
+                    urls: false,
                     hashtags: true,
+                    ecash: false,
+                    images: false,
+                    audio: false,
+                    video: false,
+                    youtube: false,
                   }}
                   classNames={{
                     emojis: "size-5",
