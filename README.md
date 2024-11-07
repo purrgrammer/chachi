@@ -11,6 +11,7 @@ chachi is a nostr group chat client. It is designed to be mobile-friendly, bandw
 - [ ] Notifications
 - [ ] Direct Messages
 - [ ] Profiles
+- [ ] PWA
 
 ### Groups
 

@@ -268,7 +268,7 @@ export function FeedEmbed({
               ) : null}
             </div>
             <div className="px-4 py-1 pb-2 space-y-3">
-              {components.preview ? (
+              {components?.preview ? (
                 components.preview({ event, group, options, classNames })
               ) : alt ? (
                 <p>{alt}</p>
@@ -404,7 +404,7 @@ export function Embed({
       </div>
       <div className="px-4 py-1 pb-2 space-y-3">
         {components?.preview ? (
-          components?.preview({ event, group, options, classNames })
+          components.preview({ event, group, options, classNames })
         ) : alt ? (
           <p>{alt}</p>
         ) : (

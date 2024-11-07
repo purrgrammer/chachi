@@ -11,12 +11,6 @@ const ndk = new NDK({
     "wss://relay.groups.nip29.com",
     "wss://groups.fiatjaf.com",
   ],
-  blacklistRelayUrls: [
-    "wss://pyramid.fiatjaf.com",
-    "wss://pyramid.fiatjaf.com/",
-    "wss://nostr.mutinywallet.com/",
-    "wss://eden.nostr.land/",
-  ],
   outboxRelayUrls,
   enableOutboxModel: false,
   cacheAdapter: cache,
