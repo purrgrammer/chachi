@@ -81,7 +81,7 @@ export function useAddress({
       return ndk
         .fetchEvent(
           { kinds: [kind], authors: [pubkey], "#d": [identifier] },
-          { cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
+          { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
           relaySet,
         )
         .then((ev) => {
