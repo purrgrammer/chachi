@@ -143,6 +143,7 @@ export function ChatMessage({
   const [showMessageActions, setShowMessageActions] = useState(false);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
+  const lastSeenRef = useRef<HTMLDivElement | null>(null);
   const isInView = useInView(ref);
   const isMobile = useIsMobile();
   const author = event.pubkey;
@@ -195,11 +196,8 @@ export function ChatMessage({
   }, [isFocused]);
 
   useEffect(() => {
-    if (isLastSeen && ref.current) {
-      ref.current.scrollIntoView({
-        behavior: "instant",
-        block: "start",
-      });
+    if (isLastSeen && lastSeenRef.current) {
+      ref.current.scrollIntoView(true);
     }
   }, [isLastSeen]);
 
@@ -471,7 +469,10 @@ export function ChatMessage({
         </ContextMenu>
       </motion.div>
       {isLastSeen ? (
-        <div className="flex flex-col items-center justify-center my-3 w-full">
+        <div
+          ref={lastSeenRef}
+          className="flex flex-col items-center justify-center my-3 w-full"
+        >
           <Separator />
           <Badge className="-mt-3 text-xs">New messages</Badge>
         </div>
