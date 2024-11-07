@@ -49,7 +49,7 @@ function RelayItem({ group }: { group: Group }) {
             className="absolute top-3 right-2 text-xs group-has-[[data-collapsible=icon]]/sidebar-wrapper:top-0 group-has-[[data-collapsible=icon]]/sidebar-wrapper:right-0"
           >
             <span className="text-xs font-light font-mono">
-              {unreadMessages > 100 ? "99+" : unreadMessages}
+              {unreadMessages >= 100 ? "99+" : unreadMessages}
             </span>
           </Badge>
         ) : null}
@@ -123,7 +123,7 @@ function GroupItem({ group }: { group: Group }) {
             className="absolute top-3 right-2 text-xs group-has-[[data-collapsible=icon]]/sidebar-wrapper:top-0 group-has-[[data-collapsible=icon]]/sidebar-wrapper:right-0"
           >
             <span className="text-xs font-light font-mono">
-              {unreadMessages > 100 ? "99+" : unreadMessages}
+              {unreadMessages >= 100 ? "99+" : unreadMessages}
             </span>
           </Badge>
         ) : null}
