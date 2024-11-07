@@ -36,6 +36,6 @@ class ChachiDatabase extends Dexie {
     });
   }
 }
-const db = new ChachiDatabase("messages");
+const db = new ChachiDatabase("chachi");
 
 export default db;

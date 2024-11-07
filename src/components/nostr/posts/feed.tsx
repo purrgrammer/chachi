@@ -49,13 +49,12 @@ export const GroupPosts = forwardRef(
               </NewPost>
               <div className="flex flex-col gap-1 w-[calc(100vw-2rem)] sm:w-[420px] md:w-[510px]">
                 {events.map((event) => (
-                  <motion.div initial={{ scale: 0.2 }} animate={{ scale: 1 }}>
-                    <FeedEmbed
-                      key={event.id}
-                      event={event}
-                      group={group}
-                      canOpenDetails
-                    />
+                  <motion.div
+                    key={event.id}
+                    initial={{ scale: 0.2 }}
+                    animate={{ scale: 1 }}
+                  >
+                    <FeedEmbed event={event} group={group} canOpenDetails />
                   </motion.div>
                 ))}
               </div>

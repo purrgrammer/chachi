@@ -86,18 +86,32 @@ function useUserEvents() {
   // Groups, contacts, media server and emoji list
   useEffect(() => {
     if (pubkey && relays.length > 0) {
-      const sub = ndk.subscribe(
+      const filters = [
         {
-          kinds: [
-            NDKKind.SimpleGroupList,
-            NDKKind.Contacts,
-            NDKKind.BlossomList,
-            NDKKind.EmojiList,
-          ],
+          kinds: [NDKKind.SimpleGroupList],
           authors: [pubkey],
+          since: groupList.created_at,
         },
         {
-          cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
+          kinds: [NDKKind.Contacts],
+          authors: [pubkey],
+          since: contactList.created_at,
+        },
+        {
+          kinds: [NDKKind.BlossomList],
+          authors: [pubkey],
+          since: mediaServerList.created_at,
+        },
+        {
+          kinds: [NDKKind.EmojiList],
+          authors: [pubkey],
+          since: emojiList.created_at,
+        },
+      ];
+      const sub = ndk.subscribe(
+        filters,
+        {
+          cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
           closeOnEose: false,
         },
         NDKRelaySet.fromRelayUrls(
