@@ -174,7 +174,6 @@ export function GroupChat({ group }: { group: Group }) {
       toast.error("Couldn't delete message");
     }
   }
-  // todo: disable input while no group info is available
 
   return (
     <>
@@ -224,14 +223,6 @@ export function GroupChat({ group }: { group: Group }) {
         disabled={!isSuccess}
         showJoinRequest={isSuccess && !canIPoast}
       />
-      {/*
-        <div className="flex items-center justify-around h-16">
-          <p className="text-muted-foreground text-sm">
-            You are not a member of this group.
-          </p>
-          <JoinGroup group={group} />
-        </div>
-	*/}
     </>
   );
 }
