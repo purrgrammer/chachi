@@ -197,7 +197,10 @@ export function ChatMessage({
 
   useEffect(() => {
     if (isLastSeen && lastSeenRef.current) {
-      ref.current.scrollIntoView(true);
+      lastSeenRef.current.scrollIntoView({
+        behavior: "instant",
+        block: "center",
+      });
     }
   }, [isLastSeen]);
 
