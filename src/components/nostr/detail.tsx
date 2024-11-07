@@ -140,8 +140,9 @@ export function FeedEmbed({
 
   function showDetail() {
     const ev = new NDKEvent(ndk, event);
+    const relays = Array.from(new Set([group.relay, ...userRelays]));
     // @ts-expect-error for some reason it thinks this function takes a number
-    const nlink = ev.encode([group.relay, ...userRelays]);
+    const nlink = ev.encode(relays);
     let url = "";
     if (group.id === "_") {
       url = `/${getRelayHost(group.relay)}/e/${nlink}`;
@@ -376,8 +377,9 @@ export function Embed({
 
   function showDetail() {
     const ev = new NDKEvent(ndk, event);
+    const relays = Array.from(new Set([group.relay, ...userRelays]));
     // @ts-expect-error for some reason it thinks this function takes a number
-    const nlink = ev.encode([group.relay, ...userRelays]);
+    const nlink = ev.encode(relays);
     let url = "";
     if (group.id === "_") {
       url = `/${getRelayHost(group.relay)}/e/${nlink}`;
