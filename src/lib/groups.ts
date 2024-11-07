@@ -8,7 +8,7 @@ export function groupId(group: Group) {
   return `${getRelayHost(group.relay)}'${group.id}`;
 }
 
-export function useGroups() {
+export function useMyGroups() {
   return useAtomValue(groupsAtom);
 }
 

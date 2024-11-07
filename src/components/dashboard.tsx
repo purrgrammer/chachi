@@ -10,7 +10,7 @@ import { useSortedGroups, useUnreadMessages, useUnreads } from "@/lib/messages";
 import { Input } from "@/components/ui/input";
 import { Highlight } from "@/components/highlight";
 import { useGroup, useAllGroups, useCloseGroups } from "@/lib/nostr/groups";
-import { groupId, useGroups, useOpenGroup } from "@/lib/groups";
+import { groupId, useMyGroups, useOpenGroup } from "@/lib/groups";
 import { nip29Relays, getRelayHost, useRelayInfo } from "@/lib/relay";
 import { CreateGroup } from "@/components/nostr/groups/create";
 import type { Group, GroupMetadata } from "@/lib/types";
@@ -136,7 +136,7 @@ function CloseGroup({
 
 function NetworkGroups() {
   const { data: groups } = useCloseGroups();
-  const myGroups = useGroups();
+  const myGroups = useMyGroups();
   const sorted =
     groups
       ?.filter((g) => !myGroups.find((mg) => mg.id === g.id))

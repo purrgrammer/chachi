@@ -8,6 +8,7 @@ import { CreateGroup } from "@/components/nostr/groups/create";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { SidebarMenu, SidebarMenuItem } from "@/components/ui/sidebar";
+import { useMyGroups } from "@/lib/groups";
 import { useGroup } from "@/lib/nostr/groups";
 import { useRelayInfo, getRelayHost } from "@/lib/relay";
 import { useNavigate } from "@/lib/navigation";
@@ -163,8 +164,9 @@ function GroupItem({ group }: { group: Group }) {
 }
 
 export function NavGroups() {
+  const myGroups = useMyGroups();
   const sortedGroups = useSortedGroups();
-  return (
+  return myGroups.length > 0 ? (
     <SidebarMenu className="gap-0">
       <Reorder.Group
         axis="y"
@@ -186,5 +188,9 @@ export function NavGroups() {
       </Reorder.Group>
       <CreateGroup className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden" />
     </SidebarMenu>
+  ) : (
+    <div className="flex items-center justify-center">
+      <span className="text-sm text-muted-foreground">No groups</span>
+    </div>
   );
 }

@@ -62,7 +62,7 @@ function useUserEvents() {
       {
         kinds: [NDKKind.RelayList],
         authors: [pubkey],
-        // todo: since last seen
+        since: relayList.created_at,
       },
       {
         cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
