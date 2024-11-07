@@ -9,13 +9,14 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   onRightIconClick?: () => void;
 }
 
+// todo: remove leftIcon/rightIcon
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
     { className, leftIcon, rightIcon, onRightIconClick, type, ...props },
     ref,
   ) => {
     return (
-      <div className="flex flex-row relative">
+      <div className="flex flex-row relative hidden">
         {leftIcon ? (
           <div className="text-muted-foreground absolute left-2 top-3">
             {leftIcon}
