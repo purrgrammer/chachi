@@ -29,6 +29,8 @@ import {
 import {
   ContextMenu,
   ContextMenuContent,
+  ContextMenuLabel,
+  ContextMenuSeparator,
   ContextMenuItem,
   ContextMenuTrigger,
   ContextMenuShortcut,
@@ -42,7 +44,8 @@ import { useEvent, useRelaySet, useRelayList } from "@/lib/nostr";
 import { useDeletions } from "@/lib/nostr/chat";
 import { usePubkey } from "@/lib/account";
 import { Emoji as EmojiType, EmojiPicker } from "@/components/emoji-picker";
-import { useLastSeen } from "@/lib/messages";
+import { useLastSeen, saveLastSeen } from "@/lib/messages";
+import { useSettings } from "@/lib/settings";
 import type { Group } from "@/lib/types";
 
 const scrollToAtom = atom<string | null>(null);
@@ -130,6 +133,7 @@ export function ChatMessage({
   richTextClassnames?: RichTextClassnames;
   className?: string;
 }) {
+  const settings = useSettings();
   const relay = group.relay;
   const { data: relayList } = useRelayList(event.pubkey);
   const ndk = useNDK();
@@ -194,7 +198,7 @@ export function ChatMessage({
     if (isLastSeen && ref.current) {
       ref.current.scrollIntoView({
         behavior: "instant",
-        block: "center",
+        block: "start",
       });
     }
   }, [isLastSeen]);
@@ -203,7 +207,6 @@ export function ChatMessage({
     if (isNew && ref.current) {
       ref.current.scrollIntoView({
         behavior: "smooth",
-        block: "start",
       });
     }
   }, [isNew]);
@@ -450,6 +453,20 @@ export function ChatMessage({
                 </ContextMenuShortcut>
               </ContextMenuItem>
             ) : null}
+            {settings.devMode ? (
+              <>
+                <ContextMenuSeparator />
+                <ContextMenuLabel className="text-xs font-light">
+                  Debug
+                </ContextMenuLabel>
+                <ContextMenuItem
+                  className="cursor-pointer"
+                  onClick={() => saveLastSeen(event, group)}
+                >
+                  Save as last seen
+                </ContextMenuItem>
+              </>
+            ) : null}
           </ContextMenuContent>
         </ContextMenu>
       </motion.div>
@@ -593,7 +610,7 @@ export function Chat({
                   groupIdx === groupedMessages.length - 1
                 }
                 setReplyingTo={setReplyingTo}
-                isNew={newMessage?.id === event.id} // fixme: not working
+                isNew={newMessage?.id === event.id}
                 showRootReply={showRootReply}
               />
             ) : Component ? (

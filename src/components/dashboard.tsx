@@ -52,7 +52,7 @@ function GroupMessages({ group }: { group: Group }) {
           </AvatarFallback>
         </Avatar>
         <Badge variant="counter" className="absolute top-0 right-0">
-          {unread}
+          {unread >= 100 ? "99+" : unread}
         </Badge>
       </Button>
     </Reorder.Item>
