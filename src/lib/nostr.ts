@@ -274,15 +274,16 @@ export function useRequest(
 // Users
 
 function fetchProfile(ndk: NDK, pubkey: string, relays: string[]) {
+  // todo: use NDK helpers to fech profile
   return ndk
     .fetchEvent(
       {
         kinds: [NDKKind.Metadata],
         authors: [pubkey],
       },
-      undefined,
+      { closeOnEose: true },
       NDKRelaySet.fromRelayUrls(
-        relays.length > 0 ? relays : ["wss://purplepag.es"],
+        relays.length > 0 ? relays : ["wss://purplepag.es", "wss://relay.nostr.band"],
         ndk,
       ),
     )
