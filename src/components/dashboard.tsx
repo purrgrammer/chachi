@@ -59,23 +59,30 @@ function GroupMessages({ group }: { group: Group }) {
   ) : null;
 }
 
-function GroupsActivity() {
+function GroupActivityList() {
   const sortedGroups = useSortedGroups();
-  const unreads = useUnreads(sortedGroups);
+  return (
+    <Reorder.Group
+      axis="x"
+      className="px-0 flex flex-row items-center gap-1 overflow-x-auto no-scrollbar w-[calc(100vw-1.5rem)] md:w-[calc(100vw-20rem)]"
+      values={sortedGroups}
+      onReorder={() => console.log("reorder")}
+    >
+      {sortedGroups.map((group) => (
+        <GroupMessages key={groupId(group)} group={group} />
+      ))}
+    </Reorder.Group>
+  );
+}
+
+function GroupsActivity() {
+  const myGroups = useMyGroups();
+  const unreads = useUnreads(myGroups);
   return (
     <div className="space-y-2">
       <Heading icon={<Activity className="size-4" />} text="Activity" />
-      {unreads.length > 0 ? (
-        <Reorder.Group
-          axis="x"
-          className="px-0 flex flex-row items-center gap-1 overflow-x-auto no-scrollbar w-[calc(100vw-1.5rem)] md:w-[calc(100vw-20rem)]"
-          values={sortedGroups}
-          onReorder={() => console.log("reorder")}
-        >
-          {sortedGroups.map((group) => (
-            <GroupMessages key={groupId(group)} group={group} />
-          ))}
-        </Reorder.Group>
+      {myGroups.length > 0 && unreads.length > 0 ? (
+        <GroupActivityList />
       ) : (
         <span className="text-sm text-muted-foreground">
           Nothing new for you... yet

@@ -163,7 +163,7 @@ function GroupItem({ group }: { group: Group }) {
   );
 }
 
-function MyGroupList(){
+function MyGroupList() {
   const sortedGroups = useSortedGroups();
   return (
     <SidebarMenu className="gap-0">
@@ -187,7 +187,7 @@ function MyGroupList(){
       </Reorder.Group>
       <CreateGroup className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden" />
     </SidebarMenu>
-    )
+  );
 }
 
 export function NavGroups() {
