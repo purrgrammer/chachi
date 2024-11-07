@@ -163,10 +163,9 @@ function GroupItem({ group }: { group: Group }) {
   );
 }
 
-export function NavGroups() {
-  const myGroups = useMyGroups();
+function MyGroupList(){
   const sortedGroups = useSortedGroups();
-  return myGroups.length > 0 ? (
+  return (
     <SidebarMenu className="gap-0">
       <Reorder.Group
         axis="y"
@@ -188,6 +187,13 @@ export function NavGroups() {
       </Reorder.Group>
       <CreateGroup className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden" />
     </SidebarMenu>
+    )
+}
+
+export function NavGroups() {
+  const myGroups = useMyGroups();
+  return myGroups.length > 0 ? (
+    <MyGroupList />
   ) : (
     <div className="flex items-center justify-center">
       <span className="text-sm text-muted-foreground">No groups</span>
