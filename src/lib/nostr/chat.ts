@@ -11,6 +11,7 @@ import { useNDK } from "@/lib/ndk";
 import { saveGroupEvent } from "@/lib/messages";
 import { getLastGroupMessage } from "@/lib/messages/queries";
 import { useStream, useRelaySet } from "@/lib/nostr";
+import { groupBy } from "@/lib/utils";
 import type { Group, Relay } from "@/lib/types";
 
 export function useLastMessage(group: Group) {
@@ -98,8 +99,7 @@ export function useDeletions(group: Group) {
 export function useGroupMessages(groups: Group[]) {
   const ndk = useNDK();
   const [subs, setSubs] = useState<NDKSubscription[]>([]);
-  // @ts-expect-error: group by is widely available
-  const byRelay = Object.groupBy(groups, (g: Group) => g.relay);
+  const byRelay = groupBy(groups, (g: Group) => g.relay);
   useEffect(() => {
     for (const [relay, gs] of Object.entries(byRelay)) {
       const lastMessages = (gs as Group[]).map(getLastGroupMessage);

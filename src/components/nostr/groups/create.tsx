@@ -84,6 +84,7 @@ export function CreateGroup({
       await editGroup(metadata);
       toast.success("Group created");
       navigate(`/${getRelayHost(relay)}/${id}`);
+      // todo: close dialog
     } catch (err) {
       console.error(err);
       toast.error("Couldn't create group");

@@ -16,7 +16,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { validateZap, Zap } from "@/lib/nip-57";
-import { cn } from "@/lib/utils";
+import { cn, groupBy } from "@/lib/utils";
 
 function Reacters({
   reactions,
@@ -210,8 +210,7 @@ export function Reactions({
   const reactions = events.filter((r) => r.kind === NDKKind.Reaction);
   const hasReactions = zaps.length > 0 || reactions.length > 0;
 
-  // @ts-expect-error: group by is widely available
-  const byContent = Object.groupBy(reactions, (r: NostrEvent) => {
+  const byContent = groupBy(reactions, (r: NostrEvent) => {
     return r.content === "+" ? "👍" : r.content === "-" ? "👎" : r.content;
   });
   const isCompact = Object.keys(byContent).length > 5;
