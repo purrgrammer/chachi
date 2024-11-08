@@ -110,7 +110,7 @@ export function GroupHeader({ group }: { group: Group }) {
           {isRelayGroup ? null : (
             <Separator orientation="vertical" className="ml-3 h-4" />
           )}
-          {!isRelayGroup ? (
+          {!isRelayGroup && metadata?.access === "closed" ? (
             <JoinRequests group={group} />
           ) : null}
           {!isRelayGroup && metadata && pubkey && admins?.includes(pubkey) ? (
