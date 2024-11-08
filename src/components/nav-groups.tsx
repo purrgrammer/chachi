@@ -74,7 +74,7 @@ function RelayItem({ group }: { group: Group }) {
                     hashtags: true,
                   }}
                   classNames={{
-                    emojis: "size-5",
+                    emojis: "size-5 opacity-70",
                   }}
                   tags={lastMessage.tags}
                 >
@@ -155,7 +155,7 @@ function GroupItem({ group }: { group: Group }) {
                     youtube: false,
                   }}
                   classNames={{
-                    emojis: "size-5",
+                    emojis: "size-5 opacity-70",
                   }}
                   tags={lastMessage.tags}
                 >
