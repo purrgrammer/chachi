@@ -85,6 +85,7 @@ interface AutocompleteTextareaProps extends TextareaProps {
   onCustomEmojisChange?: (emojis: Emoji[]) => void;
   reply?: NostrEvent;
   setReplyingTo?: (event: NostrEvent | null) => void;
+  submitOnEnter?: boolean;
 }
 
 export function AutocompleteTextarea({
@@ -97,6 +98,7 @@ export function AutocompleteTextarea({
   onCustomEmojisChange,
   reply,
   setReplyingTo,
+  submitOnEnter,
   ...props
 }: AutocompleteTextareaProps) {
   const ref = useRef<HTMLTextAreaElement | null>(null);
@@ -214,7 +216,7 @@ export function AutocompleteTextarea({
       setAutocompleteTerm("");
       setAutocompleteEmojiTerm("");
       setReplyingTo?.(null);
-    } else if (e.key === "Enter" && !e.shiftKey) {
+    } else if (e.key === "Enter" && !e.shiftKey && submitOnEnter) {
       e.preventDefault();
       onFinish(message, dedupeBy(customEmojis, "name"));
     }

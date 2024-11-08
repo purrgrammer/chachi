@@ -147,6 +147,7 @@ export function ChatInput({
       ) : (
         <div className="flex flex-row items-center h-full gap-2">
           <AutocompleteTextarea
+	    submitOnEnter
             disabled={!canPoast || disabled || !me}
             group={group}
             message={message}
