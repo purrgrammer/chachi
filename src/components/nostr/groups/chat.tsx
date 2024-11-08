@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { NostrEvent, UnsignedEvent } from "nostr-tools";
 import { NDKKind, NDKEvent } from "@nostr-dev-kit/ndk";
-import { ProfileDrawer } from "@/components/nostr/profile";
 //import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Name } from "@/components/nostr/name";
@@ -106,7 +105,7 @@ function UserActivity({
     <div className="flex w-full justify-center my-0.5">
       <Badge variant="outline" className="self-center">
         <div className="flex gap-1">
-          <ProfileDrawer pubkey={member} trigger={<Name pubkey={member} />} />
+          <Name pubkey={member} />
           <span>{action === "join" ? "joined" : "left"}</span>
         </div>
       </Badge>
