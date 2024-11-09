@@ -174,7 +174,7 @@ export function useGroupAdminsList(group: Group) {
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
   return useQuery({
-    queryKey: ['admin-list', group.id, group.relay],
+    queryKey: ["admin-list", group.id, group.relay],
     queryFn: async () => {
       if (group.id === "_") return [];
       return ndk
@@ -190,10 +190,10 @@ export function useGroupAdminsList(group: Group) {
           if (event) {
             const pTags = event.tags.filter((t) => t[0] === "p");
             const pubkeys = pTags.map((t) => t[1]);
-            return pubkeys
+            return pubkeys;
           }
-          return []
-	})
+          return [];
+        })
         .catch((err) => console.error(err));
     },
   });

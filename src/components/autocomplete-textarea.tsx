@@ -103,7 +103,7 @@ export function AutocompleteTextarea({
   ...props
 }: AutocompleteTextareaProps) {
   const ref = useRef<HTMLTextAreaElement | null>(null);
-  const {data: adminList }= useGroupAdminsList(group);
+  const { data: adminList } = useGroupAdminsList(group);
   const admins = adminList || [];
   const members = useMembers(group);
   const me = usePubkey();

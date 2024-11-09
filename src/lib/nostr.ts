@@ -201,6 +201,7 @@ export function useStream(
   filter: NDKFilter | NDKFilter[],
   relays: string[],
   live = true,
+  onlyRelays = false,
 ): NostrREQResult {
   const ndk = useNDK();
   const relaySet = useRelaySet(relays);
@@ -211,9 +212,11 @@ export function useStream(
     const sub = ndk.subscribe(
       filter,
       {
-        cacheUsage: live
-          ? NDKSubscriptionCacheUsage.PARALLEL
-          : NDKSubscriptionCacheUsage.ONLY_CACHE,
+        cacheUsage: onlyRelays
+          ? NDKSubscriptionCacheUsage.ONLY_RELAY
+          : live
+            ? NDKSubscriptionCacheUsage.PARALLEL
+            : NDKSubscriptionCacheUsage.ONLY_CACHE,
         closeOnEose: !live,
       },
       relaySet,

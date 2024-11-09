@@ -15,5 +15,6 @@ export function useReplies(event: NostrEvent, group: Group, live = true) {
     },
     [group.relay],
     live,
+    group.id === "_",
   );
 }

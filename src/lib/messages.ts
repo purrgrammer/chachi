@@ -159,6 +159,6 @@ export function useMembers(group: Group) {
   return useLiveQuery(
     () => getGroupChatParticipants(group),
     [group.id, group.relay],
-    []
+    [],
   );
 }
