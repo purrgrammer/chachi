@@ -21,7 +21,7 @@ const buttonVariants = cva(
         reaction:
           "bg-background/90 dark:bg-background/30 text-muted-foreground hover:bg-background/90 disabled:opacity-100 rounded-xl",
         action:
-          "rounded-full bg-primary text-primary-foreground hover:bg-primary/90 [&_svg]:size-7",
+          "rounded-md hover:bg-accent hover:text-accent-foreground [&_svg]:size-5",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -30,6 +30,7 @@ const buttonVariants = cva(
         icon: "h-10 w-10",
         smallIcon: "h-6 w-6",
         fit: "w-fit p-1",
+        huge: "h-32 w-32",
       },
     },
     defaultVariants: {

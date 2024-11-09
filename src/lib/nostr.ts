@@ -336,7 +336,10 @@ export function useProfile(pubkey: string, relays: string[] = []) {
 
 export function useRelayList(pubkey: string) {
   const ndk = useNDK();
-  const relaySet = useRelaySet(["wss://purplepag.es"]);
+  const relaySet = useRelaySet([
+    "wss://purplepag.es",
+    "wss://relay.nostr.band",
+  ]);
 
   return useQuery({
     queryKey: [RELAY_LIST, pubkey],
@@ -347,7 +350,7 @@ export function useRelayList(pubkey: string) {
             kinds: [NDKKind.RelayList],
             authors: [pubkey],
           },
-          undefined,
+          { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.PARALLEL },
           relaySet,
         )
         .then((ev) => {

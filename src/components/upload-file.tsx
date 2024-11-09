@@ -42,7 +42,7 @@ export function UploadFile({ onUpload, ...props }: UploadFileProps) {
   return (
     <Button
       disabled={!canSign || isUploading}
-      variant="ghost"
+      variant="action"
       size="icon"
       onClick={handleClick}
       {...props}
@@ -52,7 +52,13 @@ export function UploadFile({ onUpload, ...props }: UploadFileProps) {
       ) : (
         <Paperclip className="size-10 text-muted-foreground" />
       )}
-      <Input type="file" className="hidden" ref={ref} onChange={selectFile} />
+      <Input
+        noIcons
+        type="file"
+        className="hidden"
+        ref={ref}
+        onChange={selectFile}
+      />
     </Button>
   );
 }

@@ -69,6 +69,7 @@ export function ChatInput({
   onHeightChange,
   disabled,
   showJoinRequest,
+  children,
 }: {
   group: Group;
   kind: NDKKind;
@@ -83,6 +84,7 @@ export function ChatInput({
   onHeightChange?: (height: number) => void;
   disabled?: boolean;
   showJoinRequest?: boolean;
+  children?: React.ReactNode;
 }) {
   const ndk = useContext(NDKContext);
   const relaySet = useRelaySet([group.relay]);
@@ -145,7 +147,8 @@ export function ChatInput({
       {showJoinRequest && me ? (
         <JoinRequest pubkey={me} group={group} />
       ) : (
-        <div className="flex flex-row items-center h-full gap-2">
+        <div className="flex flex-row items-center h-full gap-1">
+          {children}
           <AutocompleteTextarea
             submitOnEnter
             disabled={!canPoast || disabled || !me}
