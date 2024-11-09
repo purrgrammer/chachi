@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Name } from "@/components/nostr/name";
 import { useProfiles } from "@/lib/nostr";
 import { useCustomEmojis } from "@/lib/nostr/emojis";
-import { useGroupAdminsList, useGroupParticipants } from "@/lib/nostr/groups";
+import { useGroupAdminsList } from "@/lib/nostr/groups";
 import { useMembers } from "@/lib/messages";
 import { cn, dedupeBy } from "@/lib/utils";
 import { Highlight } from "@/components/highlight";
