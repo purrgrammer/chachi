@@ -7,6 +7,7 @@ import { NDKKind, NDKEvent } from "@nostr-dev-kit/ndk";
 import { Badge } from "@/components/ui/badge";
 import { Name } from "@/components/nostr/name";
 import { useGroupParticipants } from "@/lib/nostr/groups";
+import { useMembers } from "@/lib/messages";
 import { ChatInput } from "@/components/nostr/chat/input";
 import { Chat } from "@/components/nostr/chat/chat";
 import { useNDK } from "@/lib/ndk";
@@ -115,6 +116,7 @@ function UserActivity({
 
 export function GroupChat({ group }: { group: Group }) {
   // todo: load older messages when scrolling up
+  const cachedMembers = useMembers(group);
   const events = useGroupchat(group);
   const { isSuccess, admins, members } = useGroupParticipants(group);
   const [replyingTo, setReplyingTo] = useState<NostrEvent | null>(null);

@@ -170,6 +170,34 @@ function useGroupMembers(group: Group) {
   });
 }
 
+export function useGroupAdminsList(group: Group) {
+  const ndk = useNDK();
+  const relaySet = useRelaySet([group.relay]);
+  return useQuery({
+    queryKey: ['admin-list', group.id, group.relay],
+    queryFn: async () => {
+      if (group.id === "_") return [];
+      return ndk
+        .fetchEvent(
+          {
+            kinds: [NDKKind.GroupAdmins],
+            "#d": [group.id],
+          },
+          { closeOnEose: true },
+          relaySet,
+        )
+        .then((event) => {
+          if (event) {
+            const pTags = event.tags.filter((t) => t[0] === "p");
+            const pubkeys = pTags.map((t) => t[1]);
+            return pubkeys
+          }
+          return []
+	})
+        .catch((err) => console.error(err));
+    },
+  });
+}
 export function useGroupAdmins(group: Group) {
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);

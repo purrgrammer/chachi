@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Name } from "@/components/nostr/name";
 import { useProfiles } from "@/lib/nostr";
 import { useCustomEmojis } from "@/lib/nostr/emojis";
-import { useGroupParticipants } from "@/lib/nostr/groups";
+import { useGroupAdminsList, useGroupParticipants } from "@/lib/nostr/groups";
+import { useMembers } from "@/lib/messages";
 import { cn, dedupeBy } from "@/lib/utils";
 import { Highlight } from "@/components/highlight";
 import { usePubkey } from "@/lib/account";
@@ -102,7 +103,9 @@ export function AutocompleteTextarea({
   ...props
 }: AutocompleteTextareaProps) {
   const ref = useRef<HTMLTextAreaElement | null>(null);
-  const { admins, members } = useGroupParticipants(group);
+  const {data: adminList }= useGroupAdminsList(group);
+  const admins = adminList || [];
+  const members = useMembers(group);
   const me = usePubkey();
 
   // Emojis

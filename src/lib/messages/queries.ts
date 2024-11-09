@@ -34,6 +34,19 @@ export async function getGroupChat(group: Group) {
   return events.slice(0, 100);
 }
 
+export async function getGroupChatParticipants(group: Group) {
+  const id = groupId(group);
+  const events = await db.events
+    .where("[group+kind]")
+    .anyOf([
+      [id, NDKKind.GroupChat],
+      [id, NDKKind.GroupAdminAddUser],
+    ])
+    .toArray();
+    const pubkeys = events.map((ev) => ev.kind === NDKKind.GroupAdminAddUser ? ev.tags.find(t => t[0] === "p")?.[1] : ev.pubkey).filter(Boolean);
+  return Array.from(new Set(pubkeys))
+}
+
 export async function getLastGroupMessage(group: Group) {
   const id = groupId(group);
   const msgs = await db.events

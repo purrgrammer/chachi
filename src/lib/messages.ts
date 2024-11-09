@@ -18,6 +18,7 @@ import {
   getGroupsSortedByLastMessage,
   getLastSeen,
   getUnreadMessages,
+  getGroupChatParticipants,
 } from "@/lib/messages/queries";
 import { Group } from "@/lib/types";
 import db from "@/lib/db";
@@ -152,4 +153,12 @@ export function useSaveLastSeen(group: Group) {
       }
     });
   };
+}
+
+export function useMembers(group: Group) {
+  return useLiveQuery(
+    () => getGroupChatParticipants(group),
+    [group.id, group.relay],
+    []
+  );
 }
