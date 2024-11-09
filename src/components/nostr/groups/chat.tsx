@@ -124,7 +124,7 @@ export function GroupChat({ group }: { group: Group }) {
   const previousMessageIds = events.slice(-3).map((e) => e.id.slice(0, 8));
   // heights
   const [inputHeight, setInputHeight] = useState(34);
-  const headerHeight = 48 + 32;
+  const headerHeight = 80;
   const nonChatHeight = inputHeight + headerHeight;
   const me = usePubkey();
   const canSign = useCanSign();

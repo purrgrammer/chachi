@@ -276,20 +276,6 @@ export function ChatMessage({
             ? () => setShowMessageActions(false)
             : undefined
         }
-        // Drag controls
-        drag={isMobile && !isMine ? "x" : false}
-        dragSnapToOrigin={true}
-        dragConstraints={{ left: 20, right: 20 }}
-        dragElastic={{ left: 0.2, right: 0.2 }}
-        onDragEnd={(_, info) => {
-          if (info.offset.x > 20) {
-            setReplyingTo?.(event);
-          } else if (info.offset.x < -20) {
-            if (canReact) {
-              setShowingEmojiPicker(true);
-            }
-          }
-        }}
         ref={ref}
         className={cn(
           `flex flex-row gap-2 items-end ${isLast ? "mb-0" : isChain ? "mb-0.5" : "mb-2"} ${isMine ? "ml-auto" : ""} transition-colors ${isFocused ? "bg-accent/30 rounded-lg" : ""}`,
@@ -304,7 +290,21 @@ export function ChatMessage({
         )}
         <ContextMenu>
           <ContextMenuTrigger asChild>
-            <div
+            <motion.div
+              // Drag controls
+              drag={isMobile && !isMine ? "x" : false}
+              dragSnapToOrigin={true}
+              dragConstraints={{ left: 20, right: 20 }}
+              dragElastic={{ left: 0.2, right: 0.2 }}
+              onDragEnd={(_, info) => {
+                if (info.offset.x > 20) {
+                  setReplyingTo?.(event);
+                } else if (info.offset.x < -20) {
+                  if (canReact) {
+                    setShowingEmojiPicker(true);
+                  }
+                }
+              }}
               className={`relative ${isChain ? "rounded-lg" : isMine ? "rounded-tl-lg rounded-tr-lg rounded-bl-lg" : "rounded-tl-lg rounded-tr-lg rounded-br-lg"} p-1 px-2 w-fit max-w-[18rem] sm:max-w-sm md:max-w-md ${isMine ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"} ${isChain && !isMine ? "ml-10" : ""} ${isOnlyImage || isOnlyVideo || isOnlyAudio ? "bg-transparent p-0" : ""}`}
             >
               {isFirstInChain ? (
@@ -416,7 +416,7 @@ export function ChatMessage({
                   </Button>
                 </div>
               ) : null}
-            </div>
+            </motion.div>
           </ContextMenuTrigger>
           <ContextMenuContent>
             <ContextMenuItem
