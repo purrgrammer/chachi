@@ -10,6 +10,7 @@ import { useGroupAdminsList } from "@/lib/nostr/groups";
 import { useMembers } from "@/lib/messages";
 import { ChatInput } from "@/components/nostr/chat/input";
 import { Chat } from "@/components/nostr/chat/chat";
+//import { New } from "@/components/nostr/new";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet } from "@/lib/nostr";
 import { usePubkey, useCanSign } from "@/lib/account";
@@ -124,7 +125,7 @@ export function GroupChat({ group }: { group: Group }) {
   const previousMessageIds = events.slice(-3).map((e) => e.id.slice(0, 8));
   // heights
   const [inputHeight, setInputHeight] = useState(34);
-  const headerHeight = 80;
+  const headerHeight = 96;
   const nonChatHeight = inputHeight + headerHeight;
   const me = usePubkey();
   const canSign = useCanSign();
@@ -178,13 +179,13 @@ export function GroupChat({ group }: { group: Group }) {
   }
 
   return (
-    <>
+    <div className={`grid grid-col-[1fr_${inputHeight}px]"`}>
       <Chat
         group={group}
         admins={admins}
         style={
           {
-            height: `calc(100vh - ${nonChatHeight + 16}px)`,
+            height: `calc(100vh - ${nonChatHeight}px)`,
           } as React.CSSProperties
         }
         newMessage={sentMessage}
@@ -222,9 +223,10 @@ export function GroupChat({ group }: { group: Group }) {
               ]
             : [["h", group.id]]
         }
-        //disabled={isSuccess}
         showJoinRequest={!canIPoast}
-      />
-    </>
+      >
+        {/*<New group={group} />*/}
+      </ChatInput>
+    </div>
   );
 }

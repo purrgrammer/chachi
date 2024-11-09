@@ -558,10 +558,10 @@ export function Chat({
   messageKinds,
   components,
   setReplyingTo,
-  className,
   style,
   newMessage,
   showRootReply = true,
+  className,
 }: ChatProps) {
   // todo: check admin events against relay pubkey
   const groupedMessages = groupByDay(events);
