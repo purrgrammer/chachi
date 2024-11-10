@@ -39,7 +39,6 @@ export function NewPost({
   const [isPosting, setIsPosting] = useState(false);
   const [message, setMessage] = useState("");
   const [customEmoji, setCustomEmoji] = useState<Emoji[]>([]);
-  //const { admins, members } = useGroupParticipants(group);
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
   const canSign = useCanSign();

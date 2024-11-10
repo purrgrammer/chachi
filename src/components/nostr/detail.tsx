@@ -34,12 +34,14 @@ import {
   ContextMenuShortcut,
 } from "@/components/ui/context-menu";
 import { Emoji as PickerEmoji, EmojiPicker } from "@/components/emoji-picker";
+import { Poll, PollResults } from "@/components/nostr/poll";
 import { ReplyDialog } from "@/components/nostr/reply";
 import { getRelayHost } from "@/lib/relay";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet, useRelays } from "@/lib/nostr";
 import { useReplies } from "@/lib/nostr/comments";
 import type { Group } from "@/lib/types";
+import { POLL } from "@/lib/kinds";
 import { cn } from "@/lib/utils";
 
 // preview: basic embed
@@ -97,10 +99,11 @@ const eventDetails: Record<
     preview: EmojiSet,
     detail: EmojiSet,
   },
-  //[1068]: {
-  //  preview: Poll,
-  //  detail: Poll,
-  //},
+  [POLL]: {
+    preview: Poll,
+    detail: Poll,
+    content: PollResults,
+  },
   //[9735]: {
   //  preview: Zap,
   //  detail: Zap,

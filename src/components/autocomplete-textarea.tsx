@@ -82,7 +82,7 @@ interface AutocompleteTextareaProps extends TextareaProps {
   topOffset?: number;
   message: string;
   setMessage: (msg: string) => void;
-  onFinish(msg: string, emojis: Emoji[]): void;
+  onFinish?: (msg: string, emojis: Emoji[]) => void;
   onCustomEmojisChange?: (emojis: Emoji[]) => void;
   reply?: NostrEvent;
   setReplyingTo?: (event: NostrEvent | null) => void;
@@ -125,6 +125,7 @@ export function AutocompleteTextarea({
 
   const profiles = useProfiles(members ?? []);
   const profileList = profiles.map((p) => p.data).filter(Boolean);
+  console.log("MEMBERS.PROFILES", profileList);
   const autocompleteProfiles =
     autocompleteTerm && isAutocompleting
       ? profileList
@@ -221,7 +222,7 @@ export function AutocompleteTextarea({
       setReplyingTo?.(null);
     } else if (e.key === "Enter" && !e.shiftKey && submitOnEnter) {
       e.preventDefault();
-      onFinish(message, dedupeBy(customEmojis, "name"));
+      onFinish?.(message, dedupeBy(customEmojis, "name"));
     }
   }
 
