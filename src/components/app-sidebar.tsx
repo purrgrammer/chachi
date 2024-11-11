@@ -27,8 +27,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             }
           }}
         >
-            <Logo className="size-8" />
-	    </Link>
+          <Logo className="size-8" />
+        </Link>
       </SidebarHeader>
       <SidebarContent>
         <NavGroups />

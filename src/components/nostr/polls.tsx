@@ -1,23 +1,23 @@
 import { forwardRef } from "react";
 import type { ForwardedRef } from "react";
-import { NDKKind } from "@nostr-dev-kit/ndk";
 import { useStream } from "@/lib/nostr";
 import { Empty } from "@/components/empty";
 import { Embed } from "@/components/nostr/detail";
 import { cn } from "@/lib/utils";
+import { POLL } from "@/lib/kinds";
 import type { Group } from "@/lib/types";
 
-export const GroupArticles = forwardRef(
+export const GroupPolls = forwardRef(
   (
     { group, className }: { group: Group; className?: string },
     ref: ForwardedRef<HTMLDivElement | null>,
   ) => {
     const filter = {
-      kinds: [NDKKind.Article],
+      kinds: [POLL],
       "#h": [group.id],
-      limit: 50,
+      limit: 5,
     };
-    const { eose, events } = useStream(filter, [group.relay]);
+    const { eose, events } = useStream(filter, [group.relay], true, true);
     return (
       <div
         ref={ref}
@@ -32,12 +32,7 @@ export const GroupArticles = forwardRef(
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {events.map((event) => (
-              <Embed
-                key={event.id}
-                event={event}
-                group={group}
-                className="border rounded-sm max-w-lg cursor-pointer hover:bg-secondary/60 text-left"
-              />
+              <Embed key={event.id} event={event} group={group} />
             ))}
           </div>
         )}
@@ -45,4 +40,4 @@ export const GroupArticles = forwardRef(
     );
   },
 );
-GroupArticles.displayName = "GroupArticles";
+GroupPolls.displayName = "GroupPolls";

@@ -10,7 +10,7 @@ import { useGroupAdminsList } from "@/lib/nostr/groups";
 import { useMembers } from "@/lib/messages";
 import { ChatInput } from "@/components/nostr/chat/input";
 import { Chat } from "@/components/nostr/chat/chat";
-import { New } from "@/components/nostr/new";
+//import { New } from "@/components/nostr/new";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet } from "@/lib/nostr";
 import { usePubkey, useCanSign } from "@/lib/account";
@@ -225,7 +225,9 @@ export function GroupChat({ group }: { group: Group }) {
         }
         showJoinRequest={!canIPoast}
       >
+	{/*
         <New group={group} />
+	*/}
       </ChatInput>
     </div>
   );

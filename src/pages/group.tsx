@@ -2,7 +2,8 @@ import { useParams } from "react-router-dom";
 import { GroupHeader } from "@/components/nostr/groups/header";
 import { GroupChat } from "@/components/nostr/groups/chat";
 import { GroupPosts } from "@/components/nostr/posts/feed";
-import { GroupArticles } from "@/components/nostr/articles";
+//import { GroupArticles } from "@/components/nostr/articles";
+//import { GroupPolls } from "@/components/nostr/polls";
 import {
   Tabs,
   TabsContent,
@@ -31,9 +32,11 @@ export default function GroupPage({
           {id !== "_" ? (
             <>
               <TabsTrigger value="posts">Posts</TabsTrigger>
-              {/*<TabsTrigger value="articles">Articles</TabsTrigger>*/}
             </>
           ) : null}
+          {/*<TabsTrigger value="articles">Articles</TabsTrigger>
+          <TabsTrigger value="polls">Polls</TabsTrigger>
+*/}
         </TabsList>
         <TabsContent asChild value="chat">
           <GroupChat key={groupId(group)} group={group} />
@@ -43,11 +46,16 @@ export default function GroupPage({
             <TabsContent asChild value="posts">
               <GroupPosts key={groupId(group)} group={group} />
             </TabsContent>
-            <TabsContent asChild value="articles">
-              <GroupArticles key={groupId(group)} group={group} />
-            </TabsContent>
           </>
         ) : null}
+        {/*
+	<TabsContent asChild value="articles">
+          <GroupArticles key={groupId(group)} group={group} />
+        </TabsContent>
+        <TabsContent asChild value="polls">
+          <GroupPolls key={groupId(group)} group={group} />
+        </TabsContent>
+	*/}
       </Tabs>
     </>
   );

@@ -1,4 +1,4 @@
-import { toast } from 'sonner';
+import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Avatar } from "@/components/nostr/avatar";
@@ -47,7 +47,7 @@ function Option({
   const percentage = (voteCount / votes.length) * 100;
   const castVote = useVote(event, [id]);
   const me = usePubkey();
-  const iVoted = optionVotes.find((v) => v.pubkey === me)
+  const iVoted = optionVotes.find((v) => v.pubkey === me);
 
   async function onClick() {
     try {
@@ -101,7 +101,7 @@ export function Poll({
   const isExpired = endsAt ? Date.now() > Number(endsAt) : false;
   const me = usePubkey();
   const votes = useVotes(event);
-  const iVoted = votes.find((v) => v.pubkey === me)
+  const iVoted = votes.find((v) => v.pubkey === me);
   const showResult = isExpired || Boolean(iVoted);
   return (
     <div className={cn("space-y-2", className)}>

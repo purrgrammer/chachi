@@ -53,7 +53,12 @@ export function NewPoll({
         const ev = new NDKEvent(ndk, {
           kind: POLL,
           content: message.trim(),
-          tags: [["h", group.id, group.relay], ...options],
+          tags: [
+            ["h", group.id, group.relay],
+            ["relay", group.relay],
+            ...options,
+            ["polltype", "singlechoice"],
+          ],
         } as NostrEvent);
         if (endsAt) {
           ev.tags.push(["endsAt", endsAt]);
@@ -61,10 +66,7 @@ export function NewPoll({
         for (const e of dedupeBy(customEmoji, "name")) {
           ev.tags.push(["emoji", e.name, e.image!]);
         }
-        await ev.sign();
-        console.log("NEWPOLL", relaySet, ev.rawEvent());
-        //await ev.publish(relaySet);
-        return;
+        await ev.publish(relaySet);
         setShowDialog(false);
         setMessage("");
         setOptions([]);
@@ -83,7 +85,7 @@ export function NewPoll({
 
   function addOption() {
     const id = randomId();
-    setOptions([...options, ["option", id, newOption]]);
+    setOptions([...options, ["option", id, newOption.trim()]]);
     setCustomEmoji([...customEmoji, ...newOptionCustomEmoji]);
     setNewOption("");
     setNewOptionCustomEmoji([]);
