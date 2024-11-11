@@ -72,6 +72,11 @@ function RelayItem({ group }: { group: Group }) {
                     emojis: true,
                     mentions: true,
                     hashtags: true,
+                    events: false,
+                    ecash: false,
+                    video: false,
+                    audio: false,
+                    youtube: false,
                   }}
                   classNames={{
                     emojis: "size-5 opacity-70",

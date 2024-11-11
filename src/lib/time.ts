@@ -1,4 +1,11 @@
 // todo: locale
+export function formatDay(date: Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(date);
+}
 
 export function formatRelativeTime(timestamp: number) {
   const now = Math.floor(Date.now() / 1000);
