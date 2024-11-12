@@ -2,7 +2,7 @@ import { forwardRef } from "react";
 import type { ForwardedRef } from "react";
 import { useStream } from "@/lib/nostr";
 import { Empty } from "@/components/empty";
-import { Embed } from "@/components/nostr/detail";
+import { FeedEmbed } from "@/components/nostr/detail";
 import { cn } from "@/lib/utils";
 import { POLL } from "@/lib/kinds";
 import type { Group } from "@/lib/types";
@@ -30,9 +30,9 @@ export const GroupPolls = forwardRef(
         {events.length === 0 && eose ? (
           <Empty />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1 w-[calc(100vw-2rem)] sm:w-[420px] md:w-[510px]">
             {events.map((event) => (
-              <Embed key={event.id} event={event} group={group} />
+              <FeedEmbed key={event.id} event={event} group={group} />
             ))}
           </div>
         )}

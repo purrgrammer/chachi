@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { NostrEvent } from "nostr-tools";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +34,7 @@ export function NewPoll({
   children?: React.ReactNode;
   onSuccess?: () => void;
 }) {
+  const [isMultiChoice, setIsMultiChoice] = useState(false);
   const [endsAt, setEndsAt] = useState("");
   const [showDialog, setShowDialog] = useState(false);
   const [newOption, setNewOption] = useState("");
@@ -57,7 +59,7 @@ export function NewPoll({
             ["h", group.id, group.relay],
             ["relay", group.relay],
             ...options,
-            ["polltype", "singlechoice"],
+            ["polltype", isMultiChoice ? "multiplechoice" : "singlechoice"],
           ],
         } as NostrEvent);
         if (endsAt) {
@@ -68,6 +70,7 @@ export function NewPoll({
         }
         await ev.publish(relaySet);
         setShowDialog(false);
+        setIsMultiChoice(false);
         setMessage("");
         setOptions([]);
         setCustomEmoji([]);
@@ -207,6 +210,10 @@ export function NewPoll({
               </Button>
             </div>
           ))}
+          <div className="flex items-center gap-2 px-2">
+            <Switch id="multiple-choice" onCheckedChange={setIsMultiChoice} />
+            <Label htmlFor="multiple-choice">Multiple choices</Label>
+          </div>
         </div>
         <div className="flex flex-row items-center justify-end w-full">
           <Button
