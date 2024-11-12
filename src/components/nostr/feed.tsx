@@ -2,26 +2,36 @@ import { forwardRef } from "react";
 import type { ForwardedRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ReactNode } from "react";
-import { NostrEvent } from "nostr-tools";
+import { NDKFilter } from "@nostr-dev-kit/ndk";
 import { FeedEmbed } from "@/components/nostr/detail";
 import { Empty } from "@/components/empty";
 import { cn } from "@/lib/utils";
+import { useStream } from "@/lib/nostr";
 import type { Group } from "@/lib/types";
 
 interface FeedProps {
   group: Group;
+  filter: NDKFilter | NDKFilter[];
+  live?: boolean;
+  onlyRelays?: boolean;
   newPost: ReactNode;
-  eose: boolean;
-  events: NostrEvent[];
   className?: string;
 }
 
 const Feed = forwardRef(
   (
-    { group, newPost, eose, events, className }: FeedProps,
+    {
+      group,
+      filter,
+      live = true,
+      onlyRelays = false,
+      newPost,
+      className,
+    }: FeedProps,
     ref: ForwardedRef<HTMLDivElement | null>,
   ) => {
     // todo: loading state
+    const { eose, events } = useStream(filter, [group.relay], live, onlyRelays);
     return eose ? (
       <AnimatePresence initial={false}>
         <div
