@@ -32,7 +32,7 @@ export function NewPoll({
 }: {
   group: Group;
   children?: React.ReactNode;
-  onSuccess?: () => void;
+  onSuccess?: (ev: NostrEvent) => void;
 }) {
   const [isMultiChoice, setIsMultiChoice] = useState(false);
   const [endsAt, setEndsAt] = useState("");
@@ -76,7 +76,7 @@ export function NewPoll({
         setCustomEmoji([]);
         setEndsAt("");
         toast.success("Poll created");
-        onSuccess?.();
+        onSuccess?.(ev.rawEvent() as NostrEvent);
       }
     } catch (err) {
       console.error(err);

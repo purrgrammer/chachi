@@ -122,6 +122,7 @@ export function FeedEmbed({
   canOpenDetails = false,
   showReactions = true,
   options = {},
+  relays = [],
 }: {
   event: NostrEvent;
   group: Group;
@@ -130,6 +131,7 @@ export function FeedEmbed({
   showReactions?: boolean;
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
+  relays?: string[];
 }) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showReplyDialog, setShowReplyDialog] = useState(false);
@@ -143,9 +145,11 @@ export function FeedEmbed({
 
   function showDetail() {
     const ev = new NDKEvent(ndk, event);
-    const relays = Array.from(new Set([group.relay, ...userRelays]));
+    const nrelays = Array.from(
+      new Set([...relays, `${group.relay}/`, ...userRelays]),
+    );
     // @ts-expect-error for some reason it thinks this function takes a number
-    const nlink = ev.encode(relays);
+    const nlink = ev.encode(nrelays);
     let url = "";
     if (group.id === "_") {
       url = `/${getRelayHost(group.relay)}/e/${nlink}`;
@@ -362,6 +366,7 @@ export function Embed({
   canOpenDetails = true,
   showReactions = true,
   options = {},
+  relays = [],
 }: {
   event: NostrEvent;
   group: Group;
@@ -370,6 +375,7 @@ export function Embed({
   showReactions?: boolean;
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
+  relays?: string[];
 }) {
   const ndk = useNDK();
   const userRelays = useRelays();
@@ -380,9 +386,11 @@ export function Embed({
 
   function showDetail() {
     const ev = new NDKEvent(ndk, event);
-    const relays = Array.from(new Set([group.relay, ...userRelays]));
+    const nrelays = Array.from(
+      new Set([...relays, `${group.relay}/`, ...userRelays]),
+    );
     // @ts-expect-error for some reason it thinks this function takes a number
-    const nlink = ev.encode(relays);
+    const nlink = ev.encode(nrelays);
     let url = "";
     if (group.id === "_") {
       url = `/${getRelayHost(group.relay)}/e/${nlink}`;
@@ -444,7 +452,6 @@ export function EventDetail({
   relays?: string[];
 }) {
   // todo: 1111 comments, reposts, bookmarks, etc
-  console.log("RELAYS", relays);
   const { events: comments } = useReplies(event, group);
   const hasContent = eventDetails[event.kind]?.content;
 
@@ -470,6 +477,7 @@ md:w-[calc(100vw-16rem)]
             image: "w-full w-96 mx-auto",
             events: "w-full max-w-96 mx-auto",
           }}
+          relays={relays}
         />
         <Tabs defaultValue={hasContent ? "content" : "replies"}>
           <TabsList className="border-t px-4">
@@ -500,6 +508,7 @@ md:w-[calc(100vw-16rem)]
                   event={comment}
                   group={group}
                   className="rounded-none border-l-none border-t-none border-r-none border-b"
+                  relays={relays}
                 />
               ))}
             </AnimatePresence>

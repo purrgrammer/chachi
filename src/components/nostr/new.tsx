@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { NostrEvent } from "nostr-tools";
+import { NDKEvent } from "@nostr-dev-kit/ndk";
 import {
   Drawer,
   DrawerContent,
@@ -12,13 +15,14 @@ import { NewPoll } from "@/components/nostr/new-poll";
 //import { CreateGroup } from "@/components/nostr/groups/create";
 import { NewPost } from "@/components/new-post";
 import { useCanSign } from "@/lib/account";
-//import { useRelayInfo } from "@/lib/relay";
+import { useNDK } from "@/lib/ndk";
 import { Button } from "@/components/ui/button";
+import { getRelayHost } from "@/lib/relay";
 import type { Group } from "@/lib/types";
 
 interface ContentProps {
   group: Group;
-  onSuccess?: () => void;
+  onSuccess?: (ev: NostrEvent) => void;
   children?: React.ReactNode;
 }
 
@@ -32,8 +36,10 @@ interface ContentType {
 export function New({ group }: { group: Group }) {
   //const { data: relayInfo } = useRelayInfo(group.relay);
   //const supportsNip29 = relayInfo?.supported_nips?.includes(29);
+  const ndk = useNDK();
   const [isOpen, setIsOpen] = useState(false);
   const canSign = useCanSign();
+  const navigate = useNavigate();
   const contentTypes = [
     { icon: "🧵", title: "Post", component: NewPost },
     { icon: "🗳️", title: "Poll", component: NewPoll },
@@ -48,6 +54,18 @@ export function New({ group }: { group: Group }) {
     //  component: supportsNip29 ? CreateGroup : null,
     //},
   ];
+
+  function onSuccess(ev: NostrEvent) {
+    setIsOpen(false);
+    const ndkEvent = new NDKEvent(ndk, ev);
+    // @ts-expect-error for some reason it thinks this function takes a number
+    const nlink = ndkEvent.encode([group.relay]);
+    if (group.id === "_") {
+      navigate(`/${getRelayHost(group.relay)}/e/${nlink}`);
+    } else {
+      navigate(`/${getRelayHost(group.relay)}/${group.id}/e/${nlink}`);
+    }
+  }
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
@@ -69,7 +87,7 @@ export function New({ group }: { group: Group }) {
                   <contentType.component
                     key={contentType.title}
                     group={group}
-                    onSuccess={() => setIsOpen(false)}
+                    onSuccess={onSuccess}
                   >
                     <Button variant="outline" size="huge">
                       <div className="flex flex-col gap-2">

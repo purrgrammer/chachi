@@ -27,6 +27,7 @@ export function NewPost({
   action = "Post",
   title = "New post",
   reply,
+  onSucess,
 }: {
   group: Group;
   kind?: NDKKind;
@@ -34,6 +35,7 @@ export function NewPost({
   action?: string;
   title?: string;
   reply?: NostrEvent;
+  onSucess?: (ev: NostrEvent) => void;
 }) {
   const [showDialog, setShowDialog] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
@@ -57,6 +59,7 @@ export function NewPost({
           ev.tags.push(["emoji", e.name, e.image!]);
         }
         await ev.publish(relaySet);
+        onSucess?.(ev.rawEvent() as NostrEvent);
         setShowDialog(false);
         setMessage("");
         toast.success("Posted");

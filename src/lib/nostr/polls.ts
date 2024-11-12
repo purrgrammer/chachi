@@ -7,8 +7,6 @@ import { POLL_VOTE } from "@/lib/kinds";
 
 export function useVotes(event: NostrEvent): NostrEvent[] {
   const relays = event.tags.filter((t) => t[0] === "relay").map((t) => t[1]);
-  const pollType =
-    event.tags.find((t) => t[0] === "polltype")?.[1] || "singlechoice";
   const endsAt = event.tags.find((t) => t[0] === "endsAt")?.[1];
   const isExpired = endsAt ? Date.now() > Number(endsAt) : false;
   const filter = {
@@ -17,13 +15,12 @@ export function useVotes(event: NostrEvent): NostrEvent[] {
     ...(endsAt ? { until: Number(endsAt) } : {}),
   };
   const { events: votes } = useStream(filter, relays, !isExpired, true);
-  // todo: if multiplechoice, only pick latest per pubkey per option
   return votes
     ? Array.from(
         votes
           .reduce((map, vote) => {
             if (
-              (pollType === "singlechoice" && !map.has(vote.pubkey)) ||
+              !map.has(vote.pubkey) ||
               vote.created_at > map.get(vote.pubkey)!.created_at
             ) {
               map.set(vote.pubkey, vote);

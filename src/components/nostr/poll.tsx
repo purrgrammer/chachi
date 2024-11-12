@@ -49,26 +49,28 @@ function Option({
   const optionVotes = votes.filter((v) =>
     v.tags.find((t) => t[0] === "response" && t[1] === id),
   );
+  // todo: ignore duplicate responses
+  const totalVotes = votes.reduce(
+    (acc, v) => acc + v.tags.filter((t) => t[0] === "response").length,
+    0,
+  );
   const voteCount = optionVotes.length;
-  const percentage = (voteCount / votes.length) * 100;
+  const percentage = (voteCount / totalVotes) * 100;
   const shouldShowBorder = optionVotes.find((v) => v.pubkey === me);
   const shouldShowCheckbox = !isExpired && !iVoted && isMultipleChoice;
   const shouldShowRadioItem = !isExpired && !iVoted && !isMultipleChoice;
 
   function onCheckedChange(checked: boolean) {
-    console.log("CHECKEDCHANGE", checked);
     if (checked) {
-      console.log("SELECT", id);
       onSelected?.(id);
     } else {
-      console.log("DESELECT", id);
       onDeselected?.(id);
     }
   }
 
   return (
     <div
-      className={`flex flex-col gap-2 p-2 border rounded-md ${shouldShowBorder ? "ring-1 ring-primary" : ""}`}
+      className={`flex flex-col gap-2 p-2 border rounded-md min-w-64 ${shouldShowBorder ? "ring-1 ring-primary" : ""}`}
     >
       <div className={`flex flex-row items-center gap-3 w-full p-2`}>
         {shouldShowCheckbox ? (
@@ -120,8 +122,7 @@ export function Poll({
 
   async function onClick() {
     try {
-      const ev = await castVote();
-      console.log("VOTED!", ev);
+      await castVote();
       toast.success("Vote cast");
     } catch (err) {
       console.error(err);
