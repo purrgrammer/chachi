@@ -28,7 +28,7 @@ export const GroupPosts = forwardRef(
         newPost={
           <NewPost group={group}>
             <Button size="sm" variant="outline">
-              <Megaphone /> Say something
+              <Megaphone /> Start a conversation
             </Button>
           </NewPost>
         }
