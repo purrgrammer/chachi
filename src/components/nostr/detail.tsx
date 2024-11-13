@@ -182,6 +182,9 @@ function ShareDialog({
         tags: [["h", group.id, group.relay]],
       } as NostrEvent);
       ev.tag(ndkEvent);
+      for (const e of customEmoji) {
+	ev.tags.push(["emoji", e.name, e.image!]);
+      }
       await ev.publish(NDKRelaySet.fromRelayUrls([group.relay], ndk));
       saveGroupEvent(ev.rawEvent() as NostrEvent, group);
       onClose(false);
