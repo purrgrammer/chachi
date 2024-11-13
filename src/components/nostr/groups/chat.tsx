@@ -166,7 +166,7 @@ export function GroupChat({ group }: { group: Group }) {
   async function deleteEvent(event: NostrEvent) {
     try {
       const ev = new NDKEvent(ndk, {
-        kind: event.pubkey === me ? NDKKind.EventDeletion : (9005 as NDKKind),
+        kind: event.pubkey === me || group.id === "_" ? NDKKind.EventDeletion : (9005 as NDKKind),
         content: "",
       } as NostrEvent);
       ev.tag(new NDKEvent(ndk, event));
