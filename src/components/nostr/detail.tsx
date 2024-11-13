@@ -71,6 +71,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { saveGroupEvent } from "@/lib/messages";
 import type { Group, Emoji as EmojiType } from "@/lib/types";
 
 // preview: basic embed
@@ -182,6 +183,7 @@ function ShareDialog({
       } as NostrEvent);
       ev.tag(ndkEvent);
       await ev.publish(NDKRelaySet.fromRelayUrls([group.relay], ndk));
+      saveGroupEvent(ev.rawEvent() as NostrEvent, group);
       onClose(false);
       toast.success("Shared");
       openGroup();
@@ -265,7 +267,6 @@ function EventMenu({
   function shareIn(group: Group) {
     setShareGroup(group);
     setShowShareDialog(true);
-    console.log("SHARING", event, group);
   }
 
   return (
