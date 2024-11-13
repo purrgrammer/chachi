@@ -130,7 +130,7 @@ function GroupItem({ group }: { group: Group }) {
             <span className="text-xs font-light font-mono">
               {unreadMessages >= 100 ? "99+" : unreadMessages}
             </span>
-          </Badge>
+	  </Badge>
         ) : null}
         <div className="flex flex-col">
           <h3 className="line-clamp-1">

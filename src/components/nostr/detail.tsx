@@ -51,7 +51,7 @@ import { useRelaySet, useRelays } from "@/lib/nostr";
 import { useReplies } from "@/lib/nostr/comments";
 import { useGroupName } from "@/lib/nostr/groups";
 import { useMyGroups, useOpenGroup } from "@/lib/groups";
-import { POLL } from "@/lib/kinds";
+import { POLL, ISSUE } from "@/lib/kinds";
 import {
   Dialog,
   DialogContent,
@@ -134,6 +134,10 @@ const eventDetails: Record<
     preview: Poll,
     detail: Poll,
     content: PollResults,
+  },
+  [ISSUE]: {
+    preview: PostWithReplies,
+    detail: Post,
   },
   //[9735]: {
   //  preview: Zap,

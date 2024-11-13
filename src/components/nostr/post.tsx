@@ -21,7 +21,10 @@ export function Post({
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
 }) {
+  const subject = event.tags.find((t) => t[0] === "subject")?.[1];
   return (
+  <>
+    {subject ? (<h3 className="text-lg font-semibold">{subject}</h3>) : null}
     <RichText
       tags={event.tags}
       group={group}
@@ -31,6 +34,7 @@ export function Post({
     >
       {event.content}
     </RichText>
+    </>
   );
 }
 
@@ -48,8 +52,10 @@ export function PostWithReplies({
   options?: RichTextOptions;
 }) {
   const { events: replies } = useReplies(event, group);
+  const subject = event.tags.find((t) => t[0] === "subject")?.[1];
   return (
     <>
+    {subject ? (<h3 className="text-lg font-semibold">{subject}</h3>) : null}
       <RichText
         tags={event.tags}
         group={group}
