@@ -158,7 +158,7 @@ export function ChatMessage({
 
   const fragments = useRichText(
     content,
-    { emojis: true, urls: true },
+    { images: true, video: true, audio: true, emojis: true, urls: true },
     event.tags,
   );
   const isSingleCustomEmoji =
@@ -185,6 +185,13 @@ export function ChatMessage({
     fragments[0].type === "block" &&
     fragments[0].nodes.length === 1 &&
     fragments[0].nodes[0].type === "audio";
+  const shouldHaveTransparentBackground =
+    (isSingleCustomEmoji ||
+      isOnlyEmojis ||
+      isOnlyImage ||
+      isOnlyVideo ||
+      isOnlyAudio) &&
+    !isReplyingTo;
 
   useEffect(() => {
     if (isFocused && ref.current) {
@@ -305,7 +312,7 @@ export function ChatMessage({
                   }
                 }
               }}
-              className={`relative ${isChain ? "rounded-lg" : isMine ? "rounded-tl-lg rounded-tr-lg rounded-bl-lg" : "rounded-tl-lg rounded-tr-lg rounded-br-lg"} p-1 px-2 w-fit max-w-[18rem] sm:max-w-sm md:max-w-md ${isMine ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"} ${isChain && !isMine ? "ml-10" : ""} ${isOnlyImage || isOnlyVideo || isOnlyAudio ? "bg-transparent p-0" : ""}`}
+              className={`relative ${isChain ? "rounded-lg" : isMine ? "rounded-tl-lg rounded-tr-lg rounded-bl-lg" : "rounded-tl-lg rounded-tr-lg rounded-br-lg"} p-1 px-2 w-fit max-w-[18rem] sm:max-w-sm md:max-w-md ${isMine ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"} ${isChain && !isMine ? "ml-10" : ""} ${shouldHaveTransparentBackground ? "bg-transparent p-0" : ""}`}
             >
               {isFirstInChain ? (
                 <div className="flex flex-row items-center gap-1">
@@ -341,7 +348,7 @@ export function ChatMessage({
                 </div>
               ) : isOnlyEmojis ? (
                 <div className={isMine ? "text-right" : ""}>
-                  <span className="text-5xl">{content}</span>
+                  <span className="text-7xl">{content}</span>
                 </div>
               ) : isSingleCustomEmoji && singleCustomEmoji ? (
                 <div className={isMine ? "flex items-end justify-end" : ""}>
