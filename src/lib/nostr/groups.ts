@@ -12,6 +12,7 @@ import { useNDK } from "@/lib/ndk";
 import { useRelays, useRelaySet, useStream } from "@/lib/nostr";
 import { nip29Relays, isRelayURL } from "@/lib/relay";
 import { useAccount } from "@/lib/account";
+import { useRelayInfo } from "@/lib/relay";
 import type { Group, GroupMembers, GroupMetadata } from "@/lib/types";
 import {
   queryClient,
@@ -423,4 +424,20 @@ export function useDeleteEvent(group: Group) {
     await event.publish(relaySet);
     return event.rawEvent() as NostrEvent;
   };
+}
+
+export function useGroupName(group: Group) {
+  const { id, relay } = group;
+  const { data: metadata } = useGroup({ id, relay });
+  const { data: relayInfo } = useRelayInfo(relay);
+  const isRelayGroup = id === "_";
+  return isRelayGroup ? relayInfo?.name : metadata?.name;
+}
+
+export function useGroupPicture(group: Group) {
+  const { id, relay } = group;
+  const { data: metadata } = useGroup({ id, relay });
+  const { data: relayInfo } = useRelayInfo(relay);
+  const isRelayGroup = id === "_";
+  return isRelayGroup ? relayInfo?.icon : metadata?.picture;
 }

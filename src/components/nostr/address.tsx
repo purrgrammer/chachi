@@ -19,6 +19,6 @@ export function Address({
 }) {
   const { data: event } = useAddress({ pubkey, kind, identifier, relays });
   return event ? (
-    <Embed event={event} group={group} className={className} />
+    <Embed event={event} group={group} className={className} relays={relays} />
   ) : null;
 }

@@ -36,6 +36,7 @@ export const GroupArticles = forwardRef(
                 key={event.id}
                 event={event}
                 group={group}
+                relays={[group.relay]}
                 className="border rounded-sm max-w-lg cursor-pointer hover:bg-secondary/60 text-left"
               />
             ))}

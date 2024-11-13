@@ -94,7 +94,12 @@ export function NewPost({
         </DialogHeader>
         <div className="space-y-0">
           {reply ? (
-            <Embed event={reply} group={group} className="border-b-none" />
+            <Embed
+              event={reply}
+              group={group}
+              className="border-b-none"
+              relays={[group.relay]}
+            />
           ) : null}
           <AutocompleteTextarea
             group={group}

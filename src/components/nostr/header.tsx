@@ -22,7 +22,7 @@ export function Header({
   return (
     <div className="flex flex-row items-center justify-between w-full">
       <div className="flex flex-row items-center gap-2">
-        <Avatar pubkey={author ?? event.pubkey} className="size-8" />
+        <Avatar pubkey={author ?? event.pubkey} className="size-9" />
         <div className="flex flex-col">
           <div className="flex flex-row items-center gap-1.5">
             <span className="font-semibold">
@@ -30,11 +30,11 @@ export function Header({
             </span>
             {icons}
           </div>
+          <span className="text-xs text-muted-foreground">
+            {formatRelativeTime(timestamp ?? 0)}
+          </span>
         </div>
       </div>
-      <span className="text-xs text-muted-foreground">
-        {formatRelativeTime(timestamp ?? 0)}
-      </span>
     </div>
   );
 }

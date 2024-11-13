@@ -54,7 +54,12 @@ const Feed = forwardRef(
                     initial={{ scale: 0.2 }}
                     animate={{ scale: 1 }}
                   >
-                    <FeedEmbed event={event} group={group} canOpenDetails />
+                    <FeedEmbed
+                      event={event}
+                      group={group}
+                      canOpenDetails
+                      relays={[group.relay]}
+                    />
                   </motion.div>
                 ))}
               </div>

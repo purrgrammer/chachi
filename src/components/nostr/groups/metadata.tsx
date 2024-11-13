@@ -1,21 +1,41 @@
-import { NostrEvent } from "nostr-tools";
-import type { Group } from "@/lib/types";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useGroup } from "@/lib/nostr/groups";
+import { useRelayInfo } from "@/lib/relay";
+import { cn } from "@/lib/utils";
+import { Group } from "@/lib/types";
 
-export function GroupMetadata({
-  event,
+export function GroupPicture({
   group,
+  className,
 }: {
-  event: NostrEvent;
   group: Group;
+  className?: string;
 }) {
-  const name = event.tags.find((t) => t[0] === "name")?.[1];
-  const picture = event.tags.find((t) => t[0] === "picture")?.[1];
-  console.log("GROUP SHARED IN ", group);
-
+  const { id, relay } = group;
+  const { data: metadata } = useGroup({ id, relay });
+  const { data: relayInfo } = useRelayInfo(relay);
+  const isRelayGroup = id === "_";
+  const name = isRelayGroup ? relayInfo?.name : metadata?.name;
+  const img = isRelayGroup ? relayInfo?.icon : metadata?.picture;
   return (
-    <div className="flex flex-row gap-2">
-      {picture ? <img src={picture} className="size-6 rounded-full" /> : null}
-      <h1 className="text-lg">{name}</h1>
-    </div>
+    <Avatar className={cn("size-6 rounded-full", className)}>
+      <AvatarImage src={img} className="object-cover" />
+      <AvatarFallback>{name?.at(0) || id.at(0)}</AvatarFallback>
+    </Avatar>
   );
+}
+
+export function GroupName({
+  group,
+  className,
+}: {
+  group: Group;
+  className?: string;
+}) {
+  const { id, relay } = group;
+  const { data: metadata } = useGroup({ id, relay });
+  const { data: relayInfo } = useRelayInfo(relay);
+  const isRelayGroup = id === "_";
+  const name = isRelayGroup ? relayInfo?.name : metadata?.name;
+  return <span className={className}>{name || id.slice(0, 8)}</span>;
 }

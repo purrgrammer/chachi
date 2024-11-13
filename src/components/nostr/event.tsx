@@ -15,6 +15,6 @@ export function Event({
 }) {
   const { data: event } = useEvent({ id, relays });
   return event ? (
-    <Embed event={event} group={group} className={className} />
+    <Embed event={event} group={group} className={className} relays={relays} />
   ) : null;
 }

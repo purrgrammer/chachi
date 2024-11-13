@@ -70,9 +70,9 @@ function Option({
 
   return (
     <div
-      className={`flex flex-col gap-2 p-2 border rounded-md min-w-64 ${shouldShowBorder ? "ring-1 ring-primary" : ""}`}
+      className={`flex flex-col gap-2 p-1 border rounded-md min-w-64 ${shouldShowBorder ? "ring-1 ring-primary" : ""}`}
     >
-      <div className={`flex flex-row items-center gap-3 w-full p-2`}>
+      <div className={`flex flex-row items-center gap-3 w-full p-1`}>
         {shouldShowCheckbox ? (
           <Checkbox id={id} onCheckedChange={onCheckedChange} />
         ) : null}
@@ -85,11 +85,11 @@ function Option({
           </RichText>
         </div>
       </div>
-      {showResult && percentage ? (
-        <div className="flex flex-row gap-3 w-full px-3">
+      {showResult ? (
+        <div className="flex flex-row gap-3 w-full p-1">
           <Progress value={percentage} />
           <span className="font-mono text-xs text-muted-foreground">
-            {percentage.toFixed(2)}%
+            {percentage.toFixed()}%
           </span>
         </div>
       ) : null}

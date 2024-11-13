@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { Maximize, Reply, SmilePlus } from "lucide-react";
+import {
+  Maximize,
+  Reply,
+  SmilePlus,
+  Ellipsis,
+  MessageSquareShare,
+} from "lucide-react";
+import { NDKRelaySet } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { Empty } from "@/components/empty";
 import { useNavigate } from "react-router-dom";
@@ -21,8 +28,9 @@ import {
   TabsTrigger,
 } from "@/components/ui/nav-tabs";
 import { Post, PostWithReplies } from "@/components/nostr/post";
+import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
 import { ArticleSummary, Article } from "@/components/nostr/article";
-import { GroupMetadata } from "@/components/nostr/groups/metadata";
+import { GroupName, GroupPicture } from "@/components/nostr/groups/metadata";
 import { Highlight } from "@/components/nostr/highlight";
 import { EmojiSet } from "@/components/nostr/emoji-set";
 import { Emoji } from "@/components/emoji";
@@ -40,9 +48,30 @@ import { getRelayHost } from "@/lib/relay";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet, useRelays } from "@/lib/nostr";
 import { useReplies } from "@/lib/nostr/comments";
-import type { Group } from "@/lib/types";
+import { useGroupName } from "@/lib/nostr/groups";
+import { useMyGroups, useOpenGroup } from "@/lib/groups";
 import { POLL } from "@/lib/kinds";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import type { Group, Emoji as EmojiType } from "@/lib/types";
 
 // preview: basic embed
 // detail: embed on detail view
@@ -55,7 +84,7 @@ type EventComponent = (props: {
   classNames?: RichTextClassnames;
 }) => JSX.Element;
 
-// todo: events with no header (group metadata, zap?)
+// todo: events with no header or alternative author (group metadata, zap?, stream)
 const eventDetails: Record<
   number,
   {
@@ -82,10 +111,10 @@ const eventDetails: Record<
   },
   //[NDKKind.GroupChat]: {
   //},
-  [NDKKind.GroupMetadata]: {
-    preview: GroupMetadata,
-    detail: GroupMetadata,
-  },
+  //[NDKKind.GroupMetadata]: {
+  //  preview: GroupMetadata,
+  //  detail: GroupMetadata,
+  //},
   [NDKKind.Highlight]: {
     preview: Highlight,
     detail: Highlight,
@@ -114,6 +143,191 @@ const eventDetails: Record<
   //},
 };
 
+function ShareDialog({
+  event,
+  relays,
+  group,
+  open,
+  onOpenChange,
+}: {
+  event: NostrEvent;
+  relays: string[];
+  group: Group;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const ndk = useNDK();
+  const [message, setMessage] = useState("");
+  const [customEmoji, setCustomEmoji] = useState<EmojiType[]>([]);
+  const groupName = useGroupName(group);
+  const openGroup = useOpenGroup(group);
+
+  function onClose(open: boolean) {
+    if (!open) {
+      setMessage("");
+      setCustomEmoji([]);
+    }
+    onOpenChange(open);
+  }
+
+  async function shareEvent() {
+    try {
+      const ndkEvent = new NDKEvent(ndk, event);
+      // @ts-expect-error encode takes relay list but type is wrong
+      const nlink = ndkEvent.encode(relays);
+      const ev = new NDKEvent(ndk, {
+        kind: NDKKind.GroupChat,
+        content: message ? `${message}\nnostr:${nlink}` : `nostr:${nlink}`,
+        tags: [["h", group.id, group.relay]],
+      } as NostrEvent);
+      ev.tag(ndkEvent);
+      await ev.publish(NDKRelaySet.fromRelayUrls([group.relay], ndk));
+      onClose(false);
+      toast.success("Shared");
+      openGroup();
+    } catch (err) {
+      console.error(err);
+      toast.error("Couldn't share post");
+    } finally {
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Share publication</DialogTitle>
+          {groupName ? (
+            <DialogDescription>
+              Share this publication in {groupName}.
+            </DialogDescription>
+          ) : (
+            <DialogDescription>Share this publication</DialogDescription>
+          )}
+        </DialogHeader>
+        <AutocompleteTextarea
+          group={group}
+          message={message}
+          setMessage={setMessage}
+          onCustomEmojisChange={(custom) =>
+            setCustomEmoji([...customEmoji, ...custom])
+          }
+          minRows={3}
+          maxRows={6}
+          submitOnEnter={false}
+          placeholder="Write a message..."
+        />
+        <DialogFooter>
+          <Button className="w-full overflow-x-hidden" onClick={shareEvent}>
+            <MessageSquareShare />
+            Share in <GroupPicture group={group} className="size-4" />{" "}
+            {groupName}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function EventMenu({
+  event,
+  group,
+  relays = [],
+  canOpen,
+}: {
+  event: NostrEvent;
+  group: Group;
+  relays: string[];
+  canOpen?: boolean;
+}) {
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [shareGroup, setShareGroup] = useState<Group>(group);
+  const ndk = useNDK();
+  const navigate = useNavigate();
+  const groups = useMyGroups();
+  const groupName = useGroupName(group);
+  const isGroupEvent =
+    group.id !== "_" && event.tags.find((t) => t[0] === "h")?.[1] === group.id;
+
+  function showDetail() {
+    const ev = new NDKEvent(ndk, event);
+    // @ts-expect-error for some reason it thinks this function takes a number
+    const nlink = ev.encode(relays);
+    let url = "";
+    if (group.id === "_") {
+      url = `/${getRelayHost(group.relay)}/e/${nlink}`;
+    } else {
+      url = `/${getRelayHost(group.relay)}/${group.id}/e/${nlink}`;
+    }
+    navigate(url);
+  }
+
+  function shareIn(group: Group) {
+    setShareGroup(group);
+    setShowShareDialog(true);
+    console.log("SHARING", event, group);
+  }
+
+  return (
+    <>
+      <ShareDialog
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+        event={event}
+        group={shareGroup}
+        relays={relays}
+      />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="smallIcon">
+            <Ellipsis />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56">
+          <DropdownMenuGroup>
+            {canOpen ? (
+              <DropdownMenuItem onClick={showDetail}>
+                <Maximize />
+                <span>Open</span>
+              </DropdownMenuItem>
+            ) : null}
+            {isGroupEvent ? (
+              <DropdownMenuItem onClick={() => shareIn(group)}>
+                <MessageSquareShare />
+                {groupName ? (
+                  <span className="line-clamp-1">
+                    {" "}
+                    Share in {groupName} chat
+                  </span>
+                ) : (
+                  <span className="line-clamp-1">Share in chat</span>
+                )}
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="gap-2">
+                  <MessageSquareShare className="size-4" />
+                  <span>Share in</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    {groups.map((g) => (
+                      <DropdownMenuItem key={g.id} onClick={() => shareIn(g)}>
+                        <GroupPicture group={g} className="size-4" />
+                        <GroupName group={g} />
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+            )}
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
+  );
+}
+
 export function FeedEmbed({
   event,
   group,
@@ -131,33 +345,16 @@ export function FeedEmbed({
   showReactions?: boolean;
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
-  relays?: string[];
+  relays: string[];
 }) {
+  const ndk = useNDK();
+  const userRelays = useRelays();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showReplyDialog, setShowReplyDialog] = useState(false);
   const relaySet = useRelaySet([group.relay]);
-  const ndk = useNDK();
-  const userRelays = useRelays();
-  const navigate = useNavigate();
   const components = eventDetails[event.kind];
   // NIP-31
   const alt = event.tags.find((t) => t[0] === "alt")?.[1];
-
-  function showDetail() {
-    const ev = new NDKEvent(ndk, event);
-    const nrelays = Array.from(
-      new Set([...relays, `${group.relay}/`, ...userRelays]),
-    );
-    // @ts-expect-error for some reason it thinks this function takes a number
-    const nlink = ev.encode(nrelays);
-    let url = "";
-    if (group.id === "_") {
-      url = `/${getRelayHost(group.relay)}/e/${nlink}`;
-    } else {
-      url = `/${getRelayHost(group.relay)}/${group.id}/e/${nlink}`;
-    }
-    navigate(url);
-  }
 
   function openEmojiPicker() {
     setShowEmojiPicker(true);
@@ -173,7 +370,7 @@ export function FeedEmbed({
       const ndkEvent = new NDKEvent(ndk, event);
       const [t, ref] = ndkEvent.tagReference();
       const root = event.tags.find(
-        (t) => t[0] === "E" || t[0] === "A" || t[0] === "i",
+        (t) => t[0] === "E" || t[0] === "A" || t[0] === "I",
       );
       const rootTag = root?.[0] ?? t.toUpperCase();
       const rootKind =
@@ -269,11 +466,12 @@ export function FeedEmbed({
           <ContextMenuTrigger>
             <div className="flex space-between items-center px-3 py-2 gap-3">
               <Header event={event} />
-              {canOpenDetails ? (
-                <Button variant="ghost" size="smallIcon" onClick={showDetail}>
-                  <Maximize />
-                </Button>
-              ) : null}
+              <EventMenu
+                event={event}
+                group={group}
+                relays={relays}
+                canOpen={canOpenDetails}
+              />
             </div>
             <div className="px-4 py-1 pb-2 space-y-3">
               {components?.preview ? (
@@ -334,6 +532,7 @@ export function FeedEmbed({
             showReactions={false}
             event={event}
             group={group}
+            relays={relays}
             className="border-none rounded-b-none max-h-32 overflow-y-auto overflow-x-hidden pretty-scrollbar"
           />
         </EmojiPicker>
@@ -350,6 +549,7 @@ export function FeedEmbed({
             showReactions={false}
             event={event}
             group={group}
+            relays={relays}
             className="border-none rounded-b-none max-h-32 overflow-y-auto overflow-x-hidden pretty-scrollbar"
           />
         </ReplyDialog>
@@ -375,31 +575,12 @@ export function Embed({
   showReactions?: boolean;
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
-  relays?: string[];
+  relays: string[];
 }) {
-  const ndk = useNDK();
   const userRelays = useRelays();
-  const navigate = useNavigate();
   const components = eventDetails[event.kind];
   // NIP-31
   const alt = event.tags.find((t) => t[0] === "alt")?.[1];
-
-  function showDetail() {
-    const ev = new NDKEvent(ndk, event);
-    const nrelays = Array.from(
-      new Set([...relays, `${group.relay}/`, ...userRelays]),
-    );
-    // @ts-expect-error for some reason it thinks this function takes a number
-    const nlink = ev.encode(nrelays);
-    let url = "";
-    if (group.id === "_") {
-      url = `/${getRelayHost(group.relay)}/e/${nlink}`;
-    } else {
-      url = `/${getRelayHost(group.relay)}/${group.id}/e/${nlink}`;
-    }
-    navigate(url);
-  }
-
   return (
     <div
       className={cn(
@@ -409,11 +590,12 @@ export function Embed({
     >
       <div className="flex space-between items-center px-3 py-2 gap-3">
         <Header event={event} />
-        {canOpenDetails ? (
-          <Button variant="ghost" size="smallIcon" onClick={showDetail}>
-            <Maximize />
-          </Button>
-        ) : null}
+        <EventMenu
+          event={event}
+          group={group}
+          relays={relays}
+          canOpen={canOpenDetails}
+        />
       </div>
       <div className="px-4 py-1 pb-2 space-y-3">
         {components?.preview ? (
@@ -449,9 +631,8 @@ export function EventDetail({
 }: {
   event: NostrEvent;
   group: Group;
-  relays?: string[];
+  relays: string[];
 }) {
-  // todo: 1111 comments, reposts, bookmarks, etc
   const { events: comments } = useReplies(event, group);
   const hasContent = eventDetails[event.kind]?.content;
 
