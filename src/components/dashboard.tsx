@@ -51,7 +51,7 @@ function GroupMessages({ group }: { group: Group }) {
             {metadata?.name?.at(0) || group.id.at(0)}
           </AvatarFallback>
         </Avatar>
-        <Badge variant="counter" className="absolute top-0 right-0">
+        <Badge variant="notification" className="absolute top-0 right-0">
           {unread >= 100 ? "99+" : unread}
         </Badge>
       </Button>

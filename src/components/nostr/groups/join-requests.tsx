@@ -80,7 +80,7 @@ export function JoinRequests({ group }: { group: Group }) {
           className="relative"
         >
           <UserRoundPlus className="size-5" />
-          <Badge variant="counter" className="bg-primary absolute top-0 -right-1">
+          <Badge variant="notification" className="absolute top-0 -right-1">
             {requests.length}
           </Badge>
         </Button>
