@@ -1,4 +1,3 @@
-import { useState, useContext } from "react";
 import { useAtomValue } from "jotai";
 import { toast } from "sonner";
 import { NostrEvent } from "nostr-tools";
@@ -9,23 +8,19 @@ import { Button } from "@/components/ui/button";
 import { Group } from "@/lib/types";
 import { useRelays, useRelaySet } from "@/lib/nostr";
 import { useAccount } from "@/lib/account";
-import { NDKContext } from "@/lib/ndk";
+import { useNDK } from "@/lib/ndk";
 
-export function BookmarkGroup({ group }: { group: Group }) {
-  const ndk = useContext(NDKContext);
-  const [isLoading, setIsLoading] = useState(false);
+export function useBookmarkGroup(group: Group) {
+  const ndk = useNDK();
   const groups = useAtomValue(groupsAtom);
-  const groupsContent = useAtomValue(groupsContentAtom);
-  const userRelays = useRelays();
-  const relaySet = useRelaySet(userRelays);
-  const account = useAccount();
   const isBookmarked = groups.find(
     (g) => group.id === g.id && group.relay == g.relay,
   );
-
+  const groupsContent = useAtomValue(groupsContentAtom);
+  const userRelays = useRelays();
+  const relaySet = useRelaySet(userRelays);
   async function bookmarkGroup() {
     try {
-      setIsLoading(true);
       const newGroups = [...groups, group];
       // todo: don't nuke content since 0xchat uses encrypted tags for groups
       const event = new NDKEvent(ndk, {
@@ -38,14 +33,11 @@ export function BookmarkGroup({ group }: { group: Group }) {
     } catch (err) {
       console.error(err);
       toast.error("Error bookmarking group");
-    } finally {
-      setIsLoading(false);
-    }
+    } 
   }
 
   async function unbookmarkGroup() {
     try {
-      setIsLoading(true);
       const newGroups = groups.filter(
         (g) => g.id !== group.id || g.relay !== group.relay,
       );
@@ -59,10 +51,15 @@ export function BookmarkGroup({ group }: { group: Group }) {
     } catch (err) {
       console.error(err);
       toast.error("Error unbookmarking group");
-    } finally {
-      setIsLoading(false);
     }
   }
+
+  return { isBookmarked, bookmarkGroup, unbookmarkGroup};
+}
+
+export function BookmarkGroup({ group }: { group: Group }) {
+  const account = useAccount();
+  const { isBookmarked, bookmarkGroup, unbookmarkGroup } = useBookmarkGroup(group);
 
   if (account?.isReadOnly) {
     return null;
@@ -70,7 +67,6 @@ export function BookmarkGroup({ group }: { group: Group }) {
 
   return isBookmarked ? (
     <Button
-      disabled={isLoading}
       variant="ghost"
       size="icon"
       aria-label="Unbookmark group"
@@ -80,7 +76,6 @@ export function BookmarkGroup({ group }: { group: Group }) {
     </Button>
   ) : (
     <Button
-      disabled={isLoading}
       variant="ghost"
       size="icon"
       aria-label="Bookmark group"

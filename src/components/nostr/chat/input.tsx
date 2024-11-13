@@ -10,6 +10,7 @@ import { NDKContext } from "@/lib/ndk";
 import { cn } from "@/lib/utils";
 import { usePubkey, useCanSign } from "@/lib/account";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
+import { useBookmarkGroup } from "@/components/nostr/groups/bookmark";
 import { useRequestedToJoin, useJoinRequest } from "@/lib/nostr/groups";
 import type { Group, Emoji } from "@/lib/types";
 
@@ -18,6 +19,7 @@ function JoinRequest({ group, pubkey }: { group: Group; pubkey: string }) {
   const { events } = useRequestedToJoin(group, pubkey);
   const joinRequest = useJoinRequest(group);
   const [requested, setRequested] = useState(false);
+  const { isBookmarked, bookmarkGroup } = useBookmarkGroup(group);
 
   useEffect(() => {
     if (events.length > 0) {
@@ -30,6 +32,9 @@ function JoinRequest({ group, pubkey }: { group: Group; pubkey: string }) {
       await joinRequest();
       toast.success("Join request sent");
       setRequested(true);
+      if (!isBookmarked) {
+	await bookmarkGroup();
+      }
     } catch (err) {
       console.error(err);
       toast.error("Failed to send join request");
