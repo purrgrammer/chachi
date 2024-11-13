@@ -31,7 +31,11 @@ import {
 import { Post, PostWithReplies } from "@/components/nostr/post";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
 import { ArticleSummary, Article } from "@/components/nostr/article";
-import { GroupName, GroupPicture } from "@/components/nostr/groups/metadata";
+import {
+  GroupMetadata,
+  GroupName,
+  GroupPicture,
+} from "@/components/nostr/groups/metadata";
 import { Highlight } from "@/components/nostr/highlight";
 import { EmojiSet } from "@/components/nostr/emoji-set";
 import { Emoji } from "@/components/emoji";
@@ -82,6 +86,7 @@ import type { Group, Emoji as EmojiType } from "@/lib/types";
 type EventComponent = (props: {
   event: NostrEvent;
   group: Group;
+  relays: string[];
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
 }) => JSX.Element;
@@ -90,6 +95,7 @@ type EventComponent = (props: {
 const eventDetails: Record<
   number,
   {
+    noHeader?: boolean;
     preview: EventComponent;
     detail: EventComponent;
     content?: EventComponent;
@@ -111,12 +117,11 @@ const eventDetails: Record<
     preview: PostWithReplies,
     detail: Post,
   },
-  //[NDKKind.GroupChat]: {
-  //},
-  //[NDKKind.GroupMetadata]: {
-  //  preview: GroupMetadata,
-  //  detail: GroupMetadata,
-  //},
+  [NDKKind.GroupMetadata]: {
+    noHeader: true,
+    preview: GroupMetadata,
+    detail: GroupMetadata,
+  },
   [NDKKind.Highlight]: {
     preview: Highlight,
     detail: Highlight,
@@ -474,17 +479,27 @@ export function FeedEmbed({
         <ContextMenu>
           <ContextMenuTrigger>
             <div className="flex space-between items-center px-3 py-2 gap-3">
-              <Header event={event} />
-              <EventMenu
-                event={event}
-                group={group}
-                relays={relays}
-                canOpen={canOpenDetails}
-              />
+              {components?.noHeader ? null : (
+                <>
+                  <Header event={event} />
+                  <EventMenu
+                    event={event}
+                    group={group}
+                    relays={relays}
+                    canOpen={canOpenDetails}
+                  />
+                </>
+              )}
             </div>
             <div className="px-4 py-1 pb-2 space-y-3">
               {components?.preview ? (
-                components.preview({ event, group, options, classNames })
+                components.preview({
+                  event,
+                  relays,
+                  group,
+                  options,
+                  classNames,
+                })
               ) : alt ? (
                 <p>{alt}</p>
               ) : (
@@ -598,17 +613,21 @@ export function Embed({
       )}
     >
       <div className="flex space-between items-center px-3 py-2 gap-3">
-        <Header event={event} />
-        <EventMenu
-          event={event}
-          group={group}
-          relays={relays}
-          canOpen={canOpenDetails}
-        />
+        {components?.noHeader ? null : (
+          <>
+            <Header event={event} />
+            <EventMenu
+              event={event}
+              group={group}
+              relays={relays}
+              canOpen={canOpenDetails}
+            />
+          </>
+        )}
       </div>
       <div className="px-4 py-1 pb-2 space-y-3">
         {components?.preview ? (
-          components.preview({ event, group, options, classNames })
+          components.preview({ event, relays, group, options, classNames })
         ) : alt ? (
           <p>{alt}</p>
         ) : (
@@ -682,6 +701,7 @@ md:w-[calc(100vw-16rem)]
               <div className="px-4 py-2">
                 {eventDetails[event.kind]?.content?.({
                   event,
+                  relays,
                   group,
                 })}
               </div>
@@ -692,7 +712,9 @@ md:w-[calc(100vw-16rem)]
               {comments.length === 0 && !eose ? (
                 <Loading className="my-16" />
               ) : null}
-              {comments.length === 0 ? <Empty className="my-16" /> : null}
+              {comments.length === 0 && eose ? (
+                <Empty className="my-16" />
+              ) : null}
               {comments.map((comment) => (
                 // todo: subthreads as chat on click
                 <FeedEmbed
