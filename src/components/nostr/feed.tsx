@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 import { NDKFilter } from "@nostr-dev-kit/ndk";
 import { FeedEmbed } from "@/components/nostr/detail";
 import { Empty } from "@/components/empty";
+import { Loading } from "@/components/loading";
 import { cn } from "@/lib/utils";
 import { useStream } from "@/lib/nostr";
 import type { Group } from "@/lib/types";
@@ -32,19 +33,19 @@ const Feed = forwardRef(
   ) => {
     // todo: loading state
     const { eose, events } = useStream(filter, [group.relay], live, onlyRelays);
-    return eose ? (
-      <AnimatePresence initial={false}>
-        <div
-          className={cn(
-            "flex flex-col items-center w-full overflow-y-auto overflow-x-hidden",
-            className,
-          )}
-          style={{ height: `calc(100vh - 90px)` }}
-          ref={ref}
-        >
-          {events.length === 0 && eose ? (
-            <Empty>{newPost}</Empty>
-          ) : (
+    return (
+      <div
+        className={cn(
+          "flex flex-col items-center w-full overflow-y-auto overflow-x-hidden",
+          className,
+        )}
+        style={{ height: `calc(100vh - 90px)` }}
+        ref={ref}
+      >
+        {events.length === 0 && !eose && <Loading />}
+        {events.length === 0 && eose ? <Empty>{newPost}</Empty> : null}
+        {events.length > 0 && eose ? (
+          <AnimatePresence initial={false}>
             <div className="flex flex-col gap-2 p-2">
               {newPost}
               <div className="flex flex-col gap-1 w-[calc(100vw-2rem)] sm:w-[420px] md:w-[510px]">
@@ -64,10 +65,10 @@ const Feed = forwardRef(
                 ))}
               </div>
             </div>
-          )}
-        </div>
-      </AnimatePresence>
-    ) : null;
+          </AnimatePresence>
+        ) : null}
+      </div>
+    );
   },
 );
 

@@ -11,6 +11,7 @@ import {
 import { NDKRelaySet } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { Empty } from "@/components/empty";
+import { Loading } from "@/components/loading";
 import { useNavigate } from "react-router-dom";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import {
@@ -183,7 +184,7 @@ function ShareDialog({
       } as NostrEvent);
       ev.tag(ndkEvent);
       for (const e of customEmoji) {
-	ev.tags.push(["emoji", e.name, e.image!]);
+        ev.tags.push(["emoji", e.name, e.image!]);
       }
       await ev.publish(NDKRelaySet.fromRelayUrls([group.relay], ndk));
       saveGroupEvent(ev.rawEvent() as NostrEvent, group);
@@ -495,7 +496,7 @@ export function FeedEmbed({
               {showReactions ? (
                 <Reactions
                   event={event}
-                  relays={[group.relay, ...userRelays]}
+                  relays={[group.relay, ...relays, ...userRelays]}
                   kinds={[NDKKind.Zap, NDKKind.Reaction]}
                 />
               ) : null}
@@ -619,7 +620,7 @@ export function Embed({
         {showReactions ? (
           <Reactions
             event={event}
-            relays={[group.relay, ...userRelays]}
+            relays={[group.relay, ...relays, ...userRelays]}
             kinds={[NDKKind.Zap, NDKKind.Reaction]}
           />
         ) : null}
@@ -637,7 +638,7 @@ export function EventDetail({
   group: Group;
   relays: string[];
 }) {
-  const { events: comments } = useReplies(event, group);
+  const { eose, events: comments } = useReplies(event, group);
   const hasContent = eventDetails[event.kind]?.content;
 
   return (
@@ -684,6 +685,9 @@ md:w-[calc(100vw-16rem)]
           ) : null}
           <TabsContent value="replies">
             <AnimatePresence initial={false}>
+              {comments.length === 0 && !eose ? (
+                <Loading className="my-16" />
+              ) : null}
               {comments.length === 0 ? <Empty className="my-16" /> : null}
               {comments.map((comment) => (
                 // todo: subthreads as chat on click
