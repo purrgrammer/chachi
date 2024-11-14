@@ -6,6 +6,7 @@ import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { groupsAtom, groupsContentAtom } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import { Group } from "@/lib/types";
+import { isRelayURL } from "@/lib/relay";
 import { useRelays, useRelaySet } from "@/lib/nostr";
 import { useAccount } from "@/lib/account";
 import { useNDK } from "@/lib/ndk";
@@ -18,7 +19,7 @@ export function useBookmarkGroup(group: Group) {
   );
   const groupsContent = useAtomValue(groupsContentAtom);
   const userRelays = useRelays();
-  const relaySet = useRelaySet(userRelays);
+  const relaySet = useRelaySet(userRelays.filter(r => isRelayURL(r)));
   async function bookmarkGroup() {
     try {
       const newGroups = [...groups, group];
