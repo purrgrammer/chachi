@@ -13,6 +13,7 @@ import { useRelays, useRelaySet, useStream } from "@/lib/nostr";
 import { nip29Relays, isRelayURL } from "@/lib/relay";
 import { useAccount } from "@/lib/account";
 import { useRelayInfo } from "@/lib/relay";
+import { LEAVE_REQUEST } from "@/lib/kinds";
 import type { Group, GroupMembers, GroupMetadata } from "@/lib/types";
 import {
   queryClient,
@@ -368,6 +369,20 @@ export function useJoinRequest(group: Group) {
   return async () => {
     const event = new NDKEvent(ndk, {
       kind: NDKKind.GroupAdminRequestJoin,
+      content: "",
+      tags: [["h", group.id]],
+    } as NostrEvent);
+    await event.publish(relaySet);
+    return event.rawEvent() as NostrEvent;
+  };
+}
+
+export function useLeaveRequest(group: Group) {
+  const ndk = useNDK();
+  const relaySet = useRelaySet([group.relay]);
+  return async () => {
+    const event = new NDKEvent(ndk, {
+      kind: LEAVE_REQUEST,
       content: "",
       tags: [["h", group.id]],
     } as NostrEvent);

@@ -14,11 +14,7 @@ import { groupId } from "@/lib/groups";
 
 type GroupTab = "chat" | "posts" | "polls";
 
-export default function GroupPage({
-  tab = "chat",
-}: {
-  tab?: GroupTab;
-}) {
+export default function GroupPage({ tab = "chat" }: { tab?: GroupTab }) {
   const navigate = useNavigate();
   const { host, id } = useParams();
   const group = {
