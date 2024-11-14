@@ -27,7 +27,7 @@ export default function GroupPage({
   };
 
   function onValueChange(value: string) {
-    if (id === "_") {
+    if (group.id === "_") {
       navigate(value === "chat" ? `/${host}` : `/${value}/${host}`);
     } else {
       navigate(value === "chat" ? `/${host}/${id}` : `/${value}/${host}/${id}`);
