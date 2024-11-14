@@ -10,6 +10,7 @@ chachi is a nostr group chat client. It is designed to be mobile-friendly, bandw
 - [ ] Sync unread counts
 - [ ] Notifications
 - [ ] Direct Messages
+- [ ] Threads
 - [ ] Profiles
 - [ ] PWA
 
@@ -18,9 +19,10 @@ chachi is a nostr group chat client. It is designed to be mobile-friendly, bandw
 - [x] Creation 
 - [x] Edition
 - [x] Join
-- [ ] Join with invite code
-- [ ] Leave
+- [x] Leave
 - [x] Bookmark
+- [ ] Join with invite code
+- [ ] Invite
 
 ### Group administration
 
@@ -33,7 +35,6 @@ chachi is a nostr group chat client. It is designed to be mobile-friendly, bandw
 - [ ] Edit roles
 - [ ] Add admins
 - [ ] Remove admins
-- [ ] Invite codes
 
 ## NIPs
 

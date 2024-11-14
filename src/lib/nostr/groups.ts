@@ -381,13 +381,15 @@ export function useLeaveRequest(group: Group) {
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
   return async () => {
-    const event = new NDKEvent(ndk, {
-      kind: LEAVE_REQUEST,
-      content: "",
-      tags: [["h", group.id]],
-    } as NostrEvent);
-    await event.publish(relaySet);
-    return event.rawEvent() as NostrEvent;
+    if (group.id !== "_") {
+      const event = new NDKEvent(ndk, {
+        kind: LEAVE_REQUEST,
+        content: "",
+        tags: [["h", group.id]],
+      } as NostrEvent);
+      await event.publish(relaySet);
+      return event.rawEvent() as NostrEvent;
+    }
   };
 }
 
