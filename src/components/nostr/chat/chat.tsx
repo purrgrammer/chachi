@@ -40,7 +40,7 @@ import { Zaps, Reactions } from "@/components/nostr/reactions";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useNDK } from "@/lib/ndk";
 import { Avatar } from "@/components/nostr/avatar";
-import { useEvent, useRelaySet, useRelayList } from "@/lib/nostr";
+import { useEvent, useRelaySet } from "@/lib/nostr";
 import { useDeletions } from "@/lib/nostr/chat";
 import { usePubkey } from "@/lib/account";
 import { Emoji as EmojiType, EmojiPicker } from "@/components/emoji-picker";
@@ -135,10 +135,8 @@ export function ChatMessage({
 }) {
   const settings = useSettings();
   const relay = group.relay;
-  const { data: relayList } = useRelayList(event.pubkey);
   const ndk = useNDK();
-  const userRelays = relayList ? relayList : [];
-  const relaySet = useRelaySet(relay ? [relay] : userRelays);
+  const relaySet = useRelaySet([group.relay]);
   const [scrollTo] = useAtom(scrollToAtom);
   const [showMessageActions, setShowMessageActions] = useState(false);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
@@ -378,13 +376,13 @@ export function ChatMessage({
               <div className="space-y-1">
                 <Zaps
                   event={event}
-                  relays={[...(relay ? [relay] : []), ...userRelays]}
+                  relays={[...(relay ? [relay] : [])]}
                   live={true}
                   className="pt-1"
                 />
                 <Reactions
                   event={event}
-                  relays={[...(relay ? [relay] : []), ...userRelays]}
+                  relays={[...(relay ? [relay] : [])]}
                   live={isInView}
                 />
               </div>
