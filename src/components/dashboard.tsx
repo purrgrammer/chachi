@@ -66,7 +66,9 @@ function GroupMessages({ group }: { group: Group }) {
           </Avatar>
           <h3 className="text-lg">{name}</h3>
           <div className="flex flex-col items-center gap-1 text-xs">
-            <div className="flex flex-row gap-1">
+            <div
+              className={`flex flex-row gap-1 ${unread === 0 ? "opacity-50" : ""}`}
+            >
               <span className="font-mono">
                 {unread >= 100 ? "99+" : unread}
               </span>
