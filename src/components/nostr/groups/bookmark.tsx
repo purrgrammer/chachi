@@ -167,7 +167,7 @@ export function BookmarkGroup({ group }: { group: Group }) {
               {isBookmarked ? "Unbookmark" : "Bookmark"}
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="text-destructive hover:text-destructive"
+              className="text-destructive dark:bg-destructive dark:text-destructive-foreground"
               onClick={() => setConfirmLeave(true)}
             >
               <DoorOpen className="size-5" />
