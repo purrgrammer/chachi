@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { GroupHeader } from "@/components/nostr/groups/header";
 import { GroupChat } from "@/components/nostr/groups/chat";
 import { GroupPosts } from "@/components/nostr/posts/feed";
@@ -12,21 +12,33 @@ import {
 } from "@/components/ui/nav-tabs";
 import { groupId } from "@/lib/groups";
 
+type GroupTab = "chat" | "posts" | "polls";
+
 export default function GroupPage({
-  page,
+  tab = "chat",
 }: {
-  page?: "chat" | "posts" | "articles";
+  tab?: GroupTab;
 }) {
+  const navigate = useNavigate();
   const { host, id } = useParams();
   const group = {
     id: id || "_",
     relay: `wss://${host}`,
   };
+
+  function onValueChange(value: string) {
+    if (id === "_") {
+      navigate(value === "chat" ? `/${host}` : `/${value}/${host}`);
+    } else {
+      navigate(value === "chat" ? `/${host}/${id}` : `/${value}/${host}/${id}`);
+    }
+  }
+
   // todo: error handling
   return (
     <>
       <GroupHeader group={group} />
-      <Tabs defaultValue="chat" value={page}>
+      <Tabs value={tab} onValueChange={onValueChange}>
         <TabsList>
           <TabsTrigger value="chat">Chat</TabsTrigger>
           {id !== "_" ? (

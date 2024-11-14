@@ -33,12 +33,28 @@ const router = createBrowserRouter([
         element: <Group />,
       },
       {
+        path: "/posts/:host",
+        element: <Group tab="posts" />,
+      },
+      {
+        path: "/polls/:host",
+        element: <Group tab="polls" />,
+      },
+      {
         path: ":host/e/:nlink",
         element: <Event />,
       },
       {
         path: ":host/:id",
         element: <Group />,
+      },
+      {
+        path: "/posts/:host/:id",
+        element: <Group tab="posts" />,
+      },
+      {
+        path: "/polls/:host/:id",
+        element: <Group tab="polls" />,
       },
       {
         path: ":host/:id/e/:nlink",
