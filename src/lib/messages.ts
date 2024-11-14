@@ -11,6 +11,7 @@ import { NostrEvent } from "nostr-tools";
 import { groupsAtom } from "@/app/store";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet } from "@/lib/nostr";
+import { usePubkey } from "@/lib/account";
 import { groupId } from "@/lib/groups";
 import {
   getGroupChat,
@@ -18,6 +19,7 @@ import {
   getGroupsSortedByLastMessage,
   getLastSeen,
   getUnreadMessages,
+  getUnreadMentions,
   getGroupChatParticipants,
 } from "@/lib/messages/queries";
 import { Group } from "@/lib/types";
@@ -124,6 +126,14 @@ export function useUnreads(groups: Group[]) {
 
 export function useUnreadMessages(group: Group) {
   return useLiveQuery(() => getUnreadMessages(group), [group.id, group.relay]);
+}
+
+export function useUnreadMentions(group: Group) {
+  const me = usePubkey();
+  return useLiveQuery(async () => {
+    if (me) return getUnreadMentions(group, me);
+    return [];
+  }, [group.id, group.relay, me ? me : "anon"]);
 }
 
 // todo: sync last seen over nostr

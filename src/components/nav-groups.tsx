@@ -12,7 +12,11 @@ import { useMyGroups } from "@/lib/groups";
 import { useGroup } from "@/lib/nostr/groups";
 import { useRelayInfo, getRelayHost } from "@/lib/relay";
 import { useNavigate } from "@/lib/navigation";
-import { useLastMessage, useUnreadMessages } from "@/lib/messages";
+import {
+  useLastMessage,
+  useUnreadMessages,
+  //useUnreadMentions,
+} from "@/lib/messages";
 import type { Group } from "@/lib/types";
 
 function RelayItem({ group }: { group: Group }) {
@@ -20,6 +24,7 @@ function RelayItem({ group }: { group: Group }) {
   const { data: relayInfo } = useRelayInfo(group.relay);
   const lastMessage = useLastMessage(group);
   const unreadMessages = useUnreadMessages(group);
+  //const unreadMentions = useUnreadMentions(group);
   const isActive = host === getRelayHost(group.relay);
   const navigate = useNavigate();
 
@@ -43,16 +48,17 @@ function RelayItem({ group }: { group: Group }) {
             </AvatarFallback>
           </Avatar>
         </div>
-        {unreadMessages && unreadMessages > 0 ? (
-          <Badge
-            variant="counter"
-            className="absolute top-3 right-2 text-xs group-has-[[data-collapsible=icon]]/sidebar-wrapper:top-0 group-has-[[data-collapsible=icon]]/sidebar-wrapper:right-0"
-          >
-            <span className="text-xs font-light font-mono">
-              {unreadMessages >= 100 ? "99+" : unreadMessages}
-            </span>
-          </Badge>
-        ) : null}
+        <div
+          className={`flex flex-row gap-1 absolute top-3 right-2 group-has-[[data-collapsible=icon]]/sidebar-wrapper:top-0 group-has-[[data-collapsible=icon]]/sidebar-wrapper:right-0`}
+        >
+          {unreadMessages && unreadMessages > 0 ? (
+            <Badge variant="counter">
+              <span className="text-xs font-light font-mono">
+                {unreadMessages >= 100 ? "99+" : unreadMessages}
+              </span>
+            </Badge>
+          ) : null}
+        </div>
         <div className="flex flex-col">
           <h3 className="line-clamp-1">
             {relayInfo?.name || group.id.slice(0, 8)}
@@ -100,6 +106,7 @@ function GroupItem({ group }: { group: Group }) {
   const { host, id } = useParams();
   const { data: metadata } = useGroup(group);
   const unreadMessages = useUnreadMessages(group);
+  //const unreadMentions = useUnreadMentions(group);
   const isActive = host === getRelayHost(group.relay) && id === group.id;
 
   function openGroup() {
@@ -122,16 +129,15 @@ function GroupItem({ group }: { group: Group }) {
             </AvatarFallback>
           </Avatar>
         </div>
-        {unreadMessages && unreadMessages > 0 ? (
-          <Badge
-            variant="counter"
-            className="absolute top-3 right-2 text-xs group-has-[[data-collapsible=icon]]/sidebar-wrapper:top-0 group-has-[[data-collapsible=icon]]/sidebar-wrapper:right-0"
-          >
-            <span className="text-xs font-light font-mono">
-              {unreadMessages >= 100 ? "99+" : unreadMessages}
-            </span>
-          </Badge>
-        ) : null}
+        <div className="flex flex-row gap-1 absolute top-3 right-2 group-has-[[data-collapsible=icon]]/sidebar-wrapper:top-0 group-has-[[data-collapsible=icon]]/sidebar-wrapper:right-0">
+          {unreadMessages && unreadMessages > 0 ? (
+            <Badge variant="counter">
+              <span className="text-xs font-light font-mono">
+                {unreadMessages >= 100 ? "99+" : unreadMessages}
+              </span>
+            </Badge>
+          ) : null}
+        </div>
         <div className="flex flex-col">
           <h3 className="line-clamp-1">
             {metadata?.name || group.id.slice(0, 8)}

@@ -33,7 +33,7 @@ function JoinRequest({ group, pubkey }: { group: Group; pubkey: string }) {
       toast.success("Join request sent");
       setRequested(true);
       if (!isBookmarked) {
-	await bookmarkGroup();
+        await bookmarkGroup();
       }
     } catch (err) {
       console.error(err);

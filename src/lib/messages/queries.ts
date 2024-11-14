@@ -94,6 +94,28 @@ export function getLastSeen(group: Group, kind = NDKKind.GroupChat) {
     .first();
 }
 
+export async function getGroupMentionsAfter(
+  group: Group,
+  pubkey: string,
+  timestamp = 0,
+) {
+  const id = groupId(group);
+  return db.events
+    .where("[group+kind]")
+    .equals([id, NDKKind.GroupChat])
+    .and(
+      (ev) =>
+        ev.created_at > timestamp &&
+        ev.tags.some((t) => t[0] === "p" && t[1] === pubkey),
+    )
+    .count();
+}
+
+export async function getUnreadMentions(group: Group, pubkey: string) {
+  const lastSeen = await getLastSeen(group);
+  return getGroupMentionsAfter(group, pubkey, lastSeen?.created_at || 0);
+}
+
 export async function getUnreadMessages(group: Group) {
   const lastSeen = await getLastSeen(group);
   return getGroupMessagesAfter(group, lastSeen?.created_at || 0);

@@ -4,12 +4,22 @@ import { Search, X, Flame, Activity, Sparkles } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { AvatarList } from "@/components/nostr/avatar-list";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useSortedGroups, useUnreadMessages, useUnreads } from "@/lib/messages";
+import {
+  useSortedGroups,
+  useUnreadMessages,
+  useUnreadMentions,
+  useUnreads,
+} from "@/lib/messages";
 import { Input } from "@/components/ui/input";
 import { Highlight } from "@/components/highlight";
-import { useGroup, useAllGroups, useCloseGroups } from "@/lib/nostr/groups";
+import {
+  useGroup,
+  useAllGroups,
+  useCloseGroups,
+  useGroupName,
+  useGroupPicture,
+} from "@/lib/nostr/groups";
 import { groupId, useMyGroups, useOpenGroup } from "@/lib/groups";
 import { nip29Relays, getRelayHost, useRelayInfo } from "@/lib/relay";
 import { CreateGroup } from "@/components/nostr/groups/create";
@@ -35,25 +45,43 @@ function Heading({ icon, text }: { icon: React.ReactNode; text: string }) {
 // Activity
 
 function GroupMessages({ group }: { group: Group }) {
-  const { data: metadata } = useGroup(group);
-  const { data: relayInfo } = useRelayInfo(group.relay);
   const unread = useUnreadMessages(group);
-  const isRelayGroup = group.id === "_";
-  const img = isRelayGroup ? relayInfo?.icon : metadata?.picture;
+  const unreadMentions = useUnreadMentions(group);
+  const mentions = (unreadMentions || 0) as number;
+  const name = useGroupName(group);
+  const img = useGroupPicture(group);
   const openGroup = useOpenGroup(group);
 
   return unread && unread > 0 ? (
     <Reorder.Item dragListener={false} key={groupId(group)} value={group}>
-      <Button variant="ghost" className="relative size-14" onClick={openGroup}>
-        <Avatar className="size-12 rounded-full">
-          <AvatarImage src={img} className="object-cover" />
-          <AvatarFallback>
-            {metadata?.name?.at(0) || group.id.at(0)}
-          </AvatarFallback>
-        </Avatar>
-        <Badge variant="notification" className="absolute top-0 right-0">
-          {unread >= 100 ? "99+" : unread}
-        </Badge>
+      <Button
+        variant="ghost"
+        className="relative h-fit min-w-32 w-fit"
+        onClick={openGroup}
+      >
+        <div className="flex flex-col items-center gap-1">
+          <Avatar className="size-12 rounded-full">
+            <AvatarImage src={img} className="object-cover" />
+            <AvatarFallback>{name?.at(0) || group.id.at(0)}</AvatarFallback>
+          </Avatar>
+          <h3 className="text-lg">{name}</h3>
+          <div className="flex flex-col items-center gap-1 text-xs">
+            <div className="flex flex-row gap-1">
+              <span className="font-mono">
+                {unread >= 100 ? "99+" : unread}
+              </span>
+              <span className="text-muted-foreground">unread</span>
+            </div>
+            <div
+              className={`flex flex-row gap-1 ${mentions === 0 ? "opacity-50" : ""}`}
+            >
+              <span className="font-mono">
+                {mentions >= 100 ? "99+" : mentions}
+              </span>
+              <span className="text-muted-foreground">mentions</span>
+            </div>
+          </div>
+        </div>
       </Button>
     </Reorder.Item>
   ) : null;

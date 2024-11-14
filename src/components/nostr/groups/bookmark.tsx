@@ -33,7 +33,7 @@ export function useBookmarkGroup(group: Group) {
     } catch (err) {
       console.error(err);
       toast.error("Error bookmarking group");
-    } 
+    }
   }
 
   async function unbookmarkGroup() {
@@ -54,12 +54,13 @@ export function useBookmarkGroup(group: Group) {
     }
   }
 
-  return { isBookmarked, bookmarkGroup, unbookmarkGroup};
+  return { isBookmarked, bookmarkGroup, unbookmarkGroup };
 }
 
 export function BookmarkGroup({ group }: { group: Group }) {
   const account = useAccount();
-  const { isBookmarked, bookmarkGroup, unbookmarkGroup } = useBookmarkGroup(group);
+  const { isBookmarked, bookmarkGroup, unbookmarkGroup } =
+    useBookmarkGroup(group);
 
   if (account?.isReadOnly) {
     return null;
