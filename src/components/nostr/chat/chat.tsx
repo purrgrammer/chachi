@@ -189,7 +189,7 @@ export function ChatMessage({
       isOnlyImage ||
       isOnlyVideo ||
       isOnlyAudio) &&
-    !isReplyingTo;
+    !isReplyingTo && !isDeleted;
 
   useEffect(() => {
     if (isFocused && ref.current) {
