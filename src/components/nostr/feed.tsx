@@ -12,6 +12,7 @@ import type { Group } from "@/lib/types";
 
 interface FeedProps {
   group: Group;
+  outboxRelays: string[];
   filter: NDKFilter | NDKFilter[];
   live?: boolean;
   onlyRelays?: boolean;
@@ -28,19 +29,22 @@ const Feed = forwardRef(
       onlyRelays = false,
       newPost,
       className,
+      outboxRelays = [],
+      ...props
     }: FeedProps,
     ref: ForwardedRef<HTMLDivElement | null>,
   ) => {
     // todo: loading state
-    const { eose, events } = useStream(filter, [group.relay], live, onlyRelays);
+    const relays = outboxRelays.length > 0 ? outboxRelays : [group.relay];
+    const { eose, events } = useStream(filter, relays, live, onlyRelays);
     return (
       <div
         className={cn(
           "flex flex-col items-center w-full overflow-y-auto overflow-x-hidden",
           className,
         )}
-        style={{ height: `calc(100vh - 90px)` }}
         ref={ref}
+        {...props}
       >
         {events.length === 0 && !eose && <Loading />}
         {events.length === 0 && eose ? <Empty>{newPost}</Empty> : null}
@@ -59,7 +63,7 @@ const Feed = forwardRef(
                       event={event}
                       group={group}
                       canOpenDetails
-                      relays={[group.relay]}
+                      relays={relays}
                     />
                   </motion.div>
                 ))}

@@ -36,6 +36,7 @@ import {
   GroupName,
   GroupPicture,
 } from "@/components/nostr/groups/metadata";
+import { Repo, Issues } from "@/components/nostr/repo";
 import { Highlight } from "@/components/nostr/highlight";
 import { EmojiSet } from "@/components/nostr/emoji-set";
 import { Emoji } from "@/components/emoji";
@@ -55,7 +56,7 @@ import { useRelaySet, useRelays } from "@/lib/nostr";
 import { useReplies } from "@/lib/nostr/comments";
 import { useGroupName } from "@/lib/nostr/groups";
 import { useMyGroups, useOpenGroup } from "@/lib/groups";
-import { POLL, ISSUE } from "@/lib/kinds";
+import { POLL, REPO, ISSUE } from "@/lib/kinds";
 import {
   Dialog,
   DialogContent,
@@ -139,6 +140,11 @@ const eventDetails: Record<
     preview: Poll,
     detail: Poll,
     content: PollResults,
+  },
+  [REPO]: {
+    preview: Repo,
+    detail: Repo,
+    content: Issues,
   },
   [ISSUE]: {
     preview: PostWithReplies,
@@ -729,7 +735,7 @@ md:w-[calc(100vw-16rem)]
             </AnimatePresence>
           </TabsContent>
           <TabsContent value="details">
-            <div className="px-2 py-3">
+            <div className="flex flex-col gap-3 px-4 py-3">
               <pre className="text-xs whitespace-pre-wrap break-words border rounded-sm p-2">
                 {JSON.stringify(event, null, 2)}
               </pre>

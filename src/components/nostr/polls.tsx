@@ -19,6 +19,7 @@ export const GroupPolls = forwardRef(
     };
     return (
       <Feed
+        style={{ height: `calc(100vh - 130px)` }}
         filter={filter}
         ref={ref}
         className={className}
