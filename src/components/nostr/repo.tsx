@@ -20,7 +20,9 @@ export function Repo({ event }: { event: NostrEvent; group: Group }) {
         <span className="text-6xl">📁</span>
         <h2 className="text-xl font-semibold line-clamp-1">{name}</h2>
         {description ? (
-          <p className="text-sm text-muted-foreground text-center">{description}</p>
+          <p className="text-sm text-muted-foreground text-center">
+            {description}
+          </p>
         ) : null}
       </div>
       <div className="flex flex-col items-center justify-center gap-2">
@@ -56,13 +58,23 @@ export function Repo({ event }: { event: NostrEvent; group: Group }) {
   );
 }
 
-export function Issues({ event, group, relays }: { event: NostrEvent; group: Group; relays: string[]}) {
+export function Issues({
+  event,
+  group,
+  relays,
+}: {
+  event: NostrEvent;
+  group: Group;
+  relays: string[];
+}) {
   const identifier = event.tags.find((t) => t[0] === "d")?.[1] || "";
   const repoRelays = event.tags.find((t) => t[0] === "relays")?.slice(1);
-  const maintainers = event.tags.find((t) => t[0] === "maintainers")?.slice(1) || [event.pubkey];
+  const maintainers = event.tags
+    .find((t) => t[0] === "maintainers")
+    ?.slice(1) || [event.pubkey];
   const filter = {
     kinds: [ISSUE],
-    "#a": maintainers.map(p => `${REPO}:${p}:${identifier}`),
+    "#a": maintainers.map((p) => `${REPO}:${p}:${identifier}`),
   };
   // todo: new post
   return (
@@ -71,7 +83,9 @@ export function Issues({ event, group, relays }: { event: NostrEvent; group: Gro
         className="w-full"
         filter={filter}
         group={group}
-        outboxRelays={repoRelays?.length && repoRelays?.length > 0 ? repoRelays : relays}
+        outboxRelays={
+          repoRelays?.length && repoRelays?.length > 0 ? repoRelays : relays
+        }
         live={true}
         onlyRelays={group.id === "_"}
       />

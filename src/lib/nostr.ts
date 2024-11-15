@@ -34,7 +34,7 @@ export function useRelaySet(relays: string[]): NDKRelaySet | undefined {
 export function useEvent({ id, relays }: { id?: string; relays: string[] }) {
   const ndk = useNDK();
   // fixme: fallback to big public relays like nostr.band when not found
-  const relaySet = useRelaySet(relays)
+  const relaySet = useRelaySet(relays);
 
   return useQuery({
     queryKey: [EVENT, id ? id : "empty"],
