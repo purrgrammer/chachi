@@ -56,12 +56,13 @@ export function Repo({ event }: { event: NostrEvent; group: Group }) {
   );
 }
 
-export function Issues({ event, group }: { event: NostrEvent; group: Group }) {
+export function Issues({ event, group, relays }: { event: NostrEvent; group: Group; relays: string[]}) {
   const identifier = event.tags.find((t) => t[0] === "d")?.[1] || "";
-  const relays = event.tags.find((t) => t[0] === "relays")?.slice(1);
+  const repoRelays = event.tags.find((t) => t[0] === "relays")?.slice(1);
+  const maintainers = event.tags.find((t) => t[0] === "maintainers")?.slice(1) || [event.pubkey];
   const filter = {
     kinds: [ISSUE],
-    "#a": [`${REPO}:${event.pubkey}:${identifier}`],
+    "#a": maintainers.map(p => `${REPO}:${p}:${identifier}`),
   };
   // todo: new post
   return (
@@ -70,7 +71,7 @@ export function Issues({ event, group }: { event: NostrEvent; group: Group }) {
         className="w-full"
         filter={filter}
         group={group}
-        outboxRelays={relays || [group.relay]}
+        outboxRelays={repoRelays?.length && repoRelays?.length > 0 ? repoRelays : relays}
         live={true}
         onlyRelays={group.id === "_"}
       />
