@@ -26,6 +26,7 @@ export const GroupPolls = forwardRef(
         group={group}
         live={true}
         onlyRelays={group.id === "_"}
+        outboxRelays={[group.relay]}
         newPost={
           <NewPoll group={group}>
             <Button size="sm" variant="outline">

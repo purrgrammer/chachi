@@ -15,7 +15,7 @@
     "@emoji-mart/react": "^1.1.1",
     "@hookform/resolvers": "^3.9.0",
     "@nostr-dev-kit/ndk": "^2.10.5",
-    "@nostr-dev-kit/ndk-cache-dexie": "^2.5.2",
+    "@nostr-dev-kit/ndk-cache-dexie": "^2.5.6",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-checkbox": "^1.1.2",

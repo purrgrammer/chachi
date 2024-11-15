@@ -1,4 +1,4 @@
-import { Code, Link, Bug } from "lucide-react";
+import { Code, Link } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 //import { Button } from "@/components/ui/button";
 import { NameList } from "@/components/nostr/name-list";
@@ -7,12 +7,13 @@ import { InputCopy } from "@/components/ui/input-copy";
 import { REPO, ISSUE } from "@/lib/kinds";
 import type { Group } from "@/lib/types";
 
-export function Repo({ event, group }: { event: NostrEvent; group: Group }) {
+export function Repo({ event }: { event: NostrEvent; group: Group }) {
   const name = event.tags.find((t) => t[0] === "name")?.[1];
   const description = event.tags.find((t) => t[0] === "description")?.[1];
   const clone = event.tags.find((t) => t[0] === "clone")?.[1];
   const web = event.tags.find((t) => t[0] === "web")?.[1];
-  const maintainers = event.tags.find((t) => t[0] === "maintainers")?.slice(1);
+  const maintainers =
+    event.tags.find((t) => t[0] === "maintainers")?.slice(1) || [];
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-4 px-8">
       <div className="flex flex-col items-center justify-center gap-2">
@@ -43,12 +44,14 @@ export function Repo({ event, group }: { event: NostrEvent; group: Group }) {
           </div>
         ) : null}
       </div>
-      <NameList
-        pubkeys={maintainers}
-        className="gap-1"
-        avatarClassName="size-6"
-        textClassName="font-normal text-sm"
-      />
+      {maintainers?.length > 0 ? (
+        <NameList
+          pubkeys={maintainers as string[]}
+          className="gap-1"
+          avatarClassName="size-6"
+          textClassName="font-normal text-sm"
+        />
+      ) : null}
     </div>
   );
 }
@@ -67,7 +70,7 @@ export function Issues({ event, group }: { event: NostrEvent; group: Group }) {
         className="w-full"
         filter={filter}
         group={group}
-        outboxRelays={relays}
+        outboxRelays={relays || [group.relay]}
         live={true}
         onlyRelays={group.id === "_"}
       />

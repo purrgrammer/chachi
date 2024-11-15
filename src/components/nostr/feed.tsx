@@ -10,13 +10,13 @@ import { cn } from "@/lib/utils";
 import { useStream } from "@/lib/nostr";
 import type { Group } from "@/lib/types";
 
-interface FeedProps {
+interface FeedProps extends React.HTMLAttributes<HTMLDivElement> {
   group: Group;
   outboxRelays: string[];
   filter: NDKFilter | NDKFilter[];
   live?: boolean;
   onlyRelays?: boolean;
-  newPost: ReactNode;
+  newPost?: ReactNode;
   className?: string;
 }
 
