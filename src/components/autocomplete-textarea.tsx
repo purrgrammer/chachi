@@ -125,7 +125,6 @@ export function AutocompleteTextarea({
 
   const profiles = useProfiles(members ?? []);
   const profileList = profiles.map((p) => p.data).filter(Boolean);
-  console.log("MEMBERS.PROFILES", profileList);
   const autocompleteProfiles =
     autocompleteTerm && isAutocompleting
       ? profileList
