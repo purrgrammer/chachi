@@ -20,7 +20,7 @@ export function Repo({ event }: { event: NostrEvent; group: Group }) {
         <span className="text-6xl">📁</span>
         <h2 className="text-xl font-semibold line-clamp-1">{name}</h2>
         {description ? (
-          <p className="text-sm text-muted-foreground">{description}</p>
+          <p className="text-sm text-muted-foreground text-center">{description}</p>
         ) : null}
       </div>
       <div className="flex flex-col items-center justify-center gap-2">
