@@ -10,7 +10,7 @@ export const nip29Relays = [
 ];
 
 const relayUrlRegex =
-  /((?:ws|wss?):\/?\/?(?:[\w+?.\w+])+(?:[\p{L}\p{N}~!@#$%^&*()_\-=+\\/?.:;',]*)?(?:[-a-z0-9+&@#/%=~()_|]))/iu;
+  /^((?:ws|wss?):\/?\/?(?:[\w+?.\w+])+(?:[\p{L}\p{N}~!@#$%^&*()_\-=+\\/?.:;',]*)?(?:[-a-z0-9+&@#/%=~()_|]))$/iu;
 
 export function isRelayURL(content: string) {
   return relayUrlRegex.test(content);
