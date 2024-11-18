@@ -15,6 +15,7 @@ import { useNDK } from "@/lib/ndk";
 import { useRelaySet } from "@/lib/nostr";
 import { usePubkey, useCanSign } from "@/lib/account";
 import type { Group } from "@/lib/types";
+import { useRelayInfo } from "@/lib/relay";
 import { useGroupchat, useSaveLastSeen, useNewMessage } from "@/lib/messages";
 
 //export function ChatZap({
@@ -120,6 +121,7 @@ export const GroupChat = forwardRef(
     // todo: load older messages when scrolling up
     const members: string[] = useMembers(group);
     const { data: adminsList } = useGroupAdminsList(group);
+    const { data: relayInfo } = useRelayInfo(group.relay);
     const admins = adminsList || [];
     const events = useGroupchat(group);
     const [replyingTo, setReplyingTo] = useState<NostrEvent | null>(null);
@@ -227,7 +229,9 @@ export const GroupChat = forwardRef(
                 ]
               : [["h", group.id]]
           }
-          showJoinRequest={!canIPoast}
+          showJoinRequest={
+            !canIPoast && relayInfo?.supported_nips?.includes(29)
+          }
         >
           <New group={group} />
         </ChatInput>
