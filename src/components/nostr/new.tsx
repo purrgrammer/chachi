@@ -69,7 +69,7 @@ export function New({ group }: { group: Group }) {
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
-      <DrawerTrigger>
+      <DrawerTrigger asChild>
         <Button disabled={!canSign} variant="action" size="icon">
           <DiamondPlus />
         </Button>

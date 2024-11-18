@@ -1,5 +1,5 @@
 //import { Bitcoin, Coins } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, forwardRef, ForwardedRef } from "react";
 import { toast } from "sonner";
 import { NostrEvent, UnsignedEvent } from "nostr-tools";
 import { NDKKind, NDKEvent } from "@nostr-dev-kit/ndk";
@@ -115,121 +115,124 @@ function UserActivity({
   ) : null;
 }
 
-export function GroupChat({ group }: { group: Group }) {
-  // todo: load older messages when scrolling up
-  const members: string[] = useMembers(group);
-  const { data: adminsList } = useGroupAdminsList(group);
-  const admins = adminsList || [];
-  const events = useGroupchat(group);
-  const [replyingTo, setReplyingTo] = useState<NostrEvent | null>(null);
-  const previousMessageIds = events.slice(-3).map((e) => e.id.slice(0, 8));
-  // heights
-  const [inputHeight, setInputHeight] = useState(34);
-  const headerHeight = 96;
-  const nonChatHeight = inputHeight + headerHeight;
-  const me = usePubkey();
-  const canSign = useCanSign();
-  const isAdmin = canSign && me && admins?.includes(me);
-  const ndk = useNDK();
-  const relaySet = useRelaySet([group.relay]);
-  const [sentMessage, setSentMessage] = useState<NostrEvent | undefined>(
-    undefined,
-  );
-  const newMessage = useNewMessage(group);
-  const saveLastSeen = useSaveLastSeen(group);
-  const isRelayGroup = group.id === "_";
-  const canIPoast =
-    me &&
-    canSign &&
-    (isRelayGroup ||
-      members?.includes(me) ||
-      admins?.includes(me) ||
-      events.find(
-        (e) =>
-          e.kind === NDKKind.GroupAdminAddUser &&
-          e.tags.find((t) => t[0] === "p" && t[1] === me),
-      ));
+export const GroupChat = forwardRef(
+  ({ group }: { group: Group }, ref: ForwardedRef<HTMLDivElement | null>) => {
+    // todo: load older messages when scrolling up
+    const members: string[] = useMembers(group);
+    const { data: adminsList } = useGroupAdminsList(group);
+    const admins = adminsList || [];
+    const events = useGroupchat(group);
+    const [replyingTo, setReplyingTo] = useState<NostrEvent | null>(null);
+    const previousMessageIds = events.slice(-3).map((e) => e.id.slice(0, 8));
+    // heights
+    const [inputHeight, setInputHeight] = useState(34);
+    const headerHeight = 96;
+    const nonChatHeight = inputHeight + headerHeight;
+    const me = usePubkey();
+    const canSign = useCanSign();
+    const isAdmin = canSign && me && admins?.includes(me);
+    const ndk = useNDK();
+    const relaySet = useRelaySet([group.relay]);
+    const [sentMessage, setSentMessage] = useState<NostrEvent | undefined>(
+      undefined,
+    );
+    const newMessage = useNewMessage(group);
+    const saveLastSeen = useSaveLastSeen(group);
+    const isRelayGroup = group.id === "_";
+    const canIPoast =
+      me &&
+      canSign &&
+      (isRelayGroup ||
+        members?.includes(me) ||
+        admins?.includes(me) ||
+        events.find(
+          (e) =>
+            e.kind === NDKKind.GroupAdminAddUser &&
+            e.tags.find((t) => t[0] === "p" && t[1] === me),
+        ));
 
-  useEffect(() => {
-    return () => saveLastSeen();
-  }, [group.id, group.relay]);
+    useEffect(() => {
+      return () => saveLastSeen();
+    }, [group.id, group.relay]);
 
-  function onNewMessage(ev: NostrEvent) {
-    setSentMessage(ev);
-    newMessage(ev);
-  }
-
-  function canDelete(event: NostrEvent) {
-    return isAdmin || event.pubkey === me;
-  }
-
-  async function deleteEvent(event: NostrEvent) {
-    try {
-      const ev = new NDKEvent(ndk, {
-        kind:
-          event.pubkey === me || group.id === "_"
-            ? NDKKind.EventDeletion
-            : (9005 as NDKKind),
-        content: "",
-      } as NostrEvent);
-      ev.tag(new NDKEvent(ndk, event));
-      await ev.publish(relaySet);
-      toast.success("Message deleted");
-    } catch (err) {
-      console.error(err);
-      toast.error("Couldn't delete message");
+    function onNewMessage(ev: NostrEvent) {
+      setSentMessage(ev);
+      newMessage(ev);
     }
-  }
 
-  return (
-    <div className={`grid grid-col-[1fr_${inputHeight}px]"`}>
-      <Chat
-        group={group}
-        admins={admins}
-        style={
-          {
-            height: `calc(100vh - ${nonChatHeight}px)`,
-          } as React.CSSProperties
-        }
-        newMessage={sentMessage}
-        // @ts-expect-error: these events are unsigned since they come from DB
-        events={events}
-        canDelete={canDelete}
-        deleteEvent={deleteEvent}
-        messageKinds={[NDKKind.GroupChat]}
-        components={{
-          [NDKKind.GroupAdminAddUser]: (props) => (
-            <UserActivity {...props} action="join" />
-          ),
-          [NDKKind.GroupAdminRemoveUser]: (props) => (
-            <UserActivity {...props} action="leave" />
-          ),
-        }}
-        setReplyingTo={setReplyingTo}
-      />
-      <ChatInput
-        group={group}
-        height={inputHeight}
-        onHeightChange={(height) => {
-          setInputHeight(height);
-        }}
-        kind={NDKKind.GroupChat}
-        replyKind={NDKKind.GroupChat}
-        onNewMessage={onNewMessage}
-        replyingTo={replyingTo}
-        setReplyingTo={setReplyingTo}
-        tags={
-          previousMessageIds.length > 0
-            ? [
-                ["h", group.id],
-                ["previous", ...previousMessageIds],
-              ]
-            : [["h", group.id]]
-        }
-        showJoinRequest={!canIPoast}
-      >
-        <New group={group} />
-      </ChatInput>
-    </div>
-  );
-}
+    function canDelete(event: NostrEvent) {
+      return isAdmin || event.pubkey === me;
+    }
+
+    async function deleteEvent(event: NostrEvent) {
+      try {
+        const ev = new NDKEvent(ndk, {
+          kind:
+            event.pubkey === me || group.id === "_"
+              ? NDKKind.EventDeletion
+              : (9005 as NDKKind),
+          content: "",
+        } as NostrEvent);
+        ev.tag(new NDKEvent(ndk, event));
+        await ev.publish(relaySet);
+        toast.success("Message deleted");
+      } catch (err) {
+        console.error(err);
+        toast.error("Couldn't delete message");
+      }
+    }
+
+    return (
+      <div className={`grid grid-col-[1fr_${inputHeight}px]"`} ref={ref}>
+        <Chat
+          group={group}
+          admins={admins}
+          style={
+            {
+              height: `calc(100vh - ${nonChatHeight}px)`,
+            } as React.CSSProperties
+          }
+          newMessage={sentMessage}
+          // @ts-expect-error: these events are unsigned since they come from DB
+          events={events}
+          canDelete={canDelete}
+          deleteEvent={deleteEvent}
+          messageKinds={[NDKKind.GroupChat]}
+          components={{
+            [NDKKind.GroupAdminAddUser]: (props) => (
+              <UserActivity {...props} action="join" />
+            ),
+            [NDKKind.GroupAdminRemoveUser]: (props) => (
+              <UserActivity {...props} action="leave" />
+            ),
+          }}
+          setReplyingTo={setReplyingTo}
+        />
+        <ChatInput
+          group={group}
+          height={inputHeight}
+          onHeightChange={(height) => {
+            setInputHeight(height);
+          }}
+          kind={NDKKind.GroupChat}
+          replyKind={NDKKind.GroupChat}
+          onNewMessage={onNewMessage}
+          replyingTo={replyingTo}
+          setReplyingTo={setReplyingTo}
+          tags={
+            previousMessageIds.length > 0
+              ? [
+                  ["h", group.id],
+                  ["previous", ...previousMessageIds],
+                ]
+              : [["h", group.id]]
+          }
+          showJoinRequest={!canIPoast}
+        >
+          <New group={group} />
+        </ChatInput>
+      </div>
+    );
+  },
+);
+GroupChat.displayName = "GroupChat";

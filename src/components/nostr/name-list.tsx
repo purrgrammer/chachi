@@ -22,7 +22,7 @@ export function NameList({
   return (
     <div className={cn("flex flex-wrap items-center gap-1", className)}>
       {deduped.map((pubkey, idx) => (
-        <div className="flex items-center gap-1">
+        <div key={pubkey} className="flex items-center gap-1">
           <Avatar
             pubkey={pubkey}
             className={cn("size-5 mr-1 inline-block", avatarClassName)}
