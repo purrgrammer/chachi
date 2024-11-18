@@ -609,6 +609,9 @@ export function RichText({
           nextBlocks.push(nodes[blockIndex]);
           nodes = nodes.slice(blockIndex + 1);
           blockIndex = nodes.findIndex(isRenderedAsBlock);
+          if (blockIndex === -1 && nodes.length > 0) {
+            nextBlocks.push({ type: "block", nodes } as Fragment);
+          }
         }
         return acc.concat(nextBlocks);
       } else {

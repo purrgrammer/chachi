@@ -2,7 +2,7 @@ import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import { useTheme } from "@/components/theme-provider";
 import { useCustomEmojis } from "@/lib/nostr/emojis";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogTitle, DialogContent } from "@/components/ui/dialog";
 
 export interface Emoji {
   id: string;
@@ -42,6 +42,7 @@ export function EmojiPicker({
   // todo: scroll?
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogTitle>Pick an emoji</DialogTitle>
       <DialogContent className="flex items-center justify-center bg-background border-none">
         <div className="emoji-picker w-[352px]">
           {children}
