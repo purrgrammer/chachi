@@ -16,7 +16,7 @@ function Names({ pubkeys }: { pubkeys: string[] }) {
     );
   }
   return pubkeys.map((pubkey, idx) => (
-    <>
+    <div key={pubkey}>
       <span className="font-semibold">
         <Name key={pubkey} pubkey={pubkey} />
       </span>
@@ -25,7 +25,7 @@ function Names({ pubkeys }: { pubkeys: string[] }) {
       ) : idx >= 0 && idx < pubkeys.length - 1 ? (
         <span>, </span>
       ) : null}
-    </>
+    </div>
   ));
 }
 
@@ -36,7 +36,7 @@ export function Group({ group }: { group: Group }) {
   return (
     <div className="border rounded-md w-[320px]">
       {admins && admins.length > 0 ? (
-        <div className="bg-accent px-2 py-1 rounded-t-md text-sm">
+        <div className="flex flex-row items-center flex-wrap gap-1 bg-accent px-2 py-1 rounded-t-md text-sm">
           Hosted by <Names pubkeys={admins || []} />
         </div>
       ) : null}
