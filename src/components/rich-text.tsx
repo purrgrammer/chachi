@@ -593,33 +593,32 @@ export function RichText({
       result = extractEcash(result);
     }
     // flatten structure to avoid invalid DOM nesting
-    const flat = result.reduce((acc, f) => {
+    return result.reduce((acc, f) => {
       if (f.type === "block") {
         let nodes = f.nodes;
         let blockIndex = nodes.findIndex(isRenderedAsBlock);
-        const nextBlocks = [];
+        // This is a block that only has inline fragments, keep it as is
         if (blockIndex === -1) {
           acc.push(f);
         }
+        // This is a block that has a block fragment, split it into multiple blocks until no nested blocks remain
         while (blockIndex !== -1) {
+          // Nodes to the left of the block are kept before the block
           const leftNodes = nodes.slice(0, blockIndex);
           if (leftNodes.length > 0) {
             acc.push({ type: "block", nodes: leftNodes });
           }
-          nextBlocks.push(nodes[blockIndex]);
+          // The block itself is added to the list of blocks
+          acc.push(nodes[blockIndex]);
+          // Update list of remaining nodes and block index
           nodes = nodes.slice(blockIndex + 1);
           blockIndex = nodes.findIndex(isRenderedAsBlock);
-          if (blockIndex === -1 && nodes.length > 0) {
-            nextBlocks.push({ type: "block", nodes } as Fragment);
-          }
         }
-        return acc.concat(nextBlocks);
       } else {
         acc.push(f);
       }
       return acc;
     }, [] as Fragment[]);
-    return flat;
   }, [children, opts, tags]);
   const body = fragments.map((f, idx) => toNode(f, idx, classNames, group));
   return options.inline ? (
