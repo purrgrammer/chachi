@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar as NostrAvatar } from "@/components/nostr/avatar";
+import { InputCopy } from "@/components/ui/input-copy";
 import { Name } from "@/components/nostr/name";
 import { RichText } from "@/components/rich-text";
 import { useGroup, useGroupParticipants } from "@/lib/nostr/groups";
@@ -128,6 +129,7 @@ function GroupInfoContent({ group }: { group: Group }) {
   const about = metadata?.about;
   const picture = metadata?.picture;
   const shortname = name ? name[0] : id.slice(0, 2);
+  const nlink = metadata?.nlink;
   return (
     <div className="flex flex-col gap-4 w-full max-w-sm lg:max-w-lg mx-auto p-4">
       <DrawerHeader className="flex flex-col items-center gap-3">
@@ -138,6 +140,11 @@ function GroupInfoContent({ group }: { group: Group }) {
           className="size-16"
         />
         <DrawerTitle>{name || id}</DrawerTitle>
+        {nlink ? (
+          <div className="flex flex-row items-center gap-2">
+            <InputCopy value={nlink} />
+          </div>
+        ) : null}
         {about ? (
           <DrawerDescription className="text-center">
             <RichText group={group}>{about}</RichText>

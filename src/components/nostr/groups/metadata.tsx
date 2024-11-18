@@ -68,7 +68,7 @@ export function GroupMetadata({
         </Avatar>
         <h2 className="text-lg font-semibold">{name}</h2>
         {about ? (
-          <p className="text-sm text-muted-foreground">{about}</p>
+          <p className="text-sm text-muted-foreground text-center">{about}</p>
         ) : null}
       </div>
       <Button size="sm" onClick={openGroup}>

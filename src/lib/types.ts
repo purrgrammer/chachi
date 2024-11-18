@@ -11,6 +11,7 @@ export interface GroupMetadata extends Group {
   picture?: string;
   visibility: "public" | "private";
   access: "open" | "closed";
+  nlink?: string;
 }
 
 export interface GroupMembers extends GroupMetadata {

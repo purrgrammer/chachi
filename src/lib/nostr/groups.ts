@@ -79,7 +79,7 @@ async function fetchGroupMetadata(ndk: NDK, group: Group) {
   return ndk
     .fetchEvent(
       { kinds: [NDKKind.GroupMetadata], "#d": [group.id] },
-      undefined, //{ cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
+      { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
       NDKRelaySet.fromRelayUrls([group.relay], ndk),
     )
     .then((ev: NDKEvent | null) => {
@@ -94,6 +94,8 @@ async function fetchGroupMetadata(ndk: NDK, group: Group) {
           ? "private"
           : "public",
         access: ev.tags.find((t) => t[0] === "closed") ? "closed" : "open",
+        // @ts-expect-error: this is incorrectly typed
+        nlink: ev.encode([group.relay]),
       } as GroupMetadata;
     });
 }
