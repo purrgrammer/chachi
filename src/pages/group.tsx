@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { GroupHeader } from "@/components/nostr/groups/header";
 import { GroupChat } from "@/components/nostr/groups/chat";
 import { GroupPosts } from "@/components/nostr/posts/feed";
+import { GroupVideos } from "@/components/nostr/videos";
 //import { GroupArticles } from "@/components/nostr/articles";
 import { GroupPolls } from "@/components/nostr/polls";
 import {
@@ -12,7 +13,7 @@ import {
 } from "@/components/ui/nav-tabs";
 import { groupId } from "@/lib/groups";
 
-type GroupTab = "chat" | "posts" | "polls";
+type GroupTab = "chat" | "posts" | "videos" | "polls";
 
 export default function GroupPage({ tab = "chat" }: { tab?: GroupTab }) {
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ export default function GroupPage({ tab = "chat" }: { tab?: GroupTab }) {
         <TabsList>
           <TabsTrigger value="chat">Chat</TabsTrigger>
           <TabsTrigger value="posts">Posts</TabsTrigger>
+          <TabsTrigger value="videos">Videos</TabsTrigger>
           {/*<TabsTrigger value="articles">Articles</TabsTrigger>
            */}
           <TabsTrigger value="polls">Polls</TabsTrigger>
@@ -47,6 +49,9 @@ export default function GroupPage({ tab = "chat" }: { tab?: GroupTab }) {
         </TabsContent>
         <TabsContent asChild value="posts">
           <GroupPosts key={groupId(group)} group={group} />
+        </TabsContent>
+        <TabsContent asChild value="videos">
+          <GroupVideos key={groupId(group)} group={group} />
         </TabsContent>
         {/*
 	<TabsContent asChild value="articles">

@@ -1,21 +1,21 @@
 import { forwardRef } from "react";
 import type { ForwardedRef } from "react";
+import { Video } from "lucide-react";
+import { NDKKind } from "@nostr-dev-kit/ndk";
 import { Button } from "@/components/ui/button";
-import { Vote } from "lucide-react";
-import { NewPoll } from "@/components/nostr/new-poll";
 import Feed from "@/components/nostr/feed";
-import { POLL } from "@/lib/kinds";
+import { NewVideo } from "@/components/nostr/video";
 import type { Group } from "@/lib/types";
 
-export const GroupPolls = forwardRef(
+export const GroupVideos = forwardRef(
   (
     { group, className }: { group: Group; className?: string },
     ref: ForwardedRef<HTMLDivElement | null>,
   ) => {
     const filter = {
-      kinds: [POLL],
+      kinds: [NDKKind.HorizontalVideo, NDKKind.VerticalVideo],
       "#h": [group.id],
-      limit: 10,
+      limit: 50,
     };
     return (
       <Feed
@@ -28,14 +28,14 @@ export const GroupPolls = forwardRef(
         onlyRelays={group.id === "_"}
         outboxRelays={[group.relay]}
         newPost={
-          <NewPoll group={group}>
+          <NewVideo group={group}>
             <Button size="sm" variant="outline">
-              <Vote /> Start a poll
+              <Video /> Post a video
             </Button>
-          </NewPoll>
+          </NewVideo>
         }
       />
     );
   },
 );
-GroupPolls.displayName = "GroupPolls";
+GroupVideos.displayName = "GroupVideos";

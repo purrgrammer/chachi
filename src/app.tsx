@@ -37,6 +37,10 @@ const router = createBrowserRouter([
         element: <Group tab="posts" />,
       },
       {
+        path: "/videos/:host",
+        element: <Group tab="videos" />,
+      },
+      {
         path: "/polls/:host",
         element: <Group tab="polls" />,
       },
@@ -51,6 +55,10 @@ const router = createBrowserRouter([
       {
         path: "/posts/:host/:id",
         element: <Group tab="posts" />,
+      },
+      {
+        path: "/videos/:host/:id",
+        element: <Group tab="videos" />,
       },
       {
         path: "/polls/:host/:id",

@@ -55,11 +55,12 @@ export function UploadImage({ defaultImage, onUpload }: UploadImageProps) {
         </>
       )}
       <Input
+        noIcons
+        accept="image/*"
         type="file"
         className="hidden"
         ref={ref}
         onChange={selectImage}
-        accept="image/*"
       />
     </Button>
   );

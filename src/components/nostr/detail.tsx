@@ -29,6 +29,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/nav-tabs";
 import { Post, PostWithReplies } from "@/components/nostr/post";
+import { HorizontalVideo, VerticalVideo } from "@/components/nostr/video";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
 import { ArticleSummary, Article } from "@/components/nostr/article";
 import {
@@ -79,10 +80,6 @@ import {
 import { cn } from "@/lib/utils";
 import { saveGroupEvent } from "@/lib/messages";
 import type { Group, Emoji as EmojiType } from "@/lib/types";
-
-// preview: basic embed
-// detail: embed on detail view
-// content: extra content for detailed view
 
 type EventComponent = (props: {
   event: NostrEvent;
@@ -149,6 +146,14 @@ const eventDetails: Record<
   [ISSUE]: {
     preview: PostWithReplies,
     detail: Post,
+  },
+  [NDKKind.HorizontalVideo]: {
+    preview: HorizontalVideo,
+    detail: HorizontalVideo,
+  },
+  [NDKKind.VerticalVideo]: {
+    preview: VerticalVideo,
+    detail: VerticalVideo,
   },
   //[9735]: {
   //  preview: Zap,

@@ -19,7 +19,7 @@ export const GroupPosts = forwardRef(
     };
     return (
       <Feed
-        style={{ height: `calc(100vh - 130px)` }}
+        style={{ height: `calc(100vh - 80px)` }}
         filter={filter}
         ref={ref}
         className={className}

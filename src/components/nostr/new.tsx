@@ -14,6 +14,7 @@ import { DiamondPlus } from "lucide-react";
 import { NewPoll } from "@/components/nostr/new-poll";
 //import { CreateGroup } from "@/components/nostr/groups/create";
 import { NewPost } from "@/components/new-post";
+import { NewVideo } from "@/components/nostr/video";
 import { useCanSign } from "@/lib/account";
 import { useNDK } from "@/lib/ndk";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ interface ContentType {
   component?: React.ComponentType<ContentProps>;
 }
 
+// todo: share chat step
 export function New({ group }: { group: Group }) {
   //const { data: relayInfo } = useRelayInfo(group.relay);
   //const supportsNip29 = relayInfo?.supported_nips?.includes(29);
@@ -43,6 +45,7 @@ export function New({ group }: { group: Group }) {
   const contentTypes = [
     { icon: "🧵", title: "Post", component: NewPost },
     { icon: "🗳️", title: "Poll", component: NewPoll },
+    { icon: "🎥", title: "Video", component: NewVideo },
     //{
     //  icon: "🏰",
     //  title: "Community",

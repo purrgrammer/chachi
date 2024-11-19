@@ -34,13 +34,12 @@ const Feed = forwardRef(
     }: FeedProps,
     ref: ForwardedRef<HTMLDivElement | null>,
   ) => {
-    // todo: loading state
     const relays = outboxRelays.length > 0 ? outboxRelays : [group.relay];
     const { eose, events } = useStream(filter, relays, live, onlyRelays);
     return (
       <div
         className={cn(
-          "flex flex-col items-center w-full overflow-y-auto overflow-x-hidden",
+          "flex flex-col items-center w-full overflow-y-auto overflow-x-hidden pretty-scrollbar",
           className,
         )}
         ref={ref}

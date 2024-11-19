@@ -79,6 +79,8 @@ export function NewPost({
     }
   }
 
+  // todo: optional title
+
   return (
     <Dialog open={showDialog} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
