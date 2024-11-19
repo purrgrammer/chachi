@@ -72,7 +72,7 @@ export function NewVideo({
         content: description.trim(),
         tags: [
           ["d", randomId()],
-	  ["h", group.id, group.relay],
+          ["h", group.id, group.relay],
           // todo: fallbacks, size
           ...(title ? [["title", title]] : []),
           [
@@ -84,7 +84,7 @@ export function NewVideo({
           ],
           ["url", blob.url],
           ["m", blob.type],
-	  ...(customEmoji.map((e) => ["emoji", e.name, e.image] as string[])),
+          ...customEmoji.map((e) => ["emoji", e.name, e.image] as string[]),
         ],
       } as NostrEvent);
       await ev.publish(relaySet);
@@ -101,13 +101,13 @@ export function NewVideo({
 
   return (
     <Dialog open={showDialog} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>{children ||
-
+      <DialogTrigger asChild>
+        {children || (
           <Button disabled={!canSign}>
             <Video /> Post
           </Button>
-
-      }</DialogTrigger>
+        )}
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>New video</DialogTitle>
@@ -116,18 +116,20 @@ export function NewVideo({
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-2">
               <Label>Title</Label>
-              <Input placeholder="Add a title" />
+              <div className="px-2">
+                <Input placeholder="Add a title" />
+              </div>
             </div>
             <div className="flex flex-col gap-2">
               <Label>Description</Label>
               <AutocompleteTextarea
-		message={description}
-		setMessage={setDescription}
+                message={description}
+                setMessage={setDescription}
                 group={group}
                 placeholder="Add a description"
                 minRows={2}
                 maxRows={6}
-		onCustomEmojisChange={setCustomEmoji}
+                onCustomEmojisChange={setCustomEmoji}
               />
             </div>
             <video
@@ -138,10 +140,10 @@ export function NewVideo({
               preload="metadata"
               className={`rounded-md ${width > height ? "aspect-video" : "aspect-auto"}`}
             />
-          <Button disabled={isPosting} onClick={poast}>
-            <Video />
-            Post
-          </Button>
+            <Button disabled={isPosting} onClick={poast}>
+              <Video />
+              Post
+            </Button>
           </div>
         ) : (
           <UploadVideo onUpload={setBlob} />
@@ -184,7 +186,7 @@ function VideoEvent({
         preload="metadata"
         poster={thumbnail}
         src={url}
-	// @ts-expect-error: for some reason `type` is not an attribute of video type
+        // @ts-expect-error: for some reason `type` is not an attribute of video type
         type={type || "video/mp4"}
       />
     </div>
