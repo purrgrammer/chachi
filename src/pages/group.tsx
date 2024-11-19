@@ -37,11 +37,7 @@ export default function GroupPage({ tab = "chat" }: { tab?: GroupTab }) {
       <Tabs value={tab} onValueChange={onValueChange}>
         <TabsList>
           <TabsTrigger value="chat">Chat</TabsTrigger>
-          {id !== "_" ? (
-            <>
-              <TabsTrigger value="posts">Posts</TabsTrigger>
-            </>
-          ) : null}
+          <TabsTrigger value="posts">Posts</TabsTrigger>
           {/*<TabsTrigger value="articles">Articles</TabsTrigger>
            */}
           <TabsTrigger value="polls">Polls</TabsTrigger>
@@ -49,13 +45,9 @@ export default function GroupPage({ tab = "chat" }: { tab?: GroupTab }) {
         <TabsContent asChild value="chat">
           <GroupChat key={groupId(group)} group={group} />
         </TabsContent>
-        {id !== "_" ? (
-          <>
-            <TabsContent asChild value="posts">
-              <GroupPosts key={groupId(group)} group={group} />
-            </TabsContent>
-          </>
-        ) : null}
+        <TabsContent asChild value="posts">
+          <GroupPosts key={groupId(group)} group={group} />
+        </TabsContent>
         {/*
 	<TabsContent asChild value="articles">
           <GroupArticles key={groupId(group)} group={group} />
