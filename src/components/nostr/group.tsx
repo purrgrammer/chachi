@@ -1,6 +1,7 @@
+import { MessagesSquare } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { useGroup, useGroupParticipants } from "@/lib/nostr/groups";
+import { useGroup, useGroupName, useGroupPicture, useGroupDescription, useGroupParticipants } from "@/lib/nostr/groups";
 import { AvatarList } from "@/components/nostr/avatar-list";
 import { getRelayHost } from "@/lib/relay";
 import { Name } from "@/components/nostr/name";
@@ -31,7 +32,9 @@ function Names({ pubkeys }: { pubkeys: string[] }) {
 
 export function Group({ group }: { group: Group }) {
   const navigate = useNavigate();
-  const { data: metadata } = useGroup(group);
+  const name = useGroupName(group);
+  const picture = useGroupPicture(group);
+  const description = useGroupDescription(group);
   const { admins, members } = useGroupParticipants(group);
   return (
     <div className="border rounded-md w-[320px]">
@@ -43,19 +46,19 @@ export function Group({ group }: { group: Group }) {
       <div className="flex flex-col gap-3 border-b p-3">
         <div className="flex flex-row items-center gap-3">
           <Avatar className="size-12">
-            <AvatarImage src={metadata?.picture} className="object-cover" />
+            <AvatarImage src={picture} className="object-cover" />
             <AvatarFallback>
-              {metadata?.name?.slice(0, 1) || group.id.slice(0, 1)}
+              {name?.slice(0, 1) || group.id.slice(0, 1)}
             </AvatarFallback>
           </Avatar>
           <h3 className="text-lg line-clamp-1">
-            {metadata?.name || group.id.slice(0, 8)}
+            {name || group.id.slice(0, 8)}
           </h3>
         </div>
-        {metadata?.about ? (
-          <span className="text-sm text-muted-foreground line-clamp-2">
-            {metadata.about}
-          </span>
+        {description ? (
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            {description}
+          </p>
         ) : null}
       </div>
       <div className="w-full flex items-center justify-between p-2">
@@ -65,7 +68,7 @@ export function Group({ group }: { group: Group }) {
           size="sm"
           onClick={() => navigate(`/${getRelayHost(group.relay)}/${group.id}`)}
         >
-          Visit
+          <MessagesSquare /> Join
         </Button>
       </div>
     </div>

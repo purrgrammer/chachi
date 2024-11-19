@@ -9,7 +9,7 @@ import NDK, {
 import { NostrEvent } from "nostr-tools";
 import { followsAtom } from "@/app/store";
 import { useNDK } from "@/lib/ndk";
-import { useRelays, useRelaySet, useStream } from "@/lib/nostr";
+import { useRelayList, useRelaySet, useStream } from "@/lib/nostr";
 import { nip29Relays, isRelayURL } from "@/lib/relay";
 import { useAccount } from "@/lib/account";
 import { useRelayInfo } from "@/lib/relay";
@@ -27,8 +27,8 @@ import {
 
 export function useUserGroups(pubkey: string) {
   const ndk = useNDK();
-  const userRelays = useRelays();
-  const relaySet = useRelaySet(userRelays);
+  const { data: userRelays } = useRelayList(pubkey);
+  const relaySet = useRelaySet(userRelays ? userRelays : []);
   return useQuery({
     enabled: !!userRelays?.length,
     queryKey: [USER_GROUPS, pubkey],

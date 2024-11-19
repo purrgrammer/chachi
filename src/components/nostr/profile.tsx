@@ -13,6 +13,7 @@ import { Name } from "@/components/nostr/name";
 import { useProfile, useRelayList } from "@/lib/nostr";
 import { Group } from "@/components/nostr/group";
 import { InputCopy } from "@/components/ui/input-copy";
+import { groupId } from "@/lib/groups";
 import { useUserGroups } from "@/lib/nostr/groups";
 
 function ProfileDrawerContent({ pubkey }: { pubkey: string }) {
@@ -43,7 +44,7 @@ function ProfileDrawerContent({ pubkey }: { pubkey: string }) {
         {groups && groups.length > 0 ? (
           <ScrollArea className="h-80">
             {groups.map((group) => (
-              <div key={`${group.id}'${group.relay}`} className="mb-2">
+              <div key={groupId(group)} className="mb-2">
                 <Group group={group} />
               </div>
             ))}
