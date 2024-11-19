@@ -9,7 +9,7 @@ import NDK, {
 import { NostrEvent } from "nostr-tools";
 import { followsAtom } from "@/app/store";
 import { useNDK } from "@/lib/ndk";
-import { useRelayList, useRelaySet, useStream } from "@/lib/nostr";
+import { useRelays, useRelayList, useRelaySet, useStream } from "@/lib/nostr";
 import { nip29Relays, isRelayURL } from "@/lib/relay";
 import { useAccount } from "@/lib/account";
 import { useRelayInfo } from "@/lib/relay";
@@ -28,32 +28,32 @@ import {
 export function useUserGroups(pubkey: string) {
   const ndk = useNDK();
   const { data: userRelays } = useRelayList(pubkey);
-  const relaySet = useRelaySet(userRelays ? userRelays : []);
+  const defaultRelays = useRelays();
+  const relays = userRelays?.filter(isRelayURL).slice(0, 5) ?? defaultRelays;
+  const relaySet = useRelaySet(relays);
   return useQuery({
-    enabled: !!userRelays?.length,
-    queryKey: [USER_GROUPS, pubkey],
+    queryKey: [USER_GROUPS, pubkey, ...relays],
     queryFn: async () => {
-      const groupList = await ndk.fetchEvent(
-        {
-          kinds: [NDKKind.SimpleGroupList],
-          authors: [pubkey],
-        },
-        {
-          closeOnEose: true,
-        },
-        relaySet,
+      const groupLists = Array.from(
+        await ndk.fetchEvents(
+          {
+            kinds: [NDKKind.SimpleGroupList],
+            authors: [pubkey],
+          },
+          {
+            closeOnEose: true,
+          },
+          relaySet,
+        ),
       );
-      // todo: doesn't handle relay groups
+      if (groupLists.length === 0) return [];
+      const groupList = groupLists.reduce((acc, ev) => {
+        if ((ev.created_at || 0) > (acc.created_at || 0)) return ev;
+        return acc;
+      }, groupLists[0]);
       return (
-        groupList?.tags
-          .filter(
-            (t) =>
-              t[0] === "group" &&
-              t[1] &&
-              t[1] !== "_" &&
-              t[2] &&
-              isRelayURL(t[2]),
-          )
+        groupList.tags
+          .filter((t) => t[0] === "group" && t[1] && t[2] && isRelayURL(t[2]))
           .map((t) => ({ id: t[1], relay: t[2] }) as Group) ?? []
       );
     },
@@ -203,6 +203,7 @@ export function useGroupAdminsList(group: Group) {
   });
 }
 export function useGroupAdmins(group: Group) {
+  // todo: support relay groups
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
   return useQuery({
@@ -459,4 +460,12 @@ export function useGroupPicture(group: Group) {
   const { data: relayInfo } = useRelayInfo(relay);
   const isRelayGroup = id === "_";
   return isRelayGroup ? relayInfo?.icon : metadata?.picture;
+}
+
+export function useGroupDescription(group: Group) {
+  const { id, relay } = group;
+  const { data: metadata } = useGroup({ id, relay });
+  const { data: relayInfo } = useRelayInfo(relay);
+  const isRelayGroup = id === "_";
+  return isRelayGroup ? relayInfo?.description : metadata?.about;
 }

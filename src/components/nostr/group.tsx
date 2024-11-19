@@ -1,7 +1,12 @@
 import { MessagesSquare } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { useGroup, useGroupName, useGroupPicture, useGroupDescription, useGroupParticipants } from "@/lib/nostr/groups";
+import {
+  useGroupName,
+  useGroupPicture,
+  useGroupDescription,
+  useGroupParticipants,
+} from "@/lib/nostr/groups";
 import { AvatarList } from "@/components/nostr/avatar-list";
 import { getRelayHost } from "@/lib/relay";
 import { Name } from "@/components/nostr/name";
