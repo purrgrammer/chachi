@@ -68,30 +68,48 @@ function Reply({
   });
   const [, setScrollTo] = useAtom(scrollToAtom);
   const isAdmin = event?.pubkey ? admins.includes(event?.pubkey) : false;
-  return event ? (
+  return (
     <div
       className={cn(
-        "p-1 pl-2 border-l-4 rounded-md mb-1 bg-background/80 border-background dark:bg-background/40 dark:border-background/60 cursor-pointer",
+        "h-12 p-1 pl-2 border-l-4 rounded-md mb-1 bg-background/80 border-background dark:bg-background/40 dark:border-background/60 cursor-pointer",
+        event ? "" : "animate-pulse place-content-center",
         className,
       )}
       onClick={() => setScrollTo(id)}
     >
-      <div className="flex flex-row items-center gap-1">
-        <h4 className="font-semibold text-sm">
-          <Name pubkey={event.pubkey} />
-        </h4>
-        {isAdmin ? <Crown className="w-3 h-3" /> : null}
-      </div>
-      <RichText
-        group={group}
-        tags={event.tags}
-        options={{ mentions: true, urls: true, emojis: true }}
-        className="line-clamp-1"
-      >
-        {event.content}
-      </RichText>
+      {event ? (
+        <>
+          <div className="flex flex-row items-center gap-1">
+            <h4 className="font-semibold text-sm">
+              <Name pubkey={event.pubkey} />
+            </h4>
+            {isAdmin ? <Crown className="w-3 h-3" /> : null}
+          </div>
+          <RichText
+            group={group}
+            tags={event.tags}
+            options={{
+              mentions: true,
+              urls: true,
+              emojis: true,
+              images: false,
+              video: false,
+              audio: false,
+              youtube: false,
+              events: false,
+              hashtags: true,
+              ecash: false,
+            }}
+            className="line-clamp-1"
+          >
+            {event.content}
+          </RichText>
+        </>
+      ) : (
+        <span>Loading message...</span>
+      )}
     </div>
-  ) : null;
+  );
 }
 
 export function ChatMessage({
