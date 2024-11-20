@@ -67,7 +67,7 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
       setOpen(false);
     } catch (err) {
       console.error(err);
-      toast.success("Couldn't update group");
+      toast.error("Couldn't update group");
     } finally {
       setIsLoading(false);
     }
