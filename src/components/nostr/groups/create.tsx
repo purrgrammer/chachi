@@ -1,9 +1,13 @@
 import { useState, ReactNode } from "react";
+import { useAtomValue } from "jotai";
 import { toast } from "sonner";
 import { z } from "zod";
+import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Plus } from "lucide-react";
+import { NostrEvent } from "nostr-tools";
+import { groupsContentAtom } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -32,11 +36,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useRelays, useRelaySet } from "@/lib/nostr";
 import { useCreateGroup, useEditGroup } from "@/lib/nostr/groups";
-import { nip29Relays, getRelayHost } from "@/lib/relay";
+import { nip29Relays, getRelayHost, isRelayURL } from "@/lib/relay";
 import { useAccount } from "@/lib/account";
+import { useMyGroups } from "@/lib/groups";
 import { randomId } from "@/lib/id";
+import { useNDK } from "@/lib/ndk";
 import { useNavigate } from "@/lib/navigation";
+import type { Group } from "@/lib/types";
 
 const formSchema = z.object({
   name: z
@@ -63,16 +71,37 @@ export function CreateGroup({
   children?: ReactNode;
   className?: string;
 }) {
+  const ndk = useNDK();
+  const [showDialog, setShowDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const groups = useMyGroups();
+  const groupsContent = useAtomValue(groupsContentAtom);
   const createGroup = useCreateGroup();
   const editGroup = useEditGroup();
   const account = useAccount();
   const canSign = account?.pubkey && !account.isReadOnly;
   const navigate = useNavigate();
+  const userRelays = useRelays();
+  const relaySet = useRelaySet(userRelays.filter((r) => isRelayURL(r)));
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
+
+  async function bookmarkGroup(group: Group) {
+    try {
+      const newGroups = [...groups, group];
+      const event = new NDKEvent(ndk, {
+        kind: NDKKind.SimpleGroupList,
+        content: groupsContent,
+        tags: newGroups.map((g) => ["group", g.id, g.relay]),
+      } as NostrEvent);
+      await event.publish(relaySet);
+    } catch (err) {
+      console.error(err);
+      toast.error("Error bookmarking group");
+    }
+  }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -84,7 +113,9 @@ export function CreateGroup({
       await editGroup(metadata);
       toast.success("Group created");
       navigate(`/${getRelayHost(relay)}/${id}`);
-      // todo: close dialog
+      setShowDialog(false);
+      resetForm();
+      bookmarkGroup(group);
     } catch (err) {
       console.error(err);
       toast.error("Couldn't create group");
@@ -93,8 +124,26 @@ export function CreateGroup({
     }
   }
 
+  function resetForm() {
+    form.reset({
+      name: "",
+      picture: "",
+      about: "",
+      visibility: "public",
+      access: "open",
+      relay: undefined,
+    });
+  }
+
+  function onOpenChange(open: boolean) {
+    if (!open) {
+      resetForm();
+    }
+    setShowDialog(open);
+  }
+
   return canSign ? (
-    <Dialog>
+    <Dialog open={showDialog} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         {children || (
           <div className="p-2 w-full">
@@ -262,7 +311,9 @@ export function CreateGroup({
               )}
             />
             <div className="flex flex-row justify-end space-y-4 space-x-2">
-              <Button type="submit">Create</Button>
+              <Button disabled={isLoading} type="submit">
+                Create
+              </Button>
             </div>
           </form>
         </Form>

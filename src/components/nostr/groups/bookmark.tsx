@@ -72,7 +72,6 @@ export function useBookmarkGroup(group: Group) {
   async function bookmarkGroup() {
     try {
       const newGroups = [...groups, group];
-      // todo: don't nuke content since 0xchat uses encrypted tags for groups
       const event = new NDKEvent(ndk, {
         kind: NDKKind.SimpleGroupList,
         content: groupsContent,
