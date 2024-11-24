@@ -22,8 +22,9 @@ import {
   getUnreadMentions,
   getGroupChatParticipants,
 } from "@/lib/messages/queries";
-import { Group } from "@/lib/types";
 import db from "@/lib/db";
+import { Group } from "@/lib/types";
+import { DELETE_GROUP } from "@/lib/kinds";
 
 export function saveGroupEvent(event: NostrEvent, group: Group) {
   const record = {
@@ -69,6 +70,7 @@ export function useGroupchat(group: Group) {
           NDKKind.GroupChat,
           NDKKind.GroupAdminAddUser,
           NDKKind.GroupAdminRemoveUser,
+          DELETE_GROUP,
         ],
         "#h": [group.id],
         ...(last ? { since: last.created_at } : {}),

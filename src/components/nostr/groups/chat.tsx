@@ -17,6 +17,7 @@ import { usePubkey, useCanSign } from "@/lib/account";
 import type { Group } from "@/lib/types";
 import { useRelayInfo } from "@/lib/relay";
 import { useGroupchat, useSaveLastSeen, useNewMessage } from "@/lib/messages";
+import { DELETE_GROUP } from "@/lib/kinds";
 
 //export function ChatZap({
 //  event,
@@ -124,6 +125,7 @@ export const GroupChat = forwardRef(
     const { data: relayInfo } = useRelayInfo(group.relay);
     const admins = adminsList || [];
     const events = useGroupchat(group);
+    const hasBeenDeleted = events.some((e) => e.kind === DELETE_GROUP);
     const [replyingTo, setReplyingTo] = useState<NostrEvent | null>(null);
     const previousMessageIds = events.slice(-3).map((e) => e.id.slice(0, 8));
     // heights
@@ -210,31 +212,42 @@ export const GroupChat = forwardRef(
           }}
           setReplyingTo={setReplyingTo}
         />
-        <ChatInput
-          group={group}
-          height={inputHeight}
-          onHeightChange={(height) => {
-            setInputHeight(height);
-          }}
-          kind={NDKKind.GroupChat}
-          replyKind={NDKKind.GroupChat}
-          onNewMessage={onNewMessage}
-          replyingTo={replyingTo}
-          setReplyingTo={setReplyingTo}
-          tags={
-            previousMessageIds.length > 0
-              ? [
-                  ["h", group.id],
-                  ["previous", ...previousMessageIds],
-                ]
-              : [["h", group.id]]
-          }
-          showJoinRequest={
-            !canIPoast && relayInfo?.supported_nips?.includes(29)
-          }
-        >
-          <New group={group} />
-        </ChatInput>
+        {hasBeenDeleted ? (
+          <div
+            className="flex items-center justify-center"
+            style={{ height: `${inputHeight + 16}px` }}
+          >
+            <span className="text-sm text-muted-foreground">
+              This group has been deleted
+            </span>
+          </div>
+        ) : (
+          <ChatInput
+            group={group}
+            height={inputHeight}
+            onHeightChange={(height) => {
+              setInputHeight(height);
+            }}
+            kind={NDKKind.GroupChat}
+            replyKind={NDKKind.GroupChat}
+            onNewMessage={onNewMessage}
+            replyingTo={replyingTo}
+            setReplyingTo={setReplyingTo}
+            tags={
+              previousMessageIds.length > 0
+                ? [
+                    ["h", group.id],
+                    ["previous", ...previousMessageIds],
+                  ]
+                : [["h", group.id]]
+            }
+            showJoinRequest={
+              !canIPoast && relayInfo?.supported_nips?.includes(29)
+            }
+          >
+            <New group={group} />
+          </ChatInput>
+        )}
       </div>
     );
   },

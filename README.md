@@ -29,8 +29,8 @@ chachi is a nostr group chat client. It is designed to be mobile-friendly, bandw
 - [x] Accept join requests
 - [x] Reject join requests
 - [x] Event deletion
-- [ ] Group deletion
-- [ ] Kick members
+- [x] Group deletion
+- [x] Kick members
 - [ ] Create roles
 - [ ] Edit roles
 - [ ] Add admins
@@ -56,6 +56,7 @@ chachi is a nostr group chat client. It is designed to be mobile-friendly, bandw
 - [x] NIP-42 Auth
 - [x] NIP-51 (Group list, Emoji list)
 - [x] NIP-65 Relay List Metadata
+- [x] NIP-71 Video
 
 ### Planned
 
@@ -74,7 +75,6 @@ chachi is a nostr group chat client. It is designed to be mobile-friendly, bandw
 - [ ] NIP-57 Zaps
 - [ ] NIP-60 Cashu Wallet
 - [ ] NIP-61 Nut Zaps
-- [ ] NIP-71 Video
 - [ ] NIP-75 Zap goals
 - [ ] NIP-89 Recommended app handlers
 - [ ] NIP-94 Files

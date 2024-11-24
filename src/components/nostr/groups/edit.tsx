@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { NostrEvent } from "nostr-tools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Settings, Trash } from "lucide-react";
+import { NDKEvent } from "@nostr-dev-kit/ndk";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,6 +24,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadImage } from "@/components/upload-image";
@@ -31,9 +45,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useRelaySet } from "@/lib/nostr";
 import { useEditGroup } from "@/lib/nostr/groups";
 import { useCanSign } from "@/lib/account";
 import type { GroupMetadata } from "@/lib/types";
+import { useNDK } from "@/lib/ndk";
+import { useBookmarkGroup } from "@/components/nostr/groups/bookmark";
+import { saveGroupEvent } from '@/lib/messages';
+import { DELETE_GROUP } from "@/lib/kinds";
 
 const formSchema = z.object({
   name: z
@@ -53,11 +72,15 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
   const [isLoading, setIsLoading] = useState(false);
   const canSign = useCanSign();
   const editGroup = useEditGroup();
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: group,
     resetOptions: { keepDefaultValues: true },
   });
+  const { isBookmarked, unbookmarkGroup } = useBookmarkGroup(group);
+  const relaySet = useRelaySet([group.relay]);
+  const ndk = useNDK();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -68,6 +91,30 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
     } catch (err) {
       console.error(err);
       toast.error("Couldn't update group");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function deleteGroup() {
+    try {
+      setIsLoading(true);
+      toast.success("Group deleted");
+      setOpen(false);
+      const ev = new NDKEvent(ndk, {
+        kind: DELETE_GROUP,
+        content: "",
+        tags: [["h", group.id, group.relay]],
+      } as NostrEvent);
+      await ev.publish(relaySet);
+      if (isBookmarked) {
+        unbookmarkGroup();
+      }
+      saveGroupEvent(ev.rawEvent() as NostrEvent, group);
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      toast.error("Couldn't delete group");
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +132,10 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
           <DialogTitle>Group settings</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col gap-2"
+          >
             <div className="flex flex-row items-center justify-between gap-6">
               <FormField
                 control={form.control}
@@ -207,7 +257,36 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
                 </FormItem>
               )}
             />
-            <div className="flex flex-row justify-end space-y-4 space-x-2">
+            <div className="flex flex-row justify-between mt-4">
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <Button type="button" variant="destructive">
+                    <Trash /> Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you sure you want to delete the group?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. The group and all its
+                      history will be deleted.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel disabled={isLoading}>
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      disabled={isLoading}
+                      onClick={deleteGroup}
+                    >
+                      <Trash className="size-8" /> Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
               <Button type="submit">Save</Button>
             </div>
           </form>
