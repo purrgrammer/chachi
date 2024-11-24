@@ -9,6 +9,7 @@ import {
   Copy,
   Trash,
   Ban,
+  ShieldBan,
 } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { Button } from "@/components/ui/button";
@@ -44,7 +45,7 @@ import { useEvent, useRelaySet } from "@/lib/nostr";
 import { useDeletions } from "@/lib/nostr/chat";
 import { usePubkey } from "@/lib/account";
 import { Emoji as EmojiType, EmojiPicker } from "@/components/emoji-picker";
-import { useLastSeen, saveLastSeen } from "@/lib/messages";
+import { useLastSeen, saveLastSeen, saveGroupEvent } from "@/lib/messages";
 import { useSettings } from "@/lib/settings";
 import type { Group } from "@/lib/types";
 
@@ -171,6 +172,8 @@ export function ChatMessage({
   const isReplyingTo = replyTo || replyRoot;
   const isFocused = scrollTo === event.id;
   const isAdmin = author ? admins.includes(author) : false;
+  const me = usePubkey();
+  const amIAdmin = me && admins.includes(me);
   const isOnlyEmojis =
     /^\p{Emoji_Presentation}{1}\s*\p{Emoji_Presentation}{0,1}$/u.test(content);
 
@@ -284,6 +287,25 @@ export function ChatMessage({
     } finally {
       setShowingEmojiPicker(false);
       setShowMessageActions(false);
+    }
+  }
+
+  async function kick(e: NostrEvent) {
+    try {
+      const ev = new NDKEvent(ndk, {
+        kind: NDKKind.GroupAdminRemoveUser,
+        content: "",
+        tags: [
+          ["h", group.id, group.relay],
+          ["p", e.pubkey],
+        ],
+      } as NostrEvent);
+      await ev.publish(relaySet);
+      toast.success("Kicked user");
+      saveGroupEvent(ev.rawEvent() as NostrEvent, group);
+    } catch (err) {
+      console.error(err);
+      toast.error("Couldn't kick user");
     }
   }
 
@@ -469,7 +491,32 @@ export function ChatMessage({
                 <Copy className="w-4 h-4" />
               </ContextMenuShortcut>
             </ContextMenuItem>
-            {deleteEvent && canDelete?.(event) ? (
+            {amIAdmin && event.pubkey !== me ? (
+              <>
+                <ContextMenuSeparator />
+                <ContextMenuLabel>Admin</ContextMenuLabel>
+                <ContextMenuItem
+                  className="cursor-pointer"
+                  onClick={() => kick(event)}
+                >
+                  Kick
+                  <ContextMenuShortcut>
+                    <ShieldBan className="w-4 h-4" />
+                  </ContextMenuShortcut>
+                </ContextMenuItem>
+                {deleteEvent ? (
+                  <ContextMenuItem
+                    className="cursor-pointer"
+                    onClick={() => deleteEvent(event)}
+                  >
+                    Delete
+                    <ContextMenuShortcut>
+                      <Trash className="w-4 h-4" />
+                    </ContextMenuShortcut>
+                  </ContextMenuItem>
+                ) : null}
+              </>
+            ) : deleteEvent && canDelete?.(event) ? (
               <ContextMenuItem
                 className="cursor-pointer"
                 onClick={() => deleteEvent(event)}
