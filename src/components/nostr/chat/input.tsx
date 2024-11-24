@@ -110,10 +110,12 @@ export function ChatInput({
       if (replyingTo) {
         const root = replyingTo.tags.find((t) => t[3] === "root")?.[1];
         if (root && root !== replyingTo.id) {
-          event.tags.push(["e", root, "", "root"]);
-          event.tags.push(["e", replyingTo.id, "", "reply"]);
+          event.tags.push(["e", root, group.relay, "root"]);
+          event.tags.push(["e", replyingTo.id, group.relay, "reply"]);
+          event.tags.push(["q", replyingTo.id, group.relay, replyingTo.pubkey]);
         } else {
-          event.tags.push(["e", replyingTo.id, "", "root"]);
+          event.tags.push(["e", replyingTo.id, group.relay, "root"]);
+          event.tags.push(["q", replyingTo.id, group.relay, replyingTo.pubkey]);
         }
         const pubkeys = (
           replyingTo.pubkey !== me ? [replyingTo.pubkey] : []
