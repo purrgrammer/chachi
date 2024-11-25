@@ -52,7 +52,10 @@ export function NewPost({
         const ev = new NDKEvent(ndk, {
           kind,
           content: message.trim(),
-          tags: [["h", group.id, group.relay]],
+          tags: [
+            ["h", group.id, group.relay],
+            ...(group.id === "_" ? [["-"]] : []),
+          ],
         } as NostrEvent);
         // todo: 1111 replies
         for (const e of customEmoji) {

@@ -73,6 +73,7 @@ export function NewVideo({
         tags: [
           ["d", randomId()],
           ["h", group.id, group.relay],
+          ...(group.id === "_" ? [["-"]] : []),
           // todo: fallbacks, size
           ...(title ? [["title", title]] : []),
           [

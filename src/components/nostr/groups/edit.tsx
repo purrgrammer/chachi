@@ -51,7 +51,7 @@ import { useCanSign } from "@/lib/account";
 import type { GroupMetadata } from "@/lib/types";
 import { useNDK } from "@/lib/ndk";
 import { useBookmarkGroup } from "@/components/nostr/groups/bookmark";
-import { saveGroupEvent } from '@/lib/messages';
+import { saveGroupEvent } from "@/lib/messages";
 import { DELETE_GROUP } from "@/lib/kinds";
 
 const formSchema = z.object({

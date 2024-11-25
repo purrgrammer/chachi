@@ -57,6 +57,7 @@ export function NewPoll({
           content: message.trim(),
           tags: [
             ["h", group.id, group.relay],
+            ...(group.id === "_" ? [["-"]] : []),
             ["relay", group.relay],
             ...options,
             ["polltype", isMultiChoice ? "multiplechoice" : "singlechoice"],

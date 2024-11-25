@@ -57,7 +57,7 @@ import { useRelaySet, useRelays } from "@/lib/nostr";
 import { useReplies } from "@/lib/nostr/comments";
 import { useGroupName } from "@/lib/nostr/groups";
 import { useMyGroups, useOpenGroup } from "@/lib/groups";
-import { POLL, REPO, ISSUE } from "@/lib/kinds";
+import { POLL, REPO, ISSUE, COMMENT } from "@/lib/kinds";
 import {
   Dialog,
   DialogContent,
@@ -103,7 +103,7 @@ const eventDetails: Record<
     preview: PostWithReplies,
     detail: Post,
   },
-  [1111]: {
+  [COMMENT]: {
     preview: PostWithReplies,
     detail: Post,
   },
@@ -404,10 +404,11 @@ export function FeedEmbed({
       const rootRelay = root ? root[2] : group.relay;
       const rootPubkey = root ? root[3] : event.pubkey;
       const ev = new NDKEvent(ndk, {
-        kind: 1111 as NDKKind,
+        kind: COMMENT,
         content,
         tags: [
           ["h", group.id, group.relay],
+          ...(group.id === "_" ? [["-"]] : []),
           // root marker
           rootTag === "E"
             ? [rootTag, rootRef, rootRelay, rootPubkey]

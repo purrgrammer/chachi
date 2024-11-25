@@ -1,5 +1,6 @@
 import { NDKKind } from "@nostr-dev-kit/ndk";
 
+export const COMMENT = 1111 as NDKKind;
 export const POLL_VOTE = 1018 as NDKKind;
 export const POLL = 1068 as NDKKind;
 export const ISSUE = 1621 as NDKKind;

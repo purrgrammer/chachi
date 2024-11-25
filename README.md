@@ -56,6 +56,7 @@ chachi is a nostr group chat client. It is designed to be mobile-friendly, bandw
 - [x] NIP-42 Auth
 - [x] NIP-51 (Group list, Emoji list)
 - [x] NIP-65 Relay List Metadata
+- [x] NIP-70 Protected Events
 - [x] NIP-71 Video
 
 ### Planned
