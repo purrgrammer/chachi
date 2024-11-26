@@ -240,7 +240,10 @@ export const GroupChat = forwardRef(
                     ...(isRelayGroup ? [["-"]] : []),
                     ["previous", ...previousMessageIds],
                   ]
-                : [["h", group.id, group.relay], ...(isRelayGroup ? [["-"]] : [])]
+                : [
+                    ["h", group.id, group.relay],
+                    ...(isRelayGroup ? [["-"]] : []),
+                  ]
             }
             showJoinRequest={
               !canIPoast && relayInfo?.supported_nips?.includes(29)

@@ -91,6 +91,7 @@ export function ChatInput({
   showJoinRequest?: boolean;
   children?: React.ReactNode;
 }) {
+  const [isPosting, setIsPosting] = useState(false);
   const ndk = useContext(NDKContext);
   const relaySet = useRelaySet([group.relay]);
   const me = usePubkey();
@@ -100,6 +101,7 @@ export function ChatInput({
   const [customEmojis, setCustomEmojis] = useState<Emoji[]>([]);
 
   async function sendMessage() {
+    setIsPosting(true);
     const content = message.trim();
     if (content) {
       const event = new NDKEvent(ndk, {
@@ -138,11 +140,13 @@ export function ChatInput({
       } catch (err) {
         console.error(err);
         toast.error("Failed to send message");
+      } finally {
+        setMessage("");
+        setIsPosting(false);
+        setReplyingTo(null);
+        setCustomEmojis([]);
+        onNewMessage?.(event.rawEvent() as NostrEvent);
       }
-      setMessage("");
-      setReplyingTo(null);
-      setCustomEmojis([]);
-      onNewMessage?.(event.rawEvent() as NostrEvent);
     }
   }
 
@@ -158,7 +162,7 @@ export function ChatInput({
           {children}
           <AutocompleteTextarea
             submitOnEnter
-            disabled={!canPoast || disabled || !me}
+            disabled={!canPoast || disabled || !me || isPosting}
             group={group}
             message={message}
             setMessage={setMessage}
