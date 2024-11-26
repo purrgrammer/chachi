@@ -199,14 +199,14 @@ export function AutocompleteTextarea({
 
   async function onKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
     if (
-      e.keyCode === TAB &&
+      (e.keyCode === TAB || e.key === "Enter") &&
       isAutocompleting &&
       autocompleteProfiles.length === 1
     ) {
       e.preventDefault();
       autocompleteProfile(autocompleteProfiles[0]);
     } else if (
-      e.keyCode === TAB &&
+      (e.keyCode === TAB || e.key === "Enter") &&
       isAutocompletingEmoji &&
       autocompleteEmojis.length === 1
     ) {
