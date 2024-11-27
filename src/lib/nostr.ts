@@ -44,7 +44,7 @@ export function useEvent({ id, relays }: { id?: string; relays: string[] }) {
         .fetchEvent(
           { ids: [id] },
           {
-            groupable: false,
+            closeOnEose: true,
             cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST,
           },
           relaySet,
@@ -53,7 +53,7 @@ export function useEvent({ id, relays }: { id?: string; relays: string[] }) {
           if (ev) {
             return ev.rawEvent() as NostrEvent;
           }
-          throw new Error("Can't find event");
+          return null;
         });
     },
     staleTime: Infinity,
@@ -91,7 +91,7 @@ export function useAddress({
           if (ev) {
             return ev.rawEvent() as NostrEvent;
           }
-          throw new Error("Can't find address");
+          return null;
         });
     },
     staleTime: Infinity,

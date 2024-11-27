@@ -37,7 +37,9 @@ export function NameList({
           </span>
         </div>
       ))}
-      {suffix ? <span className={textClassName}> {suffix}</span> : null}
+      {suffix && deduped.length > 0 ? (
+        <span className={textClassName}> {suffix}</span>
+      ) : null}
     </div>
   );
 }

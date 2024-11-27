@@ -5,8 +5,7 @@ import type {
   EventPointer,
   ProfilePointer,
 } from "nostr-tools/nip19";
-import { Event } from "@/components/nostr/event";
-import { Address } from "@/components/nostr/address";
+import { Event, Address } from "@/components/nostr/event";
 import { Image } from "@/components/image";
 import { Audio } from "@/components/audio";
 import { Video } from "@/components/video";
