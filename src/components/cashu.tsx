@@ -32,7 +32,7 @@ function RedeemToken({ token, pubkey }: { token: string; pubkey: string }) {
   }
 
   return (
-    <Button disabled={!lnurl} onClick={redeem}>
+    <Button variant="outline" disabled={!lnurl} onClick={redeem}>
       Redeem
     </Button>
   );
@@ -51,7 +51,7 @@ export function CashuToken({
 
   useEffect(() => {
     try {
-      if (!token.startsWith("cashuA") || token.length < 10) {
+      if (!token.startsWith("cashu") || token.length < 10) {
         return;
       }
       setEcash(getDecodedToken(token));
@@ -73,7 +73,7 @@ export function CashuToken({
   const unitClassname = "size-10 text-muted-foreground";
 
   return (
-    <div className={cn("flex flex-col gap-5", className)}>
+    <div className={cn("flex flex-col gap-1", className)}>
       <div className="flex gap-5 items-center">
         <div className="flex flex-row items-center">
           {unit === "sat" ? (

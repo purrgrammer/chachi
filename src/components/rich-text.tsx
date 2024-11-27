@@ -449,14 +449,14 @@ function extractHashtags(fragments: Fragment[]): Fragment[] {
   );
 }
 
-const cashuRegex = /(cashuA[A-Za-z0-9_-]{0,10000}={0,3})/i;
+const cashuRegex = /(cashu[A-Za-z0-9_-]{0,10000}={0,3})/i;
 
 function extractEcash(fragments: Fragment[]): Fragment[] {
   return extract(
     fragments,
     cashuRegex,
     (s: string) => {
-      return s.includes("cashuA");
+      return s.includes("cashu");
     },
     (token: string) => {
       return { type: "ecash", token } as Fragment;
