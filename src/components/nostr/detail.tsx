@@ -5,8 +5,10 @@ import {
   Maximize,
   Reply,
   SmilePlus,
+  Trash,
   Ellipsis,
   MessageSquareShare,
+  Ban,
 } from "lucide-react";
 import { NDKRelaySet } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
@@ -55,7 +57,7 @@ import { getRelayHost } from "@/lib/relay";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet, useRelays } from "@/lib/nostr";
 import { useReplies } from "@/lib/nostr/comments";
-import { useGroupName } from "@/lib/nostr/groups";
+import { useGroupAdminsList, useGroupName } from "@/lib/nostr/groups";
 import { useMyGroups, useOpenGroup } from "@/lib/groups";
 import { POLL, REPO, ISSUE, COMMENT } from "@/lib/kinds";
 import {
@@ -79,6 +81,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { saveGroupEvent } from "@/lib/messages";
+import { usePubkey, useCanSign } from "@/lib/account";
 import type { Group, Emoji as EmojiType } from "@/lib/types";
 
 type EventComponent = (props: {
@@ -374,10 +377,15 @@ export function FeedEmbed({
 }) {
   const ndk = useNDK();
   const userRelays = useRelays();
+  const me = usePubkey();
+  const canSign = useCanSign();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showReplyDialog, setShowReplyDialog] = useState(false);
   const relaySet = useRelaySet([group.relay]);
   const components = eventDetails[event.kind];
+  const { data: admins } = useGroupAdminsList(group);
+  const canDelete = me && (me === event.pubkey || admins?.includes(me));
+  const [isDeleted, setIsDeleted] = useState(false);
   // NIP-31
   const alt = event.tags.find((t) => t[0] === "alt")?.[1];
 
@@ -466,6 +474,73 @@ export function FeedEmbed({
     }
   }
 
+  async function onDelete() {
+    try {
+      const ev = new NDKEvent(ndk, {
+        kind:
+          event.pubkey === me || group.id === "_"
+            ? NDKKind.EventDeletion
+            : (9005 as NDKKind),
+        content: "",
+      } as NostrEvent);
+      ev.tag(new NDKEvent(ndk, event));
+      await ev.publish(relaySet);
+      toast.success("Post deleted");
+      setIsDeleted(true);
+    } catch (err) {
+      console.error(err);
+      toast.error("Couldn't delete post");
+    }
+  }
+
+  const header = (
+    <div className="flex space-between items-center px-3 py-2 gap-3">
+      {components?.noHeader ? null : (
+        <>
+          <Header event={event} />
+          <EventMenu
+            event={event}
+            group={group}
+            relays={relays}
+            canOpen={canOpenDetails}
+          />
+        </>
+      )}
+    </div>
+  );
+
+  const body = (
+    <div className="px-4 py-1 pb-2 space-y-3">
+      {components?.preview ? (
+        components.preview({
+          event,
+          relays,
+          group,
+          options,
+          classNames,
+        })
+      ) : alt ? (
+        <p>{alt}</p>
+      ) : (
+        <RichText
+          options={options}
+          group={group}
+          tags={event.tags}
+          classNames={classNames}
+        >
+          {event.content}
+        </RichText>
+      )}
+      {showReactions ? (
+        <Reactions
+          event={event}
+          relays={[group.relay, ...relays, ...userRelays]}
+          kinds={[NDKKind.Zap, NDKKind.Reaction]}
+        />
+      ) : null}
+    </div>
+  );
+
   // todo: emojis show before dragging
   return (
     <div className="bg-accent rounded-sm relative">
@@ -475,7 +550,7 @@ export function FeedEmbed({
           className,
         )}
         // Drag controls
-        drag="x"
+        drag={canSign && !isDeleted ? "x" : false}
         dragSnapToOrigin={true}
         dragConstraints={{ left: 30, right: 30 }}
         dragElastic={{ left: 0.2, right: 0.2 }}
@@ -488,76 +563,73 @@ export function FeedEmbed({
           }
         }}
       >
-        <ContextMenu>
-          <ContextMenuTrigger>
-            <div className="flex space-between items-center px-3 py-2 gap-3">
-              {components?.noHeader ? null : (
-                <>
-                  <Header event={event} />
-                  <EventMenu
-                    event={event}
-                    group={group}
-                    relays={relays}
-                    canOpen={canOpenDetails}
-                  />
-                </>
-              )}
-            </div>
-            <div className="px-4 py-1 pb-2 space-y-3">
-              {components?.preview ? (
-                components.preview({
-                  event,
-                  relays,
-                  group,
-                  options,
-                  classNames,
-                })
-              ) : alt ? (
-                <p>{alt}</p>
+        {canSign ? (
+          <ContextMenu>
+            <ContextMenuTrigger>
+              {header}
+              {isDeleted ? (
+                <div className="px-4 py-2 space-y-3">
+                  <div className="flex flex-row items-center gap-1 text-muted-foreground">
+                    <Ban className="size-3" />
+                    <span className="text-xs italic">Post deleted</span>
+                  </div>
+                </div>
               ) : (
-                <RichText
-                  options={options}
-                  group={group}
-                  tags={event.tags}
-                  classNames={classNames}
-                >
-                  {event.content}
-                </RichText>
+                body
               )}
-              {showReactions ? (
-                <Reactions
-                  event={event}
-                  relays={[group.relay, ...relays, ...userRelays]}
-                  kinds={[NDKKind.Zap, NDKKind.Reaction]}
-                />
+            </ContextMenuTrigger>
+            <ContextMenuContent>
+              <ContextMenuItem
+                className="cursor-pointer"
+                onClick={openReplyDialog}
+              >
+                Reply
+                <ContextMenuShortcut>
+                  <Reply className="w-4 h-4" />
+                </ContextMenuShortcut>
+              </ContextMenuItem>
+              <ContextMenuItem
+                className="cursor-pointer"
+                onClick={openEmojiPicker}
+              >
+                React
+                <ContextMenuShortcut>
+                  <SmilePlus className="w-4 h-4" />
+                </ContextMenuShortcut>
+              </ContextMenuItem>
+              {canDelete ? (
+                <ContextMenuItem className="cursor-pointer" onClick={onDelete}>
+                  Delete
+                  <ContextMenuShortcut>
+                    <Trash className="w-4 h-4 text-destructive" />
+                  </ContextMenuShortcut>
+                </ContextMenuItem>
               ) : null}
-            </div>
-          </ContextMenuTrigger>
-          <ContextMenuContent>
-            <ContextMenuItem
-              className="cursor-pointer"
-              onClick={openReplyDialog}
-            >
-              Reply
-              <ContextMenuShortcut>
-                <Reply className="w-4 h-4" />
-              </ContextMenuShortcut>
-            </ContextMenuItem>
-            <ContextMenuItem
-              className="cursor-pointer"
-              onClick={openEmojiPicker}
-            >
-              React
-              <ContextMenuShortcut>
-                <SmilePlus className="w-4 h-4" />
-              </ContextMenuShortcut>
-            </ContextMenuItem>
-          </ContextMenuContent>
-        </ContextMenu>
+            </ContextMenuContent>
+          </ContextMenu>
+        ) : (
+          <>
+            {header}
+            {isDeleted ? (
+              <div className="px-4 py-2 space-y-3">
+                <div className="flex flex-row items-center gap-1 text-muted-foreground">
+                  <Ban className="size-3" />
+                  <span className="text-xs italic">Post deleted</span>
+                </div>
+              </div>
+            ) : (
+              body
+            )}
+          </>
+        )}
       </motion.div>
-      <Reply className="z-0 size-6 absolute top-3 left-2" />
-      <SmilePlus className="z-0 size-6 absolute top-3 right-2" />
-      {showEmojiPicker ? (
+      {isDeleted ? null : (
+        <>
+          <Reply className="z-0 size-6 absolute top-3 left-2" />
+          <SmilePlus className="z-0 size-6 absolute top-3 right-2" />
+        </>
+      )}
+      {showEmojiPicker && canSign ? (
         <EmojiPicker
           open={showEmojiPicker}
           onOpenChange={setShowEmojiPicker}
@@ -573,7 +645,7 @@ export function FeedEmbed({
           />
         </EmojiPicker>
       ) : null}
-      {showReplyDialog ? (
+      {showReplyDialog && canSign ? (
         <ReplyDialog
           group={group}
           open={showReplyDialog}

@@ -20,26 +20,24 @@ export function NameList({
   const profiles = q.map((q) => q.data).filter(Boolean);
   const deduped = Array.from(new Set(profiles.map((p) => p.pubkey)));
   return (
-    <div className={cn("flex flex-wrap items-center gap-1", className)}>
+    <div className={cn("flex flex-wrap items-center gap-1.5", className)}>
       {deduped.map((pubkey, idx) => (
-        <div key={pubkey} className="flex items-center gap-1">
+        <div key={pubkey} className="flex items-center gap-0">
           <Avatar
             pubkey={pubkey}
             className={cn("size-5 mr-1 inline-block", avatarClassName)}
           />
           <span className={cn("font-semibold", textClassName)}>
             <Name key={pubkey} pubkey={pubkey} />
+            {idx < deduped.length - 2 ? (
+              <span className={textClassName}>, </span>
+            ) : idx === deduped.length - 2 ? (
+              <span className={textClassName}> and </span>
+            ) : null}
           </span>
-          {idx < deduped.length - 2 ? (
-            <span className={textClassName}>, </span>
-          ) : idx === deduped.length - 2 ? (
-            <span className={textClassName}> and </span>
-          ) : null}
-          {idx === deduped.length - 1 && suffix ? (
-            <span className={textClassName}>{suffix}</span>
-          ) : null}
         </div>
       ))}
+      {suffix ? <span className={textClassName}> {suffix}</span> : null}
     </div>
   );
 }
