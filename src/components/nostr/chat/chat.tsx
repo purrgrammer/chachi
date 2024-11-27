@@ -640,6 +640,7 @@ export function Chat({
   const groupedMessages = groupByDay(events);
   const lastSeen = useLastSeen(group);
   const lastMessage = events.filter((e) => e.kind === NDKKind.GroupChat).at(0);
+  const [, setScrollTo] = useAtom(scrollToAtom);
   const { events: deleteEvents } = useDeletions(group);
   const deletedIds = new Set(
     deleteEvents
@@ -647,6 +648,10 @@ export function Chat({
       .filter(Boolean),
   );
   const me = usePubkey();
+
+  useEffect(() => {
+    return () => setScrollTo(null);
+  }, [group.id, group.relay]);
 
   return (
     <div
