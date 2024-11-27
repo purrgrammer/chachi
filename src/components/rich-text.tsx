@@ -240,7 +240,10 @@ function toNode(
     return (
       <span
         key={idx}
-        className={`break-words whitespace-pre-wrap text-md leading-tight`}
+        className={cn(
+          `break-words whitespace-pre-wrap text-md leading-tight`,
+          classNames.spans,
+        )}
       >
         {fragment.text}
       </span>
@@ -487,6 +490,7 @@ export interface RichTextClassnames {
   urls?: string;
   hashtags?: string;
   ecash?: string;
+  spans?: string;
   paragraphs?: string;
   video?: string;
   audio?: string;
