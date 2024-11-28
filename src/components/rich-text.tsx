@@ -451,7 +451,7 @@ function extractHashtags(fragments: Fragment[]): Fragment[] {
   );
 }
 
-const cashuRegex = /(cashu{A,B}[A-Za-z0-9_-]{0,10000}={0,3})/i;
+const cashuRegex = /(cashu[AB][A-Za-z0-9_-]{0,10000}={0,3})/ig;
 
 function extractEcash(fragments: Fragment[]): Fragment[] {
   return extract(
