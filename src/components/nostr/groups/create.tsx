@@ -273,7 +273,8 @@ export function CreateGroup({
                   </div>
                   <FormDescription>
                     Public groups can be read by anyone, private groups require
-                    authentication.
+                    authentication. Messages in private groups are not encrypted
+                    and can be read by relays.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
