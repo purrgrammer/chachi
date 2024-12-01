@@ -225,7 +225,9 @@ export function AutocompleteTextarea({
       e.preventDefault();
       onFinish?.(message, dedupeBy(customEmojis, "name"));
       if (focusAfterSubmit) {
-        ref.current?.focus();
+        setTimeout(() => {
+          ref.current?.focus();
+        }, 300);
       }
     }
   }
