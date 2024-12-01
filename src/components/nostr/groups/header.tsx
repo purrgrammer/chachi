@@ -59,11 +59,13 @@ export function GroupHeader({ group }: { group: Group }) {
                     <TooltipTrigger>
                       <div className="flex items-center gap-1.5">
                         <BookLock className="size-3 text-muted-foreground" />
-                        <span className="text-xs hidden sm:block">Private</span>
+                        <span className="text-xs hidden sm:block">
+                          Members only
+                        </span>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      Requires authentication to read content
+                      Only members can read content
                     </TooltipContent>
                   </Tooltip>
                 ) : (
