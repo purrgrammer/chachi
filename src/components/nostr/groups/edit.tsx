@@ -212,16 +212,15 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
                           <SelectValue placeholder="Choose visibility" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="public">Public</SelectItem>
-                          <SelectItem value="private">Private</SelectItem>
+                          <SelectItem value="public">Anyone</SelectItem>
+                          <SelectItem value="private">Members only</SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
                   </div>
                   <FormDescription>
-                    Public groups can be read by anyone, private groups require
-                    authentication. Messages in private groups are not encrypted
-                    and can be read by relays.
+                    Messages are not encrypted and can be read by relays. For
+                    maximum privacy host your own relay.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -244,8 +243,8 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
                           <SelectValue placeholder="Choose policy" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="open">Open</SelectItem>
-                          <SelectItem value="closed">Closed</SelectItem>
+                          <SelectItem value="open">Anyone</SelectItem>
+                          <SelectItem value="closed">Invite only</SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
