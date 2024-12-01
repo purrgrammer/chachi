@@ -218,6 +218,7 @@ export function useStream(
             ? NDKSubscriptionCacheUsage.PARALLEL
             : NDKSubscriptionCacheUsage.ONLY_CACHE,
         closeOnEose: !live,
+        skipOptimisticPublishEvent: true,
       },
       relaySet,
     );
@@ -257,6 +258,7 @@ export function useRequest(
       filter,
       {
         closeOnEose: true,
+        skipOptimisticPublishEvent: true,
       },
       relaySet,
     );
