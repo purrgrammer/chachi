@@ -162,6 +162,7 @@ export function ChatInput({
           {children}
           <AutocompleteTextarea
             submitOnEnter
+            focusAfterSubmit
             disabled={!canPoast || disabled || !me || isPosting}
             group={group}
             message={message}

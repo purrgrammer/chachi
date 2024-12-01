@@ -87,6 +87,7 @@ interface AutocompleteTextareaProps extends TextareaProps {
   reply?: NostrEvent;
   setReplyingTo?: (event: NostrEvent | null) => void;
   submitOnEnter?: boolean;
+  focusAfterSubmit?: boolean;
 }
 
 export function AutocompleteTextarea({
@@ -100,6 +101,7 @@ export function AutocompleteTextarea({
   reply,
   setReplyingTo,
   submitOnEnter,
+  focusAfterSubmit,
   ...props
 }: AutocompleteTextareaProps) {
   const ref = useRef<HTMLTextAreaElement | null>(null);
@@ -222,6 +224,9 @@ export function AutocompleteTextarea({
     } else if (e.key === "Enter" && !e.shiftKey && submitOnEnter) {
       e.preventDefault();
       onFinish?.(message, dedupeBy(customEmojis, "name"));
+      if (focusAfterSubmit) {
+        ref.current?.focus();
+      }
     }
   }
 
