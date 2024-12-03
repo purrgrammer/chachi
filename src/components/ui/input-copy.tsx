@@ -21,7 +21,7 @@ export function InputCopy({ value, ...props }: { value: string }) {
 
   return (
     <Input
-      className="font-mono text-xs h-10 text-ellipsis w-full px-1 pr-10 h-8 bg-background border rounded-lg"
+      className="font-mono text-xs h-10 text-ellipsis w-full px-1 pr-10 h-8 bg-background"
       type="text"
       value={value}
       rightIcon={copied ? <Check /> : <Copy />}

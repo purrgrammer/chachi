@@ -1,5 +1,6 @@
 # Logs
 logs
+.env
 *.log
 *.tsbuildinfo
 npm-debug.log*

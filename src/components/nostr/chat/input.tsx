@@ -4,6 +4,7 @@ import { Send, Check } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { UploadFile } from "@/components/upload-file";
+import { GIFPicker } from "@/components/gif-picker";
 import { Button } from "@/components/ui/button";
 import { useRelaySet } from "@/lib/nostr";
 import { NDKContext } from "@/lib/ndk";
@@ -100,9 +101,12 @@ export function ChatInput({
   const [message, setMessage] = useState("");
   const [customEmojis, setCustomEmojis] = useState<Emoji[]>([]);
 
-  async function sendMessage() {
+  async function sendMessage(msg: string) {
+    const content = msg.trim();
+    if (!content) {
+      return;
+    }
     setIsPosting(true);
-    const content = message.trim();
     if (content) {
       const event = new NDKEvent(ndk, {
         kind: replyingTo && replyKind ? replyKind : kind,
@@ -172,9 +176,15 @@ export function ChatInput({
             onHeightChange={(height: number) => {
               onHeightChange?.(height);
             }}
-            onFinish={sendMessage}
+            onFinish={() => sendMessage(message)}
             reply={replyingTo && showReplyPreview ? replyingTo : undefined}
             setReplyingTo={setReplyingTo}
+          />
+          <GIFPicker
+            onPick={(gif) => {
+              const newMessage = message ? `${message} ${gif.url}` : gif.url;
+              sendMessage(newMessage);
+            }}
           />
           <UploadFile
             tabIndex={1}
@@ -186,7 +196,7 @@ export function ChatInput({
             disabled={!canPoast}
             size="icon"
             className="sm:hidden"
-            onClick={sendMessage}
+            onClick={() => sendMessage(message)}
           >
             <Send className="size-6" />
           </Button>

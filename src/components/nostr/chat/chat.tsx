@@ -43,7 +43,7 @@ import { useNDK } from "@/lib/ndk";
 import { Avatar } from "@/components/nostr/avatar";
 import { useEvent, useRelaySet } from "@/lib/nostr";
 import { useDeletions } from "@/lib/nostr/chat";
-import { usePubkey } from "@/lib/account";
+import { usePubkey, useCanSign } from "@/lib/account";
 import { Emoji as EmojiType, EmojiPicker } from "@/components/emoji-picker";
 import { useLastSeen, saveLastSeen, saveGroupEvent } from "@/lib/messages";
 import { useSettings } from "@/lib/settings";
@@ -173,6 +173,7 @@ export function ChatMessage({
   const isFocused = scrollTo === event.id;
   const isAdmin = author ? admins.includes(author) : false;
   const me = usePubkey();
+  const canSign = useCanSign();
   const amIAdmin = me && admins.includes(me);
   const isOnlyEmojis =
     /^\p{Emoji_Presentation}{1}\s*\p{Emoji_Presentation}{0,1}$/u.test(content);
@@ -235,9 +236,11 @@ export function ChatMessage({
 
   useEffect(() => {
     if (isNew && ref.current) {
-      ref.current.scrollIntoView({
-        behavior: "smooth",
-      });
+      setTimeout(() => {
+        ref.current?.scrollIntoView({
+          behavior: "smooth",
+        });
+      }, 0);
     }
   }, [isNew]);
 
@@ -340,7 +343,7 @@ export function ChatMessage({
           <ContextMenuTrigger asChild>
             <motion.div
               // Drag controls
-              drag={isMobile && !isMine ? "x" : false}
+              drag={isMobile && !isMine && canSign ? "x" : false}
               dragSnapToOrigin={true}
               dragConstraints={{ left: 20, right: 20 }}
               dragElastic={{ left: 0.2, right: 0.2 }}

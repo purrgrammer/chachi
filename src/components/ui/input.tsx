@@ -9,6 +9,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   rightIconClassName?: string;
   noIcons?: boolean;
   onRightIconClick?: () => void;
+  className?: string;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -36,7 +37,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {...props}
       />
     ) : (
-      <div className="flex flex-row relative">
+      <div className={cn("flex flex-row relative", className)}>
         {leftIcon ? (
           <div className="text-muted-foreground absolute left-2 top-3">
             {leftIcon}
