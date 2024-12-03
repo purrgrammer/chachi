@@ -30,7 +30,8 @@ const buttonVariants = cva(
         icon: "h-10 w-10",
         smallIcon: "h-6 w-6",
         fit: "w-fit p-1",
-        huge: "h-32 w-32",
+        big: "h-16 w-16 [&_svg]:size-6",
+        huge: "h-32 w-32 [&_svg]:size-9",
       },
     },
     defaultVariants: {
