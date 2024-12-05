@@ -39,6 +39,7 @@ export type MentionFragment = {
 export type EventFragment = {
   type: "event";
   id: string;
+  pubkey?: string;
   kind?: number;
   relays: string[];
 };
@@ -173,6 +174,7 @@ function toNode(
       <Event
         key={fragment.id}
         id={fragment.id}
+        pubkey={fragment.pubkey}
         group={group}
         relays={fragment.relays}
         className={classNames.events}
@@ -355,8 +357,15 @@ function extractNevent(fragments: Fragment[]): Fragment[] {
     (s: string) => s.startsWith("nostr:nevent1"),
     (s: string) => {
       const nevent = s.replace(NostrPrefixRegex, "");
-      const { id, relays, kind } = nip19.decode(nevent).data as EventPointer;
-      return { type: "event", id, relays: relays || [], kind } as Fragment;
+      const { id, relays, author, kind } = nip19.decode(nevent)
+        .data as EventPointer;
+      return {
+        type: "event",
+        id,
+        relays: relays || [],
+        kind,
+        pubkey: author,
+      } as Fragment;
     },
   );
 }

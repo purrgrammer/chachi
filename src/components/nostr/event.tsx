@@ -34,14 +34,16 @@ export function Event({
   id,
   relays,
   group,
+  pubkey,
   className,
 }: {
   id: string;
   relays: string[];
+  pubkey?: string;
   group: Group;
   className?: string;
 }) {
-  const { data: event, status } = useEvent({ id, relays });
+  const { data: event, status } = useEvent({ id, pubkey, relays });
 
   if (status === "pending") {
     return <LoadingEvent />;

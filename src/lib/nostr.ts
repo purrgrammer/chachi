@@ -31,15 +31,27 @@ export function useRelaySet(relays: string[]): NDKRelaySet | undefined {
 }
 
 // todo: rename useEventId
-export function useEvent({ id, relays }: { id?: string; relays: string[] }) {
+export function useEvent({
+  id,
+  pubkey,
+  relays,
+}: {
+  id: string;
+  pubkey?: string;
+  relays: string[];
+}) {
   const ndk = useNDK();
-  // fixme: fallback to big public relays like nostr.band when not found
-  const relaySet = useRelaySet(relays);
 
   return useQuery({
     queryKey: [EVENT, id ? id : "empty"],
-    queryFn: () => {
-      if (!id) return null;
+    queryFn: async () => {
+      const relayList =
+        pubkey && relays.length === 0
+          ? await fetchRelayList(ndk, pubkey)
+          : relays.length > 0
+            ? relays
+            : ["wss://relay.nostr.band"];
+      const relaySet = NDKRelaySet.fromRelayUrls(relayList, ndk);
       return ndk
         .fetchEvent(
           { ids: [id] },
@@ -72,12 +84,18 @@ export function useAddress({
   relays: string[];
 }) {
   const ndk = useNDK();
-  const relaySet = useRelaySet(relays);
 
   // todo: tweak staleTime, get latest
   return useQuery({
     queryKey: [ADDRESS, `${kind}:${pubkey}:${identifier}`],
-    queryFn: () => {
+    queryFn: async () => {
+      const relayList =
+        relays.length === 0
+          ? await fetchRelayList(ndk, pubkey)
+          : relays.length > 0
+            ? relays
+            : ["wss://relay.nostr.band"];
+      const relaySet = NDKRelaySet.fromRelayUrls(relayList, ndk);
       return ndk
         .fetchEvent(
           { kinds: [kind], authors: [pubkey], "#d": [identifier] },
@@ -336,32 +354,32 @@ export function useProfile(pubkey: string, relays: string[] = []) {
   });
 }
 
+async function fetchRelayList(ndk: NDK, pubkey: string) {
+  return await ndk
+    .fetchEvent(
+      {
+        kinds: [NDKKind.RelayList],
+        authors: [pubkey],
+      },
+      { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.PARALLEL },
+      NDKRelaySet.fromRelayUrls(
+        ["wss://purplepag.es", "wss://relay.nostr.band"],
+        ndk,
+      ),
+    )
+    .then((ev) => {
+      if (ev) {
+        return ev.tags.filter((t) => t[0] === "r").map((t) => t[1]);
+      }
+      throw new Error("Can't find relay list");
+    });
+}
+
 export function useRelayList(pubkey: string) {
   const ndk = useNDK();
-  const relaySet = useRelaySet([
-    "wss://purplepag.es",
-    "wss://relay.nostr.band",
-  ]);
-
   return useQuery({
     queryKey: [RELAY_LIST, pubkey],
-    queryFn: async () => {
-      return await ndk
-        .fetchEvent(
-          {
-            kinds: [NDKKind.RelayList],
-            authors: [pubkey],
-          },
-          { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.PARALLEL },
-          relaySet,
-        )
-        .then((ev) => {
-          if (ev) {
-            return ev.tags.filter((t) => t[0] === "r").map((t) => t[1]);
-          }
-          throw new Error("Can't find relay list");
-        });
-    },
+    queryFn: () => fetchRelayList(ndk, pubkey),
     staleTime: Infinity,
     gcTime: 5 * 60 * 1000,
   });
