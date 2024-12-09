@@ -24,7 +24,8 @@ export function Header({
         ? validateZap(event)?.pubkey
         : event.pubkey;
   const publishedAt = event.tags.find((t) => t[0] === "published_at")?.[1];
-  const timestamp = Number(publishedAt) || event.created_at;
+  const startsAt = event.tags.find((t) => t[0] === "starts")?.[1];
+  const timestamp = Number(publishedAt) || Number(startsAt) || event.created_at;
   return (
     <div className="flex flex-row items-center justify-between w-full">
       <div className="flex flex-row items-center gap-2">
