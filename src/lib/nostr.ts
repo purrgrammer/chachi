@@ -333,7 +333,11 @@ export function useProfiles(pubkeys: string[]) {
     queries: pubkeys.map((pubkey) => {
       return {
         queryKey: [PROFILE, pubkey],
-        queryFn: () => fetchProfile(ndk, pubkey, ["wss://purplepag.es", "wss://relay.nostr.band"]),
+        queryFn: () =>
+          fetchProfile(ndk, pubkey, [
+            "wss://purplepag.es",
+            "wss://relay.nostr.band",
+          ]),
         staleTime: Infinity,
       };
     }),

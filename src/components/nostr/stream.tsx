@@ -1,0 +1,88 @@
+import type { NostrEvent } from "nostr-tools";
+import ReactPlayer from "react-player";
+import { Radio } from "lucide-react";
+import {
+  RichText,
+  RichTextOptions,
+  RichTextClassnames,
+} from "@/components/rich-text";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import type { Group } from "@/lib/types";
+
+export function Stream({
+  event,
+  group,
+  className,
+  classNames,
+  options = {},
+}: {
+  event: NostrEvent;
+  group: Group;
+  className?: string;
+  options?: RichTextOptions;
+  classNames?: RichTextClassnames;
+}) {
+  const title = event.tags.find((t) => t[0] === "title")?.[1];
+  const summary = event.tags.find((t) => t[0] === "summary")?.[1];
+  const image = event.tags.find((t) => t[0] === "image")?.[1];
+  const isLive = event.tags.find((t) => t[0] === "status")?.[1] === "live";
+  const stream = event.tags.find((t) => t[0] === "streaming")?.[1];
+  const tags = event.tags
+    .filter((t) => t[0] === "t")
+    .map((t) => t[1])
+    .filter(Boolean)
+    .filter((t) => !t.startsWith("internal:"));
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="mb-1 relative">
+        {isLive && stream ? (
+          <ReactPlayer
+            url={stream}
+            hlsOptions={{ autoStartLoad: false }}
+            controls={true}
+            className="aspect-video rounded-sm"
+            width="100%"
+            height="100%"
+          />
+        ) : image ? (
+          <img alt={title} src={image} className="aspect-video rounded-sm" />
+        ) : null}
+        {isLive ? (
+          <Badge variant="live" className="absolute top-1 right-1">
+            <div className="flex flex-row items-center gap-1">
+              <Radio className="size-4 animate-pulse" />
+              <span className="hidden md:inline text-xs uppercase font-light">
+                Live
+              </span>
+            </div>
+          </Badge>
+        ) : null}
+      </div>
+      <div className="flex flex-row gap-6 justify-between">
+        {title ? <h3 className="text-lg font-semibold">{title}</h3> : null}
+        <div className="flex flex-row flex-wrap">
+          {tags.slice(0, 3).map((tag) => (
+            <Badge key={tag} variant="tag" className="mr-1 last:mr-0">
+              {tag}
+            </Badge>
+          ))}
+        </div>
+      </div>
+      {summary ? (
+        <RichText
+          tags={event.tags}
+          group={group}
+          className={cn(
+            "text-sm text-muted-foreground line-clamp-3",
+            className,
+          )}
+          classNames={classNames}
+          options={options}
+        >
+          {summary}
+        </RichText>
+      ) : null}
+    </div>
+  );
+}

@@ -4,6 +4,7 @@ import { NostrEvent } from "nostr-tools";
 import { Name } from "@/components/nostr/name";
 import { formatRelativeTime } from "@/lib/time";
 import { validateZap } from "@/lib/nip-57";
+import { STREAM } from "@/lib/kinds";
 import { Avatar } from "@/components/nostr/avatar";
 
 // todo: link to user profile
@@ -15,8 +16,13 @@ export function Header({
   event: NostrEvent;
   icons?: ReactNode;
 }) {
+  const host = event.tags.find((t) => t[0] === "p" && t[3] === "host")?.[1];
   const author =
-    event.kind === NDKKind.Zap ? validateZap(event)?.pubkey : event.pubkey;
+    event.kind === STREAM && host
+      ? host
+      : event.kind === NDKKind.Zap
+        ? validateZap(event)?.pubkey
+        : event.pubkey;
   const publishedAt = event.tags.find((t) => t[0] === "published_at")?.[1];
   const timestamp = Number(publishedAt) || event.created_at;
   return (

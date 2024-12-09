@@ -7,3 +7,4 @@ export const ISSUE = 1621 as NDKKind;
 export const REPO = 30617 as NDKKind;
 export const LEAVE_REQUEST = 9022 as NDKKind;
 export const DELETE_GROUP = 9008 as NDKKind;
+export const STREAM = 30311 as NDKKind;

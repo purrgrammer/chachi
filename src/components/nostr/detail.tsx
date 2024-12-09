@@ -41,6 +41,7 @@ import {
 } from "@/components/nostr/groups/metadata";
 import { Repo, Issues } from "@/components/nostr/repo";
 import { Highlight } from "@/components/nostr/highlight";
+import { Stream } from "@/components/nostr/stream";
 import { EmojiSet } from "@/components/nostr/emoji-set";
 import { Emoji } from "@/components/emoji";
 import {
@@ -59,7 +60,7 @@ import { useRelaySet, useRelays } from "@/lib/nostr";
 import { useReplies } from "@/lib/nostr/comments";
 import { useGroupAdminsList, useGroupName } from "@/lib/nostr/groups";
 import { useMyGroups, useOpenGroup } from "@/lib/groups";
-import { POLL, REPO, ISSUE, COMMENT } from "@/lib/kinds";
+import { POLL, REPO, ISSUE, COMMENT, STREAM } from "@/lib/kinds";
 import {
   Dialog,
   DialogContent,
@@ -166,6 +167,10 @@ const eventDetails: Record<
   //  preview: Book,
   //  detail: Book,
   //},
+  [STREAM]: {
+    preview: Stream,
+    detail: Stream,
+  },
 };
 
 function ShareDialog({
