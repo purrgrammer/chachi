@@ -335,6 +335,7 @@ export function ChatMessage({
       >
         {isMine || isChain ? null : (
           <ProfileDrawer
+            group={group}
             pubkey={author}
             trigger={<Avatar pubkey={author} className="size-8" />}
           />
@@ -361,6 +362,7 @@ export function ChatMessage({
               {isFirstInChain ? (
                 <div className="flex flex-row items-center gap-1">
                   <ProfileDrawer
+                    group={group}
                     pubkey={author}
                     trigger={
                       <h3 className="font-semibold text-sm">

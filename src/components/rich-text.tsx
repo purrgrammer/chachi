@@ -314,8 +314,6 @@ function extract(
     .flat();
 }
 
-const nostrEntityRegex = /^(npub1|nprofile1|note1|nevent1|naddr1)[a-z0-9]+$/g;
-
 function parseNpub(s: string): Fragment {
   const raw = s.replace(NostrPrefixRegex, "");
   const pubkey = nip19.decode(raw).data;
@@ -405,6 +403,8 @@ function extractNaddr(fragments: Fragment[]): Fragment[] {
   );
 }
 
+//const nostrEntityRegex = /^(npub1|nprofile1|note1|nevent1|naddr1)[a-z0-9]+$/g;
+
 function extractURLs(
   fragments: Fragment[],
   options: RichTextOptions,
@@ -421,6 +421,19 @@ function extractURLs(
       }
     },
     (url: string) => {
+      //const last = url.split("/").pop()?.trim();
+      //if (last && nostrEntityRegex.test(last)) {
+      //  const fragment = last.startsWith("nevent1")
+      //    ? parseEvent(last)
+      //    : last.startsWith("note1")
+      //      ? parseNote(last)
+      //      : last.startsWith("npub1")
+      //        ? parseNpub(last)
+      //        : last.startsWith("nprofile1")
+      //          ? parseNprofile(last)
+      //          : parseAddress(last);
+      //  return fragment;
+      //}
       if (isVideoLink(url) && options.video) {
         return { type: "video", url };
       }
@@ -432,18 +445,6 @@ function extractURLs(
       }
       if (url.match(youtubeUrlRegex) && options.youtube) {
         return { type: "youtube", url };
-      }
-      const last = url.split("/").pop();
-      if (options.events && last && nostrEntityRegex.test(last)) {
-        return last.startsWith("nevent1")
-          ? parseEvent(last)
-          : last.startsWith("note1")
-            ? parseNote(last)
-            : last.startsWith("npub1")
-              ? parseNpub(last)
-              : last.startsWith("nprofile1")
-                ? parseNprofile(last)
-                : parseAddress(last);
       }
       return { type: "url", url } as Fragment;
     },
@@ -540,14 +541,14 @@ export function useRichText(
 ): Fragment[] {
   const fragments = useMemo(() => {
     let result = toFragments(text || "");
+    if (options.urls) {
+      result = extractURLs(result, options);
+    }
     if (options.mentions) {
       result = extractProfiles(extractMentions(result));
     }
     if (options.events) {
       result = extractNaddr(extractNevent(extractNote(result)));
-    }
-    if (options.urls) {
-      result = extractURLs(result, options);
     }
     if (options.emojis) {
       result = extractCustomEmoji(result, tags);
@@ -615,14 +616,14 @@ export function RichText({
   const opts = { ...defaultOptions, ...options };
   const fragments = useMemo(() => {
     let result = toFragments(children || "");
+    if (opts.urls) {
+      result = extractURLs(result, opts);
+    }
     if (opts.mentions) {
       result = extractProfiles(extractMentions(result));
     }
     if (opts.events) {
       result = extractNaddr(extractNevent(extractNote(result)));
-    }
-    if (opts.urls) {
-      result = extractURLs(result, opts);
     }
     if (opts.emojis) {
       result = extractCustomEmoji(result, tags);

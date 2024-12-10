@@ -42,6 +42,7 @@ import {
 import { Repo, Issues } from "@/components/nostr/repo";
 import { Highlight } from "@/components/nostr/highlight";
 import { Stream } from "@/components/nostr/stream";
+import People from "@/components/nostr/people";
 import { EmojiSet } from "@/components/nostr/emoji-set";
 import { Emoji } from "@/components/emoji";
 import {
@@ -170,6 +171,10 @@ const eventDetails: Record<
   [STREAM]: {
     preview: Stream,
     detail: Stream,
+  },
+  [NDKKind.CategorizedPeopleList]: {
+    preview: People,
+    detail: People,
   },
 };
 

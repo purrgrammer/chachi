@@ -14,9 +14,17 @@ import { useProfile, useRelayList } from "@/lib/nostr";
 import { Group } from "@/components/nostr/group";
 import { InputCopy } from "@/components/ui/input-copy";
 import { groupId } from "@/lib/groups";
+import { RichText } from "@/components/rich-text";
 import { useUserGroups } from "@/lib/nostr/groups";
+import type { Group as GroupType } from "@/lib/types";
 
-function ProfileDrawerContent({ pubkey }: { pubkey: string }) {
+function ProfileDrawerContent({
+  pubkey,
+  group,
+}: {
+  pubkey: string;
+  group: GroupType;
+}) {
   const { data: profile } = useProfile(pubkey);
   const { data: groups } = useUserGroups(pubkey);
   const { data: relays } = useRelayList(pubkey);
@@ -37,9 +45,12 @@ function ProfileDrawerContent({ pubkey }: { pubkey: string }) {
           }
         />
         {about ? (
-          <span className="text-sm text-muted-foreground text-center">
+          <RichText
+            group={group}
+            className="text-sm text-muted-foreground text-center"
+          >
             {about}
-          </span>
+          </RichText>
         ) : null}
         {groups && groups.length > 0 ? (
           <ScrollArea className="h-80">
@@ -57,16 +68,18 @@ function ProfileDrawerContent({ pubkey }: { pubkey: string }) {
 
 export function ProfileDrawer({
   trigger,
+  group,
   pubkey,
 }: {
   trigger: ReactNode;
   pubkey: string;
+  group: GroupType;
 }) {
   return (
     <Drawer>
       <DrawerTrigger className="cursor-pointer">{trigger}</DrawerTrigger>
       <DrawerContent>
-        <ProfileDrawerContent pubkey={pubkey} />
+        <ProfileDrawerContent pubkey={pubkey} group={group} />
       </DrawerContent>
     </Drawer>
   );
