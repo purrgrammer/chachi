@@ -1,6 +1,8 @@
+import { useState } from "react";
 import type { NostrEvent } from "nostr-tools";
 import ReactPlayer from "react-player";
-import { Radio } from "lucide-react";
+import { Radio, Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   RichText,
   RichTextOptions,
@@ -23,6 +25,7 @@ export function Stream({
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
 }) {
+  const [isPlaying, setIsPlaying] = useState(false);
   const title = event.tags.find((t) => t[0] === "title")?.[1];
   const summary = event.tags.find((t) => t[0] === "summary")?.[1];
   const image = event.tags.find((t) => t[0] === "image")?.[1];
@@ -36,15 +39,34 @@ export function Stream({
   return (
     <div className="flex flex-col gap-1">
       <div className="mb-1 relative">
-        {isLive && stream ? (
-          <ReactPlayer
-            url={stream}
-            hlsOptions={{ autoStartLoad: false }}
-            controls={true}
-            className="aspect-video rounded-sm"
-            width="100%"
-            height="100%"
-          />
+        {image && isLive && stream ? (
+          isPlaying ? (
+            <ReactPlayer
+              url={stream}
+              hlsOptions={{ autoStartLoad: false }}
+              controls={true}
+              className="aspect-video rounded-sm"
+              width="100%"
+              height="100%"
+            />
+          ) : (
+            <>
+              <img
+                alt={title}
+                src={image}
+                className="aspect-video rounded-sm"
+              />
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <Button
+                  size="play"
+                  className="transition-all hover:scale-125"
+                  onClick={() => setIsPlaying(true)}
+                >
+                  <Play />
+                </Button>
+              </div>
+            </>
+          )
         ) : image ? (
           <img alt={title} src={image} className="aspect-video rounded-sm" />
         ) : null}

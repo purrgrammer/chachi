@@ -1,3 +1,4 @@
+import ReactPlayer from "react-player/youtube";
 import { cn } from "@/lib/utils";
 
 export const youtubeUrlRegex =
@@ -13,13 +14,12 @@ export function YoutubeEmbed({
   const m = url.match(youtubeUrlRegex);
   if (!m) return null;
   return (
-    <iframe
-      className={cn("aspect-video rounded-md w-full my-1", className)}
-      src={`https://www.youtube.com/embed/${m[1]}${m[3] ? `?list=${m[3].slice(6)}` : ""}`}
-      title="YouTube video player"
-      frameBorder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      allowFullScreen={true}
+    <ReactPlayer
+      url={url}
+      controls
+      className={cn("aspect-video rounded-md", className)}
+      width="100%"
+      height="100%"
     />
   );
 }
