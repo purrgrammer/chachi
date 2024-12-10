@@ -136,6 +136,7 @@ function toNode(
   idx: number,
   classNames: RichTextClassnames,
   group: Group,
+  options?: RichTextOptions,
 ) {
   if (fragment.type === "mention") {
     return (
@@ -260,7 +261,9 @@ function toNode(
           classNames.paragraphs,
         )}
       >
-        {...fragment.nodes.map((f, idx) => toNode(f, idx, classNames, group))}
+        {...fragment.nodes.map((f, idx) =>
+          toNode(f, idx, classNames, group, options),
+        )}
       </p>
     );
   }
@@ -311,17 +314,27 @@ function extract(
     .flat();
 }
 
+const nostrEntityRegex = /^(npub1|nprofile1|note1|nevent1|naddr1)[a-z0-9]+$/g;
+
+function parseNpub(s: string): Fragment {
+  const raw = s.replace(NostrPrefixRegex, "");
+  const pubkey = nip19.decode(raw).data;
+  return { type: "mention", pubkey, relays: [] } as Fragment;
+}
+
 function extractMentions(fragments: Fragment[]): Fragment[] {
   return extract(
     fragments,
     /(nostr:npub1[a-z0-9]+)/g,
     (s: string) => s.startsWith("nostr:npub1"),
-    (s: string) => {
-      const raw = s.replace(NostrPrefixRegex, "");
-      const pubkey = nip19.decode(raw).data;
-      return { type: "mention", pubkey, relays: [] } as Fragment;
-    },
+    parseNpub,
   );
+}
+
+function parseNprofile(s: string): Fragment {
+  const raw = s.replace(NostrPrefixRegex, "");
+  const { pubkey, relays } = nip19.decode(raw).data as ProfilePointer;
+  return { type: "mention", pubkey, relays: relays || [] } as Fragment;
 }
 
 function extractProfiles(fragments: Fragment[]): Fragment[] {
@@ -329,12 +342,14 @@ function extractProfiles(fragments: Fragment[]): Fragment[] {
     fragments,
     /(nostr:nprofile1[a-z0-9]+)/g,
     (s: string) => s.startsWith("nostr:nprofile1"),
-    (s: string) => {
-      const raw = s.replace(NostrPrefixRegex, "");
-      const { pubkey, relays } = nip19.decode(raw).data as ProfilePointer;
-      return { type: "mention", pubkey, relays: relays || [] } as Fragment;
-    },
+    parseNprofile,
   );
+}
+
+function parseNote(s: string): Fragment {
+  const note = s.replace(NostrPrefixRegex, "");
+  const id = nip19.decode(note).data;
+  return { type: "event", id, relays: [], kind: 1 } as Fragment;
 }
 
 function extractNote(fragments: Fragment[]): Fragment[] {
@@ -342,12 +357,21 @@ function extractNote(fragments: Fragment[]): Fragment[] {
     fragments,
     /(nostr:note1[a-z0-9]+)/g,
     (s: string) => s.startsWith("nostr:note1"),
-    (s: string) => {
-      const note = s.replace(NostrPrefixRegex, "");
-      const id = nip19.decode(note).data;
-      return { type: "event", id, relays: [], kind: 1 } as Fragment;
-    },
+    parseNote,
   );
+}
+
+function parseEvent(s: string): Fragment {
+  const nevent = s.replace(NostrPrefixRegex, "");
+  const { id, relays, author, kind } = nip19.decode(nevent)
+    .data as EventPointer;
+  return {
+    type: "event",
+    id,
+    relays: relays || [],
+    kind,
+    pubkey: author,
+  } as Fragment;
 }
 
 function extractNevent(fragments: Fragment[]): Fragment[] {
@@ -355,19 +379,21 @@ function extractNevent(fragments: Fragment[]): Fragment[] {
     fragments,
     /(nostr:nevent1[a-z0-9]+)/g,
     (s: string) => s.startsWith("nostr:nevent1"),
-    (s: string) => {
-      const nevent = s.replace(NostrPrefixRegex, "");
-      const { id, relays, author, kind } = nip19.decode(nevent)
-        .data as EventPointer;
-      return {
-        type: "event",
-        id,
-        relays: relays || [],
-        kind,
-        pubkey: author,
-      } as Fragment;
-    },
+    parseEvent,
   );
+}
+
+function parseAddress(s: string): Fragment {
+  const nevent = s.replace(NostrPrefixRegex, "");
+  const { pubkey, identifier, kind, relays } = nip19.decode(nevent)
+    .data as AddressPointer;
+  return {
+    type: "address",
+    relays: relays || [],
+    pubkey,
+    identifier,
+    kind: Number(kind),
+  } as Fragment;
 }
 
 function extractNaddr(fragments: Fragment[]): Fragment[] {
@@ -375,18 +401,7 @@ function extractNaddr(fragments: Fragment[]): Fragment[] {
     fragments,
     /(nostr:naddr1[a-z0-9]+)/g,
     (s: string) => s.startsWith("nostr:naddr1"),
-    (s: string) => {
-      const nevent = s.replace(NostrPrefixRegex, "");
-      const { pubkey, identifier, kind, relays } = nip19.decode(nevent)
-        .data as AddressPointer;
-      return {
-        type: "address",
-        relays: relays || [],
-        pubkey,
-        identifier,
-        kind: Number(kind),
-      } as Fragment;
-    },
+    parseAddress,
   );
 }
 
@@ -417,6 +432,18 @@ function extractURLs(
       }
       if (url.match(youtubeUrlRegex) && options.youtube) {
         return { type: "youtube", url };
+      }
+      const last = url.split("/").pop();
+      if (options.events && last && nostrEntityRegex.test(last)) {
+        return last.startsWith("nevent1")
+          ? parseEvent(last)
+          : last.startsWith("note1")
+            ? parseNote(last)
+            : last.startsWith("npub1")
+              ? parseNpub(last)
+              : last.startsWith("nprofile1")
+                ? parseNprofile(last)
+                : parseAddress(last);
       }
       return { type: "url", url } as Fragment;
     },
@@ -541,15 +568,17 @@ export function Fragments({
   group,
   className,
   classNames = {},
+  options,
 }: {
   fragments: Fragment[];
   group: Group;
   className?: string;
   classNames?: RichTextClassnames;
+  options?: RichTextOptions;
 }) {
   return (
     <div className={cn("flex flex-col gap-3", className)}>
-      {...fragments.map((f, idx) => toNode(f, idx, classNames, group))}
+      {...fragments.map((f, idx) => toNode(f, idx, classNames, group, options))}
     </div>
   );
 }
@@ -632,7 +661,9 @@ export function RichText({
       return acc;
     }, [] as Fragment[]);
   }, [children, opts, tags]);
-  const body = fragments.map((f, idx) => toNode(f, idx, classNames, group));
+  const body = fragments.map((f, idx) =>
+    toNode(f, idx, classNames, group, opts),
+  );
   return options.inline ? (
     <span className={className}>{...body}</span>
   ) : (
