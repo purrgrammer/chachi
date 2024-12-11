@@ -53,8 +53,16 @@ export function Markdown({
             )}
           </p>
         ),
-        pre: ({ children }) => <pre className="font-mono">{children}</pre>,
-        code: ({ children }) => <code className="font-mono">{children}</code>,
+        pre: ({ children }) => (
+          <pre className="text-xs font-mono overflow-y-auto pretty-scrollbar">
+            {children}
+          </pre>
+        ),
+        code: ({ children }) => (
+          <code className="font-mono overflow-y-auto pretty-scrollbar">
+            {children}
+          </code>
+        ),
         a: ({ children, href, ...props }) => {
           const isInternal = href?.startsWith("#");
           return isInternal ? (
