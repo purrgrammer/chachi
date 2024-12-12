@@ -80,6 +80,7 @@ function RelayItem({ group }: { group: Group }) {
                     hashtags: true,
                     events: false,
                     ecash: false,
+                    images: false,
                     video: false,
                     audio: false,
                     youtube: false,
