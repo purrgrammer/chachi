@@ -1,4 +1,4 @@
-import { useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
 
 interface Settings {
@@ -15,5 +15,5 @@ export const settingsAtom = atomWithStorage<Settings>(
 );
 
 export function useSettings() {
-  return useAtomValue(settingsAtom);
+  return useAtom(settingsAtom);
 }

@@ -152,7 +152,7 @@ export function ChatMessage({
   richTextClassnames?: RichTextClassnames;
   className?: string;
 }) {
-  const settings = useSettings();
+  const [settings] = useSettings();
   const relay = group.relay;
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
@@ -538,6 +538,12 @@ export function ChatMessage({
                 <ContextMenuLabel className="text-xs font-light">
                   Debug
                 </ContextMenuLabel>
+                <ContextMenuItem
+                  className="cursor-pointer"
+                  onClick={() => console.log(event)}
+                >
+                  Log
+                </ContextMenuItem>
                 <ContextMenuItem
                   className="cursor-pointer"
                   onClick={() => saveLastSeen(event, group)}
