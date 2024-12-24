@@ -166,7 +166,7 @@ export function ChatMessage({
   const author = event.pubkey;
   const content = event.content.trim();
   const legacyReply = event.tags.find((t) => t[3] === "reply")?.[1];
-  const quotedReply = event.tags.find((t) => t[3] === "q")?.[1];
+  const quotedReply = event.tags.find((t) => t[0] === "q")?.[1];
   const replyTo = legacyReply || quotedReply;
   const replyRoot = event.tags.find((t) => t[3] === "root")?.[1];
   const isReplyingTo = replyTo || replyRoot;
