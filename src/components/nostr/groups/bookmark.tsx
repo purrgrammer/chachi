@@ -29,6 +29,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useNDK } from "@/lib/ndk";
+import { useTranslation } from "react-i18next";
 
 export function ConfirmGroupLeaveDialog({
   open,
@@ -39,20 +40,25 @@ export function ConfirmGroupLeaveDialog({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <AlertDialog open={open}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure you want to leave?</AlertDialogTitle>
+          <AlertDialogTitle>
+            {t("group.leave.confirmation.title")}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. You will be removed from the group
-            members list.
+            {t("group.leave.confirmation.description")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel onClick={onCancel}>
+            {t("group.leave.confirmation.cancel")}
+          </AlertDialogCancel>
           <AlertDialogAction onClick={onConfirm}>
-            <DoorOpen className="size-8" /> Leave
+            <DoorOpen className="size-8" />{" "}
+            {t("group.leave.confirmation.confirm")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -61,6 +67,7 @@ export function ConfirmGroupLeaveDialog({
 }
 
 export function useBookmarkGroup(group: Group) {
+  const { t } = useTranslation();
   const ndk = useNDK();
   const groups = useAtomValue(groupsAtom);
   const isBookmarked = groups.find(
@@ -81,7 +88,7 @@ export function useBookmarkGroup(group: Group) {
       //setGroups(newGroups);
     } catch (err) {
       console.error(err);
-      toast.error("Error bookmarking group");
+      toast.error(t("group.bookmark.error"));
     }
   }
 
@@ -99,7 +106,7 @@ export function useBookmarkGroup(group: Group) {
       //setGroups(newGroups);
     } catch (err) {
       console.error(err);
-      toast.error("Error unbookmarking group");
+      toast.error(t("group.unbookmark.error"));
     }
   }
 
@@ -112,16 +119,16 @@ export function BookmarkGroup({ group }: { group: Group }) {
   const { isBookmarked, bookmarkGroup, unbookmarkGroup } =
     useBookmarkGroup(group);
   const sendLeaveRequest = useLeaveRequest(group);
-
+  const { t } = useTranslation();
   async function leaveGroup() {
     try {
       await sendLeaveRequest();
       unbookmarkGroup();
-      toast.success("Left group");
+      toast.success(t("group.leave.success"));
       setConfirmLeave(false);
     } catch (err) {
       console.error(err);
-      toast.error("Error leaving group");
+      toast.error(t("group.leave.error"));
     }
   }
 
@@ -163,14 +170,16 @@ export function BookmarkGroup({ group }: { group: Group }) {
               ) : (
                 <BookmarkCheck className="size-5" />
               )}
-              {isBookmarked ? "Unbookmark" : "Bookmark"}
+              {isBookmarked
+                ? t("group.unbookmark.trigger")
+                : t("group.bookmark.trigger")}
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-destructive dark:bg-destructive dark:text-destructive-foreground"
               onClick={() => setConfirmLeave(true)}
             >
               <DoorOpen className="size-5" />
-              Leave
+              {t("group.leave.trigger")}
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
