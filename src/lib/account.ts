@@ -9,6 +9,7 @@ import {
   accountAtom,
   followsAtom,
 } from "@/app/store";
+import { useTranslation } from "react-i18next";
 
 export function useAccount(): Account | null {
   const account = useAtomValue(accountAtom);
@@ -37,6 +38,7 @@ export function useLogout() {
 }
 
 export function useNip07Login() {
+  const { t } = useTranslation();
   const ndk = useNDK();
   const [, setAccount] = useAtom(accountAtom);
   const [, setLoginMethod] = useAtom(methodAtom);
@@ -49,7 +51,7 @@ export function useNip07Login() {
       setLoginMethod("nip07");
     } catch (err) {
       console.error(err);
-      toast.error("Error logging in with NIP-07");
+      toast.error(t("nav.user.login.error-nip07"));
     }
   };
 }
