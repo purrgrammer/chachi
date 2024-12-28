@@ -1,6 +1,7 @@
 import { toast } from "sonner";
 import { useState, ReactNode } from "react";
 import { LogIn, Puzzle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,6 +22,7 @@ export function Login({
 }) {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const nip07 = useNip07Login();
+  const { t } = useTranslation();
 
   async function nip07Login() {
     try {
@@ -28,7 +30,7 @@ export function Login({
       await nip07();
     } catch (err) {
       console.error(err);
-      toast.error("Failed to login with extension");
+      toast.error(t("nav.user.login.error"));
     } finally {
       setIsLoggingIn(false);
     }
@@ -47,19 +49,21 @@ export function Login({
                 <LogIn className="size-5" />
               </span>
             ) : (
-              <span>Get started</span>
+              <span>{t("nav.user.login.start")}</span>
             )}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Get started</DialogTitle>
-          <DialogDescription>Select the login method below.</DialogDescription>
+          <DialogTitle>{t("nav.user.login.title")}</DialogTitle>
+          <DialogDescription>
+            {t("nav.user.login.description")}
+          </DialogDescription>
         </DialogHeader>
         <div>
           <Button disabled={isLoggingIn} size="lg" onClick={nip07Login}>
-            <Puzzle className="size-5" /> Connect with NIP-07
+            <Puzzle className="size-5" /> {t("nav.user.login.nip-07")}
           </Button>
         </div>
       </DialogContent>
