@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useNDK } from "@/lib/ndk";
 import { useCustomEmojis } from "@/lib/nostr/emojis";
 import { useRelays, useRelaySet } from "@/lib/nostr";
+import { useTranslation } from "react-i18next";
 
 export function EmojiSet({ event }: { event: NostrEvent }) {
   const { data: myEmojis } = useCustomEmojis();
@@ -25,6 +26,7 @@ export function EmojiSet({ event }: { event: NostrEvent }) {
     (e) => e.identifier === identifier && e.pubkey === event.pubkey,
   );
   const [isSaving, setIsSaving] = useState(false);
+  const { t } = useTranslation();
   async function toggleFavorite() {
     try {
       setIsSaving(true);
@@ -51,7 +53,7 @@ export function EmojiSet({ event }: { event: NostrEvent }) {
       await ev.publish(relaySet);
     } catch (err) {
       console.error(err);
-      toast.error("Failed to bookmark emoji set");
+      toast.error(t("emoji.set.bookmark.error"));
     } finally {
       setIsSaving(false);
     }
@@ -59,7 +61,7 @@ export function EmojiSet({ event }: { event: NostrEvent }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-row gap-1 items-center justify-between">
+      <div className="flex flex-row gap-1 justify-between items-center">
         <h4 className="text-xl font-semibold">{title || identifier}</h4>
         <Button
           disabled={isSaving}
@@ -77,11 +79,11 @@ export function EmojiSet({ event }: { event: NostrEvent }) {
         </Button>
       </div>
       <div className="">
-        <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
+        <div className="grid grid-cols-6 gap-2 sm:grid-cols-8">
           {emojis.map((emoji) => (
             <Tooltip key={emoji[1]}>
               <TooltipTrigger asChild>
-                <div className="flex items-center justify-center">
+                <div className="flex justify-center items-center">
                   <img
                     className="size-8"
                     src={emoji[2]}
