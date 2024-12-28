@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { formatDay } from "@/lib/time";
 import type { Group } from "@/lib/types";
+import { useTranslation } from "react-i18next";
 
 function FormatDay({ endsAt }: { endsAt: number }) {
   const date = new Date(endsAt * 1000);
@@ -79,14 +80,14 @@ function Option({
         {shouldShowRadioItem ? (
           <RadioGroupItem id={id} value={id} defaultChecked={false} />
         ) : null}
-        <div className="flex flex-col items-start gap-3 w-full">
+        <div className="flex flex-col gap-3 items-start w-full">
           <RichText tags={event.tags} group={group} options={{ inline: true }}>
             {text}
           </RichText>
         </div>
       </div>
       {showResult ? (
-        <div className="flex flex-row gap-3 w-full p-1">
+        <div className="flex flex-row gap-3 p-1 w-full">
           <Progress value={percentage} />
           <span className="font-mono text-xs text-muted-foreground">
             {percentage.toFixed()}%
@@ -119,14 +120,15 @@ export function Poll({
   const iVoted = votes.find((v) => v.pubkey === me);
   const showResult = isExpired || Boolean(iVoted);
   const castVote = useVote(event, selectedOptions);
+  const { t } = useTranslation();
 
   async function onClick() {
     try {
       await castVote();
-      toast.success("Vote cast");
+      toast.success(t("vote.success"));
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't cast vote");
+      toast.error("vote.error");
     }
   }
 
@@ -173,15 +175,16 @@ export function Poll({
           </RadioGroup>
         )}
       </div>
-      <div className="flex flex-row items-center gap-6 justify-between">
+      <div className="flex flex-row gap-6 justify-between items-center">
         <div>
           {isExpired ? (
-            <span className="text-xs text-muted-foreground mt-1">
-              Poll closed
+            <span className="mt-1 text-xs text-muted-foreground">
+              {t("poll.closed")}
             </span>
           ) : endsAt ? (
-            <span className="text-xs text-muted-foreground mt-1">
-              Ends <FormatDay endsAt={Number(endsAt)} />
+            <span className="mt-1 text-xs text-muted-foreground">
+              {t("poll.ends")}
+              <FormatDay endsAt={Number(endsAt)} />
             </span>
           ) : null}
         </div>
@@ -191,7 +194,7 @@ export function Poll({
             disabled={isExpired || iVoted || selectedOptions.length === 0}
             onClick={onClick}
           >
-            <Vote /> Vote
+            <Vote /> {t("vote.action")}
           </Button>
         )}
       </div>
@@ -225,7 +228,7 @@ function ResultOption({
       </h3>
       <div className="flex flex-col gap-2">
         {optionVotes.map((vote) => (
-          <div className="flex flex-row items-center gap-2">
+          <div className="flex flex-row gap-2 items-center">
             <Avatar pubkey={vote.pubkey} className="size-6" />
             <span className="text-sm text-muted-foreground">
               <Name pubkey={vote.pubkey} />
