@@ -2,30 +2,34 @@ import { useEvent, useAddress } from "@/lib/nostr";
 import { SearchSlash, Network, Ban } from "lucide-react";
 import { Embed } from "@/components/nostr/detail";
 import type { Group } from "@/lib/types";
+import { useTranslation } from "react-i18next";
 
 function LoadingEvent() {
+  const { t } = useTranslation();
   return (
-    <div className="flex flex-row gap-3 items-center px-4 py-2 border rounded-sm text-muted-foreground bg-background">
-      <Network className="size-4 animate-pulse" />
-      <span className="text-sm italic">Loading event</span>
+    <div className="flex flex-row gap-3 items-center py-2 px-4 rounded-sm border text-muted-foreground bg-background">
+      <Network className="animate-pulse size-4" />
+      <span className="text-sm italic">{t("event.loading")}</span>
     </div>
   );
 }
 
 function EventNotFound() {
+  const { t } = useTranslation();
   return (
-    <div className="flex flex-row gap-3 items-center px-4 py-2 border rounded-sm text-muted-foreground bg-background">
+    <div className="flex flex-row gap-3 items-center py-2 px-4 rounded-sm border text-muted-foreground bg-background">
       <SearchSlash className="size-4" />
-      <span className="text-sm italic">Event not found</span>
+      <span className="text-sm italic">{t("event.not-found")}</span>
     </div>
   );
 }
 
 function EventFetchError() {
+  const { t } = useTranslation();
   return (
-    <div className="flex flex-row gap-3 items-center px-4 py-2 border rounded-sm text-muted-foreground bg-background">
+    <div className="flex flex-row gap-3 items-center py-2 px-4 rounded-sm border text-muted-foreground bg-background">
       <Ban className="size-4" />
-      <span className="text-sm italic">Error fetching event</span>
+      <span className="text-sm italic">{t("event.fetch-error")}</span>
     </div>
   );
 }
