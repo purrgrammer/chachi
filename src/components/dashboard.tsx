@@ -323,7 +323,7 @@ function GroupSearchResult({
         {group.about ? (
           <Highlight text={group.about} highlight={search} />
         ) : (
-          t("dashboard.search.result.no-description-avaible")
+          t("dashboard.search.result.no-description-available")
         )}
       </p>
     </div>
