@@ -32,10 +32,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 function Heading({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="flex flex-row items-center gap-1">
+    <div className="flex flex-row gap-1 items-center">
       {icon}
       <h3 className="text-sm font-light uppercase">{text}</h3>
     </div>
@@ -51,6 +52,7 @@ function GroupMessages({ group }: { group: Group }) {
   const name = useGroupName(group);
   const img = useGroupPicture(group);
   const openGroup = useOpenGroup(group);
+  const { t } = useTranslation();
 
   return unread && unread > 0 ? (
     <Reorder.Item dragListener={false} key={groupId(group)} value={group}>
@@ -59,20 +61,22 @@ function GroupMessages({ group }: { group: Group }) {
         className="relative h-fit min-w-32 w-fit"
         onClick={openGroup}
       >
-        <div className="flex flex-col items-center gap-1">
-          <Avatar className="size-12 rounded-full">
+        <div className="flex flex-col gap-1 items-center">
+          <Avatar className="rounded-full size-12">
             <AvatarImage src={img} className="object-cover" />
             <AvatarFallback>{name?.at(0) || group.id.at(0)}</AvatarFallback>
           </Avatar>
           <h3 className="text-lg">{name}</h3>
-          <div className="flex flex-col items-center gap-1 text-xs">
+          <div className="flex flex-col gap-1 items-center text-xs">
             <div
               className={`flex flex-row gap-1 ${unread === 0 ? "opacity-50" : ""}`}
             >
               <span className="font-mono">
                 {unread >= 100 ? "99+" : unread}
               </span>
-              <span className="text-muted-foreground">unread</span>
+              <span className="text-muted-foreground">
+                {t("dashboard.activity.unread")}
+              </span>
             </div>
             <div
               className={`flex flex-row gap-1 ${mentions === 0 ? "opacity-50" : ""}`}
@@ -80,7 +84,9 @@ function GroupMessages({ group }: { group: Group }) {
               <span className="font-mono">
                 {mentions >= 100 ? "99+" : mentions}
               </span>
-              <span className="text-muted-foreground">mentions</span>
+              <span className="text-muted-foreground">
+                {t("dashboard.activity.mentions")}
+              </span>
             </div>
           </div>
         </div>
@@ -94,7 +100,7 @@ function GroupActivityList() {
   return (
     <Reorder.Group
       axis="x"
-      className="px-0 flex flex-row items-center gap-1 overflow-x-auto no-scrollbar w-[calc(100vw-1.5rem)] md:w-[calc(100vw-20rem)]"
+      className="flex overflow-x-auto flex-row gap-1 items-center px-0 no-scrollbar w-[calc(100vw-1.5rem)] md:w-[calc(100vw-20rem)]"
       values={sortedGroups}
       onReorder={() => console.log("reorder")}
     >
@@ -108,14 +114,18 @@ function GroupActivityList() {
 function GroupsActivity() {
   const myGroups = useMyGroups();
   const unreads = useUnreads(myGroups);
+  const { t } = useTranslation();
   return (
     <div className="space-y-2">
-      <Heading icon={<Activity className="size-4" />} text="Activity" />
+      <Heading
+        icon={<Activity className="size-4" />}
+        text={t("dashboard.activity.heading")}
+      />
       {myGroups.length > 0 && unreads.length > 0 ? (
         <GroupActivityList />
       ) : (
         <span className="text-sm text-muted-foreground">
-          Nothing new for you... yet
+          {t("dashboard.activity.none")}
         </span>
       )}
     </div>
@@ -137,25 +147,26 @@ function CloseGroup({
   const name = isRelayGroup ? relayInfo?.name : metadata?.name;
   const img = isRelayGroup ? relayInfo?.icon : metadata?.picture;
   const openGroup = useOpenGroup(group);
+  const { t } = useTranslation();
   return (
     <Button variant="outline" size="fit" onClick={openGroup}>
-      <div className="p-2 rounded-sm w-64 space-y-3">
-        <div className="flex flex-row items-center gap-2">
-          <Avatar className="size-10 rounded-full">
+      <div className="p-2 space-y-3 w-64 rounded-sm">
+        <div className="flex flex-row gap-2 items-center">
+          <Avatar className="rounded-full size-10">
             <AvatarImage src={img} className="object-cover" />
             <AvatarFallback>{name?.at(0) || id.at(0)}</AvatarFallback>
           </Avatar>
-          <div className="flex flex-col items-start overflow-hidden">
+          <div className="flex overflow-hidden flex-col items-start">
             <h3 className="text-lg line-clamp-1">
               {isRelayGroup
                 ? relayInfo?.name || id.slice(0, 8)
                 : metadata?.name || id.slice(0, 8)}
             </h3>
-            <span className="text-xs font-mono">{getRelayHost(relay)}</span>
+            <span className="font-mono text-xs">{getRelayHost(relay)}</span>
           </div>
         </div>
         {about ? (
-          <p className="text-xs text-muted-foreground break-word whitespace-pre-wrap line-clamp-3">
+          <p className="text-xs whitespace-pre-wrap text-muted-foreground break-word line-clamp-3">
             {about}
           </p>
         ) : null}
@@ -163,8 +174,8 @@ function CloseGroup({
           pubkeys={members}
           max={3}
           size="sm"
-          suffix=" peers"
-          singularSuffix=" peer"
+          suffix={t("peers")}
+          singularSuffix={t("peer")}
         />
       </div>
     </Button>
@@ -178,11 +189,12 @@ function NetworkGroups() {
     groups
       ?.filter((g) => !myGroups.find((mg) => mg.id === g.id))
       .sort((a, b) => b.members.length - a.members.length) ?? [];
+  const { t } = useTranslation();
   return sorted?.length > 0 ? (
     <div className="space-y-2">
       <Heading
         icon={<Flame className="size-4" />}
-        text="Popular in your network"
+        text={t("dashboard.popular.heading")}
       />
       <div
         className="flex flex-row gap-2
@@ -212,23 +224,23 @@ function Featured({ group }: { group: Group }) {
   const openGroup = useOpenGroup(group);
   return (
     <Button variant="outline" size="fit" onClick={openGroup}>
-      <div className="p-2 rounded-sm w-64 space-y-3">
-        <div className="flex flex-row items-center gap-2">
-          <Avatar className="size-10 rounded-full">
+      <div className="p-2 space-y-3 w-64 rounded-sm">
+        <div className="flex flex-row gap-2 items-center">
+          <Avatar className="rounded-full size-10">
             <AvatarImage src={img} className="object-cover" />
             <AvatarFallback>{name?.at(0) || id.at(0)}</AvatarFallback>
           </Avatar>
-          <div className="flex flex-col items-start overflow-hidden">
+          <div className="flex overflow-hidden flex-col items-start">
             <h3 className="text-lg line-clamp-1">
               {isRelayGroup
                 ? relayInfo?.name || id.slice(0, 8)
                 : metadata?.name || id.slice(0, 8)}
             </h3>
-            <span className="text-xs font-mono">{getRelayHost(relay)}</span>
+            <span className="font-mono text-xs">{getRelayHost(relay)}</span>
           </div>
         </div>
         {about ? (
-          <p className="text-xs text-muted-foreground break-word whitespace-pre-wrap line-clamp-3">
+          <p className="text-xs whitespace-pre-wrap text-muted-foreground break-word line-clamp-3">
             {about}
           </p>
         ) : null}
@@ -247,9 +259,13 @@ const featured = [
 ];
 
 function FeaturedGroups() {
+  const { t } = useTranslation();
   return (
     <div className="space-y-2">
-      <Heading icon={<Sparkles className="size-4" />} text="Featured" />
+      <Heading
+        icon={<Sparkles className="size-4" />}
+        text={t("dashboard.featured.heading")}
+      />
       <div
         className="flex flex-row gap-2 
       w-[calc(100vw-2rem)]
@@ -277,12 +293,13 @@ function GroupSearchResult({
   className?: string;
 }) {
   const openGroup = useOpenGroup(group);
+  const { t } = useTranslation();
   return (
     <div className={cn("flex flex-col gap-3 p-2 overflow-hidden", className)}>
-      <div className="flex flex-row items-start justify-between">
+      <div className="flex flex-row justify-between items-start">
         <div className="flex flex-col gap-4">
           <div className="flex flex-row gap-2">
-            <Avatar className="size-10 rounded-full">
+            <Avatar className="rounded-full size-10">
               <AvatarImage src={group.picture} className="object-cover" />
               <AvatarFallback>
                 {group.name?.at(0) || group.id.at(0)}
@@ -292,21 +309,21 @@ function GroupSearchResult({
               <h3 className="line-clamp-1">
                 <Highlight text={group.name} highlight={search} />
               </h3>
-              <span className="text-xs font-mono text-muted-foreground">
+              <span className="font-mono text-xs text-muted-foreground">
                 {getRelayHost(group.relay)}
               </span>
             </div>
           </div>
         </div>
         <Button className="ml-auto" size="sm" onClick={openGroup}>
-          Visit
+          {t("dashboard.search.result.visit")}
         </Button>
       </div>
-      <p className="text-sm line-clamp-1 pl-12 text-muted-foreground">
+      <p className="pl-12 text-sm line-clamp-1 text-muted-foreground">
         {group.about ? (
           <Highlight text={group.about} highlight={search} />
         ) : (
-          "No description available"
+          t("dashboard.search.result.no-description-avaible")
         )}
       </p>
     </div>
@@ -333,41 +350,45 @@ function GroupSearch() {
       g.name.toLowerCase().includes(search.toLowerCase()) ||
       g.about?.toLowerCase().includes(search.toLowerCase()),
   );
+  const n = filteredGroups.length;
   const hasNoResults =
     search.trim().length >= minChars && filteredGroups.length === 0;
+  const { t } = useTranslation();
   return (
-    <div className="flex flex-col items-center justify-center space-y-2">
-      <div className="w-64 sm:w-82 md:w-96 space-y-2">
+    <div className="flex flex-col justify-center items-center space-y-2">
+      <div className="space-y-2 w-64 md:w-96 sm:w-82">
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           leftIcon={<Search className="size-4" />}
           rightIcon={<X />}
           onRightIconClick={() => setSearch("")}
-          placeholder="Search groups"
+          placeholder={t("dashboard.search.input.placeholder")}
         />
-        <span className="text-xs text-muted-foreground ml-1">
+        <span className="ml-1 text-xs text-muted-foreground">
           {hasNoResults
-            ? `No results for "${search}"`
+            ? t("dashboard.search.input.no-results-for-x", { search })
             : search.trim().length >= minChars && filteredGroups.length > 0
-              ? `${filteredGroups.length} results for "${search}"`
-              : `Start typing to filter groups`}
+              ? t("dashboard.search.input.n-results-for-x", { n, search })
+              : t("dashboard.search.input.start-typing-to-filter-groups")}
         </span>
         <AnimatePresence initial={false}>
           <ScrollArea className="h-80 md:h-96">
             {hasNoResults ? (
-              <div className="flex items-center justify-center">
+              <div className="flex justify-center items-center">
                 <div className="text-sm text-muted-foreground">
-                  No groups found for "{search}", want to{" "}
+                  {t("dashboard.search.result.no-groups-found-for-x-want-to", {
+                    search,
+                  })}
                   <CreateGroup>
                     <Button
                       variant="link"
-                      className="p-0 text-foreground underline decoration-dotted"
+                      className="p-0 underline text-foreground decoration-dotted"
                     >
-                      start one
+                      {t("dashboard.search.result.start-one")}
                     </Button>
                   </CreateGroup>
-                  ?
+                  {t("dashboard.search.result.?")}
                 </div>
               </div>
             ) : null}
@@ -390,24 +411,25 @@ function GroupSearch() {
 }
 
 function FindGroup() {
+  const { t } = useTranslation();
   return (
-    <div className="flex flex-col md:flex-row items-center gap-2">
-      <p className="text-sm font-light">Can't find what you're looking for?</p>
+    <div className="flex flex-col gap-2 items-center md:flex-row">
+      <p className="text-sm font-light">{t("dashboard.search.prompt")}</p>
       <Dialog>
         <DialogTrigger>
           <Button
             variant="link"
             size="sm"
-            className="p-0 text-foreground underline decoration-dotted"
+            className="p-0 underline text-foreground decoration-dotted"
           >
-            <Search /> Search groups
+            <Search /> {t("dashboard.search.trigger")}
           </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
               <div className="flex flex-row gap-2">
-                <Search className="size-4" /> Find a group
+                <Search className="size-4" /> {t("dashboard.search.title")}
               </div>
             </DialogTitle>
           </DialogHeader>
@@ -420,7 +442,7 @@ function FindGroup() {
 
 export function Dashboard() {
   return (
-    <div className="overflow-hidden space-y-4 px-2">
+    <div className="overflow-hidden px-2 space-y-4">
       <GroupsActivity />
       <FeaturedGroups />
       <NetworkGroups />
