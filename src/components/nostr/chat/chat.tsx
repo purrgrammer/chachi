@@ -48,6 +48,8 @@ import { Emoji as EmojiType, EmojiPicker } from "@/components/emoji-picker";
 import { useLastSeen, saveLastSeen, saveGroupEvent } from "@/lib/messages";
 import { useSettings } from "@/lib/settings";
 import type { Group } from "@/lib/types";
+import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 
 const scrollToAtom = atom<string | null>(null);
 
@@ -62,6 +64,7 @@ function Reply({
   id: string;
   className?: string;
 }) {
+  const { t } = useTranslation();
   // todo: replying to picture, video, mention, custom emoji
   const { data: event } = useEvent({
     id,
@@ -80,8 +83,8 @@ function Reply({
     >
       {event ? (
         <>
-          <div className="flex flex-row items-center gap-1">
-            <h4 className="font-semibold text-sm">
+          <div className="flex flex-row gap-1 items-center">
+            <h4 className="text-sm font-semibold">
               <Name pubkey={event.pubkey} />
             </h4>
             {isAdmin ? <Crown className="w-3 h-3" /> : null}
@@ -107,7 +110,7 @@ function Reply({
           </RichText>
         </>
       ) : (
-        <span>Loading message...</span>
+        <span>{t("chat.message.loading")}</span>
       )}
     </div>
   );
@@ -152,6 +155,7 @@ export function ChatMessage({
   richTextClassnames?: RichTextClassnames;
   className?: string;
 }) {
+  const { t } = useTranslation();
   const settings = useSettings();
   const relay = group.relay;
   const ndk = useNDK();
@@ -247,10 +251,10 @@ export function ChatMessage({
   async function copy() {
     try {
       await navigator.clipboard.writeText(content);
-      toast.success("Copied to clipboard");
+      toast.success(t("chat.message.copy.success"));
     } catch (err) {
       console.error(err);
-      toast.error("Can't copy to clipboard");
+      toast.error(t("chat.message.copy.error"));
     }
   }
 
@@ -270,23 +274,24 @@ export function ChatMessage({
       }
       await ev.publish(relaySet);
       if (e.native) {
+        // TODO add translation
         toast.success(`Reacted with ${e.native}`);
       } else if (e.src) {
         // nit: info icon
         toast(
           <div className="flex flex-row gap-2 items-center">
-            Reacted with{" "}
+            {t("chat.message.react.with")}
             <Emoji
               name={e.name}
               image={e.src}
-              className="w-5 h-5 inline-block"
+              className="inline-block w-5 h-5"
             />
           </div>,
         );
       }
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't react");
+      toast.error(t("chat.message.react.error"));
     } finally {
       setShowingEmojiPicker(false);
       setShowMessageActions(false);
@@ -304,11 +309,11 @@ export function ChatMessage({
         ],
       } as NostrEvent);
       await ev.publish(relaySet);
-      toast.success("Kicked user");
+      toast.success(t("chat.user.kick.success"));
       saveGroupEvent(ev.rawEvent() as NostrEvent, group);
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't kick user");
+      toast.error(t("chat.user.kick.error"));
     }
   }
 
@@ -360,12 +365,12 @@ export function ChatMessage({
               className={`relative ${isChain ? "rounded-lg" : isMine ? "rounded-tl-lg rounded-tr-lg rounded-bl-lg" : "rounded-tl-lg rounded-tr-lg rounded-br-lg"} p-1 px-2 w-fit max-w-[18rem] sm:max-w-sm md:max-w-md ${isMine ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"} ${isChain && !isMine ? "ml-10" : ""} ${shouldHaveTransparentBackground ? "bg-transparent p-0" : ""}`}
             >
               {isFirstInChain ? (
-                <div className="flex flex-row items-center gap-1">
+                <div className="flex flex-row gap-1 items-center">
                   <ProfileDrawer
                     group={group}
                     pubkey={author}
                     trigger={
-                      <h3 className="font-semibold text-sm">
+                      <h3 className="text-sm font-semibold">
                         <Name pubkey={author} />
                       </h3>
                     }
@@ -390,7 +395,9 @@ export function ChatMessage({
                   className={`flex flex-row items-center gap-1 ${isMine ? "text-primary-foreground" : "text-muted-foreground"}`}
                 >
                   <Ban className="size-3" />
-                  <span className="text-xs italic">Message deleted</span>
+                  <span className="text-xs italic">
+                    {t("chat.message.deleted")}
+                  </span>
                 </div>
               ) : isOnlyEmojis ? (
                 <div className={isMine ? "text-right" : ""}>
@@ -459,7 +466,7 @@ export function ChatMessage({
                 </EmojiPicker>
               ) : null}
               {showMessageActions ? (
-                <div className="flex flex-col gap-1 absolute bottom-0 -right-7">
+                <div className="flex absolute bottom-0 -right-7 flex-col gap-1">
                   <Button
                     variant="outline"
                     size="smallIcon"
@@ -476,7 +483,7 @@ export function ChatMessage({
               className="cursor-pointer"
               onClick={() => setReplyingTo?.(event)}
             >
-              Reply
+              {t("chat.message.reply.action")}
               <ContextMenuShortcut>
                 <ReplyIcon className="w-4 h-4" />
               </ContextMenuShortcut>
@@ -485,13 +492,13 @@ export function ChatMessage({
               className="cursor-pointer"
               onClick={() => setShowingEmojiPicker(true)}
             >
-              React
+              {t("chat.message.react.action")}
               <ContextMenuShortcut>
                 <SmilePlus className="w-4 h-4" />
               </ContextMenuShortcut>
             </ContextMenuItem>
             <ContextMenuItem className="cursor-pointer" onClick={() => copy()}>
-              Copy
+              {t("chat.message.copy.action")}
               <ContextMenuShortcut>
                 <Copy className="w-4 h-4" />
               </ContextMenuShortcut>
@@ -499,12 +506,12 @@ export function ChatMessage({
             {amIAdmin && event.pubkey !== me ? (
               <>
                 <ContextMenuSeparator />
-                <ContextMenuLabel>Admin</ContextMenuLabel>
+                <ContextMenuLabel>{t("group.info.admin")}</ContextMenuLabel>
                 <ContextMenuItem
                   className="cursor-pointer"
                   onClick={() => kick(event)}
                 >
-                  Kick
+                  {t("chat.user.kick.action")}
                   <ContextMenuShortcut>
                     <ShieldBan className="w-4 h-4" />
                   </ContextMenuShortcut>
@@ -514,7 +521,7 @@ export function ChatMessage({
                     className="cursor-pointer"
                     onClick={() => deleteEvent(event)}
                   >
-                    Delete
+                    {t("chat.message.delete.action")}
                     <ContextMenuShortcut>
                       <Trash className="w-4 h-4" />
                     </ContextMenuShortcut>
@@ -526,7 +533,7 @@ export function ChatMessage({
                 className="cursor-pointer"
                 onClick={() => deleteEvent(event)}
               >
-                Delete
+                {t("chat.message.delete.action")}
                 <ContextMenuShortcut>
                   <Trash className="w-4 h-4 text-destructive" />
                 </ContextMenuShortcut>
@@ -536,13 +543,13 @@ export function ChatMessage({
               <>
                 <ContextMenuSeparator />
                 <ContextMenuLabel className="text-xs font-light">
-                  Debug
+                  {t("chat.debug")}
                 </ContextMenuLabel>
                 <ContextMenuItem
                   className="cursor-pointer"
                   onClick={() => saveLastSeen(event, group)}
                 >
-                  Save as last seen
+                  {t("chat.message.save-as-last-seen")}
                 </ContextMenuItem>
               </>
             ) : null}
@@ -552,10 +559,10 @@ export function ChatMessage({
       {isLastSeen ? (
         <div
           ref={lastSeenRef}
-          className="flex flex-col items-center justify-center my-3 w-full"
+          className="flex flex-col justify-center items-center my-3 w-full"
         >
           <Separator />
-          <Badge className="-mt-3 text-xs">New messages</Badge>
+          <Badge className="-mt-3 text-xs">{t("chat.new-messages")}</Badge>
         </div>
       ) : null}
     </>
@@ -601,9 +608,9 @@ function formatDay(date: string) {
     today.getDate() === Number(day) &&
     today.getFullYear() === Number(year)
   ) {
-    return "Today";
+    return i18n.t("locale.today");
   }
-  return Intl.DateTimeFormat("en-US", {
+  return Intl.DateTimeFormat(i18n.t("locale.code"), {
     day: "numeric",
     month: "long",
     year: currentYear === Number(year) ? undefined : "numeric",
@@ -669,7 +676,7 @@ export function Chat({
       {groupedMessages.map(({ day, messages }, groupIdx) => (
         <div className="flex flex-col w-full" key={groupIdx}>
           {messages.length > 0 ? (
-            <div className="flex w-full justify-center my-2">
+            <div className="flex justify-center my-2 w-full">
               <Badge variant="outline" className="self-center">
                 {formatDay(day)}
               </Badge>
