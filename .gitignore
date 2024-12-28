@@ -26,3 +26,6 @@ dist-ssr
 *.sw?
 
 notes.md
+
+.envrc
+flake.nix

@@ -156,7 +156,7 @@ export function ChatMessage({
   className?: string;
 }) {
   const { t } = useTranslation();
-  const settings = useSettings();
+  const [settings] = useSettings();
   const relay = group.relay;
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
@@ -170,7 +170,7 @@ export function ChatMessage({
   const author = event.pubkey;
   const content = event.content.trim();
   const legacyReply = event.tags.find((t) => t[3] === "reply")?.[1];
-  const quotedReply = event.tags.find((t) => t[3] === "q")?.[1];
+  const quotedReply = event.tags.find((t) => t[0] === "q")?.[1];
   const replyTo = legacyReply || quotedReply;
   const replyRoot = event.tags.find((t) => t[3] === "root")?.[1];
   const isReplyingTo = replyTo || replyRoot;
@@ -545,6 +545,12 @@ export function ChatMessage({
                 <ContextMenuLabel className="text-xs font-light">
                   {t("chat.debug")}
                 </ContextMenuLabel>
+                <ContextMenuItem
+                  className="cursor-pointer"
+                  onClick={() => console.log(event)}
+                >
+                  Log
+                </ContextMenuItem>
                 <ContextMenuItem
                   className="cursor-pointer"
                   onClick={() => saveLastSeen(event, group)}
