@@ -18,6 +18,7 @@ import type { Group } from "@/lib/types";
 import { useRelayInfo } from "@/lib/relay";
 import { useGroupchat, useSaveLastSeen, useNewMessage } from "@/lib/messages";
 import { DELETE_GROUP } from "@/lib/kinds";
+import { useTranslation } from "react-i18next";
 
 //export function ChatZap({
 //  event,
@@ -39,13 +40,13 @@ import { DELETE_GROUP } from "@/lib/kinds";
 //    >
 //      <div className="p-1 px-2">
 //        <div className="flex flex-row gap-2 items-center">
-//          <h3 className="font-semibold text-sm">
+//          <h3 className="text-sm font-semibold">
 //            <Name pubkey={event.pubkey} />
 //          </h3>
 //          {receiver ? (
 //            <>
 //              <Coins className="size-3 text-muted-foreground" />
-//              <h3 className="font-semibold text-sm">
+//              <h3 className="text-sm font-semibold">
 //                <Name pubkey={receiver} />
 //              </h3>
 //            </>
@@ -53,7 +54,7 @@ import { DELETE_GROUP } from "@/lib/kinds";
 //        </div>
 //        <RichText tags={event.tags}>{event.content}</RichText>
 //      </div>
-//      <div className="flex items-center px-2 bg-background rounded-r-lg">
+//      <div className="flex items-center px-2 rounded-r-lg bg-background">
 //        <span className="text-muted-foreground">
 //          <Bitcoin className="size-4" />
 //        </span>
@@ -105,12 +106,17 @@ function UserActivity({
   action: "join" | "leave";
 }) {
   const member = event.tags.find((t) => t[0] === "p")?.[1];
+  const { t } = useTranslation();
   return member ? (
-    <div className="flex w-full justify-center my-0.5">
+    <div className="flex justify-center my-0.5 w-full">
       <Badge variant="outline" className="self-center">
         <div className="flex gap-1">
           <Name pubkey={member} />
-          <span>{action === "join" ? "joined" : "left"}</span>
+          <span>
+            {action === "join"
+              ? t("group.chat.user.joined")
+              : t("group.chat.user.left")}
+          </span>
         </div>
       </Badge>
     </div>
@@ -154,6 +160,7 @@ export const GroupChat = forwardRef(
             e.kind === NDKKind.GroupAdminAddUser &&
             e.tags.find((t) => t[0] === "p" && t[1] === me),
         ));
+    const { t } = useTranslation();
 
     useEffect(() => {
       return () => saveLastSeen();
@@ -179,10 +186,10 @@ export const GroupChat = forwardRef(
         } as NostrEvent);
         ev.tag(new NDKEvent(ndk, event));
         await ev.publish(relaySet);
-        toast.success("Message deleted");
+        toast.success(t("group.chat.event.delete.success"));
       } catch (err) {
         console.error(err);
-        toast.error("Couldn't delete message");
+        toast.error(t("group.chat.event.delete.error"));
       }
     }
 
@@ -214,11 +221,11 @@ export const GroupChat = forwardRef(
         />
         {hasBeenDeleted ? (
           <div
-            className="flex items-center justify-center"
+            className="flex justify-center items-center"
             style={{ height: `${inputHeight + 16}px` }}
           >
             <span className="text-sm text-muted-foreground">
-              This group has been deleted
+              {t("group.deleted")}
             </span>
           </div>
         ) : (
