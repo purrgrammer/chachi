@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Feed from "@/components/nostr/feed";
 import { NewPost } from "@/components/new-post";
 import type { Group } from "@/lib/types";
+import { useTranslation } from "react-i18next";
 
 export const GroupPosts = forwardRef(
   (
@@ -17,6 +18,7 @@ export const GroupPosts = forwardRef(
       "#h": [group.id],
       limit: 100,
     };
+    const { t } = useTranslation();
     return (
       <Feed
         style={{ height: `calc(100vh - 80px)` }}
@@ -30,7 +32,7 @@ export const GroupPosts = forwardRef(
         newPost={
           <NewPost group={group}>
             <Button size="sm" variant="outline">
-              <Megaphone /> Start a conversation
+              <Megaphone /> {t("post.start")}
             </Button>
           </NewPost>
         }
