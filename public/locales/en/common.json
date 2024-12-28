@@ -1,4 +1,403 @@
 {
-	"": "",
-	"": ""
+	"locale": {
+		"code": "en-US",
+		"today": "Today"
+	},
+	"home": "Home",
+	"nav": {
+		"user": {
+			"login": {
+				"start": "Get started",
+				"title": "Get started",
+				"description": "Select the login method below.",
+				"nip-07": "Connect with NIP-07",
+				"error": "Failed to log in with extension",
+				"error-nip07": "Error logging in with NIP-07"
+			},
+			"logout": "Log out",
+			"language": "Language",
+			"theme": {
+				"trigger": "Theme",
+				"light": "Light",
+				"dark": "Dark",
+				"system": "System"
+			}
+		},
+		"no-groups": "No groups"
+	},
+	"dashboard": {
+		"activity": {
+			"heading": "Activity",
+			"unread": "unread",
+			"mentions": "mentions",
+			"none": "Nothing new for you... yet"
+		},
+		"featured": {
+			"heading": "Featured"
+		},
+		"popular": {
+			"heading": "Popular in your network"
+		},
+		"search": {
+			"prompt": "Can't find what you're looking for?",
+			"trigger": "Search groups",
+			"title": "Find a group",
+			"input": {
+				"placeholder": "Search groups",
+				"no-results-for-x": "No results for \"{{search}}\"",
+				"n-results-for-x": "{{n}} results for \"{{search}}\"",
+				"start-typing-to-filter-groups": "Start typing to filter groups"
+			},
+			"result": {
+				"visit": "Visit",
+				"no-description-available": "No description available",
+				"no-groups-found-for-x-want-to": "No groups found for \"{{search}}\", want to ",
+				"start-one": "start one",
+				"?": "?"
+			}
+		}
+	},
+	"group": {
+		"hosted": {
+			"by": "Hosted by ",
+			"and": " and "
+		},
+		"create": {
+			"new": "New group",
+			"title": "Create group",
+			"description": "Create a new group to chat with your friends",
+			"form": {
+				"name": {
+					"label": "Name",
+					"placeholder": "This is the group's name.",
+					"required": "Please add a name"
+				},
+				"about": {
+					"label": "About",
+					"placeholder": "This is the group's description."
+				},
+				"relay": {
+					"label": "Relay",
+					"placeholder": "Choose a relay.",
+					"description": "This is the server where the posts will be stored.",
+					"required": "Please select a relay"
+				},
+				"visibility": {
+					"label": "Visibility",
+					"anyone": "Anyone",
+					"members-only": "Members only",
+					"description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+				},
+				"access": {
+					"label": "Access",
+					"anyone": "Anyone",
+					"invite-only": "Invite only"
+				},
+				"submit": {
+					"trigger": "Create",
+					"success": "Group created",
+					"error": "Couldn't create group"
+				}
+			}
+		},
+		"edit": {
+			"title": "Group settings",
+			"form": {
+				"name": {
+					"label": "Name",
+					"placeholder": "My Group",
+					"description": "This is the group's name"
+				},
+				"about": {
+					"label": "About",
+					"placeholder": "A group for my frens",
+					"description": "This is the group's description"
+				},
+				"visibility": {
+					"label": "Visibility",
+					"anyone": "Anyone",
+					"members-only": "Members only",
+					"description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+				},
+				"access": {
+					"label": "Access",
+					"anyone": "Anyone",
+					"invite-only": "Invite only",
+					"description": "Anyone can join an open group. Closed groups require approval"
+				},
+				"submit": {
+					"trigger": "Save",
+					"success": "Group updated",
+					"error": "Couldn't update group"
+				}
+			}
+		},
+		"delete": {
+			"trigger": "Delete",
+			"confirmation": {
+				"title": "Are you sure you want to delete the group?",
+				"description": "This action cannot be undone. This group and all its history will be deleted.",
+				"confirm": "Delete",
+				"cancel": "Cancel"
+			},
+			"success": "Group deleted",
+			"error": "Couldn't delete group"
+		},
+		"deleted": "This group has been deleted",
+		"bookmark": {
+			"trigger": "Bookmark",
+			"error": "Error bookmarking group"
+		},
+		"unbookmark": {
+			"trigger": "Unbookmark",
+			"error": "Error unbookmarking group"
+		},
+		"join": "Join",
+		"leave": {
+			"trigger": "Leave",
+			"confirmation": {
+				"title": "Are you sure you want to leave?",
+				"description": "This action cannot be undone. You will be removed from the group members list.",
+				"confirm": "Leave",
+				"cancel": "Cancel"
+			},
+			"success": "Left group",
+			"error": "Error leaving group"
+		},
+		"chat": {
+			"user": {
+				"joined": "joined",
+				"left": "left"
+			},
+			"event": {
+				"delete": {
+					"success": "Message deleted",
+					"error": "Couldn't delete message"
+				}
+			}
+		},
+		"metadata": {
+			"visibility": {
+				"private": {
+					"trigger": "Members only",
+					"content": "Only members can read content"
+				},
+				"public": {
+					"trigger": "Public",
+					"content": "Can be read by anyone"
+				}
+			},
+			"access": {
+				"closed": {
+					"trigger": "Closed",
+					"content": "Requires approval or an invitation to join"
+				},
+				"open": {
+					"trigger": "Open",
+					"content": "Anyone can join"
+				}
+			},
+			"join-the-conversation": "Join the conversation"
+		},
+		"info": {
+			"admin": "Admin",
+			"admins": "Admins ({{adminsLength}})",
+			"members": "Members ({{membersLength}})",
+			"no-members": "No members"
+		}
+	},
+	"chat": {
+		"message": {
+			"loading": "Loading message...",
+			"copy": {
+				"action": "Copy",
+				"success": "Copied to clipboard",
+				"error": "Can't copy to clipboard"
+			},
+			"react": {
+				"action": "React",
+				"with": "Reacted with ",
+				"success": "Reacted with {{emoji}}",
+				"error": "Can't react"
+			},
+			"reply": {
+				"action": "Reply",
+				"error": "Couldn't reply"
+			},
+			"delete": {
+				"action": "Delete"
+			},
+			"deleted": "Message deleted",
+			"save-as-last-seen": "Save as last seen"
+		},
+		"new-messages": "New messages",
+		"user": {
+			"not-member": "You are not a member of this group yet",
+			"kick": {
+				"action": "Kick",
+				"success": "Kicked user",
+				"error": "Couldn't kick user"
+			}
+		},
+		"join": {
+			"action": "Join",
+			"request": {
+				"sent": "Request sent",
+				"success": "Join request sent",
+				"error": "Failed to send join request"
+			}
+		},
+		"debug": "Debug"
+	},
+	"join": {
+		"request": {
+			"send": {
+				"success": "Join request sent",
+				"error": "Failed to send join request"
+			},
+			"accept": {
+				"action": "Accept",
+				"success": "User added to group",
+				"error": "Couldn't add user to group"
+			},
+			"reject": {
+				"action": "Reject",
+				"success": "User join request rejected",
+				"error": "Couldn't reject user from group"
+			}
+		},
+		"requests": {
+			"n": "Join requests ({{requestsLength}})",
+			"none": "No join requests... yet"
+		}
+	},
+	"gif": {
+		"search": "Search GIF",
+		"tenor": "Search Tenor",
+		"error": "Error searching GIFs"
+	},
+	"file": {
+		"upload": {
+			"error": "Couldn't upload file"
+		}
+	},
+	"image": {
+		"upload": {
+			"error": "Couldn't upload image"
+		}
+	},
+	"copy": {
+		"success": "Copied",
+		"error": "Couldn't copy"
+	},
+	"content": {
+		"prompt": "What do you want to create?",
+		"create": "Create",
+		"type": {
+			"chat": "Chat",
+			"post": "Post",
+			"posts": "Posts",
+			"poll": "Poll",
+			"polls": "Polls",
+			"video": "Video",
+			"videos": "Videos"
+		}
+	},
+	"post": {
+		"new": "New",
+		"action": "Post",
+		"placeholder": "What's on your mind?",
+		"success": "Posted",
+		"error": "Couldn't post",
+		"delete": {
+			"success": "Post deleted",
+			"error": "Couldn't delete post"
+		},
+		"start": "Start a conversation"
+	},
+	"poll": {
+		"start": "Start a poll",
+		"create": {
+			"action": "Create poll",
+			"success": "Poll created",
+			"error": "Couldn't create poll"
+		},
+		"new": "New poll",
+		"question": "Question",
+		"expiration": {
+			"label": "Expiration",
+			"date": "Expiry date",
+			"check": "Expiry date must be in the future"
+		},
+		"options": "Options",
+		"multiple-choices": "Multiple choices",
+		"closed": "Poll closed",
+		"ends": "Ends "
+	},
+	"vote": {
+		"action": "Vote",
+		"success": "Vote cast",
+		"error": "Couldn't cast vote"
+	},
+	"video": {
+		"post": "Post a video",
+		"upload": "Upload",
+		"record": "Record",
+		"publish": {
+			"success": "Video posted",
+			"error": "Failed to post video"
+		},
+		"new": "New video",
+		"title": {
+			"label": "Title",
+			"placeholder": "Add a title"
+		},
+		"description": {
+			"label": "Description",
+			"placeholder": "Add a description"
+		}
+	},
+	"emoji": {
+		"pick": "Pick an emoji",
+		"set": {
+			"bookmark": {
+				"error": "Failed to bookmark emoji set"
+			}
+		}
+	},
+	"peer": " peer",
+	"peers": " peers",
+	"message": "Message",
+	"write-a-message": "Write a message...",
+	"send": {
+		"login-required": "Log in to send message",
+		"error": "Failed to send message"
+	},
+	"event": {
+		"content": "Content",
+		"replies": "Replies",
+		"details": "Details",
+		"loading": "Loading event",
+		"not-found": "Event not found",
+		"fetch-error": "Error fetching event"
+	},
+	"events": {
+		"loading": "Loading events",
+		"none": "Nothing to see here... yet"
+	},
+	"share": {
+		"success": "Shared",
+		"error": "Couldn't share post",
+		"publication": "Share publication",
+		"this": {
+			"publication": "Share this publication",
+			"in": "Share this publication in {{groupName}}"
+		},
+		"in": {
+			"x": "Share in {{groupName}} chat",
+			"chat": "Share in chat"
+		}
+	},
+	"share-in": "Share in ",
+	"action-open": "Open"
 }
