@@ -6,6 +6,7 @@ import { NewPoll } from "@/components/nostr/new-poll";
 import Feed from "@/components/nostr/feed";
 import { POLL } from "@/lib/kinds";
 import type { Group } from "@/lib/types";
+import { useTranslation } from "react-i18next";
 
 export const GroupPolls = forwardRef(
   (
@@ -17,6 +18,7 @@ export const GroupPolls = forwardRef(
       "#h": [group.id],
       limit: 10,
     };
+    const { t } = useTranslation();
     return (
       <Feed
         style={{ height: `calc(100vh - 80px)` }}
@@ -30,7 +32,7 @@ export const GroupPolls = forwardRef(
         newPost={
           <NewPoll group={group}>
             <Button size="sm" variant="outline">
-              <Vote /> Start a poll
+              <Vote /> {t("poll.start")}
             </Button>
           </NewPoll>
         }
