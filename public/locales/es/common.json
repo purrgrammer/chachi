@@ -180,11 +180,11 @@
 			"visibility": {
 				"private": {
 					"trigger": "Solo miembros",
-					"content": "Solo los miembros pueden leer el contenido."
+					"content": "Solo los miembros pueden leer el contenido"
 				},
 				"public": {
 					"trigger": "Público",
-					"content": "Puede ser leído por cualquiera."
+					"content": "Puede ser leído por cualquiera"
 				}
 			},
 			"access": {
