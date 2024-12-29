@@ -19,12 +19,14 @@ import { useRelaySet } from "@/lib/nostr";
 import { useCanSign } from "@/lib/account";
 import { Embed } from "@/components/nostr/detail";
 import type { Group, Emoji } from "@/lib/types";
+import { useTranslation } from "react-i18next";
 
 export function NewPost({
   group,
   children,
   kind = NDKKind.GroupNote,
   action = "Post",
+  //TODO add translation
   title = "New post",
   reply,
   onSucess,
@@ -44,6 +46,7 @@ export function NewPost({
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
   const canSign = useCanSign();
+  const { t } = useTranslation();
 
   async function post() {
     try {
@@ -65,11 +68,11 @@ export function NewPost({
         onSucess?.(ev.rawEvent() as NostrEvent);
         setShowDialog(false);
         setMessage("");
-        toast.success("Posted");
+        toast.success(t("post.success"));
       }
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't post");
+      toast.error(t("post.error"));
     } finally {
       setIsPosting(false);
     }
@@ -89,7 +92,7 @@ export function NewPost({
       <DialogTrigger asChild>
         {children || (
           <Button disabled={!canSign}>
-            <Send /> Post
+            <Send /> {t("post.action")}
           </Button>
         )}
       </DialogTrigger>
@@ -113,13 +116,13 @@ export function NewPost({
             onCustomEmojisChange={setCustomEmoji}
             minRows={3}
             maxRows={6}
-            placeholder="What's on your mind?"
+            placeholder={t("post.placeholder")}
             onFinish={post}
             //className={reply ? "border-t-none" : undefined}
           />
         </div>
-        <div className="flex flex-row items-center justify-end w-full">
-          <div className="flex flex-row items-center gap-1">
+        <div className="flex flex-row justify-end items-center w-full">
+          <div className="flex flex-row gap-1 items-center">
             <UploadFile onUpload={(url) => setMessage(`${message} ${url}`)} />
             <Button
               size="sm"
@@ -132,7 +135,7 @@ export function NewPost({
         </div>
         {/*
         <DialogFooter>
-          <div className="flex flex-col w-full gap-3">
+          <div className="flex flex-col gap-3 w-full">
             <h4 className="text-xs">Preview</h4>
             <Embed
               event={{

@@ -7,6 +7,7 @@ import { useRelayInfo } from "@/lib/relay";
 import { cn } from "@/lib/utils";
 import { useOpenGroup } from "@/lib/groups";
 import { Group } from "@/lib/types";
+import { useTranslation } from "react-i18next";
 
 export function GroupPicture({
   group,
@@ -59,20 +60,21 @@ export function GroupMetadata({
   const picture = event.tags.find((t) => t[0] === "picture")?.[1];
   const about = event.tags.find((t) => t[0] === "about")?.[1];
   const openGroup = useOpenGroup({ id, relay });
+  const { t } = useTranslation();
   return (
     <div className={cn("flex flex-col gap-4", className)}>
-      <div className="flex flex-col items-center gap-1">
-        <Avatar className="size-32 rounded-full">
+      <div className="flex flex-col gap-1 items-center">
+        <Avatar className="rounded-full size-32">
           <AvatarImage src={picture} className="object-cover" />
           <AvatarFallback>{name?.at(0) || id.at(0)}</AvatarFallback>
         </Avatar>
         <h2 className="text-lg font-semibold">{name}</h2>
         {about ? (
-          <p className="text-sm text-muted-foreground text-center">{about}</p>
+          <p className="text-sm text-center text-muted-foreground">{about}</p>
         ) : null}
       </div>
       <Button size="sm" onClick={openGroup}>
-        <MessagesSquare /> Join the conversation
+        <MessagesSquare /> {t("group.metadata.join-the-conversation")}
       </Button>
     </div>
   );

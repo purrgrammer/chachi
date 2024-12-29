@@ -1,0 +1,403 @@
+{
+	"locale": {
+		"code": "zh-CN",
+		"today": "今天"
+	},
+	"home": "主頁",
+	"nav": {
+		"user": {
+			"login": {
+				"start": "開始",
+				"title": "開始",
+				"description": "請選擇以下登錄方式。",
+				"nip-07": "使用 NIP-07 連接",
+				"error": "無法使用擴充套件登錄",
+				"error-nip07": "使用 NIP-07 登录时出错了"
+			},
+			"logout": "登出",
+			"language": "語言",
+			"theme": {
+				"trigger": "主題",
+				"light": "淡色",
+				"dark": "深色",
+				"system": "系統"
+			}
+		},
+		"no-groups": "尚無群聊"
+	},
+	"dashboard": {
+		"activity": {
+			"heading": "動態",
+			"unread": "未读",
+			"mentions": "提及",
+			"none": "還沒有新動態…"
+		},
+		"featured": {
+			"heading": "精選"
+		},
+		"popular": {
+			"heading": "熱門"
+		},
+		"search": {
+			"prompt": "找不到你要找的東西嗎？",
+			"trigger": "搜索群聊",
+			"title": "查找群聊",
+			"input": {
+				"placeholder": "搜索群聊",
+				"no-results-for-x": "沒有找到\"{{search}}\"的結果",
+				"n-results-for-x": "\"{{search}}\"的{{n}}個結果",
+				"start-typing-to-filter-groups": "開始輸入以篩選群聊"
+			},
+			"result": {
+				"visit": "訪問",
+				"no-description-available": "無可用描述",
+				"no-groups-found-for-x-want-to": "未找到\"{{search}}\"相關的結果，想",
+				"start-one": "創建一個",
+				"?": "嗎？"
+			}
+		}
+	},
+	"group": {
+		"hosted": {
+			"by": "Hosted by ",
+			"and": "和"
+		},
+		"create": {
+			"new": "新群聊",
+			"title": "創建群聊",
+			"description": "創建一個新群聊與好友聊天。",
+			"form": {
+				"name": {
+					"label": "名稱",
+					"placeholder": "這是群聊的名稱。",
+					"required": "請添加一個名稱"
+				},
+				"about": {
+					"label": "關於",
+					"placeholder": "這是群聊的描述。"
+				},
+				"relay": {
+					"label": "中繼",
+					"placeholder": "選擇一個中繼。",
+					"description": "這是存儲帖子內容的服務器。",
+					"required": "選擇一個中繼"
+				},
+				"visibility": {
+					"label": "可見度",
+					"anyone": "任何人",
+					"members-only": "僅限成員",
+					"description": "消息未加密，可能會被中繼讀取。為了最大限度的保護隱私，請自行託管中繼。"
+				},
+				"access": {
+					"label": "訪問權",
+					"anyone": "任何人",
+					"invite-only": "僅限受邀"
+				},
+				"submit": {
+					"trigger": "創建",
+					"success": "群聊已創建",
+					"error": "無法創建群聊"
+				}
+			}
+		},
+		"edit": {
+			"title": "",
+			"form": {
+				"name": {
+					"label": "名稱",
+					"placeholder": "我的群聊",
+					"description": "這是群聊的名稱。"
+				},
+				"about": {
+					"label": "關於",
+					"placeholder": "給我的好友們聊天的群聊。",
+					"description": "這是群聊的描述。"
+				},
+				"visibility": {
+					"label": "可見度",
+					"anyone": "任何人",
+					"members-only": "僅限成員",
+					"description": "消息未加密，可能會被中繼讀取。為了最大限度地保護隱私，請自行託管中繼。"
+				},
+				"access": {
+					"label": "訪問權",
+					"anyone": "任何人",
+					"invite-only": "僅限受邀",
+					"description": "任何人都可以加入開放群聊。封閉群聊需要批准。"
+				},
+				"submit": {
+					"trigger": "保存",
+					"success": "群聊已更新",
+					"error": "無法更新群聊"
+				}
+			}
+		},
+		"delete": {
+			"trigger": "刪除",
+			"confirmation": {
+				"title": "你確定要刪除該群聊嗎？",
+				"description": "此操作無法撤銷。該群聊及其所有歷史紀錄將被刪除。",
+				"confirm": "刪除",
+				"cancel": "取消"
+			},
+			"success": "群聊已刪除",
+			"error": "無法刪除群聊"
+		},
+		"deleted": "該群聊已被刪除",
+		"bookmark": {
+			"trigger": "收藏",
+			"error": "收藏群聊時出錯了"
+		},
+		"unbookmark": {
+			"trigger": "取消收藏",
+			"error": "取消收藏時出錯了"
+		},
+		"join": "加入",
+		"leave": {
+			"trigger": "退出",
+			"confirmation": {
+				"title": "你確定要退出嗎？",
+				"description": "此操作無法撤銷。你將從成員列表中移除。",
+				"confirm": "退出",
+				"cancel": "取消"
+			},
+			"success": "已退出群聊",
+			"error": "退出群聊時出錯了"
+		},
+		"chat": {
+			"user": {
+				"joined": "已加入",
+				"left": "已退出"
+			},
+			"event": {
+				"delete": {
+					"success": "消息已刪除",
+					"error": "無法刪除消息"
+				}
+			}
+		},
+		"metadata": {
+			"visibility": {
+				"private": {
+					"trigger": "僅限成員",
+					"content": "只有成員可以閱讀內容"
+				},
+				"public": {
+					"trigger": "公開",
+					"content": "任何人都可以閱讀"
+				}
+			},
+			"access": {
+				"closed": {
+					"trigger": "封閉",
+					"content": "需要批准或邀請才能加入"
+				},
+				"open": {
+					"trigger": "開放",
+					"content": "任何人都可以加入"
+				}
+			},
+			"join-the-conversation": "加入對話"
+		},
+		"info": {
+			"admin": "管理員",
+			"admins": "管理員（{{adminsLength}}）",
+			"members": "成員（{{membersLength}}）",
+			"no-members": "沒有成員"
+		}
+	},
+	"chat": {
+		"message": {
+			"loading": "正在加載消息…",
+			"copy": {
+				"action": "複製",
+				"success": "已複製到剪貼板",
+				"error": "無法複製到剪貼板"
+			},
+			"react": {
+				"action": "回應",
+				"with": "回應了",
+				"success": "已用{{emoji}}回應",
+				"error": "無法回應"
+			},
+			"reply": {
+				"action": "回覆",
+				"error": "無法回覆"
+			},
+			"delete": {
+				"action": "刪除"
+			},
+			"deleted": "消息已刪除",
+			"save-as-last-seen": "保存為上次查看"
+		},
+		"new-messages": "新消息",
+		"user": {
+			"not-member": "你還不是該群聊的成員",
+			"kick": {
+				"action": "踢",
+				"success": "已踢用戶",
+				"error": "無法踢用戶"
+			}
+		},
+		"join": {
+			"action": "加入",
+			"request": {
+				"sent": "請求已發送",
+				"success": "加入請求已發送",
+				"error": "發送加入請求失敗"
+			}
+		},
+		"debug": "除錯"
+	},
+	"join": {
+		"request": {
+			"send": {
+				"success": "加入請求已發送",
+				"error": "發送加入請求失敗"
+			},
+			"accept": {
+				"action": "接受",
+				"success": "用戶已添加到群聊",
+				"error": "無法將用戶添加到群聊"
+			},
+			"reject": {
+				"action": "拒絕",
+				"success": "用戶加入請求被拒絕了",
+				"error": "無法拒絕用戶"
+			}
+		},
+		"requests": {
+			"n": "加入請求（{{requestsLength}}）",
+			"none": "還沒有加入請求…"
+		}
+	},
+	"gif": {
+		"search": "搜索 GIF",
+		"tenor": "搜索 Tenor",
+		"error": "搜索 GIFs 的時候出錯了"
+	},
+	"file": {
+		"upload": {
+			"error": "無法上傳文件"
+		}
+	},
+	"image": {
+		"upload": {
+			"error": "無法上傳圖片"
+		}
+	},
+	"copy": {
+		"success": "已複製",
+		"error": "無法複製"
+	},
+	"content": {
+		"prompt": "你想創建什麼？",
+		"create": "創建",
+		"type": {
+			"chat": "聊天",
+			"post": "帖子",
+			"posts": "帖子",
+			"poll": "投票",
+			"polls": "投票",
+			"video": "視頻",
+			"videos": "視頻"
+		}
+	},
+	"post": {
+		"new": "新帖子",
+		"action": "發佈",
+		"placeholder": "你想說些什麼？",
+		"success": "已發佈",
+		"error": "無法發佈",
+		"delete": {
+			"success": "帖子已刪除",
+			"error": "無法刪除帖子"
+		},
+		"start": "開始對話"
+	},
+	"poll": {
+		"start": "發起投票",
+		"create": {
+			"action": "創建投票",
+			"success": "投票已創建",
+			"error": "無法創建投票"
+		},
+		"new": "新投票",
+		"question": "問題",
+		"expiration": {
+			"label": "到期",
+			"date": "到期日期",
+			"check": "到期日期必須在未來"
+		},
+		"options": "選項",
+		"multiple-choices": "多選項",
+		"closed": "投票已關閉",
+		"ends": "結束於"
+	},
+	"vote": {
+		"action": "投票",
+		"success": "已投票",
+		"error": "無法投票"
+	},
+	"video": {
+		"post": "發佈視頻",
+		"upload": "上傳",
+		"record": "錄製",
+		"publish": {
+			"success": "視頻已發佈",
+			"error": "無法發佈視頻"
+		},
+		"new": "新視頻",
+		"title": {
+			"label": "標題",
+			"placeholder": "添加標題"
+		},
+		"description": {
+			"label": "描述",
+			"placeholder": "添加描述"
+		}
+	},
+	"emoji": {
+		"pick": "選擇一個表情符號",
+		"set": {
+			"bookmark": {
+				"error": "無法收藏表情符號集"
+			}
+		}
+	},
+	"peer": "個好友",
+	"peers": "個好友",
+	"message": "消息",
+	"write-a-message": "寫條消息…",
+	"send": {
+		"login-required": "登錄以發送消息",
+		"error": "發送消息失敗"
+	},
+	"event": {
+		"content": "內容",
+		"replies": "回覆",
+		"details": "詳情",
+		"loading": "正在加載事件",
+		"not-found": "未找到事件",
+		"fetch-error": "獲取事件時出錯了"
+	},
+	"events": {
+		"loading": "正在加載事件",
+		"none": "這裏還沒有什麼可看的…"
+	},
+	"share": {
+		"success": "已分享",
+		"error": "無法分享帖子",
+		"publication": "分享帖子",
+		"this": {
+			"publication": "分享這個帖子",
+			"in": "將這個帖子分享至 {{groupName}}。"
+		},
+		"in": {
+			"x": "分享至 {{groupName}} 聊天",
+			"chat": "分享至聊天"
+		}
+	},
+	"share-in": "分享至",
+	"action-open": "打開"
+}

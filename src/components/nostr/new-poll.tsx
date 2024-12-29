@@ -24,6 +24,7 @@ import { randomId } from "@/lib/id";
 import { POLL } from "@/lib/kinds";
 import { dedupeBy } from "@/lib/utils";
 import type { Group, Emoji } from "@/lib/types";
+import { useTranslation } from "react-i18next";
 
 export function NewPoll({
   group,
@@ -47,6 +48,7 @@ export function NewPoll({
   const relaySet = useRelaySet([group.relay]);
   const canSign = useCanSign();
   const endsAtIsValid = endsAt ? Number(endsAt) > Date.now() / 1000 : true;
+  const { t } = useTranslation();
 
   async function createPoll() {
     try {
@@ -76,12 +78,12 @@ export function NewPoll({
         setOptions([]);
         setCustomEmoji([]);
         setEndsAt("");
-        toast.success("Poll created");
+        toast.success(t("poll.create.success"));
         onSuccess?.(ev.rawEvent() as NostrEvent);
       }
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't post");
+      toast.error(t("poll.create.error"));
     } finally {
       setIsPosting(false);
     }
@@ -122,17 +124,17 @@ export function NewPoll({
       <DialogTrigger asChild>
         {children || (
           <Button disabled={!canSign}>
-            <Vote /> Post
+            <Vote /> {t("post.action")}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>New poll</DialogTitle>
+          <DialogTitle>{t("poll.new")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-1">
           <div className="space-y-1">
-            <Label>Question</Label>
+            <Label>{t("poll.question")}</Label>
             <AutocompleteTextarea
               group={group}
               message={message}
@@ -144,7 +146,7 @@ export function NewPoll({
             />
           </div>
           <div className="space-y-1">
-            <Label>Expiration</Label>
+            <Label>{t("poll.expiration.label")}</Label>
             <div className="p-2">
               <DatePicker
                 className={`rounded-lg ${endsAtIsValid ? "" : "text-destructive"}`}
@@ -152,14 +154,14 @@ export function NewPoll({
               />
               {!endsAtIsValid && (
                 <span className="text-xs text-destructive">
-                  Expiry date must be in the future
+                  {t("poll.expiration.check")}
                 </span>
               )}
             </div>
           </div>
           <div className="space-y-1">
-            <Label>Options</Label>
-            <div className="flex flex-row items-center gap-1">
+            <Label>{t("poll.options")}</Label>
+            <div className="flex flex-row gap-1 items-center">
               <AutocompleteTextarea
                 group={group}
                 message={newOption}
@@ -182,11 +184,11 @@ export function NewPoll({
             </div>
           </div>
         </div>
-        <div className="w-full flex flex-col gap-1">
+        <div className="flex flex-col gap-1 w-full">
           {options.map((option) => (
             <div
               key={option[1]}
-              className="w-full flex flex-row items-center justify-between border p-2 rounded-sm relative"
+              className="flex relative flex-row justify-between items-center p-2 w-full rounded-sm border"
             >
               <RichText
                 group={group}
@@ -211,12 +213,14 @@ export function NewPoll({
               </Button>
             </div>
           ))}
-          <div className="flex items-center gap-2 px-2">
+          <div className="flex gap-2 items-center px-2">
             <Switch id="multiple-choice" onCheckedChange={setIsMultiChoice} />
-            <Label htmlFor="multiple-choice">Multiple choices</Label>
+            <Label htmlFor="multiple-choice">
+              {t("poll.multiple-choices")}
+            </Label>
           </div>
         </div>
-        <div className="flex flex-row items-center justify-end w-full">
+        <div className="flex flex-row justify-end items-center w-full">
           <Button
             size="sm"
             disabled={
@@ -228,7 +232,7 @@ export function NewPoll({
             onClick={createPoll}
           >
             {isPosting ? <RotateCw className="animate-spin" /> : <Vote />}{" "}
-            Create poll
+            {t("poll.create.action")}
           </Button>
         </div>
       </DialogContent>

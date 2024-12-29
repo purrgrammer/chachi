@@ -16,6 +16,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { Group } from "@/lib/types";
+import { useTranslation } from "react-i18next";
 
 // todo: tooltip for visiblity/access
 function RelayName({ relay }: { relay: string }) {
@@ -29,11 +30,12 @@ export function GroupHeader({ group }: { group: Group }) {
   const pubkey = usePubkey();
   const name = metadata?.name;
   const isRelayGroup = group.id === "_";
+  const { t } = useTranslation();
 
   return (
     <Header>
-      <div className="flex flex-row items-center justify-between w-full">
-        <div className="flex flex-row items-center justify-between w-full">
+      <div className="flex flex-row justify-between items-center w-full">
+        <div className="flex flex-row justify-between items-center w-full">
           <div className="">
             <h2 className="text-lg line-clamp-1">
               {isRelayGroup ? (
@@ -45,63 +47,73 @@ export function GroupHeader({ group }: { group: Group }) {
             {!isRelayGroup ? (
               <Link
                 to={`/${getRelayHost(group.relay)}`}
-                className="font-mono text-xs text-muted-foreground line-clamp-1 p-0"
+                className="p-0 font-mono text-xs text-muted-foreground line-clamp-1"
               >
                 {getRelayHost(group.relay)}
               </Link>
             ) : null}
           </div>
           {isRelayGroup ? null : (
-            <div className="flex flex-row items-center gap-2">
-              <div className="flex flex-row items-center gap-1">
+            <div className="flex flex-row gap-2 items-center">
+              <div className="flex flex-row gap-1 items-center">
                 {metadata?.visibility === "private" ? (
                   <Tooltip>
                     <TooltipTrigger>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex gap-1.5 items-center">
                         <BookLock className="size-3 text-muted-foreground" />
-                        <span className="text-xs hidden sm:block">
-                          Members only
+                        <span className="hidden text-xs sm:block">
+                          {t("group.metadata.visibility.private.trigger")}
                         </span>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      Only members can read content
+                      {t("group.metadata.visibility.private.content")}
                     </TooltipContent>
                   </Tooltip>
                 ) : (
                   <Tooltip>
                     <TooltipTrigger>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex gap-1.5 items-center">
                         <BookOpen className="size-3 text-muted-foreground" />
-                        <span className="text-xs hidden sm:block">Public</span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>Can be read by anyone</TooltipContent>
-                  </Tooltip>
-                )}
-              </div>
-              <div className="flex flex-row items-center gap-1">
-                {metadata?.access === "closed" ? (
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="flex items-center gap-1.5">
-                        <Shield className="size-3 text-muted-foreground" />
-                        <span className="text-xs hidden sm:block">Closed</span>
+                        <span className="hidden text-xs sm:block">
+                          {t("group.metadata.visibility.public.trigger")}
+                        </span>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      Requires approval or an invitation to join
+                      {t("group.metadata.visibility.public.content")}
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </div>
+              <div className="flex flex-row gap-1 items-center">
+                {metadata?.access === "closed" ? (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div className="flex gap-1.5 items-center">
+                        <Shield className="size-3 text-muted-foreground" />
+                        <span className="hidden text-xs sm:block">
+                          {t("group.metadata.access.closed.trigger")}
+                        </span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {t("group.metadata.access.closed.content")}
                     </TooltipContent>
                   </Tooltip>
                 ) : (
                   <Tooltip>
                     <TooltipTrigger>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex gap-1.5 items-center">
                         <ShieldOff className="size-3 text-muted-foreground" />
-                        <span className="text-xs hidden sm:block">Open</span>
+                        <span className="hidden text-xs sm:block">
+                          {t("group.metadata.access.open.trigger")}
+                        </span>
                       </div>
                     </TooltipTrigger>
-                    <TooltipContent>Anyone can join</TooltipContent>
+                    <TooltipContent>
+                      {t("group.metadata.access.open.content")}
+                    </TooltipContent>
                   </Tooltip>
                 )}
               </div>

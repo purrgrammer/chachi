@@ -20,6 +20,7 @@ import { RichText } from "@/components/rich-text";
 import { useGroup, useGroupParticipants } from "@/lib/nostr/groups";
 import { cn } from "@/lib/utils";
 import type { Group } from "@/lib/types";
+import { useTranslation } from "react-i18next";
 
 function GroupPicture({
   picture,
@@ -71,6 +72,7 @@ function GroupMember({
   isAdmin?: boolean;
   role?: string;
 }) {
+  const { t } = useTranslation();
   return (
     <div className={cn("flex items-center justify-between py-2", className)}>
       <div className="flex gap-2 items-center">
@@ -79,7 +81,7 @@ function GroupMember({
           <Name pubkey={pubkey} />
         </span>
       </div>
-      {isAdmin ? <AdminBadge role={role || "Admin"} /> : null}
+      {isAdmin ? <AdminBadge role={role || t("group.info.admin")} /> : null}
     </div>
   );
 }
@@ -87,24 +89,31 @@ function GroupMember({
 function GroupMembers({ group }: { group: Group }) {
   const { admins, members } = useGroupParticipants(group);
   const nonAdmins = members?.filter((m) => !admins.includes(m)) ?? [];
+
+  const { t } = useTranslation();
+  const adminsLength = admins.length;
+  const membersLength = nonAdmins.length;
+
   return (admins && admins.length > 0) ||
     (nonAdmins && nonAdmins.length > 0) ? (
     <>
       <ScrollArea className="h-80">
         <div className="mb-2">
           <h3 className="text-sm text-muted-foreground">
-            Admins ({admins.length})
+            {t("group.info.admins", { adminsLength })}
           </h3>
           {admins.map((pubkey) => (
             <GroupMember isAdmin key={pubkey} pubkey={pubkey} />
           ))}
         </div>
         {nonAdmins.length === 0 ? (
-          <span className="text-xs text-muted-foreground">No members</span>
+          <span className="text-xs text-muted-foreground">
+            {t("group.info.no-members")}
+          </span>
         ) : (
           <>
             <h3 className="text-sm text-muted-foreground">
-              Members ({nonAdmins.length})
+              {t("group.info.members", { membersLength })}
             </h3>
             {nonAdmins.map((pubkey) => (
               <GroupMember key={pubkey} pubkey={pubkey} />
@@ -131,8 +140,8 @@ function GroupInfoContent({ group }: { group: Group }) {
   const shortname = name ? name[0] : id.slice(0, 2);
   const nlink = metadata?.nlink;
   return (
-    <div className="flex flex-col gap-4 w-full max-w-sm lg:max-w-lg mx-auto p-4">
-      <DrawerHeader className="flex flex-col items-center gap-3">
+    <div className="flex flex-col gap-4 p-4 mx-auto w-full max-w-sm lg:max-w-lg">
+      <DrawerHeader className="flex flex-col gap-3 items-center">
         <GroupPicture
           picture={picture}
           name={name}
@@ -141,7 +150,7 @@ function GroupInfoContent({ group }: { group: Group }) {
         />
         <DrawerTitle>{name || id}</DrawerTitle>
         {nlink ? (
-          <div className="flex flex-row items-center gap-2">
+          <div className="flex flex-row gap-2 items-center">
             <InputCopy value={nlink} />
           </div>
         ) : null}

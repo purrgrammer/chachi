@@ -53,10 +53,12 @@ import { useNDK } from "@/lib/ndk";
 import { useBookmarkGroup } from "@/components/nostr/groups/bookmark";
 import { saveGroupEvent } from "@/lib/messages";
 import { DELETE_GROUP } from "@/lib/kinds";
+import { useTranslation } from "react-i18next";
 
 const formSchema = z.object({
   name: z
     .string({
+      // TODO add translation
       required_error: "Please add a name",
     })
     .min(1)
@@ -81,16 +83,17 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
   const { isBookmarked, unbookmarkGroup } = useBookmarkGroup(group);
   const relaySet = useRelaySet([group.relay]);
   const ndk = useNDK();
+  const { t } = useTranslation();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsLoading(true);
       await editGroup({ ...group, ...values });
-      toast.success("Group updated");
+      toast.success(t("group.edit.form.submit.success"));
       setOpen(false);
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't update group");
+      toast.error(t("group.edit.form.submit.error"));
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +102,7 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
   async function deleteGroup() {
     try {
       setIsLoading(true);
-      toast.success("Group deleted");
+      toast.success(t("group.delete.success"));
       setOpen(false);
       const ev = new NDKEvent(ndk, {
         kind: DELETE_GROUP,
@@ -114,7 +117,7 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
       navigate("/");
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't delete group");
+      toast.error(t("group.delete.error"));
     } finally {
       setIsLoading(false);
     }
@@ -129,21 +132,21 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Group settings</DialogTitle>
+          <DialogTitle>{t("group.edit.title")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col gap-2"
           >
-            <div className="flex flex-row items-center justify-between gap-6">
+            <div className="flex flex-row gap-6 justify-between items-center">
               <FormField
                 control={form.control}
                 name="picture"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <div className="w-full flex items-center justify-center">
+                      <div className="flex justify-center items-center w-full">
                         <UploadImage
                           defaultImage={field.value}
                           onUpload={field.onChange}
@@ -158,15 +161,17 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
                 name="name"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>{t("group.edit.form.name.label")}</FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}
-                        placeholder="My group"
+                        placeholder={t("group.edit.form.name.placeholder")}
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>This is the group's name.</FormDescription>
+                    <FormDescription>
+                      {t("group.edit.form.name.description")}
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -177,19 +182,19 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
               name="about"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>About</FormLabel>
+                  <FormLabel>{t("group.edit.form.about.label")}</FormLabel>
                   <FormControl>
                     <Textarea
                       disabled={isLoading}
                       className="resize-none"
-                      placeholder="A group for my frens"
+                      placeholder={t("group.edit.form.about.placeholder")}
                       minRows={2}
                       maxRows={6}
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    This is the group's description.
+                    {t("group.edit.form.about.description")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -200,8 +205,10 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
               name="visibility"
               render={({ field }) => (
                 <FormItem>
-                  <div className="flex flex-row items-center justify-between">
-                    <FormLabel>Visibility</FormLabel>
+                  <div className="flex flex-row justify-between items-center">
+                    <FormLabel>
+                      {t("group.edit.form.visibility.label")}
+                    </FormLabel>
                     <FormControl>
                       <Select
                         disabled={isLoading}
@@ -212,15 +219,18 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
                           <SelectValue placeholder="Choose visibility" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="public">Anyone</SelectItem>
-                          <SelectItem value="private">Members only</SelectItem>
+                          <SelectItem value="public">
+                            {t("group.edit.form.visibility.anyone")}
+                          </SelectItem>
+                          <SelectItem value="private">
+                            {t("group.edit.form.visibility.members-only")}
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
                   </div>
                   <FormDescription>
-                    Messages are not encrypted and can be read by relays. For
-                    maximum privacy host your own relay.
+                    {t("group.edit.form.visibility.description")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -231,8 +241,8 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
               name="access"
               render={({ field }) => (
                 <FormItem>
-                  <div className="flex flex-row items-center justify-between">
-                    <FormLabel>Access</FormLabel>
+                  <div className="flex flex-row justify-between items-center">
+                    <FormLabel>{t("group.edit.form.access.label")}</FormLabel>
                     <FormControl>
                       <Select
                         disabled={isLoading}
@@ -243,15 +253,18 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
                           <SelectValue placeholder="Choose policy" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="open">Anyone</SelectItem>
-                          <SelectItem value="closed">Invite only</SelectItem>
+                          <SelectItem value="open">
+                            {t("group.edit.form.access.anyone")}
+                          </SelectItem>
+                          <SelectItem value="closed">
+                            {t("group.edit.form.access.invite-only")}
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
                   </div>
                   <FormDescription>
-                    Anyone can join an open group, closed groups require
-                    approval.
+                    {t("group.edit.form.access.description")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -261,33 +274,33 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
               <AlertDialog>
                 <AlertDialogTrigger>
                   <Button type="button" variant="destructive">
-                    <Trash /> Delete
+                    <Trash /> {t("group.delete.trigger")}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>
-                      Are you sure you want to delete the group?
+                      {t("group.delete.confirmation.title")}
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. The group and all its
-                      history will be deleted.
+                      {t("group.delete.confirmation.description")}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel disabled={isLoading}>
-                      Cancel
+                      {t("group.delete.confirmation.cancel")}
                     </AlertDialogCancel>
                     <AlertDialogAction
                       disabled={isLoading}
                       onClick={deleteGroup}
                     >
-                      <Trash className="size-8" /> Delete
+                      <Trash className="size-8" />{" "}
+                      {t("group.delete.confirmation.confirm")}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-              <Button type="submit">Save</Button>
+              <Button type="submit">{t("group.edit.submit.trigger")}</Button>
             </div>
           </form>
         </Form>

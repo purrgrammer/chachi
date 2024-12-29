@@ -14,6 +14,7 @@ import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
 import { useBookmarkGroup } from "@/components/nostr/groups/bookmark";
 import { useRequestedToJoin, useJoinRequest } from "@/lib/nostr/groups";
 import type { Group, Emoji } from "@/lib/types";
+import { useTranslation } from "react-i18next";
 
 function JoinRequest({ group, pubkey }: { group: Group; pubkey: string }) {
   const canSign = useCanSign();
@@ -21,6 +22,7 @@ function JoinRequest({ group, pubkey }: { group: Group; pubkey: string }) {
   const joinRequest = useJoinRequest(group);
   const [requested, setRequested] = useState(false);
   const { isBookmarked, bookmarkGroup } = useBookmarkGroup(group);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (events.length > 0) {
@@ -31,30 +33,32 @@ function JoinRequest({ group, pubkey }: { group: Group; pubkey: string }) {
   async function sendJoinRequest() {
     try {
       await joinRequest();
-      toast.success("Join request sent");
+      toast.success(t("chat.join.request.success"));
       setRequested(true);
       if (!isBookmarked) {
         await bookmarkGroup();
       }
     } catch (err) {
       console.error(err);
-      toast.error("Failed to send join request");
+      toast.error(t("chat.join.request.error"));
     }
   }
 
   return (
-    <div className="flex flex-row items-center justify-center h-full gap-3">
+    <div className="flex flex-row gap-3 justify-center items-center h-full">
       <span className="text-sm text-muted-foreground">
-        You are not a member of this group yet
+        {t("chat.user.not-member")}
       </span>
       {requested ? (
         <div className="flex flex-row gap-2">
           <Check className="size-5" />
-          <span className="text-sm text-muted-foreground">Request sent</span>
+          <span className="text-sm text-muted-foreground">
+            {t("chat.join.request.sent")}
+          </span>
         </div>
       ) : (
         <Button disabled={!canSign} size="sm" onClick={sendJoinRequest}>
-          Join
+          {t("chat.join.action")}
         </Button>
       )}
     </div>
@@ -100,6 +104,7 @@ export function ChatInput({
   // message
   const [message, setMessage] = useState("");
   const [customEmojis, setCustomEmojis] = useState<Emoji[]>([]);
+  const { t } = useTranslation();
 
   async function sendMessage(msg: string) {
     const content = msg.trim();
@@ -143,7 +148,7 @@ export function ChatInput({
         await event.publish(relaySet);
       } catch (err) {
         console.error(err);
-        toast.error("Failed to send message");
+        toast.error(t("send.error"));
       } finally {
         setMessage("");
         setIsPosting(false);
@@ -162,7 +167,7 @@ export function ChatInput({
       {showJoinRequest && me ? (
         <JoinRequest pubkey={me} group={group} />
       ) : (
-        <div className="flex flex-row items-center h-full gap-1">
+        <div className="flex flex-row gap-1 items-center h-full">
           {children}
           <AutocompleteTextarea
             submitOnEnter
@@ -171,7 +176,7 @@ export function ChatInput({
             group={group}
             message={message}
             setMessage={setMessage}
-            placeholder={canPoast ? "Message" : "Log in to send messages"}
+            placeholder={canPoast ? t("message") : t("send.login-required")}
             onCustomEmojisChange={setCustomEmojis}
             onHeightChange={(height: number) => {
               onHeightChange?.(height);

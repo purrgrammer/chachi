@@ -28,4 +28,5 @@ dist-ssr
 notes.md
 
 .direnv
+.envrc
 *.nix

@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogContent,
 } from "@/components/ui/dialog";
+import { useTranslation } from "react-i18next";
 
 export interface Emoji {
   id: string;
@@ -28,6 +29,7 @@ export function EmojiPicker({
   onEmojiSelect: (e: Emoji) => void;
   children?: React.ReactNode;
 }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const { data: custom } = useCustomEmojis();
   const customEmoji =
@@ -49,9 +51,9 @@ export function EmojiPicker({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Pick an emoji</DialogTitle>
+          <DialogTitle>{t("emoji.pick")}</DialogTitle>
         </DialogHeader>
-        <div className="flex items-center justify-center bg-background border-none">
+        <div className="flex justify-center items-center border-none bg-background">
           <div className="emoji-picker w-[352px]">
             {children}
             <Picker

@@ -85,6 +85,7 @@ import { cn } from "@/lib/utils";
 import { saveGroupEvent } from "@/lib/messages";
 import { usePubkey, useCanSign } from "@/lib/account";
 import type { Group, Emoji as EmojiType } from "@/lib/types";
+import { useTranslation } from "react-i18next";
 
 type EventComponent = (props: {
   event: NostrEvent;
@@ -196,6 +197,7 @@ function ShareDialog({
   const [customEmoji, setCustomEmoji] = useState<EmojiType[]>([]);
   const groupName = useGroupName(group);
   const openGroup = useOpenGroup(group);
+  const { t } = useTranslation();
 
   function onClose(open: boolean) {
     if (!open) {
@@ -222,11 +224,11 @@ function ShareDialog({
       await ev.publish(NDKRelaySet.fromRelayUrls([group.relay], ndk));
       saveGroupEvent(ev.rawEvent() as NostrEvent, group);
       onClose(false);
-      toast.success("Shared");
+      toast.success(t("share.success"));
       openGroup();
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't share post");
+      toast.error(t("share.error"));
     } finally {
     }
   }
@@ -235,13 +237,13 @@ function ShareDialog({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Share publication</DialogTitle>
+          <DialogTitle>{t("share.publication")}</DialogTitle>
           {groupName ? (
             <DialogDescription>
-              Share this publication in {groupName}.
+              {t("share.this.in", { groupName })}
             </DialogDescription>
           ) : (
-            <DialogDescription>Share this publication</DialogDescription>
+            <DialogDescription>{t("share.this.publication")}</DialogDescription>
           )}
         </DialogHeader>
         <AutocompleteTextarea
@@ -254,13 +256,13 @@ function ShareDialog({
           minRows={3}
           maxRows={6}
           submitOnEnter={false}
-          placeholder="Write a message..."
+          placeholder={t("write-a-message")}
         />
         <DialogFooter>
-          <Button className="w-full overflow-x-hidden" onClick={shareEvent}>
+          <Button className="overflow-x-hidden w-full" onClick={shareEvent}>
             <MessageSquareShare />
-            Share in <GroupPicture group={group} className="size-4" />{" "}
-            {groupName}
+            {t("share-in")}
+            <GroupPicture group={group} className="size-4" /> {groupName}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -287,6 +289,7 @@ function EventMenu({
   const groupName = useGroupName(group);
   const isGroupEvent =
     group.id !== "_" && event.tags.find((t) => t[0] === "h")?.[1] === group.id;
+  const { t } = useTranslation();
 
   function showDetail() {
     const ev = new NDKEvent(ndk, event);
@@ -326,7 +329,7 @@ function EventMenu({
             {canOpen ? (
               <DropdownMenuItem onClick={showDetail}>
                 <Maximize />
-                <span>Open</span>
+                <span>{t("action-open")}</span>
               </DropdownMenuItem>
             ) : null}
             {isGroupEvent ? (
@@ -335,10 +338,10 @@ function EventMenu({
                 {groupName ? (
                   <span className="line-clamp-1">
                     {" "}
-                    Share in {groupName} chat
+                    {t("share.in.x", { groupName })}
                   </span>
                 ) : (
-                  <span className="line-clamp-1">Share in chat</span>
+                  <span className="line-clamp-1">{t("share.in.chat")}</span>
                 )}
               </DropdownMenuItem>
             ) : (
@@ -398,6 +401,7 @@ export function FeedEmbed({
   const [isDeleted, setIsDeleted] = useState(false);
   // NIP-31
   const alt = event.tags.find((t) => t[0] === "alt")?.[1];
+  const { t } = useTranslation();
 
   function openEmojiPicker() {
     setShowEmojiPicker(true);
@@ -444,7 +448,7 @@ export function FeedEmbed({
       await ev.publish(relaySet);
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't reply");
+      toast.error(t("chat.message.reply.error"));
     } finally {
       setShowReplyDialog(false);
     }
@@ -462,23 +466,25 @@ export function FeedEmbed({
       }
       await ev.publish(relaySet);
       if (e.native) {
-        toast.success(`Reacted with ${e.native}`);
+        // TODO add translation
+        // toast.success(`Reacted with ${e.native}`);
+        toast.success(t("chat.message.react.success", { emoji: e.native }));
       } else if (e.src) {
         // nit: info icon
         toast(
           <div className="flex flex-row gap-2 items-center">
-            Reacted with{" "}
+            {t("chat.message.react.with")}
             <Emoji
               name={e.name}
               image={e.src}
-              className="w-5 h-5 inline-block"
+              className="inline-block w-5 h-5"
             />
           </div>,
         );
       }
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't react");
+      toast.error(t("chat.message.react.error"));
     } finally {
       setShowEmojiPicker(false);
     }
@@ -495,16 +501,16 @@ export function FeedEmbed({
       } as NostrEvent);
       ev.tag(new NDKEvent(ndk, event));
       await ev.publish(relaySet);
-      toast.success("Post deleted");
+      toast.success(t("post.delete.success"));
       setIsDeleted(true);
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't delete post");
+      toast.error(t("post.delete.error"));
     }
   }
 
   const header = (
-    <div className="flex space-between items-center px-3 py-2 gap-3">
+    <div className="flex gap-3 items-center py-2 px-3 space-between">
       {components?.noHeader ? null : (
         <>
           <Header event={event} />
@@ -520,7 +526,7 @@ export function FeedEmbed({
   );
 
   const body = (
-    <div className="px-4 py-1 pb-2 space-y-3">
+    <div className="py-1 px-4 pb-2 space-y-3">
       {components?.preview ? (
         components.preview({
           event,
@@ -553,7 +559,7 @@ export function FeedEmbed({
 
   // todo: emojis show before dragging
   return (
-    <div className="bg-accent rounded-sm relative">
+    <div className="relative rounded-sm bg-accent">
       <motion.div
         className={cn(
           "z-10 border relative bg-background text-foreground rounded-sm font-sans",
@@ -578,10 +584,12 @@ export function FeedEmbed({
             <ContextMenuTrigger>
               {header}
               {isDeleted ? (
-                <div className="px-4 py-2 space-y-3">
-                  <div className="flex flex-row items-center gap-1 text-muted-foreground">
+                <div className="py-2 px-4 space-y-3">
+                  <div className="flex flex-row gap-1 items-center text-muted-foreground">
                     <Ban className="size-3" />
-                    <span className="text-xs italic">Post deleted</span>
+                    <span className="text-xs italic">
+                      {t("post.delete.success")}
+                    </span>
                   </div>
                 </div>
               ) : (
@@ -593,7 +601,7 @@ export function FeedEmbed({
                 className="cursor-pointer"
                 onClick={openReplyDialog}
               >
-                Reply
+                {t("chat.message.reply.action")}
                 <ContextMenuShortcut>
                   <Reply className="w-4 h-4" />
                 </ContextMenuShortcut>
@@ -602,14 +610,14 @@ export function FeedEmbed({
                 className="cursor-pointer"
                 onClick={openEmojiPicker}
               >
-                React
+                {t("chat.message.react.action")}
                 <ContextMenuShortcut>
                   <SmilePlus className="w-4 h-4" />
                 </ContextMenuShortcut>
               </ContextMenuItem>
               {canDelete ? (
                 <ContextMenuItem className="cursor-pointer" onClick={onDelete}>
-                  Delete
+                  {t("chat.message.delete.action")}
                   <ContextMenuShortcut>
                     <Trash className="w-4 h-4 text-destructive" />
                   </ContextMenuShortcut>
@@ -621,10 +629,12 @@ export function FeedEmbed({
           <>
             {header}
             {isDeleted ? (
-              <div className="px-4 py-2 space-y-3">
-                <div className="flex flex-row items-center gap-1 text-muted-foreground">
+              <div className="py-2 px-4 space-y-3">
+                <div className="flex flex-row gap-1 items-center text-muted-foreground">
                   <Ban className="size-3" />
-                  <span className="text-xs italic">Post deleted</span>
+                  <span className="text-xs italic">
+                    {t("post.delete.success")}
+                  </span>
                 </div>
               </div>
             ) : (
@@ -635,8 +645,8 @@ export function FeedEmbed({
       </motion.div>
       {isDeleted ? null : (
         <>
-          <Reply className="z-0 size-6 absolute top-3 left-2" />
-          <SmilePlus className="z-0 size-6 absolute top-3 right-2" />
+          <Reply className="absolute left-2 top-3 z-0 size-6" />
+          <SmilePlus className="absolute right-2 top-3 z-0 size-6" />
         </>
       )}
       {showEmojiPicker && canSign ? (
@@ -651,7 +661,7 @@ export function FeedEmbed({
             event={event}
             group={group}
             relays={relays}
-            className="border-none rounded-b-none max-h-32 overflow-y-auto overflow-x-hidden pretty-scrollbar"
+            className="overflow-y-auto overflow-x-hidden max-h-32 rounded-b-none border-none pretty-scrollbar"
           />
         </EmojiPicker>
       ) : null}
@@ -668,7 +678,7 @@ export function FeedEmbed({
             event={event}
             group={group}
             relays={relays}
-            className="border-none rounded-b-none max-h-32 overflow-y-auto overflow-x-hidden pretty-scrollbar"
+            className="overflow-y-auto overflow-x-hidden max-h-32 rounded-b-none border-none pretty-scrollbar"
           />
         </ReplyDialog>
       ) : null}
@@ -706,7 +716,7 @@ export function Embed({
         className,
       )}
     >
-      <div className="flex space-between items-center px-3 py-2 gap-3">
+      <div className="flex gap-3 items-center py-2 px-3 space-between">
         {components?.noHeader ? null : (
           <>
             <Header event={event} />
@@ -719,7 +729,7 @@ export function Embed({
           </>
         )}
       </div>
-      <div className="px-4 py-1 pb-2 space-y-3">
+      <div className="py-1 px-4 pb-2 space-y-3">
         {components?.preview ? (
           components.preview({ event, relays, group, options, classNames })
         ) : alt ? (
@@ -757,6 +767,7 @@ export function EventDetail({
 }) {
   const { eose, events: comments } = useReplies(event, group);
   const hasContent = eventDetails[event.kind]?.content;
+  const { t } = useTranslation();
 
   return (
     <div
@@ -783,16 +794,16 @@ md:w-[calc(100vw-16rem)]
           relays={relays}
         />
         <Tabs defaultValue={hasContent ? "content" : "replies"}>
-          <TabsList className="border-t px-4">
+          <TabsList className="px-4 border-t">
             {hasContent ? (
-              <TabsTrigger value="content">Content</TabsTrigger>
+              <TabsTrigger value="content">{t("event.content")}</TabsTrigger>
             ) : null}
-            <TabsTrigger value="replies">Replies</TabsTrigger>
-            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="replies">{t("event.replies")}</TabsTrigger>
+            <TabsTrigger value="details">{t("event.details")}</TabsTrigger>
           </TabsList>
           {hasContent ? (
             <TabsContent value="content">
-              <div className="px-4 py-2">
+              <div className="py-2 px-4">
                 {eventDetails[event.kind]?.content?.({
                   event,
                   relays,
@@ -816,15 +827,15 @@ md:w-[calc(100vw-16rem)]
                   key={comment.id}
                   event={comment}
                   group={group}
-                  className="rounded-none border-l-none border-t-none border-r-none border-b"
+                  className="rounded-none border-b border-l-none border-t-none border-r-none"
                   relays={relays}
                 />
               ))}
             </AnimatePresence>
           </TabsContent>
           <TabsContent value="details">
-            <div className="flex flex-col gap-3 px-4 py-3">
-              <pre className="text-xs whitespace-pre-wrap break-words border rounded-sm p-2">
+            <div className="flex flex-col gap-3 py-3 px-4">
+              <pre className="p-2 text-xs whitespace-pre-wrap break-words rounded-sm border">
                 {JSON.stringify(event, null, 2)}
               </pre>
             </div>

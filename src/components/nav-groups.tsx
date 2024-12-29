@@ -1,6 +1,7 @@
 import { Reorder } from "framer-motion";
 import { useParams } from "react-router-dom";
 import { useSortedGroups } from "@/lib/messages";
+import { useTranslation } from "react-i18next";
 import { groupId } from "@/lib/groups";
 import { RichText } from "@/components/rich-text";
 import { Name } from "@/components/nostr/name";
@@ -37,11 +38,11 @@ function RelayItem({ group }: { group: Group }) {
       className={`flex items-center p-1 py-2 cursor-pointer transition-colors ${isActive ? "bg-accent/50" : "bg-background"} hover:bg-accent/80 overflow-hidden group-has-[[data-collapsible=icon]]/sidebar-wrapper:bg-transparent group-has-[[data-collapsible=icon]]/sidebar-wrapper:py-1 transition-all`}
       onClick={openGroup}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex gap-2 items-center">
         <div
           className={`size-10 rounded-full ${isActive ? "group-has-[[data-collapsible=icon]]/sidebar-wrapper:ring-2 ring-primary ring-offset-1 ring-offset-background" : ""} relative`}
         >
-          <Avatar className="size-10 shrink-0 rounded-full">
+          <Avatar className="rounded-full size-10 shrink-0">
             <AvatarImage src={relayInfo?.picture} className="object-cover" />
             <AvatarFallback>
               <img src={relayInfo?.icon} alt={relayInfo?.name} />
@@ -53,7 +54,7 @@ function RelayItem({ group }: { group: Group }) {
         >
           {unreadMessages && unreadMessages > 0 ? (
             <Badge variant="counter">
-              <span className="text-xs font-light font-mono">
+              <span className="font-mono text-xs font-light">
                 {unreadMessages >= 100 ? "99+" : unreadMessages}
               </span>
             </Badge>
@@ -64,15 +65,15 @@ function RelayItem({ group }: { group: Group }) {
             {relayInfo?.name || group.id.slice(0, 8)}
           </h3>
           {lastMessage ? (
-            <div className="flex flex-row items-center justify-between">
-              <div className="flex flex-row items-start line-clamp-1 text-xs text-muted-foreground">
+            <div className="flex flex-row justify-between items-center">
+              <div className="flex flex-row items-start text-xs line-clamp-1 text-muted-foreground">
                 <span className="font-semibold">
                   <Name pubkey={lastMessage.pubkey} />
                 </span>
                 <span className="mr-1">:</span>
                 <RichText
                   group={group}
-                  className="line-clamp-1 leading-none"
+                  className="leading-none line-clamp-1"
                   options={{
                     inline: true,
                     emojis: true,
@@ -120,11 +121,11 @@ function GroupItem({ group }: { group: Group }) {
       className={`flex items-center p-1 py-2 cursor-pointer transition-colors ${isActive ? "bg-accent/50" : "bg-background"} hover:bg-accent/80 overflow-hidden group-has-[[data-collapsible=icon]]/sidebar-wrapper:bg-transparent group-has-[[data-collapsible=icon]]/sidebar-wrapper:py-1 transition-all`}
       onClick={openGroup}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex gap-2 items-center">
         <div
           className={`size-10 rounded-full ${isActive ? "group-has-[[data-collapsible=icon]]/sidebar-wrapper:ring-2 ring-primary ring-offset-1 ring-offset-background" : ""} relative`}
         >
-          <Avatar className="size-10 shrink-0 rounded-full">
+          <Avatar className="rounded-full size-10 shrink-0">
             <AvatarImage src={metadata?.picture} className="object-cover" />
             <AvatarFallback>
               {metadata?.name?.charAt(0) || group.id.charAt(0)}
@@ -134,7 +135,7 @@ function GroupItem({ group }: { group: Group }) {
         <div className="flex flex-row gap-1 absolute top-3 right-2 group-has-[[data-collapsible=icon]]/sidebar-wrapper:top-0 group-has-[[data-collapsible=icon]]/sidebar-wrapper:right-0">
           {unreadMessages && unreadMessages > 0 ? (
             <Badge variant="counter">
-              <span className="text-xs font-light font-mono">
+              <span className="font-mono text-xs font-light">
                 {unreadMessages >= 100 ? "99+" : unreadMessages}
               </span>
             </Badge>
@@ -145,15 +146,15 @@ function GroupItem({ group }: { group: Group }) {
             {metadata?.name || group.id.slice(0, 8)}
           </h3>
           {lastMessage ? (
-            <div className="flex flex-row items-center justify-between">
-              <div className="flex flex-row items-start line-clamp-1 text-xs text-muted-foreground">
+            <div className="flex flex-row justify-between items-center">
+              <div className="flex flex-row items-start text-xs line-clamp-1 text-muted-foreground">
                 <span className="font-semibold">
                   <Name pubkey={lastMessage.pubkey} />
                 </span>
                 <span className="mr-1">:</span>
                 <RichText
                   group={group}
-                  className="line-clamp-1 leading-none"
+                  className="leading-none line-clamp-1"
                   options={{
                     inline: true,
                     emojis: true,
@@ -213,12 +214,13 @@ function MyGroupList() {
 
 export function NavGroups() {
   const myGroups = useMyGroups();
+  const { t } = useTranslation();
   return myGroups.length > 0 ? (
     <MyGroupList />
   ) : (
-    <div className="flex items-center justify-center">
+    <div className="flex justify-center items-center">
       <span className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden text-sm text-muted-foreground">
-        No groups
+        {t("nav.no-groups")}
       </span>
     </div>
   );

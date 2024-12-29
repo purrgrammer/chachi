@@ -20,6 +20,7 @@ import { useNDK } from "@/lib/ndk";
 import { Button } from "@/components/ui/button";
 import { getRelayHost } from "@/lib/relay";
 import type { Group } from "@/lib/types";
+import { useTranslation } from "react-i18next";
 
 interface ContentProps {
   group: Group;
@@ -42,10 +43,11 @@ export function New({ group }: { group: Group }) {
   const [isOpen, setIsOpen] = useState(false);
   const canSign = useCanSign();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const contentTypes = [
-    { icon: "🧵", title: "Post", component: NewPost },
-    { icon: "🗳️", title: "Poll", component: NewPoll },
-    { icon: "🎥", title: "Video", component: NewVideo },
+    { icon: "🧵", title: t("content.type.post"), component: NewPost },
+    { icon: "🗳️", title: t("content.type.poll"), component: NewPoll },
+    { icon: "🎥", title: t("content.type.video"), component: NewVideo },
     //{
     //  icon: "🏰",
     //  title: "Community",
@@ -78,11 +80,11 @@ export function New({ group }: { group: Group }) {
         </Button>
       </DrawerTrigger>
       <DrawerContent>
-        <div className="flex flex-col items-center justify-center py-6">
+        <div className="flex flex-col justify-center items-center py-6">
           <div className="flex flex-col sm:max-w-[425px]">
-            <DrawerHeader className="text-left self-start">
-              <DrawerTitle>Create</DrawerTitle>
-              <DrawerDescription>What do you want to create?</DrawerDescription>
+            <DrawerHeader className="self-start text-left">
+              <DrawerTitle>{t("content.create")}</DrawerTitle>
+              <DrawerDescription>{t("content.prompt")}</DrawerDescription>
             </DrawerHeader>
             <div className="grid grid-cols-2 gap-2">
               {contentTypes.map((contentType: ContentType) => {
