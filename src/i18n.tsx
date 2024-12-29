@@ -7,7 +7,7 @@ import hantTranslations from "../public/locales/hant/common.json";
 
 i18n.use(initReactI18next).init({
   fallbackLng: "en",
-  lng: "es",
+  lng: "en",
   resources: {
     en: {
       translations: enTranslations,
