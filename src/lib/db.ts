@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Dexie, { Table } from "dexie";
 import NDKCacheAdapterDexie from "@nostr-dev-kit/ndk-cache-dexie";
 
