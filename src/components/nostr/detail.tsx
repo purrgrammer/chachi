@@ -54,6 +54,7 @@ import {
 } from "@/components/ui/context-menu";
 import { Emoji as PickerEmoji, EmojiPicker } from "@/components/emoji-picker";
 import { Poll, PollResults } from "@/components/nostr/poll";
+import { CalendarEvent } from "@/components/nostr/calendar";
 import { ReplyDialog } from "@/components/nostr/reply";
 import { getRelayHost } from "@/lib/relay";
 import { useNDK } from "@/lib/ndk";
@@ -61,7 +62,14 @@ import { useRelaySet, useRelays } from "@/lib/nostr";
 import { useReplies } from "@/lib/nostr/comments";
 import { useGroupAdminsList, useGroupName } from "@/lib/nostr/groups";
 import { useMyGroups, useOpenGroup } from "@/lib/groups";
-import { POLL, REPO, ISSUE, COMMENT, STREAM } from "@/lib/kinds";
+import {
+  POLL,
+  REPO,
+  ISSUE,
+  COMMENT,
+  STREAM,
+  CALENDAR_EVENT,
+} from "@/lib/kinds";
 import {
   Dialog,
   DialogContent,
@@ -176,6 +184,10 @@ const eventDetails: Record<
   [NDKKind.CategorizedPeopleList]: {
     preview: People,
     detail: People,
+  },
+  [CALENDAR_EVENT]: {
+    preview: CalendarEvent,
+    detail: CalendarEvent,
   },
 };
 
