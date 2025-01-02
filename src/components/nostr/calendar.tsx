@@ -42,7 +42,7 @@ export function CalendarEvent({
             <li className="flex flex-row gap-2 items-center">
               <MapPin className="size-5 text-muted-foreground" />{" "}
               <a
-                className="text-sm underline decoration-dotted"
+                className="text-sm underline decoration-dotted line-clamp-1"
                 href={`https://www.google.com/maps/search/?api=1&query=${location}`}
                 target="_blank"
                 rel="noreferrer"
