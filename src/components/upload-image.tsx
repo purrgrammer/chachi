@@ -4,6 +4,7 @@ import { RotateCw, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUpload } from "@/lib/media";
+import { useTranslation } from "react-i18next";
 
 interface UploadImageProps {
   defaultImage?: string;
@@ -15,6 +16,7 @@ export function UploadImage({ defaultImage, onUpload }: UploadImageProps) {
   const [image, setImage] = useState<string | undefined>(defaultImage);
   const { upload, canSign } = useUpload();
   const ref = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation();
 
   function handleClick() {
     ref.current?.click();
@@ -34,7 +36,7 @@ export function UploadImage({ defaultImage, onUpload }: UploadImageProps) {
       onUpload(url);
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't upload image");
+      toast.error(t("image.upload.error"));
     } finally {
       setIsUploading(false);
     }
@@ -48,7 +50,7 @@ export function UploadImage({ defaultImage, onUpload }: UploadImageProps) {
       type="button"
     >
       {image ? (
-        <img src={image} className="size-24 rounded-full object-cover" />
+        <img src={image} className="object-cover rounded-full size-24" />
       ) : (
         <>
           {isUploading ? <RotateCw className="animate-spin" /> : <ImagePlus />}

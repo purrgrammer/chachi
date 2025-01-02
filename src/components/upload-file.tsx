@@ -4,6 +4,7 @@ import { RotateCw, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUpload } from "@/lib/media";
+import { useTranslation } from "react-i18next";
 
 type ButtonProps = React.ComponentProps<typeof Button>;
 
@@ -15,6 +16,7 @@ export function UploadFile({ onUpload, ...props }: UploadFileProps) {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const { upload, canSign } = useUpload();
   const ref = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation();
 
   function handleClick() {
     ref.current?.click();
@@ -33,7 +35,7 @@ export function UploadFile({ onUpload, ...props }: UploadFileProps) {
       onUpload(url);
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't upload file");
+      toast.error(t("file.upload.error"));
     } finally {
       setIsUploading(false);
     }
@@ -48,7 +50,7 @@ export function UploadFile({ onUpload, ...props }: UploadFileProps) {
       {...props}
     >
       {isUploading ? (
-        <RotateCw className="size-9 animate-spin text-muted-foreground" />
+        <RotateCw className="animate-spin size-9 text-muted-foreground" />
       ) : (
         <Paperclip className="size-10 text-muted-foreground" />
       )}

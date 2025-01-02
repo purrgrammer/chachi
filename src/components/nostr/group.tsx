@@ -12,8 +12,10 @@ import { getRelayHost } from "@/lib/relay";
 import { Name } from "@/components/nostr/name";
 import type { Group } from "@/lib/types";
 import { useNavigate } from "@/lib/navigation";
+import { useTranslation } from "react-i18next";
 
 function Names({ pubkeys }: { pubkeys: string[] }) {
+  const { t } = useTranslation();
   if (pubkeys.length === 1) {
     return (
       <span className="font-semibold">
@@ -27,7 +29,7 @@ function Names({ pubkeys }: { pubkeys: string[] }) {
         <Name key={pubkey} pubkey={pubkey} />
       </span>
       {idx === pubkeys.length - 2 ? (
-        <span> and </span>
+        <span>{t("group.hosted.and")}</span>
       ) : idx >= 0 && idx < pubkeys.length - 1 ? (
         <span>, </span>
       ) : null}
@@ -41,15 +43,17 @@ export function Group({ group }: { group: Group }) {
   const picture = useGroupPicture(group);
   const description = useGroupDescription(group);
   const { admins, members } = useGroupParticipants(group);
+  const { t } = useTranslation();
   return (
-    <div className="border rounded-md w-[320px]">
+    <div className="rounded-md border w-[320px]">
       {admins && admins.length > 0 ? (
-        <div className="flex flex-row items-center flex-wrap gap-1 bg-accent px-2 py-1 rounded-t-md text-sm">
-          Hosted by <Names pubkeys={admins || []} />
+        <div className="flex flex-row flex-wrap gap-1 items-center py-1 px-2 text-sm rounded-t-md bg-accent">
+          {t("group.hosted.by")}
+          <Names pubkeys={admins || []} />
         </div>
       ) : null}
-      <div className="flex flex-col gap-3 border-b p-3">
-        <div className="flex flex-row items-center gap-3">
+      <div className="flex flex-col gap-3 p-3 border-b">
+        <div className="flex flex-row gap-3 items-center">
           <Avatar className="size-12">
             <AvatarImage src={picture} className="object-cover" />
             <AvatarFallback>
@@ -66,14 +70,14 @@ export function Group({ group }: { group: Group }) {
           </p>
         ) : null}
       </div>
-      <div className="w-full flex items-center justify-between p-2">
+      <div className="flex justify-between items-center p-2 w-full">
         {members ? <AvatarList size="md" pubkeys={members} /> : null}
         <Button
           variant="outline"
           size="sm"
           onClick={() => navigate(`/${getRelayHost(group.relay)}/${group.id}`)}
         >
-          <MessagesSquare /> Join
+          <MessagesSquare /> {t("group.join")}
         </Button>
       </div>
     </div>

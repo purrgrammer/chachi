@@ -26,3 +26,7 @@ dist-ssr
 *.sw?
 
 notes.md
+
+.direnv/*
+.envrc
+*.nix

@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { randomId } from "@/lib/id";
 import type { UploadedBlob } from "@/lib/media";
 import type { Group, Emoji } from "@/lib/types";
+import { useTranslation } from "react-i18next";
 
 export function NewVideo({
   group,
@@ -44,6 +45,7 @@ export function NewVideo({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const canSign = useCanSign();
+  const { t } = useTranslation();
 
   function onOpenChange(open: boolean) {
     if (!open) {
@@ -89,12 +91,12 @@ export function NewVideo({
         ],
       } as NostrEvent);
       await ev.publish(relaySet);
-      toast.success("Video posted");
+      toast.success(t("video.publish.success"));
       onSuccess?.(ev.rawEvent() as NostrEvent);
       onOpenChange(false);
     } catch (err) {
       console.error(err);
-      toast.error("Failed to post video");
+      toast.error(t("video.publish.error"));
     } finally {
       setIsPosting(false);
     }
@@ -105,29 +107,29 @@ export function NewVideo({
       <DialogTrigger asChild>
         {children || (
           <Button disabled={!canSign}>
-            <Video /> Post
+            <Video /> {t("post.action")}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>New video</DialogTitle>
+          <DialogTitle>{t("video.new")}</DialogTitle>
         </DialogHeader>
         {blob ? (
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-2">
-              <Label>Title</Label>
+              <Label>{t("video.title.label")}</Label>
               <div className="px-2">
-                <Input placeholder="Add a title" />
+                <Input placeholder={t("video.title.placeholder")} />
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <Label>Description</Label>
+              <Label>{t("video.description.label")}</Label>
               <AutocompleteTextarea
                 message={description}
                 setMessage={setDescription}
                 group={group}
-                placeholder="Add a description"
+                placeholder={t("video.description.placeholder")}
                 minRows={2}
                 maxRows={6}
                 onCustomEmojisChange={setCustomEmoji}
@@ -143,7 +145,7 @@ export function NewVideo({
             />
             <Button disabled={isPosting} onClick={poast}>
               <Video />
-              Post
+              {t("post.action")}
             </Button>
           </div>
         ) : (
@@ -195,9 +197,9 @@ function VideoEvent({
 }
 
 export function VerticalVideo({ event }: { event: NostrEvent }) {
-  return <VideoEvent event={event} className="aspect-[9/16] rounded-sm" />;
+  return <VideoEvent event={event} className="rounded-sm aspect-[9/16]" />;
 }
 
 export function HorizontalVideo({ event }: { event: NostrEvent }) {
-  return <VideoEvent event={event} className="aspect-video rounded-sm" />;
+  return <VideoEvent event={event} className="rounded-sm aspect-video" />;
 }

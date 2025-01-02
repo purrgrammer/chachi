@@ -45,10 +45,12 @@ import { randomId } from "@/lib/id";
 import { useNDK } from "@/lib/ndk";
 import { useNavigate } from "@/lib/navigation";
 import type { Group } from "@/lib/types";
+import { useTranslation } from "react-i18next";
 
 const formSchema = z.object({
   name: z
     .string({
+      // TODO add translation
       required_error: "Please add a name",
     })
     .min(1)
@@ -59,6 +61,7 @@ const formSchema = z.object({
   access: z.enum(["open", "closed"]).default("open"),
   relay: z
     .string({
+      // TODO add translation
       required_error: "Please select a relay",
     })
     .url(),
@@ -71,6 +74,7 @@ export function CreateGroup({
   children?: ReactNode;
   className?: string;
 }) {
+  const { t } = useTranslation();
   const ndk = useNDK();
   const [showDialog, setShowDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -99,7 +103,7 @@ export function CreateGroup({
       await event.publish(relaySet);
     } catch (err) {
       console.error(err);
-      toast.error("Error bookmarking group");
+      toast.error(t("group.bookmark.error"));
     }
   }
 
@@ -111,14 +115,14 @@ export function CreateGroup({
       const group = await createGroup(id, relay);
       const metadata = { ...group, ...values };
       await editGroup(metadata);
-      toast.success("Group created");
+      toast.success(t("group.create.form.submit.success"));
       navigate(`/${getRelayHost(relay)}/${id}`);
       setShowDialog(false);
       resetForm();
       bookmarkGroup(group);
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't create group");
+      toast.error(t("group.create.form.submit.error"));
     } finally {
       setIsLoading(false);
     }
@@ -155,21 +159,19 @@ export function CreateGroup({
               size="sm"
             >
               <Plus className="size-6" />
-              <span className={className}>New group</span>
+              <span className={className}>{t("group.create.new")}</span>
             </Button>
           </div>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create group</DialogTitle>
-          <DialogDescription>
-            Create a new group to chat with your friends.
-          </DialogDescription>
+          <DialogTitle>{t("group.create.title")}</DialogTitle>
+          <DialogDescription>{t("group.create.description")}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="flex flex-row items-center justify-between gap-6">
+            <div className="flex flex-row gap-6 justify-between items-center">
               <FormField
                 control={form.control}
                 name="picture"
@@ -186,11 +188,11 @@ export function CreateGroup({
                 name="name"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>{t("group.create.form.name.label")}</FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}
-                        placeholder="This is the group's name"
+                        placeholder={t("group.create.form.name.placeholder")}
                         {...field}
                       />
                     </FormControl>
@@ -204,12 +206,12 @@ export function CreateGroup({
               name="about"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>About</FormLabel>
+                  <FormLabel>{t("group.create.form.about.label")}</FormLabel>
                   <FormControl>
                     <Textarea
                       disabled={isLoading}
                       className="resize-none"
-                      placeholder="This is the group's description."
+                      placeholder={t("group.create.form.about.placeholder")}
                       minRows={2}
                       maxRows={6}
                       {...field}
@@ -224,11 +226,13 @@ export function CreateGroup({
               name="relay"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Relay</FormLabel>
+                  <FormLabel>{t("group.create.form.relay.label")}</FormLabel>
                   <FormControl>
                     <Select disabled={isLoading} onValueChange={field.onChange}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Choose a relay" />
+                        <SelectValue
+                          placeholder={t("group.create.form.relay.placeholder")}
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {nip29Relays.map((relay) => (
@@ -243,7 +247,7 @@ export function CreateGroup({
                   </FormControl>
                   <FormMessage />
                   <FormDescription>
-                    This is the server where the posts will be stored.
+                    {t("group.create.form.relay.description")}
                   </FormDescription>
                 </FormItem>
               )}
@@ -253,8 +257,10 @@ export function CreateGroup({
               name="visibility"
               render={({ field }) => (
                 <FormItem>
-                  <div className="flex flex-row items-center justify-between">
-                    <FormLabel>Visibility</FormLabel>
+                  <div className="flex flex-row justify-between items-center">
+                    <FormLabel>
+                      {t("group.create.form.visibility.label")}
+                    </FormLabel>
                     <FormControl>
                       <Select
                         disabled={isLoading}
@@ -265,15 +271,18 @@ export function CreateGroup({
                           <SelectValue placeholder="Choose visibility" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="public">Anyone</SelectItem>
-                          <SelectItem value="private">Members only</SelectItem>
+                          <SelectItem value="public">
+                            {t("group.create.form.visibility.anyone")}
+                          </SelectItem>
+                          <SelectItem value="private">
+                            {t("group.create.form.visibility.members-only")}
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
                   </div>
                   <FormDescription>
-                    Messages are not encrypted and can be read by relays. For
-                    maximum privacy host your own relay.
+                    {t("group.create.form.visibility.description")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -284,8 +293,8 @@ export function CreateGroup({
               name="access"
               render={({ field }) => (
                 <FormItem>
-                  <div className="flex flex-row items-center justify-between">
-                    <FormLabel>Access</FormLabel>
+                  <div className="flex flex-row justify-between items-center">
+                    <FormLabel>{t("group.create.form.access.label")}</FormLabel>
                     <FormControl>
                       <Select
                         disabled={isLoading}
@@ -296,8 +305,12 @@ export function CreateGroup({
                           <SelectValue placeholder="Choose policy" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="open">Anyone</SelectItem>
-                          <SelectItem value="closed">Invite only</SelectItem>
+                          <SelectItem value="open">
+                            {t("group.create.form.access.anyone")}
+                          </SelectItem>
+                          <SelectItem value="closed">
+                            {t("group.create.form.access.invite-only")}
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -308,7 +321,7 @@ export function CreateGroup({
             />
             <div className="flex flex-row justify-end space-y-4 space-x-2">
               <Button disabled={isLoading} type="submit">
-                Create
+                {t("group.create.form.submit.trigger")}
               </Button>
             </div>
           </form>

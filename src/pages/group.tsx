@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { GroupHeader } from "@/components/nostr/groups/header";
 import { GroupChat } from "@/components/nostr/groups/chat";
 import { GroupPosts } from "@/components/nostr/posts/feed";
@@ -32,17 +33,19 @@ export default function GroupPage({ tab = "chat" }: { tab?: GroupTab }) {
   }
 
   // todo: error handling
+
+  const { t } = useTranslation();
   return (
     <>
       <GroupHeader group={group} />
       <Tabs value={tab} onValueChange={onValueChange}>
         <TabsList>
-          <TabsTrigger value="chat">Chat</TabsTrigger>
-          <TabsTrigger value="posts">Posts</TabsTrigger>
-          <TabsTrigger value="videos">Videos</TabsTrigger>
+          <TabsTrigger value="chat">{t("content.type.chat")}</TabsTrigger>
+          <TabsTrigger value="posts">{t("content.type.posts")}</TabsTrigger>
+          <TabsTrigger value="videos">{t("content.type.videos")}</TabsTrigger>
           {/*<TabsTrigger value="articles">Articles</TabsTrigger>
            */}
-          <TabsTrigger value="polls">Polls</TabsTrigger>
+          <TabsTrigger value="polls">{t("content.type.polls")}</TabsTrigger>
         </TabsList>
         <TabsContent asChild value="chat">
           <GroupChat key={groupId(group)} group={group} />

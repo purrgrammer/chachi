@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useTranslation } from "react-i18next";
 
 const API_KEY = import.meta.env.VITE_TENOR_API_KEY;
 
@@ -67,7 +68,7 @@ function GIFLoader({ loadMore }: { loadMore: () => void }) {
   return (
     <div
       ref={ref}
-      className="h-64 absolute bottom-0 w-full flex place-content-center"
+      className="flex absolute bottom-0 place-content-center w-full h-64"
     />
   );
 }
@@ -80,6 +81,7 @@ export function GIFPicker({ onPick }: { onPick: (gif: GIF) => void }) {
   const [isLoading, setIsLoading] = useState(false);
   const isLoadingPage = useRef(false);
   const [page, setPage] = useState("");
+  const { t } = useTranslation();
 
   function onSearchChange(newSearch: string) {
     setGifs([]);
@@ -117,7 +119,7 @@ export function GIFPicker({ onPick }: { onPick: (gif: GIF) => void }) {
       setPage(result.next);
     } catch (err) {
       console.error(err);
-      toast.error("Error searching GIFs");
+      toast.error(t("gif.error"));
     } finally {
       setIsLoading(false);
     }
@@ -131,7 +133,7 @@ export function GIFPicker({ onPick }: { onPick: (gif: GIF) => void }) {
       await searchTenor(true);
     } catch (err) {
       console.error(err);
-      toast.error("Error searching GIFs");
+      toast.error(t("gif.error"));
     } finally {
       isLoadingPage.current = false;
     }
@@ -151,10 +153,10 @@ export function GIFPicker({ onPick }: { onPick: (gif: GIF) => void }) {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Search GIF</DialogTitle>
+          <DialogTitle>{t("gif.search")}</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-3">
-          <div className="flex flex-row justify-between gap-2 w-full">
+          <div className="flex flex-row gap-2 justify-between w-full">
             <Input
               autoFocus
               rightIcon={<X />}
@@ -162,7 +164,7 @@ export function GIFPicker({ onPick }: { onPick: (gif: GIF) => void }) {
               value={search}
               onKeyDown={(e) => e.key === "Enter" && searchTenor(false)}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search Tenor"
+              placeholder={t("gif.tenor")}
               className="flex-1"
             />
             <Button
@@ -174,22 +176,22 @@ export function GIFPicker({ onPick }: { onPick: (gif: GIF) => void }) {
               ) : (
                 <Search />
               )}{" "}
-              Search
+              {t("gif.search")}
             </Button>
           </div>
           <ScrollArea>
             <div
               className={`flex flex-col gap-2 transition-height ${gifs.length === 0 ? "h-0" : "h-64"}`}
             >
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 relative">
+              <div className="grid relative grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
                 {gifs.map((gif) => (
                   <div
                     key={gif.id}
-                    className="group relative h-60 sm:h-44 md:h-32 w-full place-items-center object-cover cursor-pointer"
+                    className="object-cover relative place-items-center w-full h-60 cursor-pointer sm:h-44 md:h-32 group"
                     onClick={() => pickGIF(gif)}
                   >
                     <img
-                      className="w-full object-fit h-full rounded"
+                      className="w-full h-full rounded object-fit"
                       alt={search}
                       src={gif.tinyurl}
                       key={gif.id}

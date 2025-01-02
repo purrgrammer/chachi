@@ -23,6 +23,7 @@ import {
 } from "@/lib/nostr/groups";
 import { saveGroupEvent } from "@/lib/messages";
 import type { Group } from "@/lib/types";
+import { useTranslation } from "react-i18next";
 
 export function JoinRequests({ group }: { group: Group }) {
   const [accepted, setAccepted] = useState<string[]>([]);
@@ -35,11 +36,13 @@ export function JoinRequests({ group }: { group: Group }) {
       !rejected.includes(p.pubkey) &&
       !members.includes(p.pubkey),
   );
+  const requestsLength = requests.length;
   const me = usePubkey();
   const canSign = useCanSign();
   const shouldShowJoinRequests = me && canSign && admins.includes(me);
   const addUser = useAddUser(group);
   const deleteEvent = useDeleteEvent(group);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setAccepted([]);
@@ -51,10 +54,10 @@ export function JoinRequests({ group }: { group: Group }) {
       const ev = await addUser(pubkey);
       setAccepted([...accepted, pubkey]);
       saveGroupEvent(ev, group);
-      toast.success("User added to group");
+      toast.success(t("join.request.accept.success"));
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't add user to group");
+      toast.error(t("join.request.accept.error"));
     }
   }
 
@@ -63,10 +66,10 @@ export function JoinRequests({ group }: { group: Group }) {
       const joinEvents = events.filter((e) => e.pubkey === pubkey);
       await Promise.all(joinEvents.map(deleteEvent));
       setRejected([...rejected, pubkey]);
-      toast.success("User join request rejected");
+      toast.success(t("join.request.reject.success"));
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't reject user from group");
+      toast.error(t("join.request.reject.error"));
     }
   }
 
@@ -87,20 +90,20 @@ export function JoinRequests({ group }: { group: Group }) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Join requests ({requests.length})</DialogTitle>
+          <DialogTitle>{t("join.requests.n", { requestsLength })}</DialogTitle>
         </DialogHeader>
         <ScrollArea className="max-h-[260px]">
           {requests.length === 0 ? (
             <span className="text-muted-foreground">
-              No join requests... yet
+              {t("join.requests.none")}
             </span>
           ) : null}
           {requests.map((event) => (
             <div
               key={event.id}
-              className="flex flex-row justify-between gap-2 mb-2 last:mb-0"
+              className="flex flex-row gap-2 justify-between mb-2 last:mb-0"
             >
-              <div className="flex flex-row items-center gap-2">
+              <div className="flex flex-row gap-2 items-center">
                 <Avatar pubkey={event.pubkey} className="size-9" />
                 <h3 className="font-semibold text-md">
                   <Name pubkey={event.pubkey} />
@@ -113,7 +116,7 @@ export function JoinRequests({ group }: { group: Group }) {
                   className="w-20"
                   onClick={() => acceptJoinRequest(event.pubkey)}
                 >
-                  Accept
+                  {t("join.request.accept.action")}
                 </Button>
                 <Button
                   variant="destructive"
@@ -121,7 +124,7 @@ export function JoinRequests({ group }: { group: Group }) {
                   className="w-20"
                   onClick={() => rejectJoinRequest(event.pubkey)}
                 >
-                  Reject
+                  {t("join.request.reject.action")}
                 </Button>
               </div>
             </div>
