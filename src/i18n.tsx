@@ -5,9 +5,24 @@ import esTranslations from "../public/locales/es/common.json";
 import hansTranslations from "../public/locales/hans/common.json";
 import hantTranslations from "../public/locales/hant/common.json";
 
+type Language = "en" | "es" | "hans" | "hant";
+
+export function getLanguage(): Language {
+  const lang = localStorage.getItem("language");
+  if (lang && ["en", "es", "hans", "hant"].includes(lang)) {
+    return lang as Language;
+  }
+  return "en";
+}
+
+export function changeLanguage(lang: Language) {
+  localStorage.setItem("language", lang);
+  i18n.changeLanguage(lang);
+}
+
 i18n.use(initReactI18next).init({
   fallbackLng: "en",
-  lng: "en",
+  lng: getLanguage(),
   resources: {
     en: {
       translations: enTranslations,

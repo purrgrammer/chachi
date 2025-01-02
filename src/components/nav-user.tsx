@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAccount, useLogout } from "@/lib/account";
 import { useTranslation } from "react-i18next";
+import { changeLanguage } from "@/i18n";
 
 function UserInfo({ pubkey }: { pubkey: string }) {
   return (
@@ -56,9 +57,6 @@ export function NavUser() {
   const pubkey = account?.pubkey;
   const isExpanded = state === "expanded" || open || openMobile;
   const { t, i18n } = useTranslation();
-  const changeLanguage = (language: string) => {
-    i18n.changeLanguage(language);
-  };
   return (
     <SidebarMenu>
       {pubkey ? (

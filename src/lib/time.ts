@@ -1,6 +1,7 @@
-// todo: locale
+import { getLanguage } from "@/i18n";
+
 export function formatDay(date: Date) {
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat(getLanguage(), {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -23,7 +24,7 @@ export function formatRelativeTime(timestamp: number) {
     const days = Math.floor(elapsed / 86400);
     return `${days}d`;
   } else {
-    return Intl.DateTimeFormat("en-US", {
+    return Intl.DateTimeFormat(getLanguage(), {
       month: "short",
       day: "numeric",
       year: "numeric",
@@ -32,7 +33,26 @@ export function formatRelativeTime(timestamp: number) {
 }
 
 export function formatTime(timestamp: number) {
-  return Intl.DateTimeFormat("en-US", {
+  return Intl.DateTimeFormat(getLanguage(), {
     timeStyle: "short",
   }).format(new Date(timestamp * 1000));
+}
+
+function convertTZ(date: Date | string, timeZone: string) {
+  return new Date(
+    (typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {
+      timeZone,
+    }),
+  );
+}
+
+export function formatDateTime(timestamp: number, tz?: string) {
+  let date = new Date(timestamp * 1000);
+  if (tz) {
+    date = convertTZ(date, tz);
+  }
+  return Intl.DateTimeFormat(getLanguage(), {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(date);
 }

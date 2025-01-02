@@ -24,26 +24,26 @@ export function Markdown({
       className={className}
       components={{
         h1: ({ children }) => (
-          <h1 className="text-xl font-semibold mb-3">{children}</h1>
+          <h1 className="text-xl font-semibold my-3 first:mt-0">{children}</h1>
         ),
         h2: ({ children }) => (
-          <h1 className="text-lg font-semibold mb-3">{children}</h1>
+          <h1 className="text-lg font-semibold my-3 first:mt-0">{children}</h1>
         ),
         h3: ({ children }) => (
-          <h1 className="text-md font-semibold mb-3">{children}</h1>
+          <h1 className="text-md font-semibold my-3 first:mt-0">{children}</h1>
         ),
         h4: ({ children }) => (
-          <h1 className="text-sm font-semibold mb-3">{children}</h1>
+          <h1 className="text-sm font-semibold my-3 first:mt-0">{children}</h1>
         ),
         h5: ({ children }) => (
-          <h1 className="text-xs font-semibold mb-3">{children}</h1>
+          <h1 className="text-xs font-semibold my-3 first:mt-0">{children}</h1>
         ),
         h6: ({ children }) => (
-          <h1 className="text-xs font-semibold mb-3">{children}</h1>
+          <h1 className="text-xs font-semibold my-3 first:mt-0">{children}</h1>
         ),
         p: ({ children }) => (
           // todo: split blocks into multiple paragraphs
-          <p className="font-serif text-md my-4 first:mt-0 leading-normal break-words">
+          <p className="font-serif text-md my-2 first:mt-0 leading-normal break-words">
             {typeof children === "string" ? (
               <RichText group={group} tags={tags} options={{ inline: true }}>
                 {children}
