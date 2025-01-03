@@ -7,10 +7,17 @@ import type { LoginMethod, Account, Group, Relay, EmojiSet } from "@/lib/types";
 
 // Login method and account
 export const accountAtom = atom<Account | null>(null);
+export const accountIdAtom = atom<string | null>(null);
 export const methodAtom = atomWithStorage<LoginMethod | null>(
   "login-method",
   null,
   createJSONStorage<LoginMethod | null>(() => localStorage),
+  { getOnInit: true },
+);
+export const accountsAtom = atomWithStorage<Account[]>(
+  "accounts",
+  [],
+  createJSONStorage<Account[]>(() => localStorage),
   { getOnInit: true },
 );
 

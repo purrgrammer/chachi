@@ -57,10 +57,13 @@ export interface EmojiSet {
   emojis: CustomEmoji[];
 }
 
-export type LoginMethod = "nip07"; // | 'nip46' | 'npub' | 'nsec';
+export type LoginMethod = "nip07" | "nip46"; // | 'npub' | 'nsec';
 
 export interface Account {
   method: LoginMethod;
   pubkey: string;
   isReadOnly?: boolean;
+  bunker?: string;
+  secret?: string;
+  relays?: string[];
 }

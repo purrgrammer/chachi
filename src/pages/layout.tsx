@@ -1,15 +1,18 @@
 import { useAtom, useAtomValue } from "jotai";
 import { ReactNode, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import {
+import NDK, {
   NDKKind,
   NDKSubscriptionCacheUsage,
   NDKRelaySet,
   NDKNip07Signer,
+  NDKNip46Signer,
+  NDKPrivateKeySigner,
 } from "@nostr-dev-kit/ndk";
 import { useNDK, outboxRelayUrls } from "@/lib/ndk";
 import {
   accountAtom,
+  accountsAtom,
   relayListAtom,
   relaysAtom,
   groupListAtom,
@@ -28,6 +31,7 @@ import { fetchCustomEmojis } from "@/lib/nostr/emojis";
 function useUserEvents() {
   const ndk = useNDK();
   const [account, setAccount] = useAtom(accountAtom);
+  const accounts = useAtomValue(accountsAtom);
   const pubkey = account?.pubkey;
   const relays = useAtomValue(relaysAtom);
   const [groupList, setGroupList] = useAtom(groupListAtom);
@@ -51,6 +55,33 @@ function useUserEvents() {
         .catch((err) => {
           console.error(err);
         });
+    } else if (loginMethod === '"nip46"') {
+      const nip46account = accounts.find((a) => a.method === "nip46");
+      console.log("NIP46 YO", accounts, nip46account);
+      if (
+        nip46account &&
+        nip46account.secret &&
+        nip46account.bunker &&
+        nip46account.relays?.length
+      ) {
+        const bunkerNDK = new NDK({
+          explicitRelayUrls: nip46account.relays,
+        });
+        const signer = new NDKNip46Signer(
+          bunkerNDK,
+          nip46account.bunker,
+          new NDKPrivateKeySigner(nip46account.secret),
+        );
+        signer
+          .blockUntilReady()
+          .then(() => {
+            ndk.signer = signer;
+            setAccount(nip46account);
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      }
     }
   }, []);
 
