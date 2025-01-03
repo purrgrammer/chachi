@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { useNip07Login, useNip46Login } from "@/lib/account";
 
+// TODO: translate strings
 export function Login({
   isCompact,
   trigger,
