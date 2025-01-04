@@ -653,8 +653,12 @@ export function RichText({
           // The block itself is added to the list of blocks
           acc.push(nodes[blockIndex]);
           // Update list of remaining nodes and block index
-          nodes = nodes.slice(blockIndex + 1);
+          const rightNodes = nodes.slice(blockIndex + 1);
+          nodes = rightNodes;
           blockIndex = nodes.findIndex(isRenderedAsBlock);
+          if (blockIndex === -1 && rightNodes.length > 0) {
+            acc.push({ type: "block", nodes: rightNodes });
+          }
         }
       } else {
         acc.push(f);
