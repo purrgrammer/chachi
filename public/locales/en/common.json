@@ -29,32 +29,6 @@
 		},
 		"no-groups": "No groups"
 	},
-	"nav": {
-		"user": {
-			"login": {
-				"start": "Get started",
-				"title": "Get started",
-				"description": "Select the login method below.",
-				"extension": {
-					"label": "Browser extension",
-					"error": "Failed to log in with extension"
-				},
-				"or": "or",
-				"remote": {
-					"label": "Remote signer"
-				}
-			},
-			"logout": "Log out",
-			"language": "Language",
-			"theme": {
-				"trigger": "Theme",
-				"light": "Light",
-				"dark": "Dark",
-				"system": "System"
-			}
-		},
-		"no-groups": "No groups"
-	},
 	"dashboard": {
 		"activity": {
 			"heading": "Activity",
