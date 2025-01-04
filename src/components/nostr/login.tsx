@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useNip07Login, useNip46Login } from "@/lib/account";
+import { useTranslation } from "react-i18next";
 
 // TODO: translate strings
 export function Login({
@@ -26,6 +27,7 @@ export function Login({
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const nip07 = useNip07Login();
   const nip46 = useNip46Login();
+  const { t } = useTranslation();
 
   async function nip46Login() {
     try {
@@ -33,7 +35,7 @@ export function Login({
       await nip46(remoteSigner);
     } catch (err) {
       console.error(err);
-      toast.error("Failed to login with remote signer");
+      toast.error(t("user.login.remote.error"));
     } finally {
       setIsLoggingIn(false);
     }
@@ -45,7 +47,7 @@ export function Login({
       await nip07();
     } catch (err) {
       console.error(err);
-      toast.error("Failed to login with extension");
+      toast.error(t("use.login.extension.error"));
     } finally {
       setIsLoggingIn(false);
     }
@@ -71,22 +73,24 @@ export function Login({
                 <LogIn className="size-5" />
               </span>
             ) : (
-              <span>Get started</span>
+              <span>{t("user.login.start")}</span>
             )}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Get started</DialogTitle>
-          <DialogDescription>Select the login method below.</DialogDescription>
+          <DialogTitle>{t("user.login.title")}</DialogTitle>
+          <DialogDescription>{t("user.login.description")}</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-2">
           <Button disabled={isLoggingIn} size="lg" onClick={nip07Login}>
-            <Puzzle className="size-5" /> Browser extension
+            <Puzzle className="size-5" /> {t("user.login.extension.label")}
           </Button>
-          <p className="text-muted-foreground my-2 mx-auto text-xs">OR</p>
-          <Label>Remote Signer</Label>
+          <p className="my-2 mx-auto text-xs text-muted-foreground">
+            {t("user.login.or")}
+          </p>
+          <Label>{t("user.login.remote.label")}</Label>
           <Input
             disabled={isLoggingIn}
             placeholder="bunker://"
@@ -101,11 +105,11 @@ export function Login({
             onClick={nip46Login}
           >
             {isLoggingIn ? (
-              <RotateCw className="size-5 animate-spin" />
+              <RotateCw className="animate-spin size-5" />
             ) : (
               <Cable className="size-5" />
             )}{" "}
-            Connect
+            {t("user.login.connect")}
           </Button>
         </div>
       </DialogContent>
