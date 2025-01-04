@@ -1,18 +1,48 @@
 {
 	"locale": {
-		"code": "en-US",
 		"today": "Today"
 	},
 	"home": "Home",
+	"user": {
+		"login": {
+			"start": "Get started",
+			"title": "Get started",
+			"description": "Select the login method below.",
+			"extension": {
+				"label": "Browser extension",
+				"error": "Failed to log in with extension"
+			},
+			"or": "or",
+			"remote": {
+				"label": "Remote signer",
+				"error": "Failed to log in with remote signer"
+			},
+			"connect": "Connect"
+		},
+		"logout": "Log out",
+		"language": "Language",
+		"theme": {
+			"trigger": "Theme",
+			"light": "Light",
+			"dark": "Dark",
+			"system": "System"
+		},
+		"no-groups": "No groups"
+	},
 	"nav": {
 		"user": {
 			"login": {
 				"start": "Get started",
 				"title": "Get started",
 				"description": "Select the login method below.",
-				"nip-07": "Connect with NIP-07",
-				"error": "Failed to log in with extension",
-				"error-nip07": "Error logging in with NIP-07"
+				"extension": {
+					"label": "Browser extension",
+					"error": "Failed to log in with extension"
+				},
+				"or": "or",
+				"remote": {
+					"label": "Remote signer"
+				}
 			},
 			"logout": "Log out",
 			"language": "Language",
