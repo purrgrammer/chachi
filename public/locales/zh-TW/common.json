@@ -1,27 +1,31 @@
 {
 	"locale": {
-		"code": "zh-TW",
 		"today": "今天"
 	},
 	"home": "主頁",
-	"nav": {
-		"user": {
-			"login": {
-				"start": "開始",
-				"title": "開始",
-				"description": "請選擇以下登錄方式。",
-				"nip-07": "使用 NIP-07 連接",
-				"error": "無法使用擴充套件登錄",
-				"error-nip07": "使用 NIP-07 登录时出错了"
+	"user": {
+		"login": {
+			"start": "開始",
+			"title": "開始",
+			"description": "請選擇以下登錄方式。",
+			"extension": {
+				"label": "瀏覽器擴充套件",
+				"error": "無法使用擴充套件登錄"
 			},
-			"logout": "登出",
-			"language": "語言",
-			"theme": {
-				"trigger": "主題",
-				"light": "淡色",
-				"dark": "深色",
-				"system": "系統"
-			}
+			"or": "或者",
+			"remote": {
+				"label": "遠端簽署器",
+				"error": "無法使用遠端簽署器登錄"
+			},
+			"connect": "連接"
+		},
+		"logout": "登出",
+		"language": "語言",
+		"theme": {
+			"trigger": "主題",
+			"light": "淡色",
+			"dark": "深色",
+			"system": "系統"
 		},
 		"no-groups": "尚無群聊"
 	},
