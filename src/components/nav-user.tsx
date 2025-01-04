@@ -101,15 +101,15 @@ export function NavUser() {
                         <Check className="ml-auto" />
                       ) : null}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => changeLanguage("hans")}>
+                    <DropdownMenuItem onClick={() => changeLanguage("zh-CN")}>
                       <span>简体中文</span>
-                      {i18n.language === "hans" ? (
+                      {i18n.language === "zh-CN" ? (
                         <Check className="ml-auto" />
                       ) : null}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => changeLanguage("hant")}>
+                    <DropdownMenuItem onClick={() => changeLanguage("zh-TW")}>
                       <span>繁體中文</span>
-                      {i18n.language === "hant" ? (
+                      {i18n.language === "zh-TW" ? (
                         <Check className="ml-auto" />
                       ) : null}
                     </DropdownMenuItem>
