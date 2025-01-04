@@ -360,7 +360,7 @@ function EventMenu({
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className="gap-2">
                   <MessageSquareShare className="size-4" />
-                  <span>Share in</span>
+                  <span>{t("share-in")}</span>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
