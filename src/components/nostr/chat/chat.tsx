@@ -50,6 +50,7 @@ import { useSettings } from "@/lib/settings";
 import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import i18n from "i18next";
+import { getLanguage } from "@/i18n";
 
 const scrollToAtom = atom<string | null>(null);
 
@@ -616,7 +617,7 @@ function formatDay(date: string) {
   ) {
     return i18n.t("locale.today");
   }
-  return Intl.DateTimeFormat(i18n.t("locale.code"), {
+  return Intl.DateTimeFormat(getLanguage(), {
     day: "numeric",
     month: "long",
     year: currentYear === Number(year) ? undefined : "numeric",
