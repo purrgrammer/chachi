@@ -47,7 +47,7 @@ export function Login({
       await nip07();
     } catch (err) {
       console.error(err);
-      toast.error(t("use.login.extension.error"));
+      toast.error(t("user.login.extension.error"));
     } finally {
       setIsLoggingIn(false);
     }
