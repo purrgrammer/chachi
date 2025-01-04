@@ -1,27 +1,31 @@
 {
 	"locale": {
-		"code": "es-ES",
 		"today": "Hoy"
 	},
 	"home": "Inicio",
-	"nav": {
-		"user": {
-			"login": {
-				"start": "Empezar",
-				"title": "Empezar",
-				"description": "Selecciona el método de inicio de sesión a continuación.",
-				"nip-07": "Conectarse con NIP-07",
-				"error": "Error al iniciar sesión con la extensión",
-				"error-nip-07": "Error al iniciar sesión con NIP-07"
+	"user": {
+		"login": {
+			"start": "Empezar",
+			"title": "Empezar",
+			"description": "Selecciona el método de inicio de sesión a continuación.",
+			"extension": {
+				"label": "Extensión del navegador",
+				"error": "Error al iniciar sesión con la extensión"
 			},
-			"logout": "Cerrar sesión",
-			"language": "Idioma",
-			"theme": {
-				"trigger": "Tema",
-				"light": "Claro",
-				"dark": "Obscuro",
-				"system": "Sistema"
-			}
+			"or": "o",
+			"remote": {
+				"label": "Firmante remoto",
+				"error": "Error al iniciar sesión con el firmante remoto"
+			},
+			"connect": "Conectarse"
+		},
+		"logout": "Cerrar sesión",
+		"language": "Idioma",
+		"theme": {
+			"trigger": "Tema",
+			"light": "Claro",
+			"dark": "Obscuro",
+			"system": "Sistema"
 		},
 		"no-groups": "No hay grupos"
 	},
