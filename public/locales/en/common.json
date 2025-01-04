@@ -12,7 +12,7 @@
 				"label": "Browser extension",
 				"error": "Failed to log in with extension"
 			},
-			"or": "or",
+			"or": "OR",
 			"remote": {
 				"label": "Remote signer",
 				"error": "Failed to log in with remote signer"

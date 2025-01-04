@@ -12,7 +12,7 @@
 				"label": "Extensión del navegador",
 				"error": "Error al iniciar sesión con la extensión"
 			},
-			"or": "o",
+			"or": "O",
 			"remote": {
 				"label": "Firmante remoto",
 				"error": "Error al iniciar sesión con el firmante remoto"
