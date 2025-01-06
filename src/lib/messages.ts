@@ -79,6 +79,7 @@ export function useGroupchat(group: Group) {
         filter,
         {
           cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+          groupable: false,
           closeOnEose: false,
         },
         relaySet,

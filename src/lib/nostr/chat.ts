@@ -50,6 +50,7 @@ export function useGroupMessages(groups: Group[]) {
           filters,
           {
             cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+            groupable: false,
             closeOnEose: false,
           },
           relaySet,
@@ -57,11 +58,8 @@ export function useGroupMessages(groups: Group[]) {
 
         sub.on("event", (event) => {
           const h = event.tagValue("h");
-          // todo: if no relay is an event we sent client side, dismiss it
-          if (event.relay) {
-            const group = { id: h, relay: event.relay!.url } as Group;
-            saveGroupEvent(event.rawEvent() as NostrEvent, group);
-          }
+          const group = { id: h, relay } as Group;
+          saveGroupEvent(event.rawEvent() as NostrEvent, group);
         });
 
         setSubs((subs) => [...subs, sub as NDKSubscription]);
