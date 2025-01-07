@@ -174,8 +174,11 @@ export function NewPoll({
                 //className={reply ? "border-t-none" : undefined}
               />
               <UploadFile
-                onUpload={(url) =>
-                  setNewOption(newOption ? `${newOption} ${url}` : url)
+                // todo: add imeta tags
+                onUpload={(blob) =>
+                  setNewOption(
+                    newOption ? `${newOption} ${blob.url}` : blob.url,
+                  )
                 }
               />
               <Button disabled={!newOption} size="icon" onClick={addOption}>

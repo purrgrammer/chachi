@@ -17,6 +17,7 @@ import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet } from "@/lib/nostr";
 import { useCanSign } from "@/lib/account";
+import type { UploadedBlob } from "@/lib/media";
 import { Embed } from "@/components/nostr/detail";
 import type { Group, Emoji } from "@/lib/types";
 import { useTranslation } from "react-i18next";
@@ -43,10 +44,17 @@ export function NewPost({
   const [isPosting, setIsPosting] = useState(false);
   const [message, setMessage] = useState("");
   const [customEmoji, setCustomEmoji] = useState<Emoji[]>([]);
+  const [blobs, setBlobs] = useState<UploadedBlob[]>([]);
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
   const canSign = useCanSign();
   const { t } = useTranslation();
+  console.log("BLOBS", blobs);
+
+  function onFileUpload(blob: UploadedBlob) {
+    setBlobs([...blobs, blob]);
+    setMessage(`${message} ${blob.url}`);
+  }
 
   async function post() {
     try {
@@ -64,6 +72,7 @@ export function NewPost({
         for (const e of customEmoji) {
           ev.tags.push(["emoji", e.name, e.image!]);
         }
+        // todo: imeta tags
         await ev.publish(relaySet);
         onSucess?.(ev.rawEvent() as NostrEvent);
         setShowDialog(false);
@@ -123,7 +132,7 @@ export function NewPost({
         </div>
         <div className="flex flex-row justify-end items-center w-full">
           <div className="flex flex-row gap-1 items-center">
-            <UploadFile onUpload={(url) => setMessage(`${message} ${url}`)} />
+            <UploadFile onUpload={onFileUpload} />
             <Button
               size="sm"
               disabled={message.trim().length === 0 || isPosting}

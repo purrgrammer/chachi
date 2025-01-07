@@ -193,7 +193,10 @@ export function ChatInput({
           />
           <UploadFile
             tabIndex={1}
-            onUpload={(url) => setMessage(message ? `${message} ${url}` : url)}
+            // todo: add imeta tags
+            onUpload={(blob) =>
+              setMessage(message ? `${message} ${blob.url}` : blob.url)
+            }
           />
           <Button
             tabIndex={1}

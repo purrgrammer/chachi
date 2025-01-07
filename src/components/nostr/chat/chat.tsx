@@ -184,7 +184,15 @@ export function ChatMessage({
 
   const fragments = useRichText(
     content,
-    { images: true, video: true, audio: true, emojis: true, urls: true },
+    {
+      events: true,
+      images: true,
+      video: true,
+      audio: true,
+      emojis: true,
+      urls: true,
+      ecash: true,
+    },
     event.tags,
   );
   const isSingleCustomEmoji =
@@ -211,12 +219,21 @@ export function ChatMessage({
     fragments[0].type === "block" &&
     fragments[0].nodes.length === 1 &&
     fragments[0].nodes[0].type === "audio";
+  // todo: these should be flattened
+  const isSingleEmbed =
+    fragments.length === 1 &&
+    fragments[0].type === "block" &&
+    fragments[0].nodes.length === 1 &&
+    (fragments[0].nodes[0]?.type === "event" ||
+      fragments[0].nodes[0]?.type === "address" ||
+      fragments[0].nodes[0].type === "ecash");
   const shouldHaveTransparentBackground =
     (isSingleCustomEmoji ||
       isOnlyEmojis ||
       isOnlyImage ||
       isOnlyVideo ||
-      isOnlyAudio) &&
+      isOnlyAudio ||
+      isSingleEmbed) &&
     !isReplyingTo &&
     !isDeleted;
 

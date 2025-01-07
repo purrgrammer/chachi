@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/nav-tabs";
 import { Post, PostWithReplies } from "@/components/nostr/post";
 import { HorizontalVideo, VerticalVideo } from "@/components/nostr/video";
+import { Image } from "@/components/nostr/image";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
 import { ArticleSummary, Article } from "@/components/nostr/article";
 import {
@@ -168,6 +169,10 @@ const eventDetails: Record<
   [NDKKind.VerticalVideo]: {
     preview: VerticalVideo,
     detail: VerticalVideo,
+  },
+  [NDKKind.Image]: {
+    preview: Image,
+    detail: Image,
   },
   //[9735]: {
   //  preview: Zap,
@@ -741,7 +746,7 @@ export function Embed({
           </>
         )}
       </div>
-      <div className="py-1 px-4 pb-2 space-y-3">
+      <div className="flex flex-col gap-1 py-1 px-4 pb-2">
         {components?.preview ? (
           components.preview({ event, relays, group, options, classNames })
         ) : alt ? (

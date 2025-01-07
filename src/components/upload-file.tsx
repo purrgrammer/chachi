@@ -3,13 +3,13 @@ import { toast } from "sonner";
 import { RotateCw, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useUpload } from "@/lib/media";
+import { useUpload, UploadedBlob } from "@/lib/media";
 import { useTranslation } from "react-i18next";
 
 type ButtonProps = React.ComponentProps<typeof Button>;
 
 interface UploadFileProps extends ButtonProps {
-  onUpload: (url: string) => void;
+  onUpload: (blob: UploadedBlob) => void;
 }
 
 export function UploadFile({ onUpload, ...props }: UploadFileProps) {
@@ -31,8 +31,8 @@ export function UploadFile({ onUpload, ...props }: UploadFileProps) {
   async function uploadFile(file: File) {
     try {
       setIsUploading(true);
-      const url = await upload(file);
-      onUpload(url);
+      const blob = await upload(file);
+      onUpload(blob);
     } catch (err) {
       console.error(err);
       toast.error(t("file.upload.error"));

@@ -1,402 +1,402 @@
 {
-	"locale": {
-		"code": "es-ES",
-		"today": "Hoy"
-	},
-	"home": "Inicio",
-	"nav": {
-		"user": {
-			"login": {
-				"start": "Empezar",
-				"title": "Empezar",
-				"description": "Selecciona el método de inicio de sesión a continuación.",
-				"nip-07": "Conectarse con NIP-07",
-				"error": "Error al iniciar sesión con la extensión",
-				"error-nip-07": "Error al iniciar sesión con NIP-07"
-			},
-			"logout": "Cerrar sesión",
-			"language": "Idioma",
-			"theme": {
-				"trigger": "Tema",
-				"light": "Claro",
-				"dark": "Obscuro",
-				"system": "Sistema"
-			}
-		},
-		"no-groups": "No hay grupos"
-	},
-	"dashboard": {
-		"activity": {
-			"heading": "Actividad",
-			"unread": "no leído",
-			"mentions": "menciones",
-			"none": "Nada nuevo para ti... aún"
-		},
-		"featured": {
-			"heading": "Destacados"
-		},
-		"popular": {
-			"heading": "Popular en tu red"
-		},
-		"search": {
-			"prompt": "¿No puedes encontrar lo que buscas?",
-			"trigger": "Buscar grupos",
-			"title": "Encontrar un grupo",
-			"input": {
-				"placeholder": "Buscar grupos",
-				"no-results-for-x": "No hay resultados para «{{search}}»",
-				"n-results-for-x": "{{n}} resultados para «{{search}}»",
-				"start-typing-to-filter-groups": "Empieza a escribir para filtrar grupos"
-			},
-			"result": {
-				"visit": "Visitar",
-				"no-description-available": "No hay descripción disponible",
-				"no-groups-found-for-x-want-to": "No se encontraron grupos para «{{search}}», ¿quieres ",
-				"start-one": "empezar uno",
-				"?": "?"
-			}
-		}
-	},
-	"group": {
-		"hosted": {
-			"by": "Alojado por ",
-			"and": " y "
-		},
-		"create": {
-			"new": "Nuevo grupo",
-			"title": "Crear grupo",
-			"description": "Crea un nuevo grupo para chatear con tus amigos",
-			"form": {
-				"name": {
-					"label": "Nombre",
-					"placeholder": "Este es el nombre de tu grupo.",
-					"required": "Por favor, añade un nombre"
-				},
-				"about": {
-					"label": "Descripción",
-					"placeholder": "Esta es la descripción del grupo."
-				},
-				"relay": {
-					"label": "Relay",
-					"placeholder": "Elige un relay.",
-					"description": "Este es el servidor donde se almacenarán las publicaciones.",
-					"required": "Por favor, selecciona un relay"
-				},
-				"visibility": {
-					"label": "Visibilidad",
-					"anyone": "Cualquiera",
-					"members-only": "Solo miembros",
-					"description": "Los mensajes no están cifrados y pueden ser leídos por los relays. Para máxima privacidad, aloja tu propio relay."
-				},
-				"access": {
-					"label": "Acceso",
-					"anyone": "Cualquiera",
-					"invite-only": "Solo por invitación"
-				},
-				"submit": {
-					"trigger": "Crear",
-					"success": "Grupo creado",
-					"error": "No se pudo crear grupo"
-				}
-			}
-		},
-		"edit": {
-			"title": "Configuración del grupo",
-			"form": {
-				"name": {
-					"label": "Nombre",
-					"placeholder": "Mi Grupo",
-					"description": "Este es el nombre de tu grupo."
-				},
-				"about": {
-					"label": "Descripción",
-					"placeholder": "Un grupo para mis frens",
-					"description": "Esta es la descripción del grupo."
-				},
-				"visibility": {
-					"label": "Visibilidad",
-					"anyone": "Cualquiera",
-					"members-only": "Solo miembros",
-					"description": "Los mensajes no están cifrados y pueden ser leídos por los relays. Para máxima privacidad, aloja tu propio relay."
-				},
-				"access": {
-					"label": "Acceso",
-					"anyone": "Cualquiera",
-					"invite-only": "Solo por invitación",
-					"description": "Cualquiera puede unirse a un grupo abierto. Los grupos cerrados requieren aprobación."
-				},
-				"submit": {
-					"trigger": "Guardar",
-					"success": "Grupo actualizado",
-					"error": "No se pudo actualizar el grupo"
-				}
-			}
-		},
-		"delete": {
-			"trigger": "Borrar",
-			"confirmation": {
-				"title": "¿Estás seguro de que quieres borrar el grupo?",
-				"description": "Esta acción no se puede deshacer. Este grupo y toda su historia serán eliminados.",
-				"confirm": "Borrar",
-				"cancel": "Cancelar"
-			},
-			"success": "Grupo borrado",
-			"error": "No se pudo borrar el grupo"
-		},
-		"deleted": "Este grupo ha sido eliminado",
-		"bookmark": {
-			"trigger": "Marcar",
-			"error": "Error al marcar el grupo"
-		},
-		"unbookmark": {
-			"trigger": "Eliminar marcador",
-			"error": "Error al eliminar el marcador"
-		},
-		"join": "Unirse",
-		"leave": {
-			"trigger": "Salir",
-			"confirmation": {
-				"title": "¿Estás seguro de que quieres salir?",
-				"description": "Esta acción no se puede deshacer. Serás eliminado de la lista de miembros del grupo.",
-				"confirm": "Salir",
-				"cancel": "Cancelar"
-			},
-			"success": "Has salido del grupo",
-			"error": "Error al salir del grupo"
-		},
-		"chat": {
-			"user": {
-				"joined": "se ha unido",
-				"left": "ha salido"
-			},
-			"event": {
-				"delete": {
-					"success": "Mensaje borrado",
-					"error": "No se pudo borrar el mensaje"
-				}
-			}
-		},
-		"metadata": {
-			"visibility": {
-				"private": {
-					"trigger": "Solo miembros",
-					"content": "Solo los miembros pueden leer el contenido"
-				},
-				"public": {
-					"trigger": "Público",
-					"content": "Puede ser leído por cualquiera"
-				}
-			},
-			"access": {
-				"closed": {
-					"trigger": "Cerrado",
-					"content": "Requiere aprobación o una invitación para unirse"
-				},
-				"open": {
-					"trigger": "Abierto",
-					"content": "Cualquiera puede unirse"
-				}
-			},
-			"join-the-conversation": "Únete a la conversación"
-		},
-		"info": {
-			"admin": "Admin",
-			"admins": "Admins ({{adminsLength}})",
-			"members": "Miembros ({{membersLength}})",
-			"no-members": "No hay miembros"
-		}
-	},
-	"chat": {
-		"message": {
-			"loading": "Cargando mensaje...",
-			"copy": {
-				"action": "Copiar",
-				"success": "Copiado al portapapeles",
-				"error": "No se pudo copiar al portapapeles"
-			},
-			"react": {
-				"action": "Reaccionar",
-				"with": "Reaccionado con ",
-				"success": "Reaccionado con {{emoji}}",
-				"error": "No se puede reaccionar"
-			},
-			"reply": {
-				"action": "Responder",
-				"error": "No se pudo responder"
-			},
-			"delete": {
-				"action": "Borrar"
-			},
-			"deleted": "Mensaje borrado",
-			"save-as-last-seen": "Guardar como visto por última vez"
-		},
-		"new-messages": "Nuevos mensajes",
-		"user": {
-			"not-member": "Aún no eres miembro de este grupo.",
-			"kick": {
-				"action": "Expulsar",
-				"success": "Usuario expulsado",
-				"error": "No se pudo expulsar al usuario"
-			}
-		},
-		"join": {
-			"action": "Unirse",
-			"request": {
-				"sent": "Solicitud enviada",
-				"success": "Solicitud de unión enviada",
-				"error": "Error al enviar la solicitud de unión"
-			}
-		},
-		"debug": "Debug"
-	},
-	"join": {
-		"request": {
-			"send": {
-				"success": "Solicitud de unión enviada",
-				"error": "Error al enviar la solicitud de unión"
-			},
-			"accept": {
-				"action": "Aceptar",
-				"success": "Usuario añadido al grupo",
-				"error": "No se pudo añadir el usuario al grupo"
-			},
-			"reject": {
-				"action": "Rechazar",
-				"success": "Solicitud de unión de usuario rechazada",
-				"error": "No se pudo rechazar al usuario del grupo"
-			}
-		},
-		"requests": {
-			"n": "Solicitudes de unión ({{requestsLength}})",
-			"none": "No hay solicitudes de unión... aún"
-		}
-	},
-	"gif": {
-		"search": "Buscar GIF",
-		"tenor": "Buscar Tenor",
-		"error": "Error al buscar GIFs"
-	},
-	"file": {
-		"upload": {
-			"error": "No se pudo subir el archivo"
-		}
-	},
-	"image": {
-		"upload": {
-			"error": "No se pudo subir la imagen"
-		}
-	},
-	"copy": {
-		"success": "Copiado",
-		"error": "No se pudo copiar"
-	},
-	"content": {
-		"prompt": "¿Qué quieres crear?",
-		"create": "Crear",
-		"type": {
-			"chat": "Chat",
-			"post": "Publicación",
-			"posts": "Publicaciones",
-			"poll": "Encuesta",
-			"polls": "Encuestas",
-			"video": "Video",
-			"videos": "Videos"
-		}
-	},
-	"post": {
-		"action": "Publicar",
-		"placeholder": "¿Qué tienes en mente?",
-		"success": "Publicado",
-		"error": "No se pudo publicar",
-		"delete": {
-			"success": "Publicación borrada",
-			"error": "No se pudo borrar la publicación"
-		},
-		"start": "Iniciar una conversación"
-	},
-	"poll": {
-		"start": "Iniciar una encuesta",
-		"create": {
-			"action": "Crear encuesta",
-			"success": "Encuesta creado",
-			"error": "No se pudo crear la encuesta"
-		},
-		"new": "Nueva encuesta",
-		"question": "Pregunta",
-		"expiration": {
-			"label": "Expiración",
-			"date": "Fecha de caducidad",
-			"check": "La fecha de caducidad debe ser en el futuro"
-		},
-		"options": "Opciones",
-		"multiple-choices": "Opciones múltiples",
-		"closed": "Encuesta cerrada",
-		"ends": "Termina "
-	},
-	"vote": {
-		"action": "Votar",
-		"success": "Voto emitido",
-		"error": "No se pudo emitir el voto"
-	},
-	"video": {
-		"post": "Publicar un video",
-		"upload": "Subir",
-		"record": "Grabar",
-		"publish": {
-			"success": "Video publicado",
-			"error": "No se pudo publicar el video"
-		},
-		"new": "Nuevo video",
-		"title": {
-			"label": "Título",
-			"placeholder": "Añadir un título"
-		},
-		"description": {
-			"label": "Descripción",
-			"placeholder": "Añadir una descripción"
-		}
-	},
-	"emoji": {
-		"pick": "Elige un emoji",
-		"set": {
-			"bookmark": {
-				"error": "No se pudo marcar el conjunto de emojis"
-			}
-		}
-	},
-	"peer": " par",
-	"peers": " pares",
-	"message": "Mensaje",
-	"write-a-message": "Escribe un message...",
-	"send": {
-		"login-required": "Inicia sesión para enviar mensajes",
-		"error": "No se pudo enviar el mensaje"
-	},
-	"event": {
-		"content": "Contenido",
-		"replies": "Respuestas",
-		"details": "Detalles",
-		"loading": "Cargando evento",
-		"not-found": "Evento no encontrado",
-		"fetch-error": "Error al obtener el evento"
-	},
-	"events": {
-		"loading": "Cargando eventos",
-		"none": "Nada que ver aquí... todavía"
-	},
-	"share": {
-		"success": "Compartido",
-		"error": "No se pudo compartir la publicación",
-		"publication": "Compartir publicación",
-		"this": {
-			"publication": "Compartir esta publicación",
-			"in": "Compartir esta publicación en {{groupName}}"
-		},
-		"in": {
-			"x": "Compartir en chat {{groupName}}",
-			"chat": "Compartir en chat"
-		}
-	},
-	"share-in": "Compartir en ",
-	"action-open": "Abrir"
+  "locale": {
+    "code": "es-ES",
+    "today": "Hoy"
+  },
+  "home": "Inicio",
+  "nav": {
+    "user": {
+      "login": {
+        "start": "Empezar",
+        "title": "Empezar",
+        "description": "Selecciona el método de inicio de sesión a continuación.",
+        "nip-07": "Conectarse con NIP-07",
+        "error": "Error al iniciar sesión con la extensión",
+        "error-nip-07": "Error al iniciar sesión con NIP-07"
+      },
+      "logout": "Cerrar sesión",
+      "language": "Idioma",
+      "theme": {
+        "trigger": "Tema",
+        "light": "Claro",
+        "dark": "Obscuro",
+        "system": "Sistema"
+      }
+    },
+    "no-groups": "No hay grupos"
+  },
+  "dashboard": {
+    "activity": {
+      "heading": "Actividad",
+      "unread": "no leído",
+      "mentions": "menciones",
+      "none": "Nada nuevo para ti... aún"
+    },
+    "featured": {
+      "heading": "Destacados"
+    },
+    "popular": {
+      "heading": "Popular en tu red"
+    },
+    "search": {
+      "prompt": "¿No puedes encontrar lo que buscas?",
+      "trigger": "Buscar grupos",
+      "title": "Encontrar un grupo",
+      "input": {
+        "placeholder": "Buscar grupos",
+        "no-results-for-x": "No hay resultados para «{{search}}»",
+        "n-results-for-x": "{{n}} resultados para «{{search}}»",
+        "start-typing-to-filter-groups": "Empieza a escribir para filtrar grupos"
+      },
+      "result": {
+        "visit": "Visitar",
+        "no-description-available": "No hay descripción disponible",
+        "no-groups-found-for-x-want-to": "No se encontraron grupos para «{{search}}», ¿quieres ",
+        "start-one": "empezar uno",
+        "?": "?"
+      }
+    }
+  },
+  "group": {
+    "hosted": {
+      "by": "Alojado por ",
+      "and": " y "
+    },
+    "create": {
+      "new": "Nuevo grupo",
+      "title": "Crear grupo",
+      "description": "Crea un nuevo grupo para chatear con tus amigos",
+      "form": {
+        "name": {
+          "label": "Nombre",
+          "placeholder": "Este es el nombre de tu grupo.",
+          "required": "Por favor, añade un nombre"
+        },
+        "about": {
+          "label": "Descripción",
+          "placeholder": "Esta es la descripción del grupo."
+        },
+        "relay": {
+          "label": "Relay",
+          "placeholder": "Elige un relay.",
+          "description": "Este es el servidor donde se almacenarán las publicaciones.",
+          "required": "Por favor, selecciona un relay"
+        },
+        "visibility": {
+          "label": "Visibilidad",
+          "anyone": "Cualquiera",
+          "members-only": "Solo miembros",
+          "description": "Los mensajes no están cifrados y pueden ser leídos por los relays. Para máxima privacidad, aloja tu propio relay."
+        },
+        "access": {
+          "label": "Acceso",
+          "anyone": "Cualquiera",
+          "invite-only": "Solo por invitación"
+        },
+        "submit": {
+          "trigger": "Crear",
+          "success": "Grupo creado",
+          "error": "No se pudo crear grupo"
+        }
+      }
+    },
+    "edit": {
+      "title": "Configuración del grupo",
+      "form": {
+        "name": {
+          "label": "Nombre",
+          "placeholder": "Mi Grupo",
+          "description": "Este es el nombre de tu grupo."
+        },
+        "about": {
+          "label": "Descripción",
+          "placeholder": "Un grupo para mis frens",
+          "description": "Esta es la descripción del grupo."
+        },
+        "visibility": {
+          "label": "Visibilidad",
+          "anyone": "Cualquiera",
+          "members-only": "Solo miembros",
+          "description": "Los mensajes no están cifrados y pueden ser leídos por los relays. Para máxima privacidad, aloja tu propio relay."
+        },
+        "access": {
+          "label": "Acceso",
+          "anyone": "Cualquiera",
+          "invite-only": "Solo por invitación",
+          "description": "Cualquiera puede unirse a un grupo abierto. Los grupos cerrados requieren aprobación."
+        },
+        "submit": {
+          "trigger": "Guardar",
+          "success": "Grupo actualizado",
+          "error": "No se pudo actualizar el grupo"
+        }
+      }
+    },
+    "delete": {
+      "trigger": "Borrar",
+      "confirmation": {
+        "title": "¿Estás seguro de que quieres borrar el grupo?",
+        "description": "Esta acción no se puede deshacer. Este grupo y toda su historia serán eliminados.",
+        "confirm": "Borrar",
+        "cancel": "Cancelar"
+      },
+      "success": "Grupo borrado",
+      "error": "No se pudo borrar el grupo"
+    },
+    "deleted": "Este grupo ha sido eliminado",
+    "bookmark": {
+      "trigger": "Marcar",
+      "error": "Error al marcar el grupo"
+    },
+    "unbookmark": {
+      "trigger": "Eliminar marcador",
+      "error": "Error al eliminar el marcador"
+    },
+    "join": "Unirse",
+    "leave": {
+      "trigger": "Salir",
+      "confirmation": {
+        "title": "¿Estás seguro de que quieres salir?",
+        "description": "Esta acción no se puede deshacer. Serás eliminado de la lista de miembros del grupo.",
+        "confirm": "Salir",
+        "cancel": "Cancelar"
+      },
+      "success": "Has salido del grupo",
+      "error": "Error al salir del grupo"
+    },
+    "chat": {
+      "user": {
+        "joined": "se ha unido",
+        "left": "ha salido"
+      },
+      "event": {
+        "delete": {
+          "success": "Mensaje borrado",
+          "error": "No se pudo borrar el mensaje"
+        }
+      }
+    },
+    "metadata": {
+      "visibility": {
+        "private": {
+          "trigger": "Solo miembros",
+          "content": "Solo los miembros pueden leer el contenido"
+        },
+        "public": {
+          "trigger": "Público",
+          "content": "Puede ser leído por cualquiera"
+        }
+      },
+      "access": {
+        "closed": {
+          "trigger": "Cerrado",
+          "content": "Requiere aprobación o una invitación para unirse"
+        },
+        "open": {
+          "trigger": "Abierto",
+          "content": "Cualquiera puede unirse"
+        }
+      },
+      "join-the-conversation": "Únete a la conversación"
+    },
+    "info": {
+      "admin": "Admin",
+      "admins": "Admins ({{adminsLength}})",
+      "members": "Miembros ({{membersLength}})",
+      "no-members": "No hay miembros"
+    }
+  },
+  "chat": {
+    "message": {
+      "loading": "Cargando mensaje...",
+      "copy": {
+        "action": "Copiar",
+        "success": "Copiado al portapapeles",
+        "error": "No se pudo copiar al portapapeles"
+      },
+      "react": {
+        "action": "Reaccionar",
+        "with": "Reaccionado con ",
+        "success": "Reaccionado con {{emoji}}",
+        "error": "No se puede reaccionar"
+      },
+      "reply": {
+        "action": "Responder",
+        "error": "No se pudo responder"
+      },
+      "delete": {
+        "action": "Borrar"
+      },
+      "deleted": "Mensaje borrado",
+      "save-as-last-seen": "Guardar como visto por última vez"
+    },
+    "new-messages": "Nuevos mensajes",
+    "user": {
+      "not-member": "Aún no eres miembro de este grupo.",
+      "kick": {
+        "action": "Expulsar",
+        "success": "Usuario expulsado",
+        "error": "No se pudo expulsar al usuario"
+      }
+    },
+    "join": {
+      "action": "Unirse",
+      "request": {
+        "sent": "Solicitud enviada",
+        "success": "Solicitud de unión enviada",
+        "error": "Error al enviar la solicitud de unión"
+      }
+    },
+    "debug": "Debug"
+  },
+  "join": {
+    "request": {
+      "send": {
+        "success": "Solicitud de unión enviada",
+        "error": "Error al enviar la solicitud de unión"
+      },
+      "accept": {
+        "action": "Aceptar",
+        "success": "Usuario añadido al grupo",
+        "error": "No se pudo añadir el usuario al grupo"
+      },
+      "reject": {
+        "action": "Rechazar",
+        "success": "Solicitud de unión de usuario rechazada",
+        "error": "No se pudo rechazar al usuario del grupo"
+      }
+    },
+    "requests": {
+      "n": "Solicitudes de unión ({{requestsLength}})",
+      "none": "No hay solicitudes de unión... aún"
+    }
+  },
+  "gif": {
+    "search": "Buscar GIF",
+    "tenor": "Buscar Tenor",
+    "error": "Error al buscar GIFs"
+  },
+  "file": {
+    "upload": {
+      "error": "No se pudo subir el archivo"
+    }
+  },
+  "image": {
+    "upload": {
+      "error": "No se pudo subir la imagen"
+    }
+  },
+  "copy": {
+    "success": "Copiado",
+    "error": "No se pudo copiar"
+  },
+  "content": {
+    "prompt": "¿Qué quieres crear?",
+    "create": "Crear",
+    "type": {
+      "chat": "Chat",
+      "post": "Publicación",
+      "posts": "Publicaciones",
+      "poll": "Encuesta",
+      "polls": "Encuestas",
+      "video": "Video",
+      "videos": "Videos"
+    }
+  },
+  "post": {
+    "action": "Publicar",
+    "placeholder": "¿Qué tienes en mente?",
+    "success": "Publicado",
+    "error": "No se pudo publicar",
+    "delete": {
+      "success": "Publicación borrada",
+      "error": "No se pudo borrar la publicación"
+    },
+    "start": "Iniciar una conversación"
+  },
+  "poll": {
+    "start": "Iniciar una encuesta",
+    "create": {
+      "action": "Crear encuesta",
+      "success": "Encuesta creado",
+      "error": "No se pudo crear la encuesta"
+    },
+    "new": "Nueva encuesta",
+    "question": "Pregunta",
+    "expiration": {
+      "label": "Expiración",
+      "date": "Fecha de caducidad",
+      "check": "La fecha de caducidad debe ser en el futuro"
+    },
+    "options": "Opciones",
+    "multiple-choices": "Opciones múltiples",
+    "closed": "Encuesta cerrada",
+    "ends": "Termina "
+  },
+  "vote": {
+    "action": "Votar",
+    "success": "Voto emitido",
+    "error": "No se pudo emitir el voto"
+  },
+  "video": {
+    "post": "Publicar un video",
+    "upload": "Subir",
+    "record": "Grabar",
+    "publish": {
+      "success": "Video publicado",
+      "error": "No se pudo publicar el video"
+    },
+    "new": "Nuevo video",
+    "title": {
+      "label": "Título",
+      "placeholder": "Añadir un título"
+    },
+    "description": {
+      "label": "Descripción",
+      "placeholder": "Añadir una descripción"
+    }
+  },
+  "emoji": {
+    "pick": "Elige un emoji",
+    "set": {
+      "bookmark": {
+        "error": "No se pudo marcar el conjunto de emojis"
+      }
+    }
+  },
+  "peer": " par",
+  "peers": " pares",
+  "message": "Mensaje",
+  "write-a-message": "Escribe un message...",
+  "send": {
+    "login-required": "Inicia sesión para enviar mensajes",
+    "error": "No se pudo enviar el mensaje"
+  },
+  "event": {
+    "content": "Contenido",
+    "replies": "Respuestas",
+    "details": "Detalles",
+    "loading": "Cargando evento",
+    "not-found": "Evento no encontrado",
+    "fetch-error": "Error al obtener el evento"
+  },
+  "events": {
+    "loading": "Cargando eventos",
+    "none": "Nada que ver aquí... todavía"
+  },
+  "share": {
+    "success": "Compartido",
+    "error": "No se pudo compartir la publicación",
+    "publication": "Compartir publicación",
+    "this": {
+      "publication": "Compartir esta publicación",
+      "in": "Compartir esta publicación en {{groupName}}"
+    },
+    "in": {
+      "x": "Compartir en chat {{groupName}}",
+      "chat": "Compartir en chat"
+    }
+  },
+  "share-in": "Compartir en ",
+  "action-open": "Abrir"
 }
