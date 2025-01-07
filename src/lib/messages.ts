@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAtomValue } from "jotai";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
@@ -25,6 +25,7 @@ import {
 import db from "@/lib/db";
 import { Group } from "@/lib/types";
 import { DELETE_GROUP } from "@/lib/kinds";
+import { LastSeen } from "@/lib/db";
 
 export function saveGroupEvent(event: NostrEvent, group: Group) {
   const record = {
@@ -110,6 +111,18 @@ export function useLastSeen(group: Group, kind = NDKKind.GroupChat) {
     () => getLastSeen(group, kind),
     [group.id, group.relay, kind],
   );
+}
+
+export function useMemoizedLastSeen(group: Group, kind = NDKKind.GroupChat) {
+  const [memoized, setMemoized] = useState<LastSeen | null>(null);
+  useEffect(() => {
+    getLastSeen(group, kind).then((lastSeen) => {
+      if (lastSeen) {
+        setMemoized(lastSeen);
+      }
+    });
+  }, [group.id, group.relay, kind]);
+  return memoized;
 }
 
 export function useUnreads(groups: Group[]) {

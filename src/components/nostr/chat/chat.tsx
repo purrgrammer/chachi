@@ -45,7 +45,11 @@ import { useEvent, useRelaySet } from "@/lib/nostr";
 import { useDeletions } from "@/lib/nostr/chat";
 import { usePubkey, useCanSign } from "@/lib/account";
 import { Emoji as EmojiType, EmojiPicker } from "@/components/emoji-picker";
-import { useLastSeen, saveLastSeen, saveGroupEvent } from "@/lib/messages";
+import {
+  useMemoizedLastSeen,
+  saveLastSeen,
+  saveGroupEvent,
+} from "@/lib/messages";
 import { useSettings } from "@/lib/settings";
 import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
@@ -673,7 +677,7 @@ export function Chat({
 }: ChatProps) {
   // todo: check admin events against relay pubkey
   const groupedMessages = groupByDay(events);
-  const lastSeen = useLastSeen(group);
+  const lastSeen = useMemoizedLastSeen(group);
   const lastMessage = events.filter((e) => e.kind === NDKKind.GroupChat).at(0);
   const [, setScrollTo] = useAtom(scrollToAtom);
   const { events: deleteEvents } = useDeletions(group);

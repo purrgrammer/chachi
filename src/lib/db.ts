@@ -17,7 +17,7 @@ interface Event {
   tags: string[][];
 }
 
-interface LastSeen {
+export interface LastSeen {
   group: string;
   kind: number;
   tag: string;
