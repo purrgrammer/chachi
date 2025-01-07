@@ -15,6 +15,7 @@ import { NewPoll } from "@/components/nostr/new-poll";
 //import { CreateGroup } from "@/components/nostr/groups/create";
 import { NewPost } from "@/components/new-post";
 import { NewVideo } from "@/components/nostr/video";
+import { NewImage } from "@/components/nostr/image";
 import { useCanSign } from "@/lib/account";
 import { useNDK } from "@/lib/ndk";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,7 @@ export function New({ group }: { group: Group }) {
   const contentTypes = [
     { icon: "🧵", title: t("content.type.post"), component: NewPost },
     { icon: "🗳️", title: t("content.type.poll"), component: NewPoll },
+    { icon: "📷", title: t("content.type.image"), component: NewImage },
     { icon: "🎥", title: t("content.type.video"), component: NewVideo },
     //{
     //  icon: "🏰",
