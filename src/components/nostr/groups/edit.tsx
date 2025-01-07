@@ -300,7 +300,9 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-              <Button type="submit">{t("group.edit.submit.trigger")}</Button>
+              <Button type="submit">
+                {t("group.edit.form.submit.trigger")}
+              </Button>
             </div>
           </form>
         </Form>
