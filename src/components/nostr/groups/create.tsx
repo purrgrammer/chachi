@@ -178,7 +178,9 @@ export function CreateGroup({
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <UploadImage onUpload={field.onChange} />
+                      <UploadImage
+                        onUpload={(blob) => field.onChange(blob.url)}
+                      />
                     </FormControl>
                   </FormItem>
                 )}

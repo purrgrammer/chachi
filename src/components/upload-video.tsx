@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { RotateCw, Video, FileVideo } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useUploadBlob, UploadedBlob } from "@/lib/media";
+import { useUpload, UploadedBlob } from "@/lib/media";
 import { useTranslation } from "react-i18next";
 
 type ButtonProps = React.ComponentProps<typeof Button>;
@@ -14,7 +14,7 @@ interface UploadVideoProps extends ButtonProps {
 
 export function UploadVideo({ onUpload, ...props }: UploadVideoProps) {
   const [isUploading, setIsUploading] = useState<boolean>(false);
-  const { upload, canSign } = useUploadBlob();
+  const { upload, canSign } = useUpload();
   const ref = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
 

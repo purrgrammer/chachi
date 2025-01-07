@@ -5,6 +5,7 @@ import { GroupChat } from "@/components/nostr/groups/chat";
 import { GroupPosts } from "@/components/nostr/posts/feed";
 import { GroupVideos } from "@/components/nostr/videos";
 //import { GroupArticles } from "@/components/nostr/articles";
+import { GroupImages } from "@/components/nostr/images";
 import { GroupPolls } from "@/components/nostr/polls";
 import {
   Tabs,
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/nav-tabs";
 import { groupId } from "@/lib/groups";
 
-type GroupTab = "chat" | "posts" | "videos" | "polls";
+type GroupTab = "chat" | "posts" | "videos" | "images" | "polls";
 
 export default function GroupPage({ tab = "chat" }: { tab?: GroupTab }) {
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ export default function GroupPage({ tab = "chat" }: { tab?: GroupTab }) {
           <TabsTrigger value="chat">{t("content.type.chat")}</TabsTrigger>
           <TabsTrigger value="posts">{t("content.type.posts")}</TabsTrigger>
           <TabsTrigger value="videos">{t("content.type.videos")}</TabsTrigger>
+          <TabsTrigger value="images">{t("content.type.images")}</TabsTrigger>
           {/*<TabsTrigger value="articles">Articles</TabsTrigger>
            */}
           <TabsTrigger value="polls">{t("content.type.polls")}</TabsTrigger>
@@ -55,6 +57,9 @@ export default function GroupPage({ tab = "chat" }: { tab?: GroupTab }) {
         </TabsContent>
         <TabsContent asChild value="videos">
           <GroupVideos key={groupId(group)} group={group} />
+        </TabsContent>
+        <TabsContent asChild value="images">
+          <GroupImages key={groupId(group)} group={group} />
         </TabsContent>
         {/*
 	<TabsContent asChild value="articles">

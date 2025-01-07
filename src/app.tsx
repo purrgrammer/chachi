@@ -45,6 +45,10 @@ const router = createBrowserRouter([
         element: <Group tab="polls" />,
       },
       {
+        path: "/images/:host",
+        element: <Group tab="images" />,
+      },
+      {
         path: ":host/e/:nlink",
         element: <Event />,
       },
@@ -63,6 +67,10 @@ const router = createBrowserRouter([
       {
         path: "/polls/:host/:id",
         element: <Group tab="polls" />,
+      },
+      {
+        path: "/images/:host/:id",
+        element: <Group tab="images" />,
       },
       {
         path: ":host/:id/e/:nlink",

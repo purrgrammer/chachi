@@ -149,7 +149,7 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
                       <div className="flex justify-center items-center w-full">
                         <UploadImage
                           defaultImage={field.value}
-                          onUpload={field.onChange}
+                          onUpload={(blob) => field.onChange(blob.url)}
                         />
                       </div>
                     </FormControl>

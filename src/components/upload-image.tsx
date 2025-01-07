@@ -3,12 +3,12 @@ import { toast } from "sonner";
 import { RotateCw, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useUpload } from "@/lib/media";
+import { UploadedBlob, useUpload } from "@/lib/media";
 import { useTranslation } from "react-i18next";
 
 interface UploadImageProps {
   defaultImage?: string;
-  onUpload: (url: string) => void;
+  onUpload: (url: UploadedBlob) => void;
 }
 
 export function UploadImage({ defaultImage, onUpload }: UploadImageProps) {
@@ -31,9 +31,9 @@ export function UploadImage({ defaultImage, onUpload }: UploadImageProps) {
   async function uploadImage(file: File) {
     try {
       setIsUploading(true);
-      const url = await upload(file);
-      setImage(url);
-      onUpload(url);
+      const blob = await upload(file);
+      setImage(blob.url);
+      onUpload(blob);
     } catch (err) {
       console.error(err);
       toast.error(t("image.upload.error"));
