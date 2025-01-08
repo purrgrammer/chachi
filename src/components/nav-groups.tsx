@@ -68,7 +68,7 @@ function RelayItem({ group }: { group: Group }) {
             <div className="flex flex-row justify-between items-center">
               <div className="flex flex-row items-start text-xs line-clamp-1 text-muted-foreground">
                 <span className="font-semibold">
-                  <Name pubkey={lastMessage.pubkey} />
+                  <Name pubkey={lastMessage.pubkey} short />
                 </span>
                 <span className="mr-1">:</span>
                 <RichText
@@ -149,7 +149,7 @@ function GroupItem({ group }: { group: Group }) {
             <div className="flex flex-row justify-between items-center">
               <div className="flex flex-row items-start text-xs line-clamp-1 text-muted-foreground">
                 <span className="font-semibold">
-                  <Name pubkey={lastMessage.pubkey} />
+                  <Name pubkey={lastMessage.pubkey} short />
                 </span>
                 <span className="mr-1">:</span>
                 <RichText
