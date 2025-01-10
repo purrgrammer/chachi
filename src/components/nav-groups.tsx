@@ -220,7 +220,7 @@ export function NavGroups() {
   ) : (
     <div className="flex justify-center items-center">
       <span className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden text-sm text-muted-foreground">
-        {t("user.no-groups")}
+        {t("nav.no-groups")}
       </span>
     </div>
   );
