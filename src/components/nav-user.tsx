@@ -85,7 +85,7 @@ export function NavUser() {
               <DropdownMenuSeparator />
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
-                  <span>{t("user.language")}</span>
+                  <span>{t("nav.user.language")}</span>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
@@ -118,23 +118,23 @@ export function NavUser() {
               </DropdownMenuSub>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
-                  <span>{t("user.theme.trigger")}</span>
+                  <span>{t("nav.user.theme.trigger")}</span>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
                     <DropdownMenuItem onClick={() => setTheme("light")}>
                       <Sun />
-                      <span>{t("user.theme.light")}</span>
+                      <span>{t("nav.user.theme.light")}</span>
                       {theme === "light" ? <Check className="ml-auto" /> : null}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setTheme("dark")}>
                       <Moon />
-                      <span>{t("user.theme.dark")}</span>
+                      <span>{t("nav.user.theme.dark")}</span>
                       {theme === "dark" ? <Check className="ml-auto" /> : null}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setTheme("system")}>
                       <SunMoon />
-                      <span>{t("user.theme.system")}</span>
+                      <span>{t("nav.user.theme.system")}</span>
                       {theme === "system" ? (
                         <Check className="ml-auto" />
                       ) : null}
@@ -145,7 +145,7 @@ export function NavUser() {
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={logout}>
                 <LogOut />
-                {t("user.logout")}
+                {t("nav.user.logout")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
