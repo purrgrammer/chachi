@@ -178,7 +178,7 @@ const eventDetails: Record<
   },
   [NDKKind.Zap]: {
     noHeader: true,
-    className: "relative rounded-md bg-background/90 my-0.5",
+    className: "relative rounded-md bg-background/80 border-none my-0.5",
     preview: ZapPreview,
     detail: ZapDetail,
   },
@@ -580,6 +580,7 @@ export function FeedEmbed({
       <motion.div
         className={cn(
           "z-10 border relative bg-background text-foreground rounded-sm font-sans",
+          components?.className,
           className,
         )}
         // Drag controls

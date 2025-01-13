@@ -20,14 +20,7 @@ function User({ pubkey }: { pubkey: string }) {
 }
 
 function E({ id, group }: { id: string; group: Group }) {
-  return (
-    <Event
-      id={id}
-      relays={["wss://nos.lol"]}
-      group={group}
-      showReactions={false}
-    />
-  );
+  return <Event id={id} group={group} relays={[]} showReactions={false} />;
 }
 
 function A({ address, group }: { address: string; group: Group }) {
