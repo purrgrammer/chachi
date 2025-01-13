@@ -81,16 +81,7 @@ export function Stream({
           </Badge>
         ) : null}
       </div>
-      <div className="flex flex-row gap-6 justify-between">
-        {title ? <h3 className="text-lg font-semibold">{title}</h3> : null}
-        <div className="flex flex-row flex-wrap">
-          {tags.slice(0, 3).map((tag) => (
-            <Badge key={tag} variant="tag" className="mr-1 last:mr-0">
-              {tag}
-            </Badge>
-          ))}
-        </div>
-      </div>
+      {title ? <h3 className="text-lg font-semibold">{title}</h3> : null}
       {summary ? (
         <RichText
           tags={event.tags}
@@ -105,6 +96,13 @@ export function Stream({
           {summary}
         </RichText>
       ) : null}
+      <div className="flex flex-row flex-wrap">
+        {tags.slice(0, 3).map((tag) => (
+          <Badge key={tag} variant="tag" className="mr-1 last:mr-0">
+            {tag}
+          </Badge>
+        ))}
+      </div>
     </div>
   );
 }

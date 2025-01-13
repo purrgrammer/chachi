@@ -35,7 +35,7 @@ export function validateZap(zap: NostrEvent): Zap | null {
           e: req.tags.find((t) => t[0] === "e")?.[1],
           a: req.tags.find((t) => t[0] === "a")?.[1],
           p: req.tags.find((t) => t[0] === "p")?.[1],
-	  tags: req.tags,
+          tags: req.tags,
         }
       : null;
   } catch (err) {
