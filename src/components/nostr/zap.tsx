@@ -3,7 +3,7 @@ import { Bitcoin } from "lucide-react";
 import { RichText } from "@/components/rich-text";
 import { validateZap } from "@/lib/nip-57";
 import { Name } from "@/components/nostr/name";
-import { Avatar } from "@/components/nostr/Avatar";
+import { Avatar } from "@/components/nostr/avatar";
 import { formatShortNumber } from "@/lib/number";
 import { Event, Address } from "@/components/nostr/event";
 import type { Group } from "@/lib/types";
