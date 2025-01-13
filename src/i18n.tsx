@@ -2,14 +2,14 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import enTranslations from "../public/locales/en/common.json";
 import esTranslations from "../public/locales/es/common.json";
-import hansTranslations from "../public/locales/hans/common.json";
-import hantTranslations from "../public/locales/hant/common.json";
+import zhCNTranslations from "../public/locales/zh-CN/common.json";
+import zhTWTranslations from "../public/locales/zh-TW/common.json";
 
-type Language = "en" | "es" | "hans" | "hant";
+type Language = "en" | "es" | "zh-CN" | "zh-TW";
 
 export function getLanguage(): Language {
   const lang = localStorage.getItem("language");
-  if (lang && ["en", "es", "hans", "hant"].includes(lang)) {
+  if (lang && ["en", "es", "zh-CN", "zh-TW"].includes(lang)) {
     return lang as Language;
   }
   return "en";
@@ -30,17 +30,17 @@ i18n.use(initReactI18next).init({
     es: {
       translations: esTranslations,
     },
-    hans: {
-      translations: hansTranslations,
+    "zh-CN": {
+      translations: zhCNTranslations,
     },
-    hant: {
-      translations: hantTranslations,
+    "zh-TW": {
+      translations: zhTWTranslations,
     },
   },
   ns: ["translations"],
   defaultNS: "translations",
 });
 
-i18n.languages = ["en", "es", "hans", "hant"];
+i18n.languages = ["en", "es", "zh-CN", "zh-TW"];
 
 export default i18n;

@@ -1,29 +1,35 @@
 {
   "locale": {
-    "code": "zh-CN",
     "today": "今天"
   },
   "home": "主頁",
   "nav": {
-    "user": {
-      "login": {
-        "start": "開始",
-        "title": "開始",
-        "description": "請選擇以下登錄方式。",
-        "nip-07": "使用 NIP-07 連接",
-        "error": "無法使用擴充套件登錄",
-        "error-nip07": "使用 NIP-07 登录时出错了"
-      },
-      "logout": "登出",
-      "language": "語言",
-      "theme": {
-        "trigger": "主題",
-        "light": "淡色",
-        "dark": "深色",
-        "system": "系統"
-      }
-    },
     "no-groups": "尚無群聊"
+  },
+  "user": {
+    "login": {
+      "start": "開始",
+      "title": "開始",
+      "description": "請選擇以下登錄方式。",
+      "extension": {
+        "label": "擴充套件",
+        "error": "無法使用擴充套件登錄"
+      },
+      "remote": {
+        "label": "遠程簽名器",
+        "error": "无法使用遠程簽名器登录"
+      },
+      "or": "或者",
+      "connect": "連接"
+    },
+    "logout": "登出",
+    "language": "語言",
+    "theme": {
+      "trigger": "主題",
+      "light": "淡色",
+      "dark": "深色",
+      "system": "系統"
+    }
   },
   "dashboard": {
     "activity": {
@@ -300,7 +306,9 @@
       "poll": "投票",
       "polls": "投票",
       "video": "視頻",
-      "videos": "視頻"
+      "videos": "視頻",
+      "image": "圖片",
+      "images": "圖片"
     }
   },
   "post": {

@@ -1,29 +1,35 @@
 {
   "locale": {
-    "code": "es-ES",
     "today": "Hoy"
   },
   "home": "Inicio",
   "nav": {
-    "user": {
-      "login": {
-        "start": "Empezar",
-        "title": "Empezar",
-        "description": "Selecciona el método de inicio de sesión a continuación.",
-        "nip-07": "Conectarse con NIP-07",
-        "error": "Error al iniciar sesión con la extensión",
-        "error-nip-07": "Error al iniciar sesión con NIP-07"
-      },
-      "logout": "Cerrar sesión",
-      "language": "Idioma",
-      "theme": {
-        "trigger": "Tema",
-        "light": "Claro",
-        "dark": "Obscuro",
-        "system": "Sistema"
-      }
-    },
     "no-groups": "No hay grupos"
+  },
+  "user": {
+    "login": {
+      "start": "Empezar",
+      "title": "Empezar",
+      "description": "Selecciona el método de inicio de sesión a continuación.",
+      "extension": {
+        "label": "Extensión del navegador",
+        "error": "No se pudo iniciar sesión con la extensión del navegador"
+      },
+      "remote": {
+        "label": "Firmante remoto",
+        "error": "No se pudo iniciar sesión con el firmante remoto"
+      },
+      "or": "O",
+      "connect": "Conectarse"
+    },
+    "logout": "Cerrar sesión",
+    "language": "Idioma",
+    "theme": {
+      "trigger": "Tema",
+      "light": "Claro",
+      "dark": "Obscuro",
+      "system": "Sistema"
+    }
   },
   "dashboard": {
     "activity": {
@@ -300,7 +306,9 @@
       "poll": "Encuesta",
       "polls": "Encuestas",
       "video": "Video",
-      "videos": "Videos"
+      "videos": "Videos",
+      "image": "Imagen",
+      "images": "Imagenes"
     }
   },
   "post": {

@@ -11,5 +11,5 @@ export function Name({
 }) {
   const { data: profile } = useProfile(pubkey, relays);
   const name = profile?.name || profile?.display_name || pubkey.slice(0, 6);
-  return short ? name.split(' ')[0] : name;
+  return short ? name.split(" ")[0] : name;
 }
