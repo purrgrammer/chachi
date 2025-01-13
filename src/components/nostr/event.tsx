@@ -40,12 +40,14 @@ export function Event({
   group,
   pubkey,
   className,
+  showReactions = true,
 }: {
   id: string;
   relays: string[];
   pubkey?: string;
   group: Group;
   className?: string;
+  showReactions?: boolean;
 }) {
   const { data: event, status } = useEvent({ id, pubkey, relays });
 
@@ -62,7 +64,13 @@ export function Event({
   }
 
   return event ? (
-    <Embed event={event} group={group} className={className} relays={relays} />
+    <Embed
+      event={event}
+      group={group}
+      className={className}
+      relays={relays}
+      showReactions={showReactions}
+    />
   ) : (
     <EventNotFound />
   );
@@ -75,6 +83,7 @@ export function Address({
   identifier,
   relays,
   className,
+  showReactions = true,
 }: {
   group: Group;
   pubkey: string;
@@ -82,6 +91,7 @@ export function Address({
   identifier: string;
   relays: string[];
   className?: string;
+  showReactions?: boolean;
 }) {
   const { data: event, status } = useAddress({
     pubkey,
@@ -103,7 +113,13 @@ export function Address({
   }
 
   return event ? (
-    <Embed event={event} group={group} className={className} relays={relays} />
+    <Embed
+      event={event}
+      group={group}
+      className={className}
+      relays={relays}
+      showReactions={showReactions}
+    />
   ) : (
     <EventNotFound />
   );

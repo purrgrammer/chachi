@@ -127,6 +127,59 @@
   .font-serif {
     font-family: Georgia, Cambria, "Times New Roman", Times, serif;
   }
+
+  .border-gradient:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    margin: -2px;
+    background: linear-gradient(to bottom right, #ff902b, #f83838);
+    border-radius: inherit;
+  }
+  .border-animated-gradient:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    margin: -2px;
+    background: linear-gradient(
+      60deg,
+      #2bd9ff,
+      #8c8ded,
+      #f838d9,
+      #f83838,
+      #ff902b,
+      #ddf838
+    );
+    animation: animatedgradient 6s ease-in-out alternate infinite;
+    background-size: 300% 300%;
+    border-radius: inherit;
+  }
+
+  @keyframes animatedgradient {
+    0% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  mark {
+    color: hsl(var(--accent-foreground));
+    background: hsl(var(--accent));
+  }
 }
 
 em-emoji-picker {

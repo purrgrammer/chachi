@@ -6,6 +6,9 @@ export interface Zap {
   amount: number;
   pubkey: string;
   content: string;
+  e?: string;
+  a?: string;
+  p?: string;
 }
 
 export function validateZap(zap: NostrEvent): Zap | null {
@@ -21,13 +24,16 @@ export function validateZap(zap: NostrEvent): Zap | null {
     );
     // @ts-expect-error: not correctly typed, will always have a value
     const amount = Number(amountSection?.value) / 1000;
-    const req = JSON.parse(zapRequest);
+    const req = JSON.parse(zapRequest) as NostrEvent;
     return amount
       ? {
           id: zap.id,
           pubkey: req.pubkey,
           amount,
           content: req.content,
+          e: req.tags.find((t) => t[0] === "e")?.[1],
+          a: req.tags.find((t) => t[0] === "a")?.[1],
+          p: req.tags.find((t) => t[0] === "p")?.[1],
         }
       : null;
   } catch (err) {

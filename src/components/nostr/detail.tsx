@@ -40,6 +40,7 @@ import {
   GroupName,
   GroupPicture,
 } from "@/components/nostr/groups/metadata";
+import { ZapPreview, ZapDetail } from "@/components/nostr/zap";
 import { Repo, Issues } from "@/components/nostr/repo";
 import { Highlight } from "@/components/nostr/highlight";
 import { Stream } from "@/components/nostr/stream";
@@ -109,6 +110,7 @@ const eventDetails: Record<
   number,
   {
     noHeader?: boolean;
+    className?: string;
     preview: EventComponent;
     detail: EventComponent;
     content?: EventComponent;
@@ -174,10 +176,12 @@ const eventDetails: Record<
     preview: Image,
     detail: Image,
   },
-  //[9735]: {
-  //  preview: Zap,
-  //  detail: Zap,
-  //},
+  [NDKKind.Zap]: {
+    noHeader: true,
+    className: "relative rounded-md bg-background/90 my-0.5",
+    preview: ZapPreview,
+    detail: ZapDetail,
+  },
   //[30040]: {
   //  preview: Book,
   //  detail: Book,
@@ -526,19 +530,15 @@ export function FeedEmbed({
     }
   }
 
-  const header = (
+  const header = components?.noHeader ? null : (
     <div className="flex gap-3 items-center py-2 px-3 space-between">
-      {components?.noHeader ? null : (
-        <>
-          <Header event={event} />
-          <EventMenu
-            event={event}
-            group={group}
-            relays={relays}
-            canOpen={canOpenDetails}
-          />
-        </>
-      )}
+      <Header event={event} />
+      <EventMenu
+        event={event}
+        group={group}
+        relays={relays}
+        canOpen={canOpenDetails}
+      />
     </div>
   );
 
@@ -708,6 +708,7 @@ export function Embed({
   group,
   className,
   classNames,
+  isDetail = false,
   canOpenDetails = true,
   showReactions = true,
   options = {},
@@ -717,6 +718,7 @@ export function Embed({
   group: Group;
   className?: string;
   canOpenDetails?: boolean;
+  isDetail?: boolean;
   showReactions?: boolean;
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
@@ -730,24 +732,25 @@ export function Embed({
     <div
       className={cn(
         "border bg-background text-foreground rounded-sm font-sans",
+        components?.className,
         className,
       )}
     >
-      <div className="flex gap-3 items-center py-2 px-3 space-between">
-        {components?.noHeader ? null : (
-          <>
-            <Header event={event} />
-            <EventMenu
-              event={event}
-              group={group}
-              relays={relays}
-              canOpen={canOpenDetails}
-            />
-          </>
-        )}
-      </div>
+      {components?.noHeader ? null : (
+        <div className="flex gap-3 items-center py-2 px-3 space-between">
+          <Header event={event} />
+          <EventMenu
+            event={event}
+            group={group}
+            relays={relays}
+            canOpen={canOpenDetails}
+          />
+        </div>
+      )}
       <div className="flex flex-col gap-1 py-1 px-4 pb-2">
-        {components?.preview ? (
+        {isDetail && components?.detail ? (
+          components.detail({ event, relays, group, options, classNames })
+        ) : components?.preview ? (
           components.preview({ event, relays, group, options, classNames })
         ) : alt ? (
           <p>{alt}</p>
@@ -798,7 +801,8 @@ md:w-[calc(100vw-16rem)]
 	  group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100vw-4rem)]"
     >
       <div className="w-full max-w-xl">
-        <FeedEmbed
+        <Embed
+          isDetail
           event={event}
           group={group}
           className="border-none"
