@@ -9,6 +9,7 @@ export interface Zap {
   e?: string;
   a?: string;
   p?: string;
+  tags: string[][];
 }
 
 export function validateZap(zap: NostrEvent): Zap | null {
@@ -34,6 +35,7 @@ export function validateZap(zap: NostrEvent): Zap | null {
           e: req.tags.find((t) => t[0] === "e")?.[1],
           a: req.tags.find((t) => t[0] === "a")?.[1],
           p: req.tags.find((t) => t[0] === "p")?.[1],
+	  tags: req.tags,
         }
       : null;
   } catch (err) {

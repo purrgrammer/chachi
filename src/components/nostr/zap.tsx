@@ -85,7 +85,7 @@ export function Zap({
         </div>
         {zap.p ? <User pubkey={zap.p} /> : null}
       </div>
-      <RichText tags={event.tags} group={group}>
+      <RichText tags={event.tags.concat(zap.tags)} group={group}>
         {zap.content}
       </RichText>
       {zap.e ? (
