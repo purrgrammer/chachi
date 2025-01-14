@@ -451,7 +451,7 @@ function extractURLs(
   );
 }
 
-const customEmojiRegex = /:([a-zA-Z0-9_-]+):/g;
+const customEmojiRegex = /(:[a-zA-Z0-9_-]+:)/g;
 
 function extractCustomEmoji(
   fragments: Fragment[],
@@ -461,14 +461,16 @@ function extractCustomEmoji(
     fragments,
     customEmojiRegex,
     (name: string) => {
-      return Boolean(tags.find((a) => a[0] === "emoji" && a[1] === name));
+      const code = name.slice(1, -1);
+      return Boolean(tags.find((a) => a[0] === "emoji" && a[1] === code));
     },
     (name: string) => {
-      const image = tags.find((t) => t[0] === "emoji" && t[1] === name)?.[2];
+      const code = name.slice(1, -1);
+      const image = tags.find((t) => t[0] === "emoji" && t[1] === code)?.[2];
       if (image) {
-        return { type: "emoji", name, image } as Fragment;
+        return { type: "emoji", name: code, image } as Fragment;
       }
-      return { type: "text", text: `:${name}:` } as Fragment;
+      return { type: "text", text: name } as Fragment;
     },
   );
 }
