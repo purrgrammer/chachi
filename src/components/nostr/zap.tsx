@@ -19,8 +19,24 @@ function User({ pubkey }: { pubkey: string }) {
   );
 }
 
-function E({ id, group }: { id: string; group: Group }) {
-  return <Event id={id} group={group} relays={[]} showReactions={false} />;
+function E({
+  id,
+  group,
+  pubkey,
+}: {
+  id: string;
+  pubkey?: string;
+  group: Group;
+}) {
+  return (
+    <Event
+      id={id}
+      group={group}
+      pubkey={pubkey}
+      relays={[]}
+      showReactions={false}
+    />
+  );
 }
 
 function A({ address, group }: { address: string; group: Group }) {
@@ -73,7 +89,7 @@ export function Zap({
     <div
       className={`flex flex-col gap-2 ${animateGradient ? "rounded-md border-gradient" : ""} ${animateGradient && zap.amount >= HUGE_ZAP ? "border-animated-gradient" : ""}`}
     >
-      <div className="flex flex-row gap-6 relative justify-between">
+      <div className="flex flex-row gap-3 justify-between">
         <User pubkey={zap.pubkey} />
         <div className="flex items-center">
           <span className="font-mono text-lg">
@@ -89,7 +105,7 @@ export function Zap({
         {zap.content}
       </RichText>
       {zap.e ? (
-        <E id={zap.e} group={group} />
+        <E id={zap.e} group={group} pubkey={zap.p} />
       ) : zap.a ? (
         <A address={zap.a} group={group} />
       ) : null}
