@@ -9,3 +9,4 @@ export const LEAVE_REQUEST = 9022 as NDKKind;
 export const DELETE_GROUP = 9008 as NDKKind;
 export const STREAM = 30311 as NDKKind;
 export const CALENDAR_EVENT = 31923 as NDKKind;
+export const GIF_SET = 30169 as NDKKind;

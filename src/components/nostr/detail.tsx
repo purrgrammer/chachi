@@ -46,6 +46,7 @@ import { Highlight } from "@/components/nostr/highlight";
 import { Stream } from "@/components/nostr/stream";
 import People from "@/components/nostr/people";
 import { EmojiSet } from "@/components/nostr/emoji-set";
+import { GIFSet } from "@/components/nostr/gif-set";
 import { Emoji } from "@/components/emoji";
 import {
   ContextMenu,
@@ -71,6 +72,7 @@ import {
   COMMENT,
   STREAM,
   CALENDAR_EVENT,
+  GIF_SET,
 } from "@/lib/kinds";
 import {
   Dialog,
@@ -149,6 +151,10 @@ const eventDetails: Record<
   [NDKKind.EmojiSet]: {
     preview: EmojiSet,
     detail: EmojiSet,
+  },
+  [GIF_SET]: {
+    preview: GIFSet,
+    detail: GIFSet,
   },
   [POLL]: {
     preview: Poll,

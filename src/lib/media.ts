@@ -20,6 +20,8 @@ export interface Imeta {
   width?: number;
   height?: number;
   blurhash?: string;
+  thumbnail?: string;
+  summary?: string;
   type?: string;
   alt?: string;
   fallback?: string;
@@ -33,6 +35,8 @@ export function parseImeta(imeta: string[]): Imeta | null {
       width: parseInt(getImetaValue(imeta, "width")),
       height: parseInt(getImetaValue(imeta, "height")),
       blurhash: getImetaValue(imeta, "blurhash"),
+      thumbnail: getImetaValue(imeta, "thumb"),
+      summary: getImetaValue(imeta, "summary"),
       x: getImetaValue(imeta, "x"),
       type: getImetaValue(imeta, "m"),
       alt: getImetaValue(imeta, "alt"),
