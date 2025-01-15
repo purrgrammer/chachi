@@ -426,5 +426,9 @@
   "action-open": "Open",
   "media": {
     "reveal": "Reveal"
+  },
+  "header": {
+    "public": "Public",
+    "unknown": "Unknown"
   }
 }

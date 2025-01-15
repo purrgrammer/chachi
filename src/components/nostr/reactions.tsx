@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { validateZap, Zap } from "@/lib/nip-57";
 import { cn, groupBy } from "@/lib/utils";
+import { CUSTOM_EMOJI_CONTENT_REGEX } from "@/lib/emoji";
 
 function Reacters({
   reactions,
@@ -55,8 +56,6 @@ function Reacters({
   );
 }
 
-const CUSTOM_EMOJI = /^:[\S]+:$/;
-
 function Reaction({
   event,
   relays,
@@ -73,7 +72,7 @@ function Reaction({
   const ndk = useContext(NDKContext);
   const relaySet = useRelaySet(relays);
   const [isReacting, setIsReacting] = useState(false);
-  const isCustomEmoji = CUSTOM_EMOJI.test(content);
+  const isCustomEmoji = CUSTOM_EMOJI_CONTENT_REGEX.test(content);
   const emojiName = content.slice(1, -1);
   const emojiImage = reactions[0].tags.find(
     (t) => t[0] === "emoji" && t[1] === emojiName,

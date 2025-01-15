@@ -48,6 +48,7 @@ import People from "@/components/nostr/people";
 import { EmojiSet } from "@/components/nostr/emoji-set";
 import { GIFSet } from "@/components/nostr/gif-set";
 import { Emoji } from "@/components/emoji";
+import Reaction from "@/components/nostr/reaction";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -64,7 +65,7 @@ import { useNDK } from "@/lib/ndk";
 import { useRelaySet, useRelays } from "@/lib/nostr";
 import { useReplies } from "@/lib/nostr/comments";
 import { useGroupAdminsList, useGroupName } from "@/lib/nostr/groups";
-import { useMyGroups, useOpenGroup } from "@/lib/groups";
+import { useMyGroups, useOpenGroup, groupId } from "@/lib/groups";
 import {
   POLL,
   REPO,
@@ -205,6 +206,11 @@ const eventDetails: Record<
   [CALENDAR_EVENT]: {
     preview: CalendarEvent,
     detail: CalendarEvent,
+  },
+  [NDKKind.Reaction]: {
+    noHeader: true,
+    preview: Reaction,
+    detail: Reaction,
   },
 };
 
@@ -349,7 +355,7 @@ function EventMenu({
       />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="smallIcon">
+          <Button variant="ghost" size="icon">
             <Ellipsis />
           </Button>
         </DropdownMenuTrigger>
@@ -382,8 +388,11 @@ function EventMenu({
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
                     {groups.map((g) => (
-                      <DropdownMenuItem key={g.id} onClick={() => shareIn(g)}>
-                        <GroupPicture group={g} className="size-4" />
+                      <DropdownMenuItem
+                        key={groupId(g)}
+                        onClick={() => shareIn(g)}
+                      >
+                        <GroupPicture group={g} className="size-5" />
                         <GroupName group={g} />
                       </DropdownMenuItem>
                     ))}

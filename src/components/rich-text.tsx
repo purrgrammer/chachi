@@ -17,6 +17,7 @@ import { youtubeUrlRegex, YoutubeEmbed } from "@/components/youtube";
 import { isImageLink, isVideoLink, isAudioLink } from "@/lib/string";
 import type { Group } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { CUSTOM_EMOJI_REGEX } from "@/lib/emoji";
 
 // todo: blossom link fallbacks
 
@@ -451,15 +452,13 @@ function extractURLs(
   );
 }
 
-const customEmojiRegex = /(:[\S]+:)/g;
-
 function extractCustomEmoji(
   fragments: Fragment[],
   tags: string[][],
 ): Fragment[] {
   return extract(
     fragments,
-    customEmojiRegex,
+    CUSTOM_EMOJI_REGEX,
     (name: string) => {
       const code = name.slice(1, -1);
       return Boolean(tags.find((a) => a[0] === "emoji" && a[1] === code));

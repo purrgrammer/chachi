@@ -1,6 +1,9 @@
 import emojiData from "@emoji-mart/data";
 import type { Emoji } from "@/lib/types";
 
+export const CUSTOM_EMOJI_CONTENT_REGEX = /^:[\S]+:$/;
+export const CUSTOM_EMOJI_REGEX = /(:[\S]+:)/g;
+
 interface Skin {
   native: string;
 }

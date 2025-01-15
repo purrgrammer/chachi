@@ -12,6 +12,14 @@ export function useMyGroups() {
   return useAtomValue(groupsAtom);
 }
 
+export function groupURL(group: Group) {
+  if (group.id === "_") {
+    return `/${getRelayHost(group.relay)}`;
+  } else {
+    return `/${getRelayHost(group.relay)}/${group.id}`;
+  }
+}
+
 export function useOpenGroup(group: Group) {
   const navigate = useNavigate();
   return () => {
