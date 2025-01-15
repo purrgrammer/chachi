@@ -451,7 +451,7 @@ function extractURLs(
   );
 }
 
-const customEmojiRegex = /(:[a-zA-Z0-9_-]+:)/g;
+const customEmojiRegex = /(:[\S]+:)/g;
 
 function extractCustomEmoji(
   fragments: Fragment[],

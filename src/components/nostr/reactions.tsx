@@ -55,7 +55,7 @@ function Reacters({
   );
 }
 
-const CUSTOM_EMOJI = /^:[a-zA-Z0-9_-]+:$/;
+const CUSTOM_EMOJI = /^:[\S]+:$/;
 
 function Reaction({
   event,
