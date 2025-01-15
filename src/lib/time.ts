@@ -25,9 +25,7 @@ export function formatRelativeTime(timestamp: number) {
     return `${days}d`;
   } else {
     return Intl.DateTimeFormat(getLanguage(), {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
+      dateStyle: "short",
     }).format(new Date(timestamp * 1000));
   }
 }
