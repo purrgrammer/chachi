@@ -113,6 +113,7 @@ const eventDetails: Record<
   {
     noHeader?: boolean;
     className?: string;
+    innerClassname?: string;
     preview: EventComponent;
     detail: EventComponent;
     content?: EventComponent;
@@ -153,6 +154,7 @@ const eventDetails: Record<
     detail: EmojiSet,
   },
   [GIF_SET]: {
+    innerClassname: "pb-0",
     preview: GIFSet,
     detail: GIFSet,
   },
@@ -754,7 +756,12 @@ export function Embed({
           />
         </div>
       )}
-      <div className="flex flex-col gap-1 py-1 px-4 pb-2">
+      <div
+        className={cn(
+          "flex flex-col gap-1 py-1 px-4 pb-2",
+          components?.innerClassname,
+        )}
+      >
         {isDetail && components?.detail ? (
           components.detail({ event, relays, group, options, classNames })
         ) : components?.preview ? (

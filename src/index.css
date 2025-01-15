@@ -32,6 +32,7 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --arrow: 220.9 39.3% 11%;
   }
 
   .dark {
@@ -179,6 +180,17 @@
   mark {
     color: hsl(var(--accent-foreground));
     background: hsl(var(--accent));
+  }
+
+  .gallery {
+    --slider-height-percentage: 100%;
+    --slider-transition-duration: 120ms;
+    --organic-arrow-thickness: 4px;
+    --organic-arrow-border-radius: 0px;
+    --organic-arrow-height: 40px;
+    --organic-arrow-color: white;
+    --loader-bar-color: hsl(var(--primary));
+    --loader-bar-height: 4px;
   }
 }
 

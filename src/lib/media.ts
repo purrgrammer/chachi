@@ -30,10 +30,12 @@ export interface Imeta {
 export function parseImeta(imeta: string[]): Imeta | null {
   const url = getImetaValue(imeta, "url");
   if (url) {
+    const dimensions = getImetaValue(imeta, "dim");
+    const [width, height] = dimensions ? dimensions.split("x").map(Number) : [];
     return {
       url,
-      width: parseInt(getImetaValue(imeta, "width")),
-      height: parseInt(getImetaValue(imeta, "height")),
+      width,
+      height,
       blurhash: getImetaValue(imeta, "blurhash"),
       thumbnail: getImetaValue(imeta, "thumb"),
       summary: getImetaValue(imeta, "summary"),
@@ -60,6 +62,7 @@ export function blobToImeta(blob: UploadedBlob): string[] {
     `m ${blob.type || blob.nip94?.m}`,
     `size ${blob.size || blob.nip94?.size}`,
     ...(blob.nip94?.dim ? [`dim ${blob.nip94.dim}`] : []),
+    //...(blob.nip94?.blurhash ? [`blurhash ${blob.nip94.blurhash}`] : []),
   ];
 }
 

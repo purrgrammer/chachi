@@ -423,5 +423,8 @@
     }
   },
   "share-in": "Share in ",
-  "action-open": "Open"
+  "action-open": "Open",
+  "media": {
+    "reveal": "Reveal"
+  }
 }
