@@ -32,6 +32,7 @@ const buttonVariants = cva(
         play: "w-12 h-12 [&_svg]:size-8",
         fit: "w-fit p-1",
         huge: "h-32 w-32",
+        wide: "w-32 h-18",
       },
     },
     defaultVariants: {

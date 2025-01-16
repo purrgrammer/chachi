@@ -149,7 +149,7 @@ export function ChatMessage({
   isFirstInChain?: boolean;
   isLast?: boolean;
   isDeleted?: boolean;
-  setReplyingTo?: (event: NostrEvent | null) => void;
+  setReplyingTo?: (event: NostrEvent | undefined) => void;
   canDelete?: (ev: NostrEvent) => boolean;
   deleteEvent?: (event: NostrEvent) => void;
   isNew?: boolean;
@@ -655,7 +655,7 @@ interface ChatProps extends MotionProps {
   canDelete?: (event: NostrEvent) => boolean;
   deleteEvent?: (event: NostrEvent) => void;
   components?: Record<number, React.ComponentType<{ event: NostrEvent }>>;
-  setReplyingTo?: (event: NostrEvent | null) => void;
+  setReplyingTo?: (event: NostrEvent | undefined) => void;
   className?: string;
   style?: React.CSSProperties;
   newMessage?: NostrEvent;

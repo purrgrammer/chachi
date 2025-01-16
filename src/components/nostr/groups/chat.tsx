@@ -132,7 +132,7 @@ export const GroupChat = forwardRef(
     const admins = adminsList || [];
     const events = useGroupchat(group);
     const hasBeenDeleted = events.some((e) => e.kind === DELETE_GROUP);
-    const [replyingTo, setReplyingTo] = useState<NostrEvent | null>(null);
+    const [replyingTo, setReplyingTo] = useState<NostrEvent | undefined>();
     const previousMessageIds = events.slice(-3).map((e) => e.id.slice(0, 8));
     // heights
     const [inputHeight, setInputHeight] = useState(34);

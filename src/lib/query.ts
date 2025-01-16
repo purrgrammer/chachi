@@ -13,3 +13,4 @@ export const GROUP_METADATA = "group-metadata";
 export const GROUP_MEMBERS = "group-members";
 export const GROUP_ADMINS = "group-admins";
 export const GROUP_ROLES = "group-roles";
+export const LNURL = "lnurl";

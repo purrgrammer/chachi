@@ -1,13 +1,12 @@
+import { validateNutzap } from "@/lib/nip-61";
+import { Bitcoin, Euro, DollarSign } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
-import { Bitcoin } from "lucide-react";
-import { RichText } from "@/components/rich-text";
-//import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
-import { Group } from "@/lib/types";
-import { User } from "@/components/nostr/user";
 import { Event, Address } from "@/components/nostr/event";
-import { validateZap } from "@/lib/nip-57";
 import { formatShortNumber } from "@/lib/number";
+import { RichText } from "@/components/rich-text";
+import { User } from "@/components/nostr/user";
 import { HUGE_AMOUNT } from "@/lib/zap";
+import { Group } from "@/lib/types";
 
 function E({
   id,
@@ -43,27 +42,27 @@ function A({ address, group }: { address: string; group: Group }) {
   );
 }
 
-export function ZapDetail({
+export function NutzapDetail({
   event,
   group,
 }: {
   event: NostrEvent;
   group: Group;
 }) {
-  return <Zap event={event} group={group} animateGradient={false} />;
+  return <Nutzap event={event} group={group} animateGradient={false} />;
 }
 
-export function ZapPreview({
+export function NutzapPreview({
   event,
   group,
 }: {
   event: NostrEvent;
   group: Group;
 }) {
-  return <Zap event={event} group={group} animateGradient={true} />;
+  return <Nutzap event={event} group={group} animateGradient={true} />;
 }
 
-export function Zap({
+export function Nutzap({
   event,
   group,
   animateGradient,
@@ -72,7 +71,7 @@ export function Zap({
   group: Group;
   animateGradient?: boolean;
 }) {
-  const zap = validateZap(event);
+  const zap = validateNutzap(event);
   return zap ? (
     <div
       className={`flex flex-col gap-2 ${animateGradient ? "rounded-md border-gradient" : ""} ${animateGradient && zap.amount >= HUGE_AMOUNT ? "border-animated-gradient" : ""}`}
@@ -84,18 +83,22 @@ export function Zap({
             {formatShortNumber(zap.amount)}
           </span>
           <span className="text-muted-foreground">
-            <Bitcoin className="size-4" />
+            {zap.unit === "sat" ? (
+              <Bitcoin className="size-4" />
+            ) : zap.unit === "eur" ? (
+              <Euro className="size-4" />
+            ) : zap.unit === "usd" ? (
+              <DollarSign className="size-4" />
+            ) : null}
           </span>
         </div>
         {zap.p ? (
           <User pubkey={zap.p} classNames={{ avatar: "size-4" }} />
         ) : null}
       </div>
-      {zap.content.trim().length > 0 ? (
-        <RichText tags={event.tags.concat(zap.tags)} group={group}>
-          {zap.content}
-        </RichText>
-      ) : null}
+      <RichText tags={event.tags.concat(zap.tags)} group={group}>
+        {zap.content}
+      </RichText>
       {zap.e ? (
         <E id={zap.e} group={group} pubkey={zap.p} />
       ) : zap.a ? (

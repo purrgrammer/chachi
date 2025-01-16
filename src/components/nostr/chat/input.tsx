@@ -85,8 +85,8 @@ export function ChatInput({
   kind: NDKKind;
   showReplyPreview?: boolean;
   replyKind?: NDKKind;
-  replyingTo: NostrEvent | null;
-  setReplyingTo: (event: NostrEvent | null) => void;
+  replyingTo?: NostrEvent;
+  setReplyingTo: (event: NostrEvent | undefined) => void;
   onNewMessage?: (event: NostrEvent) => void;
   tags?: string[][];
   className?: string;
@@ -152,7 +152,7 @@ export function ChatInput({
       } finally {
         setMessage("");
         setIsPosting(false);
-        setReplyingTo(null);
+        setReplyingTo(undefined);
         setCustomEmojis([]);
         onNewMessage?.(event.rawEvent() as NostrEvent);
       }

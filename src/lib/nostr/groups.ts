@@ -86,6 +86,7 @@ async function fetchGroupMetadata(ndk: NDK, group: Group) {
       if (!ev) throw new Error("Can't find group metadata");
       return {
         id: group.id,
+        pubkey: ev.pubkey,
         relay: group.relay,
         name: ev.tagValue("name") || "",
         about: ev.tagValue("about"),

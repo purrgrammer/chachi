@@ -8,6 +8,7 @@ export interface Group {
 export interface GroupMetadata extends Group {
   name: string;
   about?: string;
+  pubkey?: string;
   picture?: string;
   visibility: "public" | "private";
   access: "open" | "closed";

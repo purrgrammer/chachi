@@ -206,7 +206,7 @@ function Imeta({ imeta }: { imeta: string[] }) {
   const blurhash = parsed?.blurhash;
   const alt = parsed?.alt;
   return blurhash && parsed?.width && parsed?.height && url ? (
-    <div ref={ref} className="min-w-[286px] sm:min-w-[446px]">
+    <div ref={ref} className="min-w-[250px] md:min-w-[400px]">
       {ref.current ? (
         <BlurhashPreview
           alt={alt}

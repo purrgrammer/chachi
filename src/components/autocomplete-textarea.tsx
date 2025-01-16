@@ -33,7 +33,7 @@ function ReplyPreview({
   topOffset?: number;
   width: number;
   reply: NostrEvent;
-  setReplyingTo?: (event: NostrEvent | null) => void;
+  setReplyingTo?: (event: NostrEvent | undefined) => void;
 }) {
   return (
     <motion.div
@@ -67,7 +67,7 @@ function ReplyPreview({
           variant="ghost"
           size="icon"
           className="absolute top-1 right-1 w-5 h-5"
-          onClick={() => setReplyingTo?.(null)}
+          onClick={() => setReplyingTo?.(undefined)}
         >
           <X className="w-4 h-4 text-muted-foreground" />
         </Button>
@@ -85,7 +85,7 @@ interface AutocompleteTextareaProps extends TextareaProps {
   onFinish?: (msg: string, emojis: Emoji[]) => void;
   onCustomEmojisChange?: (emojis: Emoji[]) => void;
   reply?: NostrEvent;
-  setReplyingTo?: (event: NostrEvent | null) => void;
+  setReplyingTo?: (event: NostrEvent | undefined) => void;
   submitOnEnter?: boolean;
   focusAfterSubmit?: boolean;
 }
@@ -220,7 +220,7 @@ export function AutocompleteTextarea({
       setIsAutocompletingEmoji(false);
       setAutocompleteTerm("");
       setAutocompleteEmojiTerm("");
-      setReplyingTo?.(null);
+      setReplyingTo?.(undefined);
     } else if (e.key === "Enter" && !e.shiftKey && submitOnEnter) {
       e.preventDefault();
       onFinish?.(message, dedupeBy(customEmojis, "name"));
