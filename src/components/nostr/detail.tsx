@@ -137,6 +137,7 @@ const eventDetails: Record<
   [NDKKind.GroupChat]: {
     noHeader: true,
     className: "border-none",
+    innerClassname: "pb-0",
     preview: ChatBubble,
     detail: ChatBubbleDetail,
   },
