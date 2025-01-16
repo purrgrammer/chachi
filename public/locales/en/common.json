@@ -230,6 +230,10 @@
         "action": "Reply",
         "error": "Couldn't reply"
       },
+      "forward": {
+        "action": "Forward",
+        "forwarded": "forwarded from"
+      },
       "delete": {
         "action": "Delete"
       },

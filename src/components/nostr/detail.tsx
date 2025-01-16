@@ -22,6 +22,7 @@ import {
   RichTextClassnames,
 } from "@/components/rich-text";
 import { Button } from "@/components/ui/button";
+import { ChatBubble, ChatBubbleDetail } from "@/components/nostr/chat-bubble";
 import { Header } from "@/components/nostr/header";
 import { Reactions } from "@/components/nostr/reactions";
 import {
@@ -132,6 +133,12 @@ const eventDetails: Record<
   [NDKKind.GroupNote]: {
     preview: PostWithReplies,
     detail: Post,
+  },
+  [NDKKind.GroupChat]: {
+    noHeader: true,
+    className: "border-none",
+    preview: ChatBubble,
+    detail: ChatBubbleDetail,
   },
   [NDKKind.GroupReply]: {
     preview: PostWithReplies,
