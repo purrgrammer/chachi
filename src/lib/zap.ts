@@ -1,13 +1,19 @@
+import { useCallback, useEffect, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
-import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
+import {
+  NDKEvent,
+  NDKKind,
+  NDKSubscriptionCacheUsage,
+} from "@nostr-dev-kit/ndk";
 import { useNDK } from "@/lib/ndk";
+import { useRelaySet } from "@/lib/nostr";
 import { NostrEvent } from "nostr-tools";
 import { LNURL } from "@/lib/query";
 import { useGroup } from "@/lib/nostr/groups";
 import type { Group } from "@/lib/types";
+import { Zap, validateZap } from "@/lib/nip-57";
 
 export const HUGE_AMOUNT = 21_000;
 
@@ -174,4 +180,39 @@ export function useWallets(): Wallet[] {
         ]
       : []),
   ];
+}
+
+export function useZaps(event: NostrEvent, relays: string[], live = true) {
+  const ndk = useNDK();
+  const relaySet = useRelaySet(relays);
+  // todo: use user inbox relays too
+  const [zaps, setZaps] = useState<Zap[]>([]);
+
+  useEffect(() => {
+    const filter = {
+      kinds: [NDKKind.Zap],
+      ...new NDKEvent(ndk, event).filter(),
+    };
+    const sub = ndk.subscribe(
+      filter,
+      {
+        cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
+        closeOnEose: !live,
+      },
+      relaySet,
+    );
+
+    sub.on("event", (event) => {
+      const zap = validateZap(event.rawEvent() as NostrEvent);
+      if (zap) {
+        setZaps([...zaps, zap]);
+      } else {
+        console.warn("Invalid zap", event.rawEvent());
+      }
+    });
+
+    return () => sub.stop();
+  }, []);
+
+  return zaps;
 }

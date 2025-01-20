@@ -42,6 +42,7 @@ import {
   GroupPicture,
 } from "@/components/nostr/groups/metadata";
 import { ZapPreview, ZapDetail } from "@/components/nostr/zap";
+import { ZapGoal } from "@/components/nostr/zap-goal";
 import { NutzapPreview, NutzapDetail } from "@/components/nostr/nutzap";
 import { Repo, Issues } from "@/components/nostr/repo";
 import { Highlight } from "@/components/nostr/highlight";
@@ -76,6 +77,7 @@ import {
   STREAM,
   CALENDAR_EVENT,
   GIF_SET,
+  GOAL,
 } from "@/lib/kinds";
 import {
   Dialog,
@@ -199,6 +201,10 @@ const eventDetails: Record<
     className: "relative rounded-md bg-background/80 border-none my-0.5",
     preview: ZapPreview,
     detail: ZapDetail,
+  },
+  [GOAL]: {
+    preview: ZapGoal,
+    detail: ZapGoal,
   },
   [NDKKind.Nutzap]: {
     noHeader: true,

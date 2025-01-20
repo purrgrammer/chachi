@@ -1,5 +1,6 @@
 import { MapPin, Calendar } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
+import { RichText } from "@/components/rich-text";
 import { cn } from "@/lib/utils";
 import { formatDateTime } from "@/lib/time";
 
@@ -19,15 +20,15 @@ export function CalendarEvent({
   const tz = event.tags.find((tag) => tag[0] === "start_tzid")?.[1];
   const location = event.tags.find((tag) => tag[0] === "location")?.[1];
   return (
-    <div className={cn("flex flex-col", className)}>
+    <div className={cn("flex flex-col gap-1", className)}>
       {image ? (
         <img
           src={image}
-          className="w-full aspect-auto max-h-[210px] object-cover mb-2"
+          className="w-full aspect-auto max-h-[210px] object-cover"
         />
       ) : null}
 
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-2">
         <h3 className="text-lg">{title}</h3>
         <ul className="flex flex-col gap-1 ml-3">
           {startDate && (
@@ -52,7 +53,7 @@ export function CalendarEvent({
             </li>
           )}
         </ul>
-        <p className="text-sm">{summary}</p>
+        <RichText className="text-sm" tags={event.tags}>{summary}</RichText>
       </div>
     </div>
   );

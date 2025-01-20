@@ -5,7 +5,7 @@ import { RichText } from "@/components/rich-text";
 import { Group } from "@/lib/types";
 import { User } from "@/components/nostr/user";
 import { Event, Address } from "@/components/nostr/event";
-import { validateZap } from "@/lib/nip-57";
+import { validateZap, Zap as ZapType } from "@/lib/nip-57";
 import { formatShortNumber } from "@/lib/number";
 import { HUGE_AMOUNT } from "@/lib/zap";
 
@@ -50,7 +50,12 @@ export function ZapDetail({
   event: NostrEvent;
   group: Group;
 }) {
-  return <Zap event={event} group={group} animateGradient={false} />;
+  const zap = validateZap(event);
+  return zap ? (
+    <Zap zap={zap} group={group} animateGradient={false} />
+  ) : (
+    <span>Invalid zap</span>
+  );
 }
 
 export function ZapPreview({
@@ -60,20 +65,26 @@ export function ZapPreview({
   event: NostrEvent;
   group: Group;
 }) {
-  return <Zap event={event} group={group} animateGradient={true} />;
+  const zap = validateZap(event);
+  return zap ? (
+    <Zap zap={zap} group={group} animateGradient={false} />
+  ) : (
+    <span>Invalid zap</span>
+  );
 }
 
 export function Zap({
-  event,
+  zap,
   group,
   animateGradient,
+  embedMention = true,
 }: {
-  event: NostrEvent;
+  zap: ZapType;
   group: Group;
   animateGradient?: boolean;
+  embedMention?: boolean;
 }) {
-  const zap = validateZap(event);
-  return zap ? (
+  return (
     <div
       className={`flex flex-col gap-2 ${animateGradient ? "rounded-md border-gradient" : ""} ${animateGradient && zap.amount >= HUGE_AMOUNT ? "border-animated-gradient" : ""}`}
     >
@@ -92,17 +103,15 @@ export function Zap({
         ) : null}
       </div>
       {zap.content.trim().length > 0 ? (
-        <RichText tags={event.tags.concat(zap.tags)} group={group}>
+        <RichText tags={zap.tags} group={group}>
           {zap.content}
         </RichText>
       ) : null}
-      {zap.e ? (
+      {zap.e && embedMention ? (
         <E id={zap.e} group={group} pubkey={zap.p} />
-      ) : zap.a ? (
+      ) : zap.a && embedMention ? (
         <A address={zap.a} group={group} />
       ) : null}
     </div>
-  ) : (
-    <span className="text-xs text-muted-foreground">Invalid zap</span>
   );
 }
