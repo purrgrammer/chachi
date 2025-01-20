@@ -59,7 +59,7 @@ export function ZapGoal({ event, group }: { event: NostrEvent; group: Group }) {
           <LinkIcon className="size-3" />
           <Link
             to={website}
-            className="text-sm font-mono line-clamp-1 underline decoration-dotted"
+            className="text-xs font-mono line-clamp-1 underline decoration-dotted"
           >
             {website}
           </Link>
