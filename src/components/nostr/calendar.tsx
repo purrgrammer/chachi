@@ -3,12 +3,15 @@ import { NostrEvent } from "nostr-tools";
 import { RichText } from "@/components/rich-text";
 import { cn } from "@/lib/utils";
 import { formatDateTime } from "@/lib/time";
+import type { Group } from "@/lib/types";
 
 export function CalendarEvent({
   event,
+  group,
   className,
 }: {
   event: NostrEvent;
+  group: Group;
   className?: string;
 }) {
   // todo: RSVP, calendar
@@ -53,7 +56,11 @@ export function CalendarEvent({
             </li>
           )}
         </ul>
-        <RichText className="text-sm" tags={event.tags}>{summary}</RichText>
+        {summary ? (
+          <RichText className="text-sm" tags={event.tags} group={group}>
+            {summary}
+          </RichText>
+        ) : null}
       </div>
     </div>
   );
