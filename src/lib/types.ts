@@ -10,8 +10,8 @@ export interface GroupMetadata extends Group {
   about?: string;
   pubkey?: string;
   picture?: string;
-  visibility: "public" | "private";
-  access: "open" | "closed";
+  visibility?: "public" | "private";
+  access?: "open" | "closed";
   nlink?: string;
 }
 

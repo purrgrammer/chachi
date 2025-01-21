@@ -18,7 +18,7 @@ export function isRelayURL(content: string) {
   return relayUrlRegex.test(content);
 }
 
-function fetchRelayInfo(url: string) {
+export function fetchRelayInfo(url: string) {
   const httpUrl = url.replace("wss://", "https://");
   return fetch(httpUrl, {
     headers: {

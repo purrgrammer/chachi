@@ -12,7 +12,7 @@ import { useNDK } from "@/lib/ndk";
 import { useRelays, useRelayList, useRelaySet, useStream } from "@/lib/nostr";
 import { nip29Relays, isRelayURL } from "@/lib/relay";
 import { useAccount } from "@/lib/account";
-import { useRelayInfo } from "@/lib/relay";
+import { useRelayInfo, fetchRelayInfo } from "@/lib/relay";
 import { LEAVE_REQUEST } from "@/lib/kinds";
 import type { Group, GroupMembers, GroupMetadata } from "@/lib/types";
 import {
@@ -75,7 +75,19 @@ function groupMetadata(ev: NDKEvent, id: string, relay: string) {
 }
 
 async function fetchGroupMetadata(ndk: NDK, group: Group) {
-  // todo: group.id === "_"
+  // todo: useRelayInfo
+  if (group.id === "_") {
+    return fetchRelayInfo(group.relay).then((info) => {
+      return {
+        id: group.id,
+        relay: group.relay,
+        pubkey: info.pubkey,
+        name: info.name,
+        about: info.description,
+        picture: info.icon,
+      } as GroupMetadata;
+    });
+  }
   return ndk
     .fetchEvent(
       { kinds: [NDKKind.GroupMetadata], "#d": [group.id] },
