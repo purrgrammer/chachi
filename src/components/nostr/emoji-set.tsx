@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { NostrEvent } from "nostr-tools";
-import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { RotateCw, Star, Check } from "lucide-react";
+import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import {
   Tooltip,
   TooltipContent,

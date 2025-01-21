@@ -3,6 +3,7 @@ import { MessagesSquare } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useGroup } from "@/lib/nostr/groups";
 import { Button } from "@/components/ui/button";
+import { RichText } from "@/components/rich-text";
 import { useRelayInfo } from "@/lib/relay";
 import { cn } from "@/lib/utils";
 import { useOpenGroup } from "@/lib/groups";
@@ -47,10 +48,12 @@ export function GroupName({
 
 export function GroupMetadata({
   event,
+  group,
   relays,
   className,
 }: {
   event: NostrEvent;
+  group: Group;
   relays: string[];
   className?: string;
 }) {
@@ -70,7 +73,13 @@ export function GroupMetadata({
         </Avatar>
         <h2 className="text-lg font-semibold">{name}</h2>
         {about ? (
-          <p className="text-sm text-center text-muted-foreground">{about}</p>
+          <RichText
+            tags={event.tags}
+            group={group}
+            className="text-sm text-center text-muted-foreground"
+          >
+            {about}
+          </RichText>
         ) : null}
       </div>
       <Button size="sm" onClick={openGroup}>

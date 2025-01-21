@@ -435,6 +435,10 @@
     "public": "Public",
     "unknown": "Unknown"
   },
+  "book": {
+    "by": "by {{ author }}",
+    "current-chapter": "{{ chapter }} / {{ total }}"
+  },
   "goal": {
     "expires-in": "Expires in",
     "expired": "Goal expired",

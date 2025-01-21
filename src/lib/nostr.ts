@@ -116,6 +116,15 @@ export function useAddress({
   });
 }
 
+export function useTag(tag: string[]) {
+  const [t] = tag;
+  if (t === "e") {
+    return useERef(tag);
+  } else {
+    return useARef(tag);
+  }
+}
+
 export function useERef(tag: string[]) {
   const [, id, relay] = tag;
   return useEvent({ id, relays: relay && isRelayURL(relay) ? [relay] : [] });

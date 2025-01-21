@@ -18,7 +18,7 @@ const badgeVariants = cva(
         counter: "bg-accent text-accent-foreground rounded-full py-0 px-1",
         notification:
           "bg-primary text-primary-foreground rounded-full py-0 px-1",
-        tag: "py-0.5 px-1 text-xs border-transparent bg-primary text-primary-foreground",
+        tag: "py-0.5 px-2 text-xs font-light border-primary",
         live: "border-transparent bg-destructive text-destructive-foreground p-1",
       },
     },

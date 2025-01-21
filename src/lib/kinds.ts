@@ -11,3 +11,5 @@ export const STREAM = 30311 as NDKKind;
 export const CALENDAR_EVENT = 31923 as NDKKind;
 export const GIF_SET = 30169 as NDKKind;
 export const GOAL = 9041 as NDKKind;
+export const BOOK = 30040 as NDKKind;
+export const BOOK_CONTENT = 30041 as NDKKind;

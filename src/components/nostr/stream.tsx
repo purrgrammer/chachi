@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { NostrEvent } from "nostr-tools";
 import ReactPlayer from "react-player";
 import { Radio, Play } from "lucide-react";
+import Hashtags from "@/components/nostr/hashtags";
 import { Button } from "@/components/ui/button";
 import {
   RichText,
@@ -31,11 +32,6 @@ export function Stream({
   const image = event.tags.find((t) => t[0] === "image")?.[1];
   const isLive = event.tags.find((t) => t[0] === "status")?.[1] === "live";
   const stream = event.tags.find((t) => t[0] === "streaming")?.[1];
-  const tags = event.tags
-    .filter((t) => t[0] === "t")
-    .map((t) => t[1])
-    .filter(Boolean)
-    .filter((t) => !t.startsWith("internal:"));
   return (
     <div className="flex flex-col gap-1">
       <div className="mb-1 relative">
@@ -96,13 +92,7 @@ export function Stream({
           {summary}
         </RichText>
       ) : null}
-      <div className="flex flex-row flex-wrap">
-        {tags.slice(0, 3).map((tag) => (
-          <Badge key={tag} variant="tag" className="mr-1 last:mr-0">
-            {tag}
-          </Badge>
-        ))}
-      </div>
+      <Hashtags event={event} />
     </div>
   );
 }

@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { ChatBubble, ChatBubbleDetail } from "@/components/nostr/chat-bubble";
 import { Header } from "@/components/nostr/header";
 import { Reactions } from "@/components/nostr/reactions";
+import { Book, BookContent } from "@/components/nostr/book";
 import {
   Tabs,
   TabsContent,
@@ -78,6 +79,7 @@ import {
   CALENDAR_EVENT,
   GIF_SET,
   GOAL,
+  BOOK,
 } from "@/lib/kinds";
 import {
   Dialog,
@@ -212,10 +214,11 @@ const eventDetails: Record<
     preview: NutzapPreview,
     detail: NutzapDetail,
   },
-  //[30040]: {
-  //  preview: Book,
-  //  detail: Book,
-  //},
+  [BOOK]: {
+    preview: Book,
+    detail: Book,
+    content: BookContent,
+  },
   [STREAM]: {
     preview: Stream,
     detail: Stream,

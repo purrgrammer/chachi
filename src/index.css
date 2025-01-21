@@ -192,6 +192,52 @@
     --loader-bar-color: hsl(var(--primary));
     --loader-bar-height: 4px;
   }
+
+  .toc {
+    counter-reset: item;
+  }
+  .toc-item {
+    display: block;
+    cursor: pointer;
+    counter-increment: item;
+    @apply text-muted-foreground;
+
+    &:hover {
+      @apply text-foreground;
+    }
+  }
+  .toc-item:before {
+    content: counters(item, ".") ". ";
+  }
+  .asciidoc {
+    @apply font-serif;
+
+    p {
+      @apply break-words whitespace-pre-wrap my-3 leading-tight;
+    }
+    pre {
+      @apply text-xs font-mono overflow-y-auto;
+    }
+    ul {
+      list-style: disc;
+      @apply mx-5;
+    }
+    a {
+      @apply underline decoration-dotted;
+    }
+
+    .imageblock {
+      .content {
+        @apply my-3;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      img {
+        @apply object-cover w-full aspect-auto rounded-sm;
+      }
+    }
+  }
 }
 
 em-emoji-picker {
