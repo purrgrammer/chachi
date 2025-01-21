@@ -4,9 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 
 export const nip29Relays = [
   "wss://groups.0xchat.com",
+  "wss://groups.fiatjaf.com",
   "wss://relay.groups.nip29.com",
   "wss://relay29.notoshi.win",
-  "wss://groups.fiatjaf.com",
+  "wss://communities.nos.social",
+  "wss://staging.bitcointxoko.com",
 ];
 
 const relayUrlRegex =
