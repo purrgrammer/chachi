@@ -36,22 +36,30 @@ export function GroupHeader({ group }: { group: Group }) {
     <Header>
       <div className="flex flex-row justify-between items-center w-full">
         <div className="flex flex-row justify-between items-center w-full">
-          <div className="">
-            <h2 className="text-lg line-clamp-1">
-              {isRelayGroup ? (
-                <RelayName relay={group.relay} />
-              ) : (
-                <>{name || group.id.slice(0, 6)}</>
-              )}
-            </h2>
-            {!isRelayGroup ? (
-              <Link
-                to={`/${getRelayHost(group.relay)}`}
-                className="p-0 font-mono text-xs text-muted-foreground line-clamp-1"
-              >
-                {getRelayHost(group.relay)}
-              </Link>
+          <div className="flex flex-row gap-2 items-center">
+            {metadata?.picture ? (
+              <img
+                src={metadata.picture}
+                className="size-6 sm:size-8 rounded-full"
+              />
             ) : null}
+            <div className="dis">
+              <h2 className="text-lg line-clamp-1">
+                {isRelayGroup ? (
+                  <RelayName relay={group.relay} />
+                ) : (
+                  <>{name || group.id.slice(0, 6)}</>
+                )}
+              </h2>
+              {!isRelayGroup ? (
+                <Link
+                  to={`/${getRelayHost(group.relay)}`}
+                  className="hidden sm:block p-0 font-mono text-xs text-muted-foreground line-clamp-1"
+                >
+                  {getRelayHost(group.relay)}
+                </Link>
+              ) : null}
+            </div>
           </div>
           {isRelayGroup ? null : (
             <div className="flex flex-row gap-2 items-center">
