@@ -92,7 +92,7 @@ export function Stream({
           {summary}
         </RichText>
       ) : null}
-      <Hashtags event={event} />
+      <Hashtags event={event} className="mt-2" />
     </div>
   );
 }
