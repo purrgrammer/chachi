@@ -213,7 +213,7 @@
     @apply font-serif;
 
     p {
-      @apply break-words whitespace-pre-wrap my-3 leading-tight;
+      @apply break-words my-3 leading-tight;
     }
     pre {
       @apply text-xs font-mono overflow-y-auto;
