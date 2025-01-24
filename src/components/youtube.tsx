@@ -14,12 +14,14 @@ export function YoutubeEmbed({
   const m = url.match(youtubeUrlRegex);
   if (!m) return null;
   return (
-    <ReactPlayer
-      url={url}
-      controls
-      className={cn("aspect-video rounded-md", className)}
-      width="100%"
-      height="100%"
-    />
+    <div className="min-w-[250px] md:min-w-[430px]">
+      <ReactPlayer
+        url={url}
+        controls
+        className={cn("aspect-video rounded-md", className)}
+        width="100%"
+        height="100%"
+      />
+    </div>
   );
 }
