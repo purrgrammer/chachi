@@ -43,7 +43,7 @@ function UserInfo({ pubkey }: { pubkey: string }) {
         <span className="font-semibold truncate">
           <Name pubkey={pubkey} />
         </span>
-        <span className="text-xs truncate">
+        <span className="text-xs text-muted-foreground truncate">
           <Nip05 pubkey={pubkey} />
         </span>
       </div>
@@ -88,7 +88,7 @@ export function NavUser() {
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   <div className="flex flex-row items-center gap-2">
-                    <Languages className="size-4" />
+                    <Languages className="text-muted-foreground size-4" />
                     <span>{t("user.language")}</span>
                   </div>
                 </DropdownMenuSubTrigger>
@@ -124,24 +124,24 @@ export function NavUser() {
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   <div className="flex flex-row items-center gap-2">
-                    <Palette className="size-4" />
+                    <Palette className="size-4 text-muted-foreground" />
                     <span>{t("user.theme.trigger")}</span>
                   </div>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
                     <DropdownMenuItem onClick={() => setTheme("light")}>
-                      <Sun />
+                      <Sun className="text-muted-foreground" />
                       <span>{t("user.theme.light")}</span>
                       {theme === "light" ? <Check className="ml-auto" /> : null}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setTheme("dark")}>
-                      <Moon />
+                      <Moon className="text-muted-foreground" />
                       <span>{t("user.theme.dark")}</span>
                       {theme === "dark" ? <Check className="ml-auto" /> : null}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setTheme("system")}>
-                      <SunMoon />
+                      <SunMoon className="text-muted-foreground" />
                       <span>{t("user.theme.system")}</span>
                       {theme === "system" ? (
                         <Check className="ml-auto" />
@@ -152,7 +152,7 @@ export function NavUser() {
               </DropdownMenuSub>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={logout}>
-                <LogOut />
+                <LogOut className="text-destructive dark:text-red-300" />
                 {t("user.logout")}
               </DropdownMenuItem>
             </DropdownMenuContent>
