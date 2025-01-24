@@ -55,8 +55,13 @@ export function saveLastSeen(ev: NostrEvent, group: Group) {
 export function useGroupchat(group: Group) {
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
+  const groups = useAtomValue(groupsAtom);
+  const groupIds = groups.map(groupId);
+  const isSubbed = groupIds.includes(groupId(group));
 
   useEffect(() => {
+    if (isSubbed) return;
+
     let sub: NDKSubscription | undefined;
     getLastGroupMessage(group).then((last) => {
       const filter = {
@@ -85,9 +90,9 @@ export function useGroupchat(group: Group) {
     });
 
     return () => {
-      sub?.stop();
+      if (!isSubbed) sub?.stop();
     };
-  }, [group.id, group.relay]);
+  }, [isSubbed, group.id, group.relay]);
 
   return useLiveQuery(() => getGroupChat(group), [group.id, group.relay], []);
 }
