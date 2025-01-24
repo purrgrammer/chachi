@@ -237,6 +237,17 @@
         @apply object-cover w-full aspect-auto rounded-sm;
       }
     }
+
+    hr {
+      @apply my-2;
+    }
+
+    #footnotes {
+      @apply text-sm;
+    }
+    .footnote {
+      @apply first:mt-0 my-1 mx-2;
+    }
   }
 }
 
