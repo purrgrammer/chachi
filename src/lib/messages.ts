@@ -85,6 +85,8 @@ export function useGroupchat(group: Group) {
       );
 
       sub.on("event", (event) => {
+        // todo: check that event.h is the same as group.id
+        // todo: check that event.h relay is the group relay
         saveGroupEvent(event.rawEvent() as NostrEvent, group);
       });
     });

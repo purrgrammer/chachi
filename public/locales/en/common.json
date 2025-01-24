@@ -443,5 +443,19 @@
     "expires-in": "Expires in",
     "expired": "Goal expired",
     "leaderboard": "Leaderboard"
+  },
+  "wallet": {
+    "connect": "Connect",
+    "dialog": {
+      "title": "Connect wallet",
+      "description": "Connect your wallet to send tips and support your favorite creators",
+      "connect-webln": "Connect web wallet",
+      "webln-connected": "Connected to web wallet",
+      "webln-unavailable": "WebLN wallet not available",
+      "webln-error": "Failed to connect to WebLN wallet",
+      "connect-nip60": "Connect remote wallet",
+      "nwc-empty": "NWC address is empty",
+      "nwc-error": "Failed to connect to remote wallet"
+    }
   }
 }

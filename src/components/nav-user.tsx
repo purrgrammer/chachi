@@ -31,6 +31,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import Wallet from "@/components/wallet";
 import { useAccount, useLogout } from "@/lib/account";
 import { useTranslation } from "react-i18next";
 import { changeLanguage } from "@/i18n";
@@ -84,6 +85,8 @@ export function NavUser() {
                   <UserInfo pubkey={pubkey} />
                 </div>
               </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <Wallet />
               <DropdownMenuSeparator />
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>

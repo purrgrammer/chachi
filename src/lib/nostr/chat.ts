@@ -53,7 +53,11 @@ export function useGroupMessages(groups: Group[]) {
         );
 
         sub.on("event", (event) => {
-          saveGroupEvent(event.rawEvent() as NostrEvent, group);
+          // todo: check that event.h is the same as group.id
+          // todo: check that event.h relay is the group relay
+          if (event.tags.find((tag) => tag[0] === "h" && tag[1] === group.id)) {
+            saveGroupEvent(event.rawEvent() as NostrEvent, group);
+          }
         });
 
         setSubs((subs) => [...subs, sub as NDKSubscription]);
