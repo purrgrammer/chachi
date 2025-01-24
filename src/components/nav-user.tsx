@@ -5,6 +5,8 @@ import {
   Sun,
   SunMoon,
   Check,
+  Languages,
+  Palette,
 } from "lucide-react";
 import { Login } from "@/components/nostr/login";
 import { Avatar } from "@/components/nostr/avatar";
@@ -85,7 +87,10 @@ export function NavUser() {
               <DropdownMenuSeparator />
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
-                  <span>{t("user.language")}</span>
+                  <div className="flex flex-row items-center gap-2">
+                    <Languages className="size-4" />
+                    <span>{t("user.language")}</span>
+                  </div>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
@@ -118,7 +123,10 @@ export function NavUser() {
               </DropdownMenuSub>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
-                  <span>{t("user.theme.trigger")}</span>
+                  <div className="flex flex-row items-center gap-2">
+                    <Palette className="size-4" />
+                    <span>{t("user.theme.trigger")}</span>
+                  </div>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
