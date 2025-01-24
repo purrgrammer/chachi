@@ -12,7 +12,7 @@ chachi is a nostr group chat client. It is designed to be mobile-friendly, bandw
 - [ ] Direct Messages
 - [ ] Threads
 - [ ] Profiles
-- [ ] PWA
+- [x] PWA
 
 ### Groups
 
@@ -64,8 +64,7 @@ chachi is a nostr group chat client. It is designed to be mobile-friendly, bandw
 - [ ] NIP-02 Follow List
 - [ ] NIP-05 DNS-based identifiers
 - [ ] NIP-17 Private Direct Messages
-- [ ] NIP-31 Alt
-- [ ] NIP-34 git stuff
+- [.] NIP-34 git stuff
 - [ ] NIP-38 User statuses
 - [ ] NIP-46 Nostr Remote Signing
 - [ ] NIP-47 NWC

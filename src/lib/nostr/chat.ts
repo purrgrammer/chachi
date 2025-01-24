@@ -10,7 +10,6 @@ import { useNDK } from "@/lib/ndk";
 import { saveGroupEvent } from "@/lib/messages";
 import { getLastGroupMessage } from "@/lib/messages/queries";
 import { useStream } from "@/lib/nostr";
-import { groupBy } from "@/lib/utils";
 import type { Group } from "@/lib/types";
 import { DELETE_GROUP } from "@/lib/kinds";
 
@@ -27,27 +26,24 @@ export function useDeletions(group: Group) {
 export function useGroupMessages(groups: Group[]) {
   const ndk = useNDK();
   const [subs, setSubs] = useState<NDKSubscription[]>([]);
-  const byRelay = groupBy(groups, (g: Group) => g.relay);
   useEffect(() => {
-    for (const [relay, gs] of Object.entries(byRelay)) {
-      const lastMessages = (gs as Group[]).map(getLastGroupMessage);
-      const relaySet = NDKRelaySet.fromRelayUrls([relay], ndk);
-      let sub: NDKSubscription | undefined;
-      Promise.all(lastMessages).then((lasts) => {
-        const filters = (gs as Group[]).map((group, i) => {
-          return {
-            kinds: [
-              NDKKind.GroupChat,
-              NDKKind.GroupAdminAddUser,
-              NDKKind.GroupAdminRemoveUser,
-              DELETE_GROUP,
-            ],
-            "#h": [group.id],
-            ...(lasts[i] ? { since: lasts[i].created_at } : {}),
-          };
-        });
+    for (const group of groups) {
+      const { id, relay } = group;
+      getLastGroupMessage(group).then((lastMessage) => {
+        const relaySet = NDKRelaySet.fromRelayUrls([relay], ndk);
+        let sub: NDKSubscription | undefined;
+        const filter = {
+          kinds: [
+            NDKKind.GroupChat,
+            NDKKind.GroupAdminAddUser,
+            NDKKind.GroupAdminRemoveUser,
+            DELETE_GROUP,
+          ],
+          "#h": [id],
+          ...(lastMessage ? { since: lastMessage.created_at } : {}),
+        };
         sub = ndk.subscribe(
-          filters,
+          filter,
           {
             cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
             groupable: false,
@@ -57,8 +53,6 @@ export function useGroupMessages(groups: Group[]) {
         );
 
         sub.on("event", (event) => {
-          const h = event.tagValue("h");
-          const group = { id: h, relay } as Group;
           saveGroupEvent(event.rawEvent() as NostrEvent, group);
         });
 
