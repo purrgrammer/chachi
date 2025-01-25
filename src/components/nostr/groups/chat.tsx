@@ -1,9 +1,10 @@
-//import { Bitcoin, Coins } from "lucide-react";
 import React, { useState, useEffect, forwardRef, ForwardedRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Bitcoin } from "lucide-react";
 import { toast } from "sonner";
 import { NostrEvent, UnsignedEvent } from "nostr-tools";
 import { NDKKind, NDKEvent } from "@nostr-dev-kit/ndk";
-//import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Name } from "@/components/nostr/name";
 import { useGroupAdminsList } from "@/lib/nostr/groups";
@@ -11,6 +12,7 @@ import { useMembers } from "@/lib/messages";
 import { ChatInput } from "@/components/nostr/chat/input";
 import { Chat } from "@/components/nostr/chat/chat";
 import { New } from "@/components/nostr/new";
+import { NewZap } from '@/components/nostr/zap';
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet } from "@/lib/nostr";
 import { usePubkey, useCanSign } from "@/lib/account";
@@ -256,7 +258,11 @@ export const GroupChat = forwardRef(
               !canIPoast && relayInfo?.supported_nips?.includes(29)
             }
           >
+	    {replyingTo ? (
+	<NewZap event={replyingTo} group={group} />
+	    ) : (
             <New group={group} />
+	    )}
           </ChatInput>
         )}
       </div>

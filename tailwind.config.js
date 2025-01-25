@@ -55,6 +55,10 @@ export default {
           4: "hsl(var(--chart-4))",
           5: "hsl(var(--chart-5))",
         },
+        bitcoin: {
+          DEFAULT: "hsl(var(--bitcoin-background))",
+          foreground: "hsl(var(--bitcoin-foreground))",
+	},
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
