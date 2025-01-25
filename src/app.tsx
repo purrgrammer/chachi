@@ -13,6 +13,8 @@ import Layout from "@/pages/layout";
 import Home from "@/pages/home";
 import Group from "@/pages/group";
 import Event from "@/pages/event";
+import Wallet from "@/pages/wallet";
+import Settings from "@/pages/settings";
 
 const router = createBrowserRouter([
   {
@@ -75,6 +77,14 @@ const router = createBrowserRouter([
       {
         path: ":host/:id/e/:nlink",
         element: <Event />,
+      },
+      {
+        path: "/wallet",
+        element: <Wallet />,
+      },
+      {
+        path: "/settings",
+        element: <Settings />,
       },
     ],
   },

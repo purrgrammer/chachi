@@ -253,6 +253,12 @@
       @apply first:mt-0 my-1 mx-2;
     }
   }
+
+  .svg-qr-code {
+    image {
+      clip-path: circle(50%);
+    }
+  }
 }
 
 em-emoji-picker {

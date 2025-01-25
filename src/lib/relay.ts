@@ -8,7 +8,7 @@ export const nip29Relays = [
   "wss://relay.groups.nip29.com",
   "wss://relay29.notoshi.win",
   "wss://communities.nos.social",
-  "wss://staging.bitcointxoko.com",
+  "wss://community.bitcointxoko.com",
   "wss://groups.hzrd149.com",
 ];
 

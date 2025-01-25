@@ -26,20 +26,26 @@ interface GroupList {
   created_at: number;
   content: string;
   groups: Group[];
+  couldDecrypt?: boolean;
+  privateGroups?: Group[];
 }
 
 export const groupListAtom = atomWithStorage<GroupList>(
-  "group-list",
+  "groups",
   {
     created_at: 0,
     content: "",
     groups: [],
+    couldDecrypt: false,
+    privateGroups: [],
   },
   createJSONStorage<GroupList>(() => localStorage),
   { getOnInit: true },
 );
 export const groupsAtom = atom<Group[]>((get) => {
-  return get(groupListAtom).groups;
+  const { groups } = get(groupListAtom);
+  // todo: deduplicate, show private
+  return groups; //.concat(privateGroups || []);
 });
 export const groupsContentAtom = atom<string>((get) => {
   return get(groupListAtom).content;
@@ -63,6 +69,32 @@ export const relayListAtom = atomWithStorage<RelayList>(
 );
 export const relaysAtom = atom<Relay[]>((get) => {
   return get(relayListAtom).relays;
+});
+
+// Cashu mints
+interface MintList {
+  created_at: number;
+  mints: string[];
+  relays: string[];
+  p2pk?: string;
+}
+
+export const mintListAtom = atomWithStorage<MintList>(
+  "mint-list",
+  {
+    created_at: 0,
+    mints: [],
+    relays: [],
+    p2pk: undefined,
+  },
+  createJSONStorage<MintList>(() => localStorage),
+  { getOnInit: true },
+);
+export const mintsAtom = atom<string[]>((get) => {
+  return get(mintListAtom).mints;
+});
+export const mintRelaysAtom = atom<string[]>((get) => {
+  return get(mintListAtom).relays;
 });
 
 // Frens

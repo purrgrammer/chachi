@@ -29,7 +29,8 @@
       "light": "Light",
       "dark": "Dark",
       "system": "System"
-    }
+    },
+    "settings": "Settings"
   },
   "dashboard": {
     "activity": {
@@ -215,6 +216,9 @@
   "chat": {
     "message": {
       "loading": "Loading message...",
+      "tip": {
+        "action": "Zap"
+      },
       "copy": {
         "action": "Copy",
         "success": "Copied to clipboard",
@@ -445,7 +449,25 @@
     "leaderboard": "Leaderboard"
   },
   "wallet": {
+    "title": "Wallet",
     "connect": "Connect",
+    "make-default": "Make default",
+    "make-default-error": "Failed to set wallet as default",
+    "make-default-success": "Wallet set as default",
+    "create": "Create wallet",
+    "mints": "Mints",
+    "add-mint": "Add mint",
+    "relays": "Relays",
+    "add-relay": "Add relay",
+    "deposit": "Receive",
+    "withdraw": "Send",
+    "mints-description": "Mints are the custodians of the funds. Withdraw your funds to your wallet regularly.",
+    "relays-description": "Relays where the wallet data is stored.",
+    "name": "Name",
+    "name-description": "A name for your wallet",
+    "ready": "Wallet `{{ name }}` ready",
+    "sync-error": "Error syncing wallet",
+    "deposit": "Deposit",
     "dialog": {
       "title": "Connect wallet",
       "description": "Connect your wallet to send tips and support your favorite creators",
@@ -456,6 +478,60 @@
       "connect-nip60": "Connect remote wallet",
       "nwc-empty": "NWC address is empty",
       "nwc-error": "Failed to connect to remote wallet"
+    },
+    "settings": {
+      "title": "Wallet settings",
+      "description": "Manage your wallet settings",
+      "create": {
+        "title": "Create wallet",
+        "description": "Create a wallet to start sending and receiving zaps"
+      }
+    }
+  },
+  "zap": {
+    "trigger": "Tip",
+    "action": "Tip",
+    "dialog": {
+      "title": "Zap {{ name }}",
+      "description": "Send a tip to {{ name }}",
+      "amount": "Amount",
+      "message": "Message",
+      "message-placeholder": "Add a message",
+      "tip": "Zap {{ amount }}",
+      "copy": "Copy invoice",
+      "wallet": "Open in wallet",
+      "wallet-error": "Couldn't open wallet",
+      "error": "Failed to send zap"
+    }
+  },
+  "ecash": {
+    "redeem": "Redeem",
+    "fee": "fee:"
+  },
+  "settings": {
+    "title": "Settings",
+    "ui": {
+      "title": "Appearance",
+      "language": {
+        "title": "Language",
+        "description": "Choose your preferred language"
+      },
+      "theme": {
+        "title": "Theme",
+        "description": "Choose your preferred theme",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      }
+    },
+    "wallet": {
+      "title": "Wallet"
+    },
+    "media": {
+      "title": "Media"
+    },
+    "relays": {
+      "title": "Relays"
     }
   }
 }

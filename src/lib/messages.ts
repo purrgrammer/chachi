@@ -23,6 +23,7 @@ import {
   getGroupChatParticipants,
 } from "@/lib/messages/queries";
 import db from "@/lib/db";
+import { useGroup } from "@/lib/nostr/groups";
 import { Group } from "@/lib/types";
 import { DELETE_GROUP } from "@/lib/kinds";
 import { LastSeen } from "@/lib/db";
@@ -55,6 +56,7 @@ export function saveLastSeen(ev: NostrEvent, group: Group) {
 export function useGroupchat(group: Group) {
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
+  const { data: metadata } = useGroup(group);
   const groups = useAtomValue(groupsAtom);
   const groupIds = groups.map(groupId);
   const isSubbed = groupIds.includes(groupId(group));
@@ -95,6 +97,29 @@ export function useGroupchat(group: Group) {
       if (!isSubbed) sub?.stop();
     };
   }, [isSubbed, group.id, group.relay]);
+
+  useEffect(() => {
+    if (!metadata?.pubkey) return;
+    const filter = {
+      kinds: [NDKKind.Zap, NDKKind.Nutzap],
+      "#a": [`${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`],
+    };
+    const sub = ndk.subscribe(
+      filter,
+      {
+        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+        groupable: false,
+        closeOnEose: false,
+      },
+      relaySet,
+    );
+
+    sub.on("event", (event) => {
+      saveGroupEvent(event.rawEvent() as NostrEvent, group);
+    });
+
+    return () => sub.stop();
+  }, [metadata, group.id, group.relay]);
 
   return useLiveQuery(() => getGroupChat(group), [group.id, group.relay], []);
 }

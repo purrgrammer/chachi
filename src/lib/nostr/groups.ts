@@ -71,10 +71,11 @@ function groupMetadata(ev: NDKEvent, id: string, relay: string) {
     picture: ev.tagValue("picture"),
     visibility: ev.tags.find((t) => t[0] === "private") ? "private" : "public",
     access: ev.tags.find((t) => t[0] === "closed") ? "closed" : "open",
+    pubkey: ev.pubkey,
   } as GroupMetadata;
 }
 
-async function fetchGroupMetadata(ndk: NDK, group: Group) {
+export async function fetchGroupMetadata(ndk: NDK, group: Group) {
   // todo: useRelayInfo
   if (group.id === "_") {
     return fetchRelayInfo(group.relay).then((info) => {

@@ -26,20 +26,25 @@ function GroupName({ group }: { group: Group }) {
 
 interface ChatBubbleProps {
   event: NostrEvent;
+  group: Group;
 }
 
-export function ChatBubble({ event }: ChatBubbleProps) {
+export function ChatBubble({ event, group }: ChatBubbleProps) {
   const { t } = useTranslation();
   const groupTag = event.tags.find((t) => t[0] === "h");
   const [, id, relay] = groupTag ? groupTag : [];
-  const group = { id, relay };
+  const chatGroup = { id, relay };
+  const isForwarded =
+    chatGroup.id &&
+    chatGroup.relay &&
+    (group.id !== chatGroup.id || group.relay !== chatGroup.relay);
   return (
     <div className="flex flex-col gap-0">
-      {group.id && group.relay ? (
+      {isForwarded ? (
         <div className="flex flex-row gap-1 items-center text-muted-foreground ml-10">
           <Forward className="size-4" />
           <span className="text-sm">{t("chat.message.forward.forwarded")}</span>
-          <GroupName group={group} />
+          <GroupName group={chatGroup} />
         </div>
       ) : null}
       <ChatMessage event={event} group={group} admins={[]} />

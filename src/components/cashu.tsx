@@ -1,39 +1,57 @@
 import { useState, useEffect } from "react";
-import { Bitcoin, Euro, DollarSign } from "lucide-react";
-import { getDecodedToken } from "@cashu/cashu-ts";
+import { HandCoins, Bitcoin, Euro, DollarSign, RotateCw } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { Token, getDecodedToken } from "@cashu/cashu-ts";
+import {
+  NDKCashuWallet,
+  NDKWebLNWallet,
+  NDKNWCWallet,
+} from "@nostr-dev-kit/ndk-wallet";
 import { Button } from "@/components/ui/button";
+import { usePubkey } from "@/lib/account";
 import { formatShortNumber } from "@/lib/number";
-import { useProfile } from "@/lib/nostr";
 import { cn } from "@/lib/utils";
-import { useAccount } from "@/lib/account";
+import { useWallet } from "@/lib/wallet";
 
-type Unit = "msat" | "sat" | "eur" | "usd" | string;
+function RedeemToken({ token }: { token: string }) {
+  const [isRedeeming, setIsRedeeming] = useState(false);
+  const { t } = useTranslation();
+  const wallet = useWallet();
 
-interface Token {
-  token: Array<{
-    mint: string;
-    proofs: Array<{
-      amount: number;
-    }>;
-  }>;
-  memo?: string;
-  unit?: Unit;
-}
-
-function RedeemToken({ token, pubkey }: { token: string; pubkey: string }) {
-  const { data: profile } = useProfile(pubkey);
-  const lnurl = profile?.lud16 ?? "";
-
+  // todo: use wallet
   async function redeem() {
-    const url = `https://redeem.cashu.me?token=${encodeURIComponent(token)}&lightning=${encodeURIComponent(
-      lnurl,
-    )}&autopay=yes`;
-    window.open(url, "_blank");
+    if (!wallet) return;
+
+    try {
+      setIsRedeeming(true);
+      if (wallet instanceof NDKCashuWallet) {
+        // todo: if not a token in our mints, swap to our mint and redeem
+        await wallet.receiveToken(token);
+        toast.success(`Ecash redeemed`);
+      } else if (wallet instanceof NDKWebLNWallet) {
+        console.log("TODO: WebLN Wallet");
+      } else if (wallet instanceof NDKNWCWallet) {
+        console.log("TODO: NWC Wallet");
+      }
+    } catch (err) {
+      toast.error(
+        `Error redeeming token: ${(err as Error | undefined)?.message || "Unknown error"}`,
+      );
+      // todo: error state
+    } finally {
+      setIsRedeeming(false);
+    }
   }
 
   return (
-    <Button variant="outline" disabled={!lnurl} onClick={redeem}>
-      Redeem
+    <Button
+      variant="outline"
+      disabled={!wallet || isRedeeming}
+      onClick={redeem}
+    >
+      {isRedeeming ? <RotateCw className="animate-spin" /> : <HandCoins />}
+      {t("ecash.redeem")}
     </Button>
   );
 }
@@ -45,9 +63,12 @@ export function CashuToken({
   token: string;
   className?: string;
 }) {
-  const account = useAccount();
-  const me = account?.pubkey;
+  const me = usePubkey();
   const [ecash, setEcash] = useState<Token | null>(null);
+  const unit = ecash?.unit ?? "sat";
+  const sum = ecash?.proofs.reduce((acc, t) => acc + t.amount, 0) ?? 0;
+  const total = unit === "msat" ? sum / 1000 : sum;
+  const unitClassname = "size-10 text-muted-foreground";
 
   useEffect(() => {
     try {
@@ -63,15 +84,6 @@ export function CashuToken({
   if (!ecash) {
     return <p className="break-all font-mono">{token}</p>;
   }
-
-  const unit = ecash.unit ?? "sat";
-  const sum = ecash.token.reduce(
-    (acc, t) => acc + t.proofs.reduce((acc, p) => acc + p.amount, 0),
-    0,
-  );
-  const total = unit === "msat" ? sum / 1000 : sum;
-  const unitClassname = "size-10 text-muted-foreground";
-
   return (
     <div className={cn("flex flex-col gap-1", className)}>
       <div className="flex gap-5 items-center">
@@ -91,7 +103,7 @@ export function CashuToken({
           </p>
         ) : null}
       </div>
-      {me ? <RedeemToken token={token} pubkey={me} /> : null}
+      {me ? <RedeemToken token={token} /> : null}
     </div>
   );
 }

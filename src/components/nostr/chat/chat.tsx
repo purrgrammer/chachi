@@ -10,6 +10,7 @@ import {
   Trash,
   Ban,
   ShieldBan,
+  Bitcoin,
 } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { ProfileDrawer } from "@/components/nostr/profile";
 import { Separator } from "@/components/ui/separator";
 import { Emoji } from "@/components/emoji";
+import { NewZapDialog } from "@/components/nostr/zap";
 import { Badge } from "@/components/ui/badge";
 import {
   useRichText,
@@ -168,6 +170,7 @@ export function ChatMessage({
   const [scrollTo] = useAtom(scrollToAtom);
   const [showMessageActions, setShowMessageActions] = useState(false);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
+  const [showingZapDialog, setShowingZapDialog] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
   const lastSeenRef = useRef<HTMLDivElement | null>(null);
   const isInView = useInView(ref);
@@ -463,6 +466,14 @@ export function ChatMessage({
                   live={isInView}
                 />
               </div>
+              {showingZapDialog ? (
+                <NewZapDialog
+                  open
+                  event={event}
+                  group={group}
+                  onClose={() => setShowingZapDialog(false)}
+                />
+              ) : null}
               {showingEmojiPicker ? (
                 <EmojiPicker
                   open={showingEmojiPicker}
@@ -519,6 +530,16 @@ export function ChatMessage({
                 <SmilePlus className="w-4 h-4" />
               </ContextMenuShortcut>
             </ContextMenuItem>
+            <ContextMenuItem
+              className="cursor-pointer"
+              onClick={() => setShowingZapDialog(true)}
+            >
+              {t("chat.message.tip.action")}
+              <ContextMenuShortcut>
+                <Bitcoin className="w-4 h-4" />
+              </ContextMenuShortcut>
+            </ContextMenuItem>
+            <ContextMenuSeparator />
             <ContextMenuItem className="cursor-pointer" onClick={() => copy()}>
               {t("chat.message.copy.action")}
               <ContextMenuShortcut>

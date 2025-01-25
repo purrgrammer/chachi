@@ -5,14 +5,18 @@ import { useQuery } from "@tanstack/react-query";
 import {
   NDKEvent,
   NDKKind,
+  NDKUser,
+  NDKZapper,
   NDKSubscriptionCacheUsage,
+  NDKTag,
 } from "@nostr-dev-kit/ndk";
 import { useNDK } from "@/lib/ndk";
-import { useRelaySet } from "@/lib/nostr";
+import { useRelaySet, useRelayList } from "@/lib/nostr";
 import { NostrEvent } from "nostr-tools";
 import { LNURL } from "@/lib/query";
 import { useGroup } from "@/lib/nostr/groups";
 import type { Group } from "@/lib/types";
+import { useMintList } from "@/lib/cashu";
 import { Zap, validateZap } from "@/lib/nip-57";
 
 export const HUGE_AMOUNT = 21_000;
@@ -20,11 +24,6 @@ export const HUGE_AMOUNT = 21_000;
 // Record how many times we have used each amount to suggest it to the user
 type ZapAmounts = Record<number, number>;
 // todo: local-storage synced, store frequency, sort amounts by frequency
-
-interface ZapAmount {
-  amount: number;
-  frequency: number;
-}
 
 export const zapAmountsAtom = atomWithStorage<ZapAmounts>(
   "zap-amounts",
@@ -48,12 +47,15 @@ export function useIncreaseZapAmount() {
   );
 }
 
-export function useZapAmounts(): ZapAmount[] {
+export function useZapAmounts(): number[] {
   const amounts = useAtomValue(zapAmountsAtom);
-  return Object.entries(amounts).map(([amount, frequency]) => ({
-    amount: parseInt(amount),
-    frequency,
-  }));
+  return Object.entries(amounts)
+    .map(([amount, frequency]) => ({
+      amount: parseInt(amount),
+      frequency,
+    }))
+    .sort((a, b) => b.frequency - a.frequency)
+    .map(({ amount }) => amount);
 }
 
 interface LNURLParams {
@@ -70,7 +72,6 @@ interface LNURLParams {
 type LNURLResponse = { status: "ERROR"; reason?: string } | LNURLParams;
 
 async function fetchLNURLParams(lud16: string) {
-  console.log("FETCHLNURL", lud16);
   const [name, domain] = lud16.split("@");
   const lnurlParams = (await fetch(
     `https://${domain}/.well-known/lnurlp/${name}`,
@@ -108,36 +109,106 @@ export function fetchInvoice(
 
 export function useZap(group: Group, pubkey: string, event?: NostrEvent) {
   const { data: metadata } = useGroup(group);
+  const { data: relayList } = useRelayList(pubkey);
   const ndk = useNDK();
-  const zap = useCallback(
-    (content: string, amount: number, tags: string[][]) => {
+  return useCallback(
+    async (content: string, amount: number, tags: string[][]) => {
       const zapped = event ? new NDKEvent(ndk, event) : null;
-      // todo: a-tag zaps
-      const [t, v] = zapped ? zapped.tagReference() : [];
-      const ev = new NDKEvent(ndk, {
-        kind: NDKKind.ZapRequest,
-        content,
-        tags: [
-          ["relays", group.relay],
-          ["p", pubkey],
-          ["amount", String(amount * 1000)],
-          ...tags,
-          ...(t && v ? [[t, v]] : []),
-        ],
-      } as NostrEvent);
-      // a-tag the group so in case `h` is not set in the receipt we can still find the zap
-      if (metadata) {
-        ev.tags.push([
-          "a",
-          `${NDKKind.GroupMetadata}:${metadata.pubkey}:${metadata.id}`,
-          group.relay,
-        ]);
-      }
-      return ev;
+      const zapper = new Zapper(
+        zapped ? zapped : new NDKUser({ pubkey }),
+        amount,
+        "sat",
+        {
+          comment: content,
+          nutzapAsFallback: true,
+          ndk,
+          tags: [
+            ...tags,
+            ...(metadata
+              ? [
+                  [
+                    "a",
+                    `${NDKKind.GroupMetadata}:${metadata.pubkey}:${metadata.id}`,
+                    group.relay,
+                  ],
+                ]
+              : []),
+          ],
+        },
+        { relays: relayList ? relayList : [group.relay]},
+      );
+      console.log("ZAPPER", zapper);
+      return;
+      const result = await zapper.zap();
+      console.log("ZAPPER.RESULT", result);
+      //const [t, v] = zapped ? zapped.tagReference() : [];
+      //const ev = new NDKEvent(ndk, {
+      //  kind: NDKKind.ZapRequest,
+      //  content,
+      //  tags: [
+      //    ["relays", group.relay, ...(relayList || [])],
+      //    ["h", group.id, group.relay],
+      //    ["p", pubkey],
+      //    ["amount", String(amount * 1000)],
+      //    ...tags,
+      //    ...(t && v ? [[t, v]] : []),
+      //  ],
+      //} as NostrEvent);
+      //// a-tag the group so in case `h` is not set in the receipt we can still find the zap
+      //if (metadata) {
+      //  ev.tags.push([
+      //    "a",
+      //    `${NDKKind.GroupMetadata}:${metadata.pubkey}:${metadata.id}`,
+      //    group.relay,
+      //  ]);
+      //}
+      //return ev;
     },
     [pubkey, event],
   );
-  return zap;
+}
+
+export function useNutzap(group: Group, pubkey: string, event?: NostrEvent) {
+  const { data: metadata } = useGroup(group);
+  const { data: relayList } = useRelayList(pubkey);
+  const { data: mintList } = useMintList(pubkey);
+  const ndk = useNDK();
+  return useCallback(
+    async (comment: string, amount: number, extraTags: string[]) => {
+      const tags = [
+        ["h", group.id, group.relay],
+        ...(metadata
+          ? [
+              [
+                "a",
+                `${NDKKind.GroupMetadata}:${metadata.pubkey}:${metadata.id}`,
+                group.relay,
+              ],
+            ]
+          : []),
+        ...extraTags,
+      ] as NDKTag[];
+      const zapper = new NDKZapper(new NDKEvent(ndk, event), amount, "sat", {
+        comment,
+        tags,
+      });
+      const nutzap = await zapper.zapNip61(
+        {
+          pubkey,
+          amount,
+        },
+        {
+          relays: [group.relay, ...(relayList ? relayList : [])],
+          mints: mintList ? mintList : [],
+          p2pk: pubkey,
+          //allowIntramintFallback: true,
+        },
+      );
+      console.log("NUTZAP", nutzap);
+      return nutzap;
+    },
+    [pubkey, event],
+  );
 }
 
 interface WebLNWallet {
@@ -215,4 +286,27 @@ export function useZaps(event: NostrEvent, relays: string[], live = true) {
   }, []);
 
   return zaps;
+}
+
+interface ZapperConfig {
+  relays: string[];
+}
+
+export class Zapper extends NDKZapper {
+  public config: ZapperConfig;
+
+  constructor(
+    target: NDKEvent | NDKUser,
+    amount: number,
+    unit: string = "msat",
+    options = {},
+    config: ZapperConfig = { relays: [] },
+  ) {
+    super(target, amount, unit, options);
+    this.config = config;
+  }
+
+  public async relays(): Promise<string[]> {
+    return this.config.relays;
+  }
 }

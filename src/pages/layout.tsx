@@ -2,6 +2,7 @@ import { useAtom, useAtomValue } from "jotai";
 import { ReactNode, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import NDK, {
+  NDKUser,
   NDKKind,
   NDKSubscriptionCacheUsage,
   NDKRelaySet,
@@ -15,6 +16,7 @@ import {
   accountsAtom,
   relayListAtom,
   relaysAtom,
+  mintListAtom,
   groupListAtom,
   contactListAtom,
   mediaServerListAtom,
@@ -27,6 +29,7 @@ import { SidebarInset } from "@/components/ui/sidebar";
 import { useGroups } from "@/lib/nostr/groups";
 import { useGroupMessages } from "@/lib/nostr/chat";
 import { fetchCustomEmojis } from "@/lib/nostr/emojis";
+import { useChachiWallet } from "@/lib/wallet";
 
 function useUserEvents() {
   const ndk = useNDK();
@@ -34,6 +37,7 @@ function useUserEvents() {
   const accounts = useAtomValue(accountsAtom);
   const pubkey = account?.pubkey;
   const relays = useAtomValue(relaysAtom);
+  const [mints, setMints] = useAtom(mintListAtom);
   const [groupList, setGroupList] = useAtom(groupListAtom);
   const [relayList, setRelayList] = useAtom(relayListAtom);
   const [contactList, setContactList] = useAtom(contactListAtom);
@@ -57,7 +61,6 @@ function useUserEvents() {
         });
     } else if (loginMethod === '"nip46"') {
       const nip46account = accounts.find((a) => a.method === "nip46");
-      console.log("NIP46 YO", accounts, nip46account);
       if (
         nip46account &&
         nip46account.secret &&
@@ -114,6 +117,40 @@ function useUserEvents() {
     return () => sub.stop();
   }, [pubkey]);
 
+  // Mint list
+  useEffect(() => {
+    if (!pubkey) return;
+
+    const filter = {
+      kinds: [NDKKind.CashuMintList],
+      authors: [pubkey],
+      ...(mints.created_at ? { since: mints.created_at } : {}),
+    };
+    const sub = ndk.subscribe(
+      filter,
+      {
+        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+        closeOnEose: false,
+      },
+      NDKRelaySet.fromRelayUrls(outboxRelayUrls, ndk),
+    );
+
+    sub.on("event", (event) => {
+      if (event.created_at && event.created_at > (mints.created_at || 0)) {
+        const mints = event.tags
+          .filter((t) => t[0] === "mint")
+          .map((t) => t[1]);
+        const relays = event.tags
+          .filter((t) => t[0] === "relay")
+          .map((t) => t[1]);
+        const p2pk = event.tags.find((t) => t[0] === "p2pk")?.[1];
+        setMints({ created_at: event.created_at, mints, relays, p2pk });
+      }
+    });
+
+    return () => sub.stop();
+  }, [pubkey]);
+
   // Groups, contacts, media server and emoji list
   useEffect(() => {
     if (pubkey && relays.length > 0) {
@@ -151,7 +188,7 @@ function useUserEvents() {
         ),
       );
 
-      sub.on("event", (event) => {
+      sub.on("event", async (event) => {
         if (event.kind === NDKKind.SimpleGroupList) {
           const userGroups = event.tags
             .filter((t) => t[0] === "group" && t[1] && t[2] && isRelayURL(t[2]))
@@ -160,11 +197,29 @@ function useUserEvents() {
             event.created_at &&
             event.created_at > (groupList.created_at || 0)
           ) {
-            setGroupList({
-              groups: userGroups,
-              content: event.content,
-              created_at: event.created_at,
-            });
+            try {
+              await event.decrypt(new NDKUser({ pubkey }));
+              const privateGroups = (JSON.parse(event.content) as string[][])
+                .filter(
+                  (t) => t[0] === "group" && t[1] && t[2] && isRelayURL(t[2]),
+                )
+                .map((t) => ({ id: t[1], relay: t[2] }));
+              setGroupList({
+                groups: userGroups,
+                content: event.content,
+                created_at: event.created_at,
+                couldDecrypt: true,
+                privateGroups,
+              });
+            } catch (err) {
+              setGroupList({
+                groups: userGroups,
+                content: event.content,
+                created_at: event.created_at,
+                couldDecrypt: false,
+                privateGroups: [],
+              });
+            }
           }
         } else if (event.kind === NDKKind.Contacts) {
           // todo: petnames
@@ -230,6 +285,8 @@ function useUserEvents() {
   // Groups and messages
   useGroups(groupList.groups);
   useGroupMessages(groupList.groups);
+  // Wallet
+  useChachiWallet();
 }
 
 function NostrSync({ children }: { children: ReactNode }) {

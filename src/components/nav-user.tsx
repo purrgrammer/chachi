@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import {
   ChevronsUpDown,
   LogOut,
@@ -7,6 +8,7 @@ import {
   Check,
   Languages,
   Palette,
+  Settings,
 } from "lucide-react";
 import { Login } from "@/components/nostr/login";
 import { Avatar } from "@/components/nostr/avatar";
@@ -31,9 +33,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import Wallet from "@/components/wallet";
+import { WalletBalance } from "@/components/wallet";
 import { useAccount, useLogout } from "@/lib/account";
 import { useTranslation } from "react-i18next";
+import { useWallet } from "@/lib/wallet";
 import { changeLanguage } from "@/i18n";
 
 function UserInfo({ pubkey }: { pubkey: string }) {
@@ -55,11 +58,14 @@ function UserInfo({ pubkey }: { pubkey: string }) {
 export function NavUser() {
   const { isMobile, open, openMobile, state } = useSidebar();
   const { theme, setTheme } = useTheme();
+  const wallet = useWallet();
   const logout = useLogout();
   const account = useAccount();
+  const navigate = useNavigate();
   const pubkey = account?.pubkey;
   const isExpanded = state === "expanded" || open || openMobile;
   const { t, i18n } = useTranslation();
+
   return (
     <SidebarMenu>
       {pubkey ? (
@@ -85,8 +91,19 @@ export function NavUser() {
                   <UserInfo pubkey={pubkey} />
                 </div>
               </DropdownMenuLabel>
+              {wallet ? (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/wallet")}>
+                    <WalletBalance wallet={wallet} />
+                  </DropdownMenuItem>
+                </>
+              ) : null}
               <DropdownMenuSeparator />
-              <Wallet />
+              <DropdownMenuItem onClick={() => navigate("/settings")}>
+                <Settings className="text-muted-foreground size-4" />
+                {t("user.settings")}
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>

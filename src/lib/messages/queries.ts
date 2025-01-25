@@ -25,6 +25,8 @@ export async function getGroupChat(group: Group) {
     .where("[group+kind]")
     .anyOf([
       [id, NDKKind.GroupChat],
+      [id, NDKKind.Zap],
+      [id, NDKKind.Nutzap],
       [id, NDKKind.GroupAdminAddUser],
       [id, NDKKind.GroupAdminRemoveUser],
     ])

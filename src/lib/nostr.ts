@@ -16,8 +16,8 @@ import { useNDK } from "@/lib/ndk";
 import { isRelayURL } from "@/lib/relay";
 import { EVENT, ADDRESS, PROFILE, RELAY_LIST } from "@/lib/query";
 
-interface NostrREQResult {
-  events: NostrEvent[];
+interface NostrREQResult<A> {
+  events: A[];
   eose: boolean;
 }
 
@@ -229,7 +229,7 @@ export function useStream(
   relays: string[],
   live = true,
   onlyRelays = false,
-): NostrREQResult {
+): NostrREQResult<NostrEvent> {
   const ndk = useNDK();
   const relaySet = useRelaySet(relays);
   const [eose, setEose] = useState(false);
@@ -251,14 +251,10 @@ export function useStream(
     );
 
     sub.on("event", (event) => {
-      setEvents((events) => {
-        const newEvents = [...events];
-        insertEventIntoDescendingList(
-          newEvents,
-          event.rawEvent() as NostrEvent,
-        );
-        return newEvents;
-      });
+      const newEvents = [...events];
+      const rawEvent = event.rawEvent() as NostrEvent;
+      insertEventIntoDescendingList(newEvents, rawEvent);
+      setEvents(newEvents);
     });
 
     sub.on("eose", () => {
@@ -274,7 +270,7 @@ export function useStream(
 export function useRequest(
   filter: NDKFilter | NDKFilter[],
   relays: string[],
-): NostrREQResult {
+): NostrREQResult<NostrEvent> {
   const ndk = useNDK();
   const relaySet = useRelaySet(relays);
   const [eose, setEose] = useState(false);

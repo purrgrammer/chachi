@@ -7,7 +7,7 @@ import { EditGroup } from "@/components/nostr/groups/edit";
 import { Separator } from "@/components/ui/separator";
 import { Header } from "@/components/header";
 import { usePubkey } from "@/lib/account";
-import { useRelayInfo, getRelayHost } from "@/lib/relay";
+import { getRelayHost } from "@/lib/relay";
 import { groupId } from "@/lib/groups";
 import { JoinRequests } from "@/components/nostr/groups/join-requests";
 import {
@@ -16,13 +16,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { Group } from "@/lib/types";
+import { RelayName } from "@/components/nostr/relay";
 import { useTranslation } from "react-i18next";
-
-// todo: tooltip for visiblity/access
-function RelayName({ relay }: { relay: string }) {
-  const { data: metadata } = useRelayInfo(relay);
-  return metadata?.name;
-}
 
 export function GroupHeader({ group }: { group: Group }) {
   const { data: metadata } = useGroup(group);

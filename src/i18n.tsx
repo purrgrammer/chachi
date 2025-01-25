@@ -5,11 +5,13 @@ import esTranslations from "../public/locales/es/common.json";
 import zhCNTranslations from "../public/locales/zh-CN/common.json";
 import zhTWTranslations from "../public/locales/zh-TW/common.json";
 
-type Language = "en" | "es" | "zh-CN" | "zh-TW";
+export type Language = "en" | "es" | "zh-CN" | "zh-TW";
+
+export const languages = ["en", "es", "zh-CN", "zh-TW"] as const;
 
 export function getLanguage(): Language {
   const lang = localStorage.getItem("language");
-  if (lang && ["en", "es", "zh-CN", "zh-TW"].includes(lang)) {
+  if (lang && languages.includes(lang as Language)) {
     return lang as Language;
   }
   return "en";
@@ -41,6 +43,6 @@ i18n.use(initReactI18next).init({
   defaultNS: "translations",
 });
 
-i18n.languages = ["en", "es", "zh-CN", "zh-TW"];
+i18n.languages = languages;
 
 export default i18n;
