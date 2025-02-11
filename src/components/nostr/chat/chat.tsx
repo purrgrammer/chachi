@@ -44,14 +44,9 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useNDK } from "@/lib/ndk";
 import { Avatar } from "@/components/nostr/avatar";
 import { useEvent, useRelaySet } from "@/lib/nostr";
-import { useDeletions } from "@/lib/nostr/chat";
 import { usePubkey, useCanSign } from "@/lib/account";
 import { Emoji as EmojiType, EmojiPicker } from "@/components/emoji-picker";
-import {
-  useMemoizedLastSeen,
-  saveLastSeen,
-  saveGroupEvent,
-} from "@/lib/messages";
+import { saveLastSeen, saveGroupEvent } from "@/lib/messages";
 import { useSettings } from "@/lib/settings";
 import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
@@ -66,7 +61,7 @@ function Reply({
   id,
   className,
 }: {
-  group: Group;
+  group?: Group;
   admins: string[];
   id: string;
   className?: string;
@@ -75,7 +70,7 @@ function Reply({
   // todo: replying to picture, video, mention, custom emoji
   const { data: event } = useEvent({
     id,
-    relays: [group.relay],
+    relays: group ? [group.relay] : [],
   });
   const [, setScrollTo] = useAtom(scrollToAtom);
   const isAdmin = event?.pubkey ? admins.includes(event?.pubkey) : false;
@@ -143,7 +138,7 @@ export function ChatMessage({
   richTextClassnames = {},
   className,
 }: {
-  group: Group;
+  group?: Group;
   event: NostrEvent;
   admins: string[];
   isChain?: boolean;
@@ -164,9 +159,9 @@ export function ChatMessage({
 }) {
   const { t } = useTranslation();
   const [settings] = useSettings();
-  const relay = group.relay;
+  const relay = group?.relay;
   const ndk = useNDK();
-  const relaySet = useRelaySet([group.relay]);
+  const relaySet = useRelaySet(group ? [group.relay] : []);
   const [scrollTo] = useAtom(scrollToAtom);
   const [showMessageActions, setShowMessageActions] = useState(false);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
@@ -329,13 +324,15 @@ export function ChatMessage({
         kind: NDKKind.GroupAdminRemoveUser,
         content: "",
         tags: [
-          ["h", group.id, group.relay],
+          ...(group ? [["h", group.id, group.relay]] : []),
           ["p", e.pubkey],
         ],
       } as NostrEvent);
       await ev.publish(relaySet);
       toast.success(t("chat.user.kick.success"));
-      saveGroupEvent(ev.rawEvent() as NostrEvent, group);
+      if (group) {
+        saveGroupEvent(ev.rawEvent() as NostrEvent, group);
+      }
     } catch (err) {
       console.error(err);
       toast.error(t("chat.user.kick.error"));
@@ -594,12 +591,14 @@ export function ChatMessage({
                 >
                   Log
                 </ContextMenuItem>
-                <ContextMenuItem
-                  className="cursor-pointer"
-                  onClick={() => saveLastSeen(event, group)}
-                >
-                  {t("chat.message.save-as-last-seen")}
-                </ContextMenuItem>
+                {group ? (
+                  <ContextMenuItem
+                    className="cursor-pointer"
+                    onClick={() => saveLastSeen(event, group)}
+                  >
+                    {t("chat.message.save-as-last-seen")}
+                  </ContextMenuItem>
+                ) : null}
               </>
             ) : null}
           </ContextMenuContent>
@@ -669,7 +668,7 @@ function formatDay(date: string) {
 type MotionProps = React.ComponentProps<typeof motion.div>;
 
 interface ChatProps extends MotionProps {
-  group: Group;
+  group?: Group;
   events: NostrEvent[];
   admins: string[];
   messageKinds: NDKKind[];
@@ -681,6 +680,8 @@ interface ChatProps extends MotionProps {
   style?: React.CSSProperties;
   newMessage?: NostrEvent;
   showRootReply?: boolean;
+  lastSeen?: { ref: string };
+  deleteEvents: NostrEvent[];
 }
 
 export function Chat({
@@ -696,13 +697,13 @@ export function Chat({
   newMessage,
   showRootReply = true,
   className,
+  lastSeen,
+  deleteEvents,
 }: ChatProps) {
   // todo: check admin events against relay pubkey
   const groupedMessages = groupByDay(events);
-  const lastSeen = useMemoizedLastSeen(group);
   const lastMessage = events.filter((e) => e.kind === NDKKind.GroupChat).at(0);
   const [, setScrollTo] = useAtom(scrollToAtom);
-  const { events: deleteEvents } = useDeletions(group);
   const deletedIds = new Set(
     deleteEvents
       .map((e) => e.tags.find((t) => t[0] === "e")?.[1])
@@ -712,7 +713,7 @@ export function Chat({
 
   useEffect(() => {
     return () => setScrollTo(null);
-  }, [group.id, group.relay]);
+  }, [group?.id, group?.relay]);
 
   return (
     <div

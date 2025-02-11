@@ -7,15 +7,22 @@ import { Name } from "@/components/nostr/name";
 import { useGroupAdminsList } from "@/lib/nostr/groups";
 import { useMembers } from "@/lib/messages";
 import { ChatInput } from "@/components/nostr/chat/input";
+import { ChatNutzap } from "@/components/nostr/nutzap";
 import { Chat } from "@/components/nostr/chat/chat";
 import { New } from "@/components/nostr/new";
 import { NewZap } from "@/components/nostr/zap";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet } from "@/lib/nostr";
+import { useDeletions } from "@/lib/nostr/chat";
 import { usePubkey, useCanSign } from "@/lib/account";
 import type { Group } from "@/lib/types";
 import { useRelayInfo } from "@/lib/relay";
-import { useGroupchat, useSaveLastSeen, useNewMessage } from "@/lib/messages";
+import {
+  useGroupchat,
+  useSaveLastSeen,
+  useMemoizedLastSeen,
+  useNewMessage,
+} from "@/lib/messages";
 import { DELETE_GROUP } from "@/lib/kinds";
 import { useTranslation } from "react-i18next";
 
@@ -147,6 +154,7 @@ export const GroupChat = forwardRef(
     );
     const newMessage = useNewMessage(group);
     const saveLastSeen = useSaveLastSeen(group);
+    const { events: deleteEvents } = useDeletions(group);
     const isRelayGroup = group.id === "_";
     const canIPoast =
       me &&
@@ -160,6 +168,7 @@ export const GroupChat = forwardRef(
             e.tags.find((t) => t[0] === "p" && t[1] === me),
         ));
     const { t } = useTranslation();
+    const lastSeen = useMemoizedLastSeen(group);
 
     useEffect(() => {
       return () => saveLastSeen();
@@ -203,14 +212,15 @@ export const GroupChat = forwardRef(
             } as React.CSSProperties
           }
           newMessage={sentMessage}
+          lastSeen={lastSeen ? lastSeen : undefined}
+          deleteEvents={deleteEvents}
           // @ts-expect-error: these events are unsigned since they come from DB
           events={events}
           canDelete={canDelete}
           deleteEvent={deleteEvent}
           messageKinds={[NDKKind.GroupChat]}
           components={{
-            [NDKKind.Zap]: () => <>TODO: zap</>,
-            [NDKKind.Nutzap]: () => <>TODO: nutzap</>,
+            [NDKKind.Nutzap]: ({ event }) => <ChatNutzap event={event} />,
             [NDKKind.GroupAdminAddUser]: (props) => (
               <UserActivity {...props} action="join" />
             ),

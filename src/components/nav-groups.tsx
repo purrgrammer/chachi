@@ -89,7 +89,7 @@ function RelayItem({ group }: { group: Group }) {
                   classNames={{
                     emojis: "size-5 opacity-70",
                     spans: "break-all",
-		    urls: "pointer-events-none",
+                    urls: "pointer-events-none",
                   }}
                   tags={lastMessage.tags}
                 >

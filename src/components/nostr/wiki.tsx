@@ -1,9 +1,8 @@
 import { NostrEvent } from "nostr-tools";
-import { Markdown } from "@/components/markdown";
+import Asciidoc from "@/components/asciidoc";
 import { cn } from "@/lib/utils";
-import type { Group } from "@/lib/types";
 
-export function ArticleSummary({
+export function WikiPreview({
   event,
   className,
 }: {
@@ -34,26 +33,6 @@ export function ArticleSummary({
   );
 }
 
-// todo: scroll on mobile
-// todo: NostrEvent
-export function Article({
-  event,
-  group,
-  className,
-}: {
-  event: NostrEvent;
-  group?: Group;
-  className?: string;
-}) {
-  // todo: communities list
-  // todo: default image
-  // todo: smooth scroll footnotes
-  // todo: max width
-  return (
-    <div className={cn("flex flex-col p-2", className)}>
-      <Markdown group={group} tags={event.tags}>
-        {event.content}
-      </Markdown>
-    </div>
-  );
+export function WikiDetail({ event }: { event: NostrEvent }) {
+  return <Asciidoc content={event.content} />;
 }

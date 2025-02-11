@@ -53,7 +53,7 @@ export function GroupMetadata({
   className,
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   relays: string[];
   className?: string;
 }) {

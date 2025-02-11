@@ -28,7 +28,7 @@ export function NewVideo({
   children,
   onSuccess,
 }: {
-  group: Group;
+  group?: Group;
   children?: ReactNode;
   onSuccess?: (ev: NostrEvent) => void;
 }) {
@@ -41,7 +41,7 @@ export function NewVideo({
   const [blob, setBlob] = useState<UploadedBlob | null>(null);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
-  const relaySet = useRelaySet([group.relay]);
+  const relaySet = useRelaySet(group ? [group.relay] : []);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const canSign = useCanSign();
@@ -74,8 +74,8 @@ export function NewVideo({
         content: description.trim(),
         tags: [
           ["d", randomId()],
-          ["h", group.id, group.relay],
-          ...(group.id === "_" ? [["-"]] : []),
+          ...(group ? [["h", group.id, group.relay]] : []),
+          ...(group?.id === "_" ? [["-"]] : []),
           // todo: fallbacks, size
           ...(title ? [["title", title]] : []),
           blobToImeta(blob),

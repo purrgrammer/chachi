@@ -55,7 +55,7 @@ export function Book({
   className,
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   relays: string[];
   className?: string;
 }) {

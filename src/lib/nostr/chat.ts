@@ -39,6 +39,7 @@ export function useGroupMessages(groups: Group[]) {
             NDKKind.GroupAdminAddUser,
             NDKKind.GroupAdminRemoveUser,
             DELETE_GROUP,
+            NDKKind.Nutzap,
           ],
           "#h": [id],
           ...(lastMessage ? { since: lastMessage.created_at } : {}),
@@ -65,7 +66,7 @@ export function useGroupMessages(groups: Group[]) {
 
         fetchGroupMetadata(ndk, group).then((metadata) => {
           const filter = {
-            kinds: [NDKKind.Zap, NDKKind.Nutzap],
+            kinds: [NDKKind.Zap],
             "#a": [`${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`],
           };
           const s = ndk.subscribe(

@@ -12,10 +12,20 @@ const ndk = new NDK({
 });
 ndk.relayAuthDefaultPolicy = NDKRelayAuthPolicies.signIn({ ndk });
 
+export const nwcNdk = new NDK({
+  explicitRelayUrls: [],
+  enableOutboxModel: false,
+});
+
 export function useNDK() {
   return useContext(NDKContext);
 }
 
+export function useNWCNDK() {
+  return useContext(NDKNWCContext);
+}
+
 export const NDKContext = createContext<NDK>(ndk);
+export const NDKNWCContext = createContext<NDK>(nwcNdk);
 
 export default ndk;

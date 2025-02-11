@@ -128,12 +128,12 @@ async function fetchGroups(ndk: NDK, relay: string) {
     });
 }
 
-export function useGroup(group: Group) {
-  const { id, relay } = group;
+export function useGroup(group?: Group) {
   const ndk = useNDK();
   return useQuery({
-    queryKey: [GROUP_METADATA, id, relay],
-    queryFn: () => fetchGroupMetadata(ndk, group),
+    enabled: Boolean(group),
+    queryKey: [GROUP_METADATA, group?.id, group?.relay],
+    queryFn: () => (group ? fetchGroupMetadata(ndk, group) : null),
     staleTime: Infinity,
   });
 }
@@ -188,12 +188,14 @@ function useGroupMembers(group: Group) {
   });
 }
 
-export function useGroupAdminsList(group: Group) {
+export function useGroupAdminsList(group?: Group) {
   const ndk = useNDK();
-  const relaySet = useRelaySet([group.relay]);
+  const relaySet = useRelaySet(group ? [group.relay] : []);
   return useQuery({
-    queryKey: ["admin-list", group.id, group.relay],
+    enabled: Boolean(group),
+    queryKey: ["admin-list", group?.id, group?.relay],
     queryFn: async () => {
+      if (!group) return [];
       if (group.id === "_") return [];
       return ndk
         .fetchEvent(

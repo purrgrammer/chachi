@@ -11,7 +11,7 @@ import { useStream } from "@/lib/nostr";
 import type { Group } from "@/lib/types";
 
 interface FeedProps extends React.HTMLAttributes<HTMLDivElement> {
-  group: Group;
+  group?: Group;
   outboxRelays: string[];
   filter: NDKFilter | NDKFilter[];
   live?: boolean;
@@ -34,7 +34,8 @@ const Feed = forwardRef(
     }: FeedProps,
     ref: ForwardedRef<HTMLDivElement | null>,
   ) => {
-    const relays = outboxRelays.length > 0 ? outboxRelays : [group.relay];
+    const relays =
+      outboxRelays.length > 0 ? outboxRelays : group ? [group.relay] : [];
     const { eose, events } = useStream(filter, relays, live, onlyRelays);
     return (
       <div

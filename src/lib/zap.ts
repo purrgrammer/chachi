@@ -8,15 +8,11 @@ import {
   NDKUser,
   NDKZapper,
   NDKSubscriptionCacheUsage,
-  NDKTag,
 } from "@nostr-dev-kit/ndk";
 import { useNDK } from "@/lib/ndk";
-import { useRelaySet, useRelayList } from "@/lib/nostr";
+import { useRelaySet } from "@/lib/nostr";
 import { NostrEvent } from "nostr-tools";
 import { LNURL } from "@/lib/query";
-import { useGroup } from "@/lib/nostr/groups";
-import type { Group } from "@/lib/types";
-import { useMintList } from "@/lib/cashu";
 import { Zap, validateZap } from "@/lib/nip-57";
 
 export const HUGE_AMOUNT = 21_000;
@@ -107,107 +103,34 @@ export function fetchInvoice(
   ).then((r) => r.json());
 }
 
-export function useZap(group: Group, pubkey: string, event?: NostrEvent) {
-  const { data: metadata } = useGroup(group);
-  const { data: relayList } = useRelayList(pubkey);
+export function useZap(pubkey: string, relays: string[], event?: NostrEvent) {
   const ndk = useNDK();
   return useCallback(
     async (content: string, amount: number, tags: string[][]) => {
-      const zapped = event ? new NDKEvent(ndk, event) : null;
-      const zapper = new Zapper(
-        zapped ? zapped : new NDKUser({ pubkey }),
-        amount,
-        "sat",
-        {
-          comment: content,
-          nutzapAsFallback: true,
-          ndk,
-          tags: [
-            ...tags,
-            ...(metadata
-              ? [
-                  [
-                    "a",
-                    `${NDKKind.GroupMetadata}:${metadata.pubkey}:${metadata.id}`,
-                    group.relay,
-                  ],
-                ]
-              : []),
-          ],
-        },
-        { relays: relayList ? relayList : [group.relay]},
-      );
-      console.log("ZAPPER", zapper);
-      return;
-      const result = await zapper.zap();
-      console.log("ZAPPER.RESULT", result);
-      //const [t, v] = zapped ? zapped.tagReference() : [];
-      //const ev = new NDKEvent(ndk, {
-      //  kind: NDKKind.ZapRequest,
-      //  content,
-      //  tags: [
-      //    ["relays", group.relay, ...(relayList || [])],
-      //    ["h", group.id, group.relay],
-      //    ["p", pubkey],
-      //    ["amount", String(amount * 1000)],
-      //    ...tags,
-      //    ...(t && v ? [[t, v]] : []),
-      //  ],
-      //} as NostrEvent);
-      //// a-tag the group so in case `h` is not set in the receipt we can still find the zap
-      //if (metadata) {
-      //  ev.tags.push([
-      //    "a",
-      //    `${NDKKind.GroupMetadata}:${metadata.pubkey}:${metadata.id}`,
-      //    group.relay,
-      //  ]);
-      //}
-      //return ev;
-    },
-    [pubkey, event],
-  );
-}
-
-export function useNutzap(group: Group, pubkey: string, event?: NostrEvent) {
-  const { data: metadata } = useGroup(group);
-  const { data: relayList } = useRelayList(pubkey);
-  const { data: mintList } = useMintList(pubkey);
-  const ndk = useNDK();
-  return useCallback(
-    async (comment: string, amount: number, extraTags: string[]) => {
-      const tags = [
-        ["h", group.id, group.relay],
-        ...(metadata
-          ? [
-              [
-                "a",
-                `${NDKKind.GroupMetadata}:${metadata.pubkey}:${metadata.id}`,
-                group.relay,
-              ],
-            ]
-          : []),
-        ...extraTags,
-      ] as NDKTag[];
-      const zapper = new NDKZapper(new NDKEvent(ndk, event), amount, "sat", {
-        comment,
-        tags,
+      return new Promise((resolve, reject) => {
+        try {
+          const zapped = event ? new NDKEvent(ndk, event) : null;
+          const zapper = new Zapper(
+            zapped ? zapped : new NDKUser({ pubkey }),
+            amount,
+            "sat",
+            {
+              comment: content,
+              ndk,
+              tags,
+            },
+            { relays },
+          );
+          zapper.on("complete", (res) => {
+            resolve(res);
+          });
+          zapper.zap();
+        } catch (err) {
+          reject(err);
+        }
       });
-      const nutzap = await zapper.zapNip61(
-        {
-          pubkey,
-          amount,
-        },
-        {
-          relays: [group.relay, ...(relayList ? relayList : [])],
-          mints: mintList ? mintList : [],
-          p2pk: pubkey,
-          //allowIntramintFallback: true,
-        },
-      );
-      console.log("NUTZAP", nutzap);
-      return nutzap;
     },
-    [pubkey, event],
+    [pubkey, relays, event],
   );
 }
 

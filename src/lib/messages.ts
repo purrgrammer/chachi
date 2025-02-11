@@ -72,6 +72,7 @@ export function useGroupchat(group: Group) {
           NDKKind.GroupAdminAddUser,
           NDKKind.GroupAdminRemoveUser,
           DELETE_GROUP,
+          NDKKind.Nutzap,
         ],
         "#h": [group.id],
         ...(last ? { since: last.created_at } : {}),
@@ -99,15 +100,15 @@ export function useGroupchat(group: Group) {
   }, [isSubbed, group.id, group.relay]);
 
   useEffect(() => {
-    if (!metadata?.pubkey) return;
+    if (!metadata) return;
     const filter = {
-      kinds: [NDKKind.Zap, NDKKind.Nutzap],
+      kinds: [NDKKind.Zap],
       "#a": [`${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`],
     };
     const sub = ndk.subscribe(
       filter,
       {
-        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+        cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
         groupable: false,
         closeOnEose: false,
       },
@@ -117,8 +118,6 @@ export function useGroupchat(group: Group) {
     sub.on("event", (event) => {
       saveGroupEvent(event.rawEvent() as NostrEvent, group);
     });
-
-    return () => sub.stop();
   }, [metadata, group.id, group.relay]);
 
   return useLiveQuery(() => getGroupChat(group), [group.id, group.relay], []);
@@ -206,10 +205,15 @@ export function useSaveLastSeen(group: Group) {
   };
 }
 
-export function useMembers(group: Group) {
+export function useMembers(group?: Group) {
   return useLiveQuery(
-    () => getGroupChatParticipants(group),
-    [group.id, group.relay],
+    () => {
+      if (group) {
+        return getGroupChatParticipants(group);
+      }
+      return [];
+    },
+    [group?.id, group?.relay],
     [],
   );
 }

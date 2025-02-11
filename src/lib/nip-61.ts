@@ -14,14 +14,19 @@ export interface Nutzap {
 
 export function validateNutzap(zap: NostrEvent): Nutzap | null {
   try {
-    const amount = zap.tags.find((t) => t[0] === "amount")?.[1];
+    const proof = zap.tags.find((t) => t[0] === "proof")?.[1];
+    if (!proof) return null;
+    const tokens = JSON.parse(proof);
+    const amount = Array.isArray(tokens)
+      ? tokens.reduce((acc, t) => acc + t.amount, 0)
+      : parseInt(tokens.amount);
     const unit = zap.tags.find((t) => t[0] === "unit")?.[1] || "msat";
     return amount
       ? {
           id: zap.id,
           pubkey: zap.pubkey,
-          amount: unit === "msat" ? Number(amount) / 1000 : Number(amount),
-          unit: unit === "msat" ? "sat" : unit.toLowerCase(),
+          amount,
+          unit: unit.startsWith("msat") ? "sat" : unit.toLowerCase(),
           content: zap.content,
           e: zap.tags.find((t) => t[0] === "e")?.[1],
           a: zap.tags.find((t) => t[0] === "a")?.[1],

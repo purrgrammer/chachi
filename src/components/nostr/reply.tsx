@@ -12,7 +12,7 @@ export function ReplyDialog({
   onReply,
   children,
 }: {
-  group: Group;
+  group?: Group;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onReply: (msg: string, tags: string[][]) => void;

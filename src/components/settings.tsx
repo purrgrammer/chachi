@@ -1,8 +1,25 @@
+import { useMemo } from "react";
 import { z } from "zod";
+import { NostrEvent } from "nostr-tools";
 import { useTranslation } from "react-i18next";
-import { Moon, Sun, SunMoon } from "lucide-react";
+import {
+  Moon,
+  Sun,
+  SunMoon,
+  Wallet as WalletIcon,
+  PlugZap,
+  Puzzle,
+  Landmark,
+  Server,
+} from "lucide-react";
+import { NDKCashuWallet, NDKNWCWallet } from "@nostr-dev-kit/ndk-wallet";
+import { InputCopy } from "@/components/ui/input-copy";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { MintIcon, MintName } from "@/components/mint";
+import { RelayIcon, RelayName } from "@/components/nostr/relay";
 import {
   Form,
   FormField,
@@ -19,8 +36,29 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import {
+  CreateWallet,
+  ConnectWallet,
+  NWCWalletBalanceAmount,
+  CashuWalletBalanceAmount,
+} from "@/components/wallet";
+import { User } from "@/components/nostr/user";
 import { useTheme } from "@/components/theme-provider";
 import { changeLanguage, languages, Language } from "@/i18n";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  useWallet,
+  useDefaultWallet,
+  useWallets,
+  useCashuWallets,
+  ChachiWallet,
+} from "@/lib/wallet";
 import { themes, Theme } from "@/theme";
 
 const uiSchema = z.object({
@@ -43,6 +81,7 @@ function UILanguage({ lang }: { lang: Language }) {
     </span>
   );
 }
+
 function UITheme({ theme }: { theme: "light" | "dark" | "system" }) {
   const { t } = useTranslation();
   return (
@@ -173,6 +212,246 @@ export function UI() {
   );
 }
 
+function WalletSummary({
+  name,
+  wallet,
+  event,
+  showControls = false,
+  isDefault = false,
+}: {
+  name: string;
+  wallet: ChachiWallet;
+  event?: NostrEvent;
+  showControls?: boolean;
+  isDefault?: boolean;
+}) {
+  const { t } = useTranslation();
+  const ndkWallet = useWallet();
+  const [, setDefaultWallet] = useDefaultWallet();
+  const [wallets, setWallets] = useWallets();
+  const { relays, pubkey } = useMemo(() => {
+    if (wallet.type === "nwc") {
+      const u = new URL(wallet.connection);
+      const pubkey = u.host ?? u.pathname;
+      const relays = u.searchParams.getAll("relay");
+      return { relays, pubkey };
+    }
+    return {};
+  }, []);
+
+  function removeWallet() {
+    // todo: if nip60 wallet, publish event deletion
+    if (isDefault) {
+      setDefaultWallet(null);
+    }
+    const newWallets = wallets.filter((w) => {
+      if (w.type === "nip60" && wallet.type === "nip60") {
+        return w.id !== wallet.id;
+      } else if (w.type === "nwc" && wallet.type === "nwc") {
+        return w.connection !== wallet.connection;
+      } else {
+        return true;
+      }
+    });
+    console.log("NEWWALLETS", newWallets, wallet);
+    setWallets(newWallets);
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex flex-row justify-between">
+          <div className="flex flex-row items-center gap-1.5">
+            {wallet.type === "nip60" ? (
+              <WalletIcon className="size-6 text-muted-foreground" />
+            ) : wallet.type === "nwc" ? (
+              <PlugZap className="size-6 text-muted-foreground" />
+            ) : (
+              <Puzzle className="size-6 text-muted-foreground" />
+            )}
+            {wallet.type === "nwc" && pubkey ? (
+              <User
+                pubkey={pubkey}
+                classNames={{ avatar: "size-5", name: "text-md" }}
+              />
+            ) : (
+              <span className="">{name}</span>
+            )}
+          </div>
+          {wallet.type === "nwc" &&
+          isDefault &&
+          ndkWallet instanceof NDKNWCWallet ? (
+            <NWCWalletBalanceAmount
+              wallet={ndkWallet}
+              classNames={{ icon: "size-5", text: "text-xl font-light" }}
+            />
+          ) : wallet.type === "nip60" &&
+            isDefault &&
+            ndkWallet instanceof NDKCashuWallet ? (
+            <CashuWalletBalanceAmount
+              wallet={ndkWallet}
+              classNames={{ icon: "size-5", text: "text-xl font-light" }}
+            />
+          ) : null}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-4">
+        {wallet.type === "nip60" && event ? (
+          <MintList
+            mints={event.tags.filter((t) => t[0] === "mint")?.map((t) => t[1])}
+          />
+        ) : null}
+        {wallet.type === "nwc" ? (
+          <div className="flex flex-col gap-2">
+            <InputCopy value={wallet.connection} />
+            {relays ? <RelayList relays={relays} /> : null}
+          </div>
+        ) : null}
+      </CardContent>
+      {showControls ? (
+        <CardFooter className="flex justify-end">
+          <div className="flex flex-row gap-2 items-center justify-between">
+            <Button
+              onClick={removeWallet}
+              variant="destructive"
+              className="w-full"
+              size="sm"
+            >
+              {t("settings.wallet.wallets.remove")}
+            </Button>
+            {isDefault ? null : (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setDefaultWallet(wallet)}
+              >
+                {t("settings.wallet.wallets.make-default")}
+              </Button>
+            )}
+          </div>
+        </CardFooter>
+      ) : null}
+    </Card>
+  );
+}
+
+function RelayList({ relays }: { relays: string[] }) {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-row gap-1 items-center flex-wrap">
+        <Server className="size-4 text-muted-foreground" />
+        <h4 className="text-sm uppercase font-light text-muted-foreground">
+          {t("settings.wallet.relays")}
+        </h4>
+      </div>
+      <div className="flex flex-col gap-0.5">
+        {relays.map((t) => (
+          <div key={t} className="flex flex-row items-center gap-1">
+            <RelayIcon relay={t} className="size-4" />
+            <span className="text-sm">
+              <RelayName relay={t} />
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MintList({ mints }: { mints: string[] }) {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-row gap-1 items-center flex-wrap">
+        <Landmark className="size-4 text-muted-foreground" />
+        <h4 className="text-sm uppercase font-light text-muted-foreground">
+          {t("settings.wallet.mints")}
+        </h4>
+      </div>
+      <div className="flex flex-col gap-0.5">
+        {mints.map((t) => (
+          <div key={t} className="flex flex-row items-center gap-1">
+            <MintIcon url={t} className="size-4" />
+            <MintName url={t} className="text-sm" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function Wallet() {
-  return <>TODO: Wallet settings</>;
+  const { t } = useTranslation();
+  const wallet = useWallet();
+  const [defaultWallet] = useDefaultWallet();
+  const [wallets] = useWallets();
+  const { data: cashuWallets } = useCashuWallets();
+  return (
+    <div className="flex flex-col gap-4">
+      {defaultWallet && wallet ? (
+        <div className="flex flex-col gap-2">
+          <h3 className="text-sm font-light uppercase line-clamp-1 text-muted-foreground">
+            {t("settings.wallet.default-wallet.title")}
+          </h3>
+          <WalletSummary
+            name={
+              wallet instanceof NDKCashuWallet
+                ? wallet.name || wallet.walletId
+                : wallet.walletId
+            }
+            wallet={defaultWallet}
+            event={
+              wallet instanceof NDKCashuWallet
+                ? (wallet.event?.rawEvent() as NostrEvent)
+                : undefined
+            }
+            showControls
+            isDefault
+          />
+        </div>
+      ) : (
+        <span className="text-xs text-muted-foreground">
+          {t("settings.wallet.default-wallet.none")}
+        </span>
+      )}
+      <div className="flex flex-col gap-2">
+        <h3 className="text-sm font-light uppercase line-clamp-1 text-muted-foreground">
+          {t("settings.wallet.wallets.title")}
+        </h3>
+        <ScrollArea className="h-80">
+          {wallets.length === 0 && (cashuWallets || []).length === 0 ? (
+            <span className="text-xs text-muted-foreground">
+              {t("settings.wallet.wallets.none")}
+            </span>
+          ) : null}
+          {cashuWallets ? (
+            <div className="flex flex-col gap-2">
+              {cashuWallets
+                .filter((w) =>
+                  defaultWallet?.type === "nip60"
+                    ? defaultWallet.id !== w.tags.find((t) => t[0] === "d")?.[1]
+                    : true,
+                )
+                .map((ev) => (
+                  <WalletSummary
+                    name={ev.tags.find((t) => t[0] === "d")?.[1]!}
+                    event={ev}
+                    wallet={{
+                      type: "nip60",
+                      id: ev.tags.find((t) => t[0] === "d")?.[1]!,
+                    }}
+                    showControls
+                  />
+                ))}
+            </div>
+          ) : null}
+        </ScrollArea>
+      </div>
+      <div className="flex flex-col gap-2">
+        <ConnectWallet />
+        <CreateWallet />
+      </div>
+    </div>
+  );
 }

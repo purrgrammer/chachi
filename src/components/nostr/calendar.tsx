@@ -11,7 +11,7 @@ export function CalendarEvent({
   className,
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   className?: string;
 }) {
   // todo: RSVP, calendar

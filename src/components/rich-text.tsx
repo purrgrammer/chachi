@@ -136,7 +136,7 @@ function toNode(
   fragment: Fragment,
   idx: number,
   classNames: RichTextClassnames,
-  group: Group,
+  group?: Group,
   options?: RichTextOptions,
 ) {
   if (fragment.type === "mention") {
@@ -573,7 +573,7 @@ export function Fragments({
   options,
 }: {
   fragments: Fragment[];
-  group: Group;
+  group?: Group;
   className?: string;
   classNames?: RichTextClassnames;
   options?: RichTextOptions;
@@ -612,7 +612,7 @@ export function RichText({
   tags?: string[][];
   className?: string;
   classNames?: RichTextClassnames;
-  group: Group;
+  group?: Group;
 }) {
   const opts = { ...defaultOptions, ...options };
   const fragments = useMemo(() => {

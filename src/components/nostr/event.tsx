@@ -45,7 +45,7 @@ export function Event({
   id: string;
   relays: string[];
   pubkey?: string;
-  group: Group;
+  group?: Group;
   className?: string;
   showReactions?: boolean;
 }) {
@@ -85,7 +85,7 @@ export function Address({
   className,
   showReactions = true,
 }: {
-  group: Group;
+  group?: Group;
   pubkey: string;
   kind: number;
   identifier: string;

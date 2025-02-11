@@ -7,7 +7,7 @@ import { InputCopy } from "@/components/ui/input-copy";
 import { REPO, ISSUE } from "@/lib/kinds";
 import type { Group } from "@/lib/types";
 
-export function Repo({ event }: { event: NostrEvent; group: Group }) {
+export function Repo({ event }: { event: NostrEvent; group?: Group }) {
   const name = event.tags.find((t) => t[0] === "name")?.[1];
   const description = event.tags.find((t) => t[0] === "description")?.[1];
   const clone = event.tags.find((t) => t[0] === "clone")?.[1];
@@ -64,7 +64,7 @@ export function Issues({
   relays,
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   relays: string[];
 }) {
   const identifier = event.tags.find((t) => t[0] === "d")?.[1] || "";
@@ -87,7 +87,7 @@ export function Issues({
           repoRelays?.length && repoRelays?.length > 0 ? repoRelays : relays
         }
         live={true}
-        onlyRelays={group.id === "_"}
+        onlyRelays={group?.id === "_"}
       />
     </div>
   );

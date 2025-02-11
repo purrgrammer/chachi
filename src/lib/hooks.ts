@@ -23,7 +23,7 @@ export function useCopy(): [boolean, (text: string) => Promise<void>] {
 export function useHost(url: string) {
   return useMemo(() => {
     try {
-      return new URL(url).hostname;
+      return new URL(url).host;
     } catch {
       return url;
     }

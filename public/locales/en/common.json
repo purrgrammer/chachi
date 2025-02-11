@@ -451,6 +451,8 @@
   "wallet": {
     "title": "Wallet",
     "connect": "Connect",
+    "not-found": "Wallet not found",
+    "no-transactions": "No transactions found",
     "make-default": "Make default",
     "make-default-error": "Failed to set wallet as default",
     "make-default-success": "Wallet set as default",
@@ -477,7 +479,22 @@
       "webln-error": "Failed to connect to WebLN wallet",
       "connect-nip60": "Connect remote wallet",
       "nwc-empty": "NWC address is empty",
-      "nwc-error": "Failed to connect to remote wallet"
+      "nwc-error": "Failed to connect to remote wallet",
+      "nwc-connected": "Connected to remote wallet"
+    },
+    "deposit": {
+      "title": "Deposit",
+      "mint": "Mint",
+      "amount": "Amount",
+      "confirm": "Confirm",
+      "success": "Deposit successful",
+      "error": "Failed to deposit"
+    },
+    "withdraw": {
+      "title": "Withdraw",
+      "to": "To",
+      "confirm": "Confirm",
+      "to-description": "The invoice or lightning address you want to send the funds to"
     },
     "settings": {
       "title": "Wallet settings",
@@ -486,6 +503,10 @@
         "title": "Create wallet",
         "description": "Create a wallet to start sending and receiving zaps"
       }
+    },
+    "transactions": {
+      "loading": "Loading transactions",
+      "loading-error": "Error loading transactions"
     }
   },
   "zap": {
@@ -525,7 +546,27 @@
       }
     },
     "wallet": {
-      "title": "Wallet"
+      "title": "Wallet",
+      "mints": "Mints",
+      "relays": "Relays",
+      "default-wallet": {
+        "title": "Active wallet",
+        "none": "No wallet selected"
+      },
+      "wallets": {
+        "title": "Wallets",
+        "none": "No wallets",
+        "remove": "Remove",
+        "description": "Manage your wallets",
+        "create": "Create wallet",
+        "default": "Default",
+        "make-default": "Make default",
+        "delete": "Delete",
+        "delete-error": "Failed to delete wallet",
+        "delete-success": "Wallet deleted",
+        "create-error": "Failed to create wallet",
+        "create-success": "Wallet created"
+      }
     },
     "media": {
       "title": "Media"

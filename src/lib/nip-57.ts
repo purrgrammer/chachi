@@ -12,12 +12,10 @@ export interface Zap {
   tags: string[][];
 }
 
-export function validateZap(zap: NostrEvent): Zap | null {
-  const invoice = zap.tags.find((t) => t[0] === "bolt11")?.[1];
-  const zapRequest = zap.tags.find((t) => t[0] === "description")?.[1];
-
-  if (!invoice || !zapRequest) return null;
-
+export function validateZapRequest(
+  zapRequest: string,
+  invoice: string,
+): Zap | null {
   try {
     const decoded = decode(invoice);
     const amountSection = decoded.sections.find(
@@ -28,7 +26,7 @@ export function validateZap(zap: NostrEvent): Zap | null {
     const req = JSON.parse(zapRequest) as NostrEvent;
     return amount
       ? {
-          id: zap.id,
+          id: req.id,
           pubkey: req.pubkey,
           amount,
           content: req.content,
@@ -42,4 +40,13 @@ export function validateZap(zap: NostrEvent): Zap | null {
     console.error(err);
     return null;
   }
+}
+
+export function validateZap(zap: NostrEvent): Zap | null {
+  const invoice = zap.tags.find((t) => t[0] === "bolt11")?.[1];
+  const zapRequest = zap.tags.find((t) => t[0] === "description")?.[1];
+
+  if (!invoice || !zapRequest) return null;
+
+  return validateZapRequest(zapRequest, invoice);
 }

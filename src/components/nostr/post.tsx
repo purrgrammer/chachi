@@ -16,7 +16,7 @@ export function Post({
   options = {},
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   className?: string;
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
@@ -46,7 +46,7 @@ export function PostWithReplies({
   options = {},
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   className?: string;
   classNames?: RichTextClassnames;
   options?: RichTextOptions;

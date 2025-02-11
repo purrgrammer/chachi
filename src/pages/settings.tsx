@@ -3,21 +3,21 @@ import {
   Settings as SettingsIcon,
   SunMoon,
   Wallet as WalletIcon,
-  HardDriveUpload,
+  //HardDriveUpload,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { UI, Wallet } from "@/components/settings";
 import { Header } from "@/components/header";
 
-type Tab = "wallet" | "ui" | "media";// | "relays";
+type Tab = "wallet" | "ui"; // | "media"; // | "relays";
 
 interface TabSpec {
   text: string;
   icon: ReactNode;
 }
 
-const tabs: Tab[] = ["ui", "wallet", "media"];
+const tabs: Tab[] = ["ui", "wallet"];
 
 export default function Settings() {
   const { t } = useTranslation();
@@ -30,10 +30,10 @@ export default function Settings() {
       text: t("settings.wallet.title"),
       icon: <WalletIcon className="size-4 text-muted-foreground" />,
     },
-    media: {
-      text: t("settings.media.title"),
-      icon: <HardDriveUpload className="size-4 text-muted-foreground" />,
-    },
+    //media: {
+    //  text: t("settings.media.title"),
+    //  icon: <HardDriveUpload className="size-4 text-muted-foreground" />,
+    //},
     //relays: {
     //  text: t("settings.relays.title"),
     //  icon: <Server className="size-4 text-muted-foreground" />,

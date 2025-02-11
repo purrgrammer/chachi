@@ -77,7 +77,7 @@ function ReplyPreview({
 }
 
 interface AutocompleteTextareaProps extends TextareaProps {
-  group: Group;
+  group?: Group;
   className?: string;
   topOffset?: number;
   message: string;
@@ -106,8 +106,8 @@ export function AutocompleteTextarea({
 }: AutocompleteTextareaProps) {
   const ref = useRef<HTMLTextAreaElement | null>(null);
   const { data: adminList } = useGroupAdminsList(group);
-  const admins = adminList || [];
   const members = useMembers(group);
+  const admins = adminList || [];
   const me = usePubkey();
 
   // Emojis

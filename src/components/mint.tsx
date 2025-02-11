@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useMintInfo } from "@/lib/cashu";
+import { useHost } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 
 export function MintIcon({
@@ -10,8 +11,16 @@ export function MintIcon({
   className?: string;
 }) {
   const { data: info } = useMintInfo(url);
-  // @ts-expect-error the cashu-ts type lacks this field
-  const icon = info?.icon_url;
+  const host = useHost(url);
+  const is0xChat = host.endsWith("0xchat.com");
+  const icon =
+    // @ts-expect-error the cashu-ts type lacks this field
+    info?.icon_url
+    // @ts-expect-error the cashu-ts type lacks this field
+      ? info.icon_url
+      : is0xChat
+        ? `https://0xchat.com/favicon1.png`
+        : null;
   return icon ? (
     <img
       src={icon}
@@ -20,8 +29,14 @@ export function MintIcon({
   ) : null;
 }
 
-export function MintName({ url }: { url: string }) {
+export function MintName({
+  url,
+  className,
+}: {
+  url: string;
+  className?: string;
+}) {
   const host = useMemo(() => new URL(url).hostname, [url]);
   const { data: info } = useMintInfo(url);
-  return info?.name || host || url;
+  return <span className={className}>{info?.name || host || url}</span>;
 }

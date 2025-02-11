@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import ndk, { NDKContext } from "@/lib/ndk";
+import ndk, { nwcNdk, NDKNWCContext, NDKContext } from "@/lib/ndk";
 import { queryClient } from "@/lib/query";
 
 import Layout from "@/pages/layout";
@@ -21,8 +21,9 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     loader: async () => {
-      console.log("CONNECTING NDK");
+      console.log("CONNECTING NDK instances");
       await ndk.connect();
+      await nwcNdk.connect();
       return null;
     },
     children: [
@@ -86,6 +87,10 @@ const router = createBrowserRouter([
         path: "/settings",
         element: <Settings />,
       },
+      {
+        path: "/e/:nlink",
+        element: <Event />,
+      },
     ],
   },
 ]);
@@ -93,16 +98,18 @@ const router = createBrowserRouter([
 export default function App() {
   return (
     <Provider>
-      <NDKContext.Provider value={ndk}>
-        <QueryClientProvider client={queryClient}>
-          <SidebarProvider>
-            <ThemeProvider defaultTheme="dark" storageKey="chachi-theme">
-              <RouterProvider router={router} />
-              <Toaster position="top-right" />
-            </ThemeProvider>
-          </SidebarProvider>
-        </QueryClientProvider>
-      </NDKContext.Provider>
+      <NDKNWCContext.Provider value={nwcNdk}>
+        <NDKContext.Provider value={ndk}>
+          <QueryClientProvider client={queryClient}>
+            <SidebarProvider>
+              <ThemeProvider defaultTheme="dark" storageKey="chachi-theme">
+                <RouterProvider router={router} />
+                <Toaster position="top-right" />
+              </ThemeProvider>
+            </SidebarProvider>
+          </QueryClientProvider>
+        </NDKContext.Provider>
+      </NDKNWCContext.Provider>
     </Provider>
   );
 }

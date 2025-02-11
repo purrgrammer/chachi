@@ -13,7 +13,7 @@ export function Markdown({
   className,
 }: {
   children: string;
-  group: Group;
+  group?: Group;
   tags?: string[][];
   className?: string;
 }) {

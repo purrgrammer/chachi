@@ -23,7 +23,7 @@ function ProfileDrawerContent({
   group,
 }: {
   pubkey: string;
-  group: GroupType;
+  group?: GroupType;
 }) {
   const { data: profile } = useProfile(pubkey);
   const { data: groups } = useUserGroups(pubkey);
@@ -73,7 +73,7 @@ export function ProfileDrawer({
 }: {
   trigger: ReactNode;
   pubkey: string;
-  group: GroupType;
+  group?: GroupType;
 }) {
   return (
     <Drawer>

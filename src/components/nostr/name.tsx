@@ -10,6 +10,10 @@ export function Name({
   short?: boolean;
 }) {
   const { data: profile } = useProfile(pubkey, relays);
-  const name = profile?.name || profile?.display_name || pubkey.slice(0, 6);
+  const name = (
+    profile?.name ||
+    profile?.display_name ||
+    pubkey.slice(0, 6)
+  ).trim();
   return short ? name.split(" ")[0] : name;
 }

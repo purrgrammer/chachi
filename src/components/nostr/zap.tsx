@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
 import { User } from "@/components/nostr/user";
 import { Event, Address } from "@/components/nostr/event";
+import { NDKKind } from "@nostr-dev-kit/ndk";
+import { useNDK } from "@/lib/ndk";
 import { validateZap, Zap as ZapType } from "@/lib/nip-57";
 import { formatShortNumber } from "@/lib/number";
 import {
@@ -20,7 +22,7 @@ import {
   useIncreaseZapAmount,
   useZap,
 } from "@/lib/zap";
-import { useProfile } from "@/lib/nostr";
+import { useProfile, useRelayList, useRelaySet } from "@/lib/nostr";
 import {
   Dialog,
   DialogContent,
@@ -29,9 +31,9 @@ import {
   DialogDescription,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useGroup } from "@/lib/nostr/groups";
+import { usePubkey } from "@/lib/account";
 import type { Group, Emoji } from "@/lib/types";
-
-// todo: frequently used amounts
 
 export function NewZapDialog({
   open,
@@ -44,12 +46,13 @@ export function NewZapDialog({
   open?: boolean;
   onClose?: () => void;
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   trigger?: React.ReactNode;
   reply?: string;
 }) {
   const { t } = useTranslation();
   const amounts = useZapAmounts();
+  const { data: metadata } = useGroup(group);
   const increaseZapAmount = useIncreaseZapAmount();
   const [customEmojis, setCustomEmojis] = useState<Emoji[]>([]);
   const [isOpen, setIsOpen] = useState(open);
@@ -59,7 +62,19 @@ export function NewZapDialog({
   const [message, setMessage] = useState(reply || "");
   const { data: profile } = useProfile(event.pubkey);
   const name = profile?.name || event.pubkey.slice(0, 6);
-  const sendZap = useZap(group, event.pubkey, event);
+  const { data: relayList } = useRelayList(event.pubkey);
+  const ndk = useNDK();
+  const pubkey = usePubkey();
+  const relays =
+    relayList && group
+      ? [group.relay, ...relayList]
+      : relayList
+        ? relayList
+        : group
+          ? [group.relay]
+          : [];
+  const relaySet = useRelaySet(relays);
+  const sendZap = useZap(event.pubkey, relays, event);
 
   function onOpenChange(open: boolean) {
     setIsOpen(open);
@@ -75,21 +90,47 @@ export function NewZapDialog({
   async function onZap() {
     try {
       setIsZapping(true);
-      // todo: use NDK zapper
-      // todo: nutzaps
-      await sendZap(
-        message,
-        Number(amount),
-        customEmojis.flatMap((e) =>
+      sendZap(message, Number(amount), [
+        ...(group ? [["h", group.id, group.relay]] : []),
+        ...(group && metadata?.pubkey
+          ? [["a", `${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`]]
+          : []),
+        ...customEmojis.flatMap((e) =>
           e.name && e.image ? [["emoji", e.name, e.image]] : [],
         ),
-      );
+      ]);
+      // todo: nutzaps
+      if (pubkey) {
+        ndk
+          .fetchEvent(
+            {
+              kinds: [NDKKind.Zap],
+              "#e": [event.id],
+              "#p": [pubkey],
+            },
+            {
+              closeOnEose: true,
+            },
+            relaySet,
+          )
+          .then((ev) => {
+            if (ev) {
+              const zap = validateZap(ev.rawEvent() as NostrEvent);
+              console.log("ZAPPPEV", ev.rawEvent());
+              if (zap) {
+                console.log("ZAPPP", zap);
+              }
+            }
+          })
+          .catch((err) => console.error(err));
+      }
       increaseZapAmount(Number(amount));
     } catch (err) {
       console.error(err);
       toast.error(t("zap.dialog.error"));
     } finally {
       setIsZapping(false);
+      onOpenChange(false);
     }
   }
 
@@ -181,7 +222,7 @@ export function NewZapDialog({
   );
 }
 
-export function NewZap({ event, group }: { event: NostrEvent; group: Group }) {
+export function NewZap({ event, group }: { event: NostrEvent; group?: Group }) {
   return (
     <NewZapDialog
       event={event}
@@ -209,7 +250,7 @@ function E({
 }: {
   id: string;
   pubkey?: string;
-  group: Group;
+  group?: Group;
 }) {
   return (
     <Event
@@ -222,7 +263,7 @@ function E({
   );
 }
 
-function A({ address, group }: { address: string; group: Group }) {
+function A({ address, group }: { address: string; group?: Group }) {
   const [k, pubkey, d] = address.split(":");
   return (
     <Address
@@ -241,7 +282,7 @@ export function ZapDetail({
   group,
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
 }) {
   const zap = validateZap(event);
   return zap ? (
@@ -256,7 +297,7 @@ export function ZapPreview({
   group,
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
 }) {
   const zap = validateZap(event);
   return zap ? (
@@ -273,7 +314,7 @@ export function Zap({
   embedMention = true,
 }: {
   zap: ZapType;
-  group: Group;
+  group?: Group;
   animateGradient?: boolean;
   embedMention?: boolean;
 }) {
@@ -295,15 +336,15 @@ export function Zap({
           <User pubkey={zap.p} classNames={{ avatar: "size-4" }} />
         ) : null}
       </div>
-      {zap.content.trim().length > 0 ? (
-        <RichText tags={zap.tags} group={group}>
-          {zap.content}
-        </RichText>
-      ) : null}
       {zap.e && embedMention ? (
         <E id={zap.e} group={group} pubkey={zap.p} />
       ) : zap.a && embedMention ? (
         <A address={zap.a} group={group} />
+      ) : null}
+      {zap.content.trim().length > 0 ? (
+        <RichText tags={zap.tags} group={group}>
+          {zap.content}
+        </RichText>
       ) : null}
     </div>
   );

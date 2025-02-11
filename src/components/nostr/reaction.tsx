@@ -14,7 +14,7 @@ export default function Reaction({
   group,
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
 }) {
   const eventId = event.tags.find((t) => t[0] === "e")?.[1];
   const pubkey = event.tags.find((t) => t[0] === "p")?.[1];

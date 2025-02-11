@@ -227,7 +227,7 @@ function Imeta({ imeta }: { imeta: string[] }) {
   );
 }
 
-export function Image({ event, group }: { event: NostrEvent; group: Group }) {
+export function Image({ event, group }: { event: NostrEvent; group?: Group }) {
   const imetas = event.tags.filter((t) => t[0] === "imeta");
   const imeta = imetas[0];
   const isGallery = imetas.length > 1;
