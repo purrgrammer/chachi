@@ -10,11 +10,13 @@ import { cn } from "@/lib/utils";
 export function Avatar({
   pubkey,
   className,
+  relays,
 }: {
   pubkey: string;
   className?: string;
+  relays?: string[];
 }) {
-  const { data: profile } = useProfile(pubkey);
+  const { data: profile } = useProfile(pubkey, relays);
   return (
     <BaseAvatar className={cn("size-12", className)}>
       <AvatarImage

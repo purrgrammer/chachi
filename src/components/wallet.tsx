@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import { NostrEvent } from "nostr-tools";
 import { InputCopy } from "@/components/ui/input-copy";
 import {
   Wallet as WalletIcon,
@@ -25,7 +24,6 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import {
   NDKWallet,
   NDKCashuWallet,
@@ -39,8 +37,8 @@ import { Event } from "@/components/nostr/event";
 import { Label } from "@/components/ui/label";
 import { Invoice } from "@/components/ln";
 import { Zap, validateZapRequest } from "@/lib/nip-57";
-import { useNDK } from "@/lib/ndk";
-import { useRelays, useRelaySet } from "@/lib/nostr";
+import { useNDK, useNWCNDK } from "@/lib/ndk";
+import { useRelays } from "@/lib/nostr";
 import { formatShortNumber } from "@/lib/number";
 import { useHost } from "@/lib/hooks";
 import {
@@ -52,6 +50,7 @@ import {
   useDefaultWallet,
   useWallets,
   useNWCBalance,
+  useNWCInfo,
   useNWCTransactions,
   Transaction,
   Unit,
@@ -133,13 +132,13 @@ export function CreateWallet() {
   const myRelays = useRelays();
   const [isCreating, setIsCreating] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [name, setName] = useState("chachi");
   const [mint, setMint] = useState("");
   const [relay, setRelay] = useState("");
   const [mints, setMints] = useState<string[]>(defaultMints);
   const [selectedMints, setSelectedMints] = useState<string[]>(defaultMints);
   const [relays, setRelays] = useState<string[]>(myRelays);
   const [selectedRelays, setSelectedRelays] = useState<string[]>(myRelays);
+  const [,setDefaultWallet] = useDefaultWallet();
   const createWallet = useCreateWallet();
 
   function addToMints() {
@@ -159,7 +158,8 @@ export function CreateWallet() {
   async function onCreate() {
     try {
       setIsCreating(true);
-      await createWallet(name, selectedRelays, selectedMints);
+      await createWallet(selectedMints, selectedRelays);
+      setDefaultWallet({ type: "nip60" });
     } catch (err) {
       console.error(err);
     } finally {
@@ -194,17 +194,6 @@ export function CreateWallet() {
       </DialogTrigger>
       <DialogContent>
         <div className="w-full flex flex-col gap-4">
-          <div className="flex flex-col gap-0.5">
-            <Label>{t("wallet.name")}</Label>
-            <span className="text-xs text-muted-foreground">
-              {t("wallet.name-description")}
-            </span>
-            <Input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
           <div className="flex flex-col gap-0.5">
             <Label>{t("wallet.mints")}</Label>
             <span className="text-xs text-muted-foreground">
@@ -292,6 +281,7 @@ export function CreateWallet() {
 export function ConnectWallet() {
   const { t } = useTranslation();
   const ndk = useNDK();
+  const nwcNdk = useNWCNDK();
   const [isOpen, setIsOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isLoadingWebln, setIsLoadingWebln] = useState(false);
@@ -329,13 +319,17 @@ export function ConnectWallet() {
     }
     try {
       setIsConnecting(true);
-      //const relays = new URL(connectString).searchParams.getAll("relay");
-      //const walletNdk = new NDK({ explicitRelayUrls: relays });
-      const nwc = new NDKNWCWallet(ndk);
-      // todo: add explicit relays
+      const u = new URL(connectString);
+      const relayUrls = u.searchParams.getAll("relay");
+      for (const relay of relayUrls) {
+        nwcNdk.addExplicitRelay(relay);
+      }
+      const nwc = new NDKNWCWallet(nwcNdk, {
+        timeout: 10_000,
+	pairingCode: connectString,
+      });
       try {
         setIsConnecting(true);
-        nwc.initWithPairingCode(connectString);
         nwc.on("ready", () => {
           setDefaultWallet({ type: "nwc", connection: connectString });
           setWallets((ws) => [
@@ -425,51 +419,56 @@ function Tx({ tx }: { tx: Transaction }) {
       <div className="flex flex-row gap-2 items-center">
         {isCredit ? (
           p ? (
-            <div className="size-12 relative">
+            <div className="size-16 relative place-content-center">
               <User
                 pubkey={p}
                 classNames={{
                   wrapper: "flex-col gap-0",
-                  avatar: "size-9",
+                  avatar: "size-10",
                   name: "text-xs font-light text-muted-foreground line-clamp-1",
                 }}
               />
               <ArrowDownRight className="size-5 text-green-200 absolute top-0 left-0" />
             </div>
           ) : tx.mint ? (
-            <div className="size-12 relative flex items-center justify-center">
-              <MintIcon url={tx.mint} className="size-9" />
+            <div className="size-16 relative place-content-center">
+              <MintIcon url={tx.mint} className="size-10" />
               <ArrowDownRight className="size-5 text-green-200 absolute top-0 left-0" />
             </div>
           ) : (
-            <div className="size-12 relative">
-              <ArrowDownRight className="size-12 text-green-200" />
+            <div className="size-16 relative">
+              <ArrowDownRight className="size-14 text-green-200" />
             </div>
           )
         ) : p ? (
-          <div className="size-12 relative">
+          <div className="size-16 relative place-content-center">
             <User
               pubkey={p}
               classNames={{
                 wrapper: "flex-col gap-0",
-                avatar: "size-9",
+                avatar: "size-10",
                 name: "text-xs font-light text-muted-foreground line-clamp-1",
               }}
             />
             <ArrowUpRight className="size-5 text-destructive absolute -top-1.5 right-0" />
           </div>
         ) : (
-          <div className="size-12 relative">
-            <ArrowUpRight className="size-12 text-destructive" />
+          <div className="size-16 relative place-content-center">
+            <ArrowUpRight className="size-14 text-destructive" />
           </div>
         )}
         <div className="flex flex-col items-start gap-0.5">
-          {tx.description && !tx.zap && !tx.description.includes("pubkey") ? (
+          {tx.description && !tx.zap ? (
             <span className="text-md line-clamp-1">{tx.description}</span>
-          ) : null}
-          {tx.zap?.content ? (
+          ) : tx.zap?.content ? (
             <span className="text-md line-clamp-1">{tx.zap.content}</span>
-          ) : null}
+          ) : (
+            <div className="flex flex-col gap-0 items-start">
+              <span className="text-md text-muted-foreground">
+                {isCredit ? t("wallet.credit") : t("wallet.debit")}
+              </span>
+            </div>
+          )}
           {tx.mint ? (
             <div className="flex flex-row items-center gap-1">
               <Landmark className="size-3 text-muted-foreground" />
@@ -522,7 +521,7 @@ function Tx({ tx }: { tx: Transaction }) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>{component}</DialogTrigger>
       <DialogContent className="bg-transparent border-none">
-        <Event id={e} relays={[]} pubkey={tx.p} showReactions={true} />
+        <Event id={e} relays={[]} pubkey={tx.p} showReactions={false} />
       </DialogContent>
     </Dialog>
   ) : (
@@ -566,16 +565,20 @@ function WalletTransactions({
 interface WalletActionsProps {
   onDeposit: () => void;
   isDepositing: boolean;
+  canDeposit?: boolean;
   onWithdraw: () => void;
   isWithdrawing: boolean;
+  canWithdraw?: boolean;
   scanQrCode: () => void;
 }
 
 function WalletActions({
   onDeposit,
   isDepositing,
+  canDeposit = true,
   onWithdraw,
   isWithdrawing,
+  canWithdraw = true,
   scanQrCode,
 }: WalletActionsProps) {
   const { t } = useTranslation();
@@ -584,7 +587,7 @@ function WalletActions({
       <Button
         variant="outline"
         className="flex-1"
-        disabled={isDepositing}
+        disabled={isDepositing || !canDeposit}
         onClick={onDeposit}
       >
         {isDepositing ? (
@@ -600,7 +603,7 @@ function WalletActions({
       <Button
         variant="outline"
         className="flex-1"
-        disabled={isWithdrawing}
+        disabled={isWithdrawing || !canWithdraw}
         onClick={onWithdraw}
       >
         {isWithdrawing ? (
@@ -789,13 +792,8 @@ function CashuDeposit({
 }
 
 function CashuWalletSettings({ wallet }: { wallet: NDKCashuWallet }) {
-  const ndk = useNDK();
-  const relays = useRelays();
-  const relaySet = useRelaySet(relays);
   const [showDeposit, setShowDeposit] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [, setDefaultWallet] = useDefaultWallet();
   const pubkey = usePubkey();
   const { t } = useTranslation();
   const balances = wallet?.mintBalances || {};
@@ -809,44 +807,10 @@ function CashuWalletSettings({ wallet }: { wallet: NDKCashuWallet }) {
     setShowWithdraw(true);
   }
 
-  async function makeDefaultWallet(w: NDKCashuWallet) {
-    try {
-      setIsLoading(true);
-      const p2pk = await w.getP2pk();
-      if (!p2pk) {
-        toast.error("wallet.make-default-error");
-        return;
-      }
-      const ev = new NDKEvent(ndk, {
-        kind: NDKKind.CashuMintList,
-        content: "",
-        tags: [
-          ["pubkey", p2pk],
-          ...w.relays.map((r) => ["relay", r]),
-          ...w.mints.map((m) => ["mint", m]),
-        ],
-      } as NostrEvent);
-      await ev.publish(relaySet);
-      setDefaultWallet({
-        type: "nip60",
-        id: w.walletId,
-      });
-      toast.success("wallet.make-default-success");
-    } catch (err) {
-      console.error(err);
-      toast.error("wallet.make-default-error");
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
   return (
     <div className="flex flex-col gap-4">
       {wallet ? (
         <>
-          {wallet.name ? (
-            <h4 className="text-xl font-light">{wallet.name}</h4>
-          ) : null}
           <div className="flex flex-col gap-3">
             <div className="w-full flex items-center justify-center">
               <div className="flex flex-row gap-0 items-center">
@@ -895,17 +859,9 @@ function CashuWalletSettings({ wallet }: { wallet: NDKCashuWallet }) {
               ))}
             </ul>
           </div>
-          {wallet.relays ? <RelayList relays={wallet.relays} /> : null}
+          {wallet.relaySet ? <RelayList relays={wallet.relaySet.relayUrls} /> : null}
         </>
       ) : null}
-      <Button
-        variant="secondary"
-        size="sm"
-        disabled={isLoading}
-        onClick={() => makeDefaultWallet(wallet)}
-      >
-        {t("wallet.make-default")}
-      </Button>
     </div>
   );
 }
@@ -922,12 +878,90 @@ function tryParseZap(raw: string, invoice: string): Zap | null {
   }
 }
 
-function NWCWalletSettings({ wallet }: { wallet: NDKNWCWallet }) {
-  const { t } = useTranslation();
+//function NWCDeposit({
+//  wallet,
+//  open,
+//  onOpenChange,
+//}: {
+//  wallet: NDKNWCWallet;
+//
+//  open?: boolean;
+//  onOpenChange?: (open: boolean) => void;
+//}) {
+//  const [isDepositing, setIsDepositing] = useState(false);
+//  const [invoice, setInvoice] = useState(null);
+//  const [amount, setAmount] = useState("21");
+//  const [mint, setMint] = useState(wallet.mints[0]);
+//  const deposit = useDeposit();
+//  const { t } = useTranslation();
+//
+//  async function onDeposit() {
+//    try {
+//      setIsDepositing(true);
+//      // todo: make_invoice
+//      setInvoice(pr);
+//    } catch (err) {
+//      console.error(err);
+//    } finally {
+//      setIsDepositing(false);
+//    }
+//  }
+//
+//  return (
+//    <Dialog open={open} onOpenChange={onOpenChange}>
+//      <DialogContent className="w-96">
+//        <DialogHeader>
+//          <DialogTitle>{t("wallet.deposit.title")}</DialogTitle>
+//        </DialogHeader>
+//        {invoice ? (
+//          <Invoice invoice={invoice} />
+//        ) : (
+//          <div className="flex flex-col gap-4">
+//            <div className="flex flex-col gap-1">
+//              <Label>{t("wallet.deposit.amount")}</Label>
+//              <div className="flex flex-row gap-4 items-center mx-2">
+//                <Bitcoin className="size-14 text-muted-foreground" />
+//                <Input
+//                  type="number"
+//                  className="w-full text-center font-mono text-6xl h-15"
+//                  value={amount}
+//                  onChange={(e) => setAmount(e.target.value)}
+//                />
+//              </div>
+//            </div>
+//            <div className="flex flex-col gap-1">
+//              <Label>{t("wallet.deposit.mint")}</Label>
+//              <Select
+//                disabled={isDepositing || wallet.mints.length < 2}
+//                onValueChange={setMint}
+//                defaultValue={mint}
+//              >
+//                <SelectTrigger className="w-full">
+//                  <SelectValue placeholder="Choose mint" />
+//                </SelectTrigger>
+//                <SelectContent>
+//                  {wallet.mints.map((m) => (
+//                    <SelectItem key={m} value={m}>
+//                      <MintName url={m} />
+//                    </SelectItem>
+//                  ))}
+//                </SelectContent>
+//              </Select>
+//            </div>
+//            <Button disabled={isDepositing} onClick={onDeposit}>
+//              {t("wallet.deposit.confirm")}
+//            </Button>
+//          </div>
+//        )}
+//      </DialogContent>
+//    </Dialog>
+//  );
+//}
+
+function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
   const { data: txs, isLoading, isError } = useNWCTransactions(wallet);
-  const { data: amount } = useNWCBalance(wallet);
-  const [isDepositing, setIsDepositing] = useState(false);
-  const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const { t } = useTranslation();
+
   const transactions = useMemo(() => {
     if (!txs) return [];
 
@@ -936,8 +970,9 @@ function NWCWalletSettings({ wallet }: { wallet: NDKNWCWallet }) {
         id: nwcTx.preimage || nwcTx.invoice,
         created_at: nwcTx.created_at,
         amount: nwcTx.amount / 1000,
-        fee: nwcTx.fees_paid || 0,
+        fee: nwcTx.fees_paid ? nwcTx.fees_paid / 1000 : 0,
         unit: "sat" as Unit,
+        invoice: nwcTx.invoice,
         direction: nwcTx.type === "incoming" ? "in" : ("out" as Direction),
         description: nwcTx.description,
         zap: nwcTx.description
@@ -952,6 +987,48 @@ function NWCWalletSettings({ wallet }: { wallet: NDKNWCWallet }) {
     "TXS",
     transactions.filter((t) => t.zap),
   );
+
+  return (
+    <>
+      {isLoading || isError ? (
+        <div className="flex items-center justify-center w-full h-80">
+          <div className="flex flex-col items-center justify-center text-muted-foreground">
+            {isError ? (
+              <ServerCrash className="size-5 text-destructive" />
+            ) : (
+              <Network className="size-5 animate-pulse" />
+            )}
+            {isError ? (
+              <span className="text-sm text-destructive">
+                {t("wallet.transactions.loading-error")}
+              </span>
+            ) : (
+              <span className="text-sm">
+                {t("wallet.transactions.loading")}
+              </span>
+            )}
+          </div>
+        </div>
+      ) : (
+        <ScrollArea className="h-80">
+          <div className="flex flex-col gap-2 pr-2.5">
+            {transactions.map((tx) => (
+              <Tx key={tx.id} tx={tx} />
+            ))}
+          </div>
+        </ScrollArea>
+      )}
+    </>
+  );
+}
+
+function NWCWalletSettings({ wallet }: { wallet: NDKNWCWallet }) {
+  const { data: amount } = useNWCBalance(wallet);
+  const { data: info } = useNWCInfo(wallet);
+  const isDepositSupported = info?.methods.includes("make_invoice");
+  const isWithdrawalSupported = info?.methods.includes("pay_invoice");
+  const [isDepositing, setIsDepositing] = useState(false);
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
 
   function onDeposit() {
     setIsDepositing(true);
@@ -983,42 +1060,27 @@ function NWCWalletSettings({ wallet }: { wallet: NDKNWCWallet }) {
           </span>
         </div>
       </div>
-      {wallet.pairingCode ? <InputCopy value={wallet.pairingCode} /> : null}
+      {wallet.pairingCode ? (
+        <div className="flex flex-row gap-1 items-center">
+          <PlugZap className="text-muted-foreground size-6" />
+          <InputCopy isSecret value={wallet.pairingCode} />
+        </div>
+      ) : null}
       <WalletActions
         onDeposit={onDeposit}
         isDepositing={isDepositing}
+        canDeposit={isDepositSupported}
         onWithdraw={onWithdraw}
         isWithdrawing={isWithdrawing}
+        canWithdraw={isWithdrawalSupported}
         scanQrCode={scanQrCode}
       />
-      {isLoading || isError ? (
-        <div className="flex items-center justify-center w-full min-h-32">
-          <div className="flex flex-col items-center justify-center text-muted-foreground">
-            {isError ? (
-              <ServerCrash className="size-5 text-destructive" />
-            ) : (
-              <Network className="size-5 animate-pulse" />
-            )}
-            {isError ? (
-              <span className="text-sm text-destructive">
-                {t("wallet.transactions.loading-error")}
-              </span>
-            ) : (
-              <span className="text-sm">
-                {t("wallet.transactions.loading")}
-              </span>
-            )}
-          </div>
-        </div>
-      ) : (
-        <ScrollArea className="h-80">
-          <div className="flex flex-col gap-2 px-3">
-            {transactions.map((tx) => (
-              <Tx key={tx.id} tx={tx} />
-            ))}
-          </div>
-        </ScrollArea>
-      )}
+      <NWCWalletTransactions wallet={wallet} />
+      {wallet.pairingCode ? (
+	      <RelayList
+        relays={new URL(wallet.pairingCode).searchParams.getAll("relay")}
+      />
+      ) : null}
     </div>
   );
 }
@@ -1136,11 +1198,10 @@ export function CashuWalletBalanceAmount({
 }) {
   const balances = wallet.mintBalances || {};
   const balance = Object.values(balances).reduce((acc, b) => acc + b, 0);
-  const amount = wallet.unit === "msat" ? balance * 1000 : balance;
   return (
     <Balance
-      amount={amount}
-      unit={wallet.unit as Unit}
+      amount={balance}
+      unit="sat"
       classNames={classNames}
     />
   );
@@ -1150,15 +1211,15 @@ function CashuWalletBalance({ wallet }: { wallet: NDKCashuWallet }) {
   const balances = wallet.mintBalances || {};
   const balance = Object.values(balances).reduce((acc, b) => acc + b, 0);
   const { t } = useTranslation();
-  const name = wallet.name || t("wallet.title");
-  const amount = wallet.unit === "msat" ? balance * 1000 : balance;
+  const name = t("wallet.title");
+  const amount = balance;
   return (
     <div className="flex flex-row w-full items-center justify-between">
       <div className="flex flex-row gap-2 items-center">
         <WalletIcon className="size-4 text-muted-foreground" />
         <span className="text-sm">{name}</span>
       </div>
-      <Balance amount={amount} unit={wallet.unit as Unit} />
+      <Balance amount={amount} unit="sat" />
     </div>
   );
 }

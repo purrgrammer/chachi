@@ -426,6 +426,7 @@
       "in": "Share this publication in {{groupName}}"
     },
     "in": {
+      "group": "Share in",
       "x": "Share in {{groupName}} chat",
       "chat": "Share in chat"
     }
@@ -449,7 +450,9 @@
     "leaderboard": "Leaderboard"
   },
   "wallet": {
-    "title": "Wallet",
+    "title": "Incoming payment",
+    "debit": "Payment",
+    "credit": "Payment",
     "connect": "Connect",
     "not-found": "Wallet not found",
     "no-transactions": "No transactions found",

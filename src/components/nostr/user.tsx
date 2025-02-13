@@ -11,16 +11,17 @@ interface UserClassNames {
 interface UserProps {
   pubkey: string;
   classNames?: UserClassNames;
+  relays?: string[];
 }
 
-export function User({ pubkey, classNames }: UserProps) {
+export function User({ pubkey, classNames, relays }: UserProps) {
   return (
     <div
       className={cn("flex flex-row items-center gap-2", classNames?.wrapper)}
     >
-      <Avatar pubkey={pubkey} className={classNames?.avatar} />
+      <Avatar pubkey={pubkey} relays={relays} className={classNames?.avatar} />
       <span className={cn("text-md font-semibold", classNames?.name)}>
-        <Name pubkey={pubkey} />
+        <Name relays={relays} pubkey={pubkey} />
       </span>
     </div>
   );

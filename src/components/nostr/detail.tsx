@@ -304,7 +304,7 @@ function ShareDialog({
           <DialogTitle>{t("share.publication")}</DialogTitle>
           {group ? (
             <DialogDescription>
-              {t("share.in")}{" "}
+              {t("share.in.group")}{" "}
               <div className="flex flex-row items-center gap-1">
                 <GroupPicture group={group} className="size-5" />
                 <GroupName group={group} />

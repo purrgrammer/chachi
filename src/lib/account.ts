@@ -74,7 +74,7 @@ async function getNostrConnectSettings(ndk: NDK, nostrConnect: string) {
     } else {
       const user = await NDKUser.fromNip05(nostrConnect, ndk);
       if (user) {
-        const pubkey = user.hexpubkey;
+        const pubkey = user.pubkey;
         const relays =
           user.nip46Urls?.length > 0
             ? user.nip46Urls

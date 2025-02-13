@@ -27,10 +27,10 @@ import { useRelays, useRelaySet } from "@/lib/nostr";
 export type ChachiWallet =
   | { type: "nwc"; connection: string }
   | { type: "webln" }
-  | { type: "nip60"; id: string };
+  | { type: "nip60" };
 
 export const walletAtom = atomWithStorage<NostrEvent | null>(
-  "nutsack",
+  "cashu-wallet",
   null,
   createJSONStorage<NostrEvent | null>(() => localStorage),
   { getOnInit: true },
@@ -72,7 +72,6 @@ export function useChachiWallet() {
           {
             kinds: [NDKKind.CashuWallet],
             authors: [pubkey],
-            "#d": [defaultWallet.id],
           },
           {
             closeOnEose: true,
@@ -95,7 +94,7 @@ export function useChachiWallet() {
                   setWallet(w);
                   //fixme: this is trying to /mint/bolt11 already minted tokens?
                   w.start();
-                  const name = w.name || w.walletId || event.dTag;
+                  const name = w.walletId || event.dTag;
                   w.on("ready", () =>
                     toast.success(t("wallet.ready", { name })),
                   );
@@ -113,12 +112,14 @@ export function useChachiWallet() {
       };
     } else if (defaultWallet?.type === "nwc") {
       const u = new URL(defaultWallet.connection);
-      const relays = u.searchParams.getAll("relay");
-      for (const relay of relays) {
+      const relayUrls = u.searchParams.getAll("relay");
+      for (const relay of relayUrls) {
         nwcNdk.addExplicitRelay(relay);
       }
-      const nwc = new NDKNWCWallet(nwcNdk);
-      nwc.initWithPairingCode(defaultWallet.connection);
+      const nwc = new NDKNWCWallet(nwcNdk, {
+        timeout: 10_000,
+        pairingCode: defaultWallet.connection,
+      });
       nwc.on("ready", () => {
         setWallet(nwc);
         ndk.wallet = nwc;
@@ -156,6 +157,7 @@ export interface Transaction {
   description?: string;
   mint?: string;
   token?: string;
+  invoice?: string;
   e?: string;
   p?: string;
   pubkey?: string;
@@ -207,7 +209,7 @@ export function useTransactions(pubkey: string, wallet: NDKCashuWallet) {
       authors: [pubkey],
       ...wallet.event!.filter(),
     },
-    wallet.relays,
+    wallet.relaySet?.relayUrls || [],
     async (ev: NostrEvent): Promise<Transaction | null> => {
       try {
         const event = new NDKEvent(ndk, ev);
@@ -254,7 +256,6 @@ export function useTransactions(pubkey: string, wallet: NDKCashuWallet) {
   );
 }
 
-// todo: compatible with NWC wallet
 export function useDeposit() {
   const wallet = useWallet();
   const { t } = useTranslation();
@@ -267,13 +268,13 @@ export function useDeposit() {
     ) => {
       if (!wallet) throw new Error("No wallet");
       if (wallet instanceof NDKCashuWallet) {
-        const deposit = wallet.deposit(amount, mint, "sat");
+        const deposit = wallet.deposit(amount, mint);
         deposit.on("success", onSuccess);
         deposit.on("error", onError);
         return deposit.start();
       } else if (wallet instanceof NDKNWCWallet) {
-        // @ts-expect-error: for some reason this does not typecheck
         const res = await wallet.makeInvoice(amount, t("wallet.deposit"));
+	// @ts-expect-error: wrongly typed
         return res.invoice;
       } else {
         throw new Error("Deposit not supported for this wallet type");
@@ -284,31 +285,39 @@ export function useDeposit() {
 }
 
 export function useCreateWallet() {
+	// todo: cashu mint list
   const ndk = useNDK();
   const [, setWallet] = useAtom(walletAtom);
-  return async (name: string, relays: string[], mints: string[]) => {
-    const wallet = NDKCashuWallet.create(
+  return async (mints: string[], relays: string[]) => {
+    const wallet = NDKCashuWallet.findOrCreate(
       ndk,
       mints ? mints : defaultMints,
       relays,
     );
-    wallet.name = name;
-    await wallet.getP2pk();
+    const p2pk = await wallet.getP2pk();
     await wallet.publish();
+    const ev = new NDKEvent(ndk, {
+	    kind: NDKKind.CashuMintList,
+	    tags: [
+		    ...relays.map((r) => ["relay", r]),
+			    ...mints.map((m) => ["mint", m]),
+		    ["pubkey", p2pk],
+	    ],
+    } as NostrEvent)
+    await ev.publish()
     if (wallet.event) {
       setWallet(wallet.event.rawEvent() as NostrEvent);
     }
-    // todo: publish cashu mint list with mints, p2pk, and relays
   };
 }
 
-async function fetchCashuWallets(
+async function fetchCashuWallet(
   ndk: NDK,
   pubkey: string,
   relays: string[],
-): Promise<NostrEvent[]> {
+): Promise<NostrEvent | null> {
   return ndk
-    .fetchEvents(
+    .fetchEvent(
       {
         kinds: [NDKKind.CashuWallet],
         authors: [pubkey],
@@ -318,21 +327,23 @@ async function fetchCashuWallets(
       },
       NDKRelaySet.fromRelayUrls(relays, ndk),
     )
-    .then((set) =>
-      Array.from(set)
-        .map((e) => e?.rawEvent() as NostrEvent)
-        .filter(Boolean),
-    );
+    .then(async (ev) => {
+      if (ev) {
+        await ev.decrypt(new NDKUser({ pubkey }));
+        return ev.rawEvent() as NostrEvent;
+      }
+      return null;
+    });
 }
 
-export function useCashuWallets() {
+export function useNutsack() {
   const ndk = useNDK();
   const pubkey = usePubkey();
   const relays = useRelays();
   return useQuery({
     enabled: Boolean(pubkey),
-    queryKey: ["cashu-wallets", pubkey],
-    queryFn: () => fetchCashuWallets(ndk, pubkey!, relays),
+    queryKey: ["nutsack", pubkey],
+    queryFn: () => fetchCashuWallet(ndk, pubkey!, relays),
   });
 }
 
@@ -369,26 +380,30 @@ export function useCashuWallet(pubkey: string, id: string) {
 
 export function useNWCBalance(wallet: NDKNWCWallet) {
   return useQuery({
-    //enabled: wallet._status === "ready",
     queryKey: ["nwc-balance", wallet.walletId],
     queryFn: async () => {
       try {
-        console.log("NWC BALANCE");
-        await wallet.updateBalance();
-        console.log("NWC BALANCE GOT", wallet, wallet.balance());
-        return (
-          wallet
-            .balance()
-            ?.reduce(
-              (acc, b) =>
-                acc + (b.unit.startsWith("msat") ? b.amount / 1000 : b.amount),
-              0,
-            ) ?? 0
-        );
+        const res = await wallet.req("get_balance", {});
+        if (res?.result) {
+          return res.result.balance ? res.result.balance / 1000 : 0;
+        }
+	return 0;
       } catch (err) {
         console.error(err);
       }
     },
+    staleTime: Infinity,
+  });
+}
+
+export function useNWCInfo(wallet: NDKNWCWallet) {
+  return useQuery({
+    queryKey: ["nwc-info", wallet.walletId],
+    queryFn: async () => {
+      console.log("NWC INFO");
+      return wallet.getInfo();
+    },
+    staleTime: Infinity,
   });
 }
 
@@ -408,6 +423,7 @@ async function fetchNWCTransactions(
   wallet: NDKNWCWallet,
 ): Promise<NWCWalletTransaction[]> {
   try {
+    console.log("NWC TRANSACTIONS");
     const res = await wallet.req("list_transactions", {});
     console.log("NWC TRANSACTIONS RESULT", res, res?.result);
     if (res?.result) {
@@ -422,8 +438,8 @@ async function fetchNWCTransactions(
 
 export function useNWCTransactions(wallet: NDKNWCWallet) {
   return useQuery({
-    //enabled: wallet._status === "ready",
     queryKey: ["nwc-txs", wallet.walletId],
     queryFn: () => fetchNWCTransactions(wallet),
+    staleTime: Infinity,
   });
 }

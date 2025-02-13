@@ -15,7 +15,6 @@ import {
 import { NDKCashuWallet, NDKNWCWallet } from "@nostr-dev-kit/ndk-wallet";
 import { InputCopy } from "@/components/ui/input-copy";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { MintIcon, MintName } from "@/components/mint";
@@ -55,8 +54,7 @@ import {
 import {
   useWallet,
   useDefaultWallet,
-  useWallets,
-  useCashuWallets,
+  useNutsack,
   ChachiWallet,
 } from "@/lib/wallet";
 import { themes, Theme } from "@/theme";
@@ -228,7 +226,6 @@ function WalletSummary({
   const { t } = useTranslation();
   const ndkWallet = useWallet();
   const [, setDefaultWallet] = useDefaultWallet();
-  const [wallets, setWallets] = useWallets();
   const { relays, pubkey } = useMemo(() => {
     if (wallet.type === "nwc") {
       const u = new URL(wallet.connection);
@@ -240,21 +237,13 @@ function WalletSummary({
   }, []);
 
   function removeWallet() {
-    // todo: if nip60 wallet, publish event deletion
     if (isDefault) {
       setDefaultWallet(null);
     }
-    const newWallets = wallets.filter((w) => {
-      if (w.type === "nip60" && wallet.type === "nip60") {
-        return w.id !== wallet.id;
-      } else if (w.type === "nwc" && wallet.type === "nwc") {
-        return w.connection !== wallet.connection;
-      } else {
-        return true;
-      }
-    });
-    console.log("NEWWALLETS", newWallets, wallet);
-    setWallets(newWallets);
+  }
+
+  function makeDefault(wallet: ChachiWallet) {
+    setDefaultWallet(wallet);
   }
 
   return (
@@ -323,7 +312,7 @@ function WalletSummary({
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => setDefaultWallet(wallet)}
+                onClick={() => makeDefault(wallet)}
               >
                 {t("settings.wallet.wallets.make-default")}
               </Button>
@@ -385,21 +374,14 @@ export function Wallet() {
   const { t } = useTranslation();
   const wallet = useWallet();
   const [defaultWallet] = useDefaultWallet();
-  const [wallets] = useWallets();
-  const { data: cashuWallets } = useCashuWallets();
+  const { data: cashuWallet } = useNutsack();
   return (
     <div className="flex flex-col gap-4">
       {defaultWallet && wallet ? (
         <div className="flex flex-col gap-2">
-          <h3 className="text-sm font-light uppercase line-clamp-1 text-muted-foreground">
-            {t("settings.wallet.default-wallet.title")}
-          </h3>
           <WalletSummary
-            name={
-              wallet instanceof NDKCashuWallet
-                ? wallet.name || wallet.walletId
-                : wallet.walletId
-            }
+            key={wallet.walletId}
+            name={wallet.walletId}
             wallet={defaultWallet}
             event={
               wallet instanceof NDKCashuWallet
@@ -416,41 +398,8 @@ export function Wallet() {
         </span>
       )}
       <div className="flex flex-col gap-2">
-        <h3 className="text-sm font-light uppercase line-clamp-1 text-muted-foreground">
-          {t("settings.wallet.wallets.title")}
-        </h3>
-        <ScrollArea className="h-80">
-          {wallets.length === 0 && (cashuWallets || []).length === 0 ? (
-            <span className="text-xs text-muted-foreground">
-              {t("settings.wallet.wallets.none")}
-            </span>
-          ) : null}
-          {cashuWallets ? (
-            <div className="flex flex-col gap-2">
-              {cashuWallets
-                .filter((w) =>
-                  defaultWallet?.type === "nip60"
-                    ? defaultWallet.id !== w.tags.find((t) => t[0] === "d")?.[1]
-                    : true,
-                )
-                .map((ev) => (
-                  <WalletSummary
-                    name={ev.tags.find((t) => t[0] === "d")?.[1]!}
-                    event={ev}
-                    wallet={{
-                      type: "nip60",
-                      id: ev.tags.find((t) => t[0] === "d")?.[1]!,
-                    }}
-                    showControls
-                  />
-                ))}
-            </div>
-          ) : null}
-        </ScrollArea>
-      </div>
-      <div className="flex flex-col gap-2">
         <ConnectWallet />
-        <CreateWallet />
+        {cashuWallet ? null : <CreateWallet />}
       </div>
     </div>
   );

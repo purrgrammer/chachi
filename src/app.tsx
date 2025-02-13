@@ -57,7 +57,6 @@ const router = createBrowserRouter([
     loader: async () => {
       console.log("CONNECTING NDK instances");
       await ndk.connect();
-      await nwcNdk.connect();
       return null;
     },
     children: [

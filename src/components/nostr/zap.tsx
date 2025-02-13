@@ -115,8 +115,8 @@ export function NewZapDialog({
           )
           .then((ev) => {
             if (ev) {
-              const zap = validateZap(ev.rawEvent() as NostrEvent);
               console.log("ZAPPPEV", ev.rawEvent());
+              const zap = validateZap(ev.rawEvent() as NostrEvent);
               if (zap) {
                 console.log("ZAPPP", zap);
               }
