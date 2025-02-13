@@ -274,7 +274,7 @@ export function useDeposit() {
         return deposit.start();
       } else if (wallet instanceof NDKNWCWallet) {
         const res = await wallet.makeInvoice(amount, t("wallet.deposit"));
-	// @ts-expect-error: wrongly typed
+        // @ts-expect-error: wrongly typed
         return res.invoice;
       } else {
         throw new Error("Deposit not supported for this wallet type");
@@ -285,26 +285,26 @@ export function useDeposit() {
 }
 
 export function useCreateWallet() {
-	// todo: cashu mint list
+  // todo: cashu mint list
   const ndk = useNDK();
   const [, setWallet] = useAtom(walletAtom);
   return async (mints: string[], relays: string[]) => {
-    const wallet = NDKCashuWallet.findOrCreate(
-      ndk,
-      mints ? mints : defaultMints,
-      relays,
-    );
+    const wallet = new NDKCashuWallet(ndk);
+    wallet.mints = mints ? mints : defaultMints;
+    wallet.relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
     const p2pk = await wallet.getP2pk();
     await wallet.publish();
-    const ev = new NDKEvent(ndk, {
-	    kind: NDKKind.CashuMintList,
-	    tags: [
-		    ...relays.map((r) => ["relay", r]),
-			    ...mints.map((m) => ["mint", m]),
-		    ["pubkey", p2pk],
-	    ],
-    } as NostrEvent)
-    await ev.publish()
+    if (p2pk) {
+      const ev = new NDKEvent(ndk, {
+        kind: NDKKind.CashuMintList,
+        tags: [
+          ...relays.map((r) => ["relay", r]),
+          ...mints.map((m) => ["mint", m]),
+          ["pubkey", p2pk],
+        ],
+      } as NostrEvent);
+      await ev.publish();
+    }
     if (wallet.event) {
       setWallet(wallet.event.rawEvent() as NostrEvent);
     }
@@ -351,19 +351,18 @@ export function useDefaultWallet() {
   return useAtom(defaultWalletAtom);
 }
 
-export function useCashuWallet(pubkey: string, id: string) {
+export function useCashuWallet(pubkey: string) {
   const ndk = useNDK();
   const relays = useRelays();
   return useQuery({
     enabled: Boolean(pubkey),
-    queryKey: ["cashu-wallet", pubkey, id],
+    queryKey: ["cashu-wallet", pubkey],
     queryFn: () =>
       ndk
         .fetchEvent(
           {
             kinds: [NDKKind.CashuWallet],
             authors: [pubkey],
-            "#d": [id],
           },
           {
             closeOnEose: true,
@@ -387,7 +386,7 @@ export function useNWCBalance(wallet: NDKNWCWallet) {
         if (res?.result) {
           return res.result.balance ? res.result.balance / 1000 : 0;
         }
-	return 0;
+        return 0;
       } catch (err) {
         console.error(err);
       }

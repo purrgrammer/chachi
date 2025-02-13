@@ -375,6 +375,7 @@ export function Wallet() {
   const wallet = useWallet();
   const [defaultWallet] = useDefaultWallet();
   const { data: cashuWallet } = useNutsack();
+  console.log("NUTSACK", cashuWallet);
   return (
     <div className="flex flex-col gap-4">
       {defaultWallet && wallet ? (

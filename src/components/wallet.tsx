@@ -138,7 +138,7 @@ export function CreateWallet() {
   const [selectedMints, setSelectedMints] = useState<string[]>(defaultMints);
   const [relays, setRelays] = useState<string[]>(myRelays);
   const [selectedRelays, setSelectedRelays] = useState<string[]>(myRelays);
-  const [,setDefaultWallet] = useDefaultWallet();
+  const [, setDefaultWallet] = useDefaultWallet();
   const createWallet = useCreateWallet();
 
   function addToMints() {
@@ -326,7 +326,7 @@ export function ConnectWallet() {
       }
       const nwc = new NDKNWCWallet(nwcNdk, {
         timeout: 10_000,
-	pairingCode: connectString,
+        pairingCode: connectString,
       });
       try {
         setIsConnecting(true);
@@ -859,7 +859,9 @@ function CashuWalletSettings({ wallet }: { wallet: NDKCashuWallet }) {
               ))}
             </ul>
           </div>
-          {wallet.relaySet ? <RelayList relays={wallet.relaySet.relayUrls} /> : null}
+          {wallet.relaySet ? (
+            <RelayList relays={wallet.relaySet.relayUrls} />
+          ) : null}
         </>
       ) : null}
     </div>
@@ -1077,9 +1079,9 @@ function NWCWalletSettings({ wallet }: { wallet: NDKNWCWallet }) {
       />
       <NWCWalletTransactions wallet={wallet} />
       {wallet.pairingCode ? (
-	      <RelayList
-        relays={new URL(wallet.pairingCode).searchParams.getAll("relay")}
-      />
+        <RelayList
+          relays={new URL(wallet.pairingCode).searchParams.getAll("relay")}
+        />
       ) : null}
     </div>
   );
@@ -1198,20 +1200,13 @@ export function CashuWalletBalanceAmount({
 }) {
   const balances = wallet.mintBalances || {};
   const balance = Object.values(balances).reduce((acc, b) => acc + b, 0);
-  return (
-    <Balance
-      amount={balance}
-      unit="sat"
-      classNames={classNames}
-    />
-  );
+  return <Balance amount={balance} unit="sat" classNames={classNames} />;
 }
 
 function CashuWalletBalance({ wallet }: { wallet: NDKCashuWallet }) {
   const balances = wallet.mintBalances || {};
   const balance = Object.values(balances).reduce((acc, b) => acc + b, 0);
-  const { t } = useTranslation();
-  const name = t("wallet.title");
+  const name = wallet.type;
   const amount = balance;
   return (
     <div className="flex flex-row w-full items-center justify-between">
