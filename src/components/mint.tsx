@@ -16,8 +16,8 @@ export function MintIcon({
   const icon =
     // @ts-expect-error the cashu-ts type lacks this field
     info?.icon_url
-    // @ts-expect-error the cashu-ts type lacks this field
-      ? info.icon_url
+      ? // @ts-expect-error the cashu-ts type lacks this field
+        info.icon_url
       : is0xChat
         ? `https://0xchat.com/favicon1.png`
         : null;
