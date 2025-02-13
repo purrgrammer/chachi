@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import {
   Moon,
   Sun,
+  Zap as ZapIcon,
   SunMoon,
   Wallet as WalletIcon,
   PlugZap,
@@ -226,12 +227,13 @@ function WalletSummary({
   const { t } = useTranslation();
   const ndkWallet = useWallet();
   const [, setDefaultWallet] = useDefaultWallet();
-  const { relays, pubkey } = useMemo(() => {
+  const { relays, pubkey, lud16 } = useMemo(() => {
     if (wallet.type === "nwc") {
       const u = new URL(wallet.connection);
       const pubkey = u.host ?? u.pathname;
       const relays = u.searchParams.getAll("relay");
-      return { relays, pubkey };
+      const lud16 = u.searchParams.get("lud16");
+      return { relays, pubkey, lud16 };
     }
     return {};
   }, []);
@@ -292,6 +294,12 @@ function WalletSummary({
         ) : null}
         {wallet.type === "nwc" ? (
           <div className="flex flex-col gap-2">
+            {lud16 ? (
+              <div className="flex flex-row gap-1 items-center">
+                <ZapIcon className="size-4 text-muted-foreground" />
+                <span className="text-sm">{lud16}</span>
+              </div>
+            ) : null}
             <InputCopy value={wallet.connection} />
             {relays ? <RelayList relays={relays} /> : null}
           </div>

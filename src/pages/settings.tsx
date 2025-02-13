@@ -54,7 +54,7 @@ export default function Settings() {
             {tabs.map((tab) => {
               const { icon, text } = tabConfig[tab];
               return (
-                <TabsTrigger value={tab}>
+                <TabsTrigger key={tab} value={tab}>
                   <div className="flex flex-row items-center gap-2">
                     {icon}
                     <span>{text}</span>

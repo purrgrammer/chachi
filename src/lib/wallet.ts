@@ -125,7 +125,6 @@ export function useChachiWallet() {
         ndk.wallet = nwc;
       });
     } else if (defaultWallet?.type === "webln") {
-      console.log("CREATING WEBLN WALLET");
       const w = new NDKWebLNWallet();
       setWallet(w);
       ndk.wallet = w;
@@ -332,7 +331,7 @@ async function fetchCashuWallet(
         await ev.decrypt(new NDKUser({ pubkey }));
         return ev.rawEvent() as NostrEvent;
       }
-      return null;
+      throw new Error("Wallet not found");
     });
 }
 
@@ -341,7 +340,7 @@ export function useNutsack() {
   const pubkey = usePubkey();
   const relays = useRelays();
   return useQuery({
-    enabled: Boolean(pubkey),
+    enabled: Boolean(pubkey) && relays?.length > 0,
     queryKey: ["nutsack", pubkey],
     queryFn: () => fetchCashuWallet(ndk, pubkey!, relays),
   });
@@ -355,10 +354,10 @@ export function useCashuWallet(pubkey: string) {
   const ndk = useNDK();
   const relays = useRelays();
   return useQuery({
-    enabled: Boolean(pubkey),
+    enabled: Boolean(pubkey) && relays?.length > 0,
     queryKey: ["cashu-wallet", pubkey],
-    queryFn: () =>
-      ndk
+    queryFn: () => {
+      return ndk
         .fetchEvent(
           {
             kinds: [NDKKind.CashuWallet],
@@ -373,7 +372,8 @@ export function useCashuWallet(pubkey: string) {
           if (!ev) throw new Error("Wallet not found");
           await ev.decrypt(new NDKUser({ pubkey }));
           return ev.rawEvent() as NostrEvent;
-        }),
+        });
+    },
   });
 }
 
@@ -399,7 +399,6 @@ export function useNWCInfo(wallet: NDKNWCWallet) {
   return useQuery({
     queryKey: ["nwc-info", wallet.walletId],
     queryFn: async () => {
-      console.log("NWC INFO");
       return wallet.getInfo();
     },
     staleTime: Infinity,
@@ -422,9 +421,7 @@ async function fetchNWCTransactions(
   wallet: NDKNWCWallet,
 ): Promise<NWCWalletTransaction[]> {
   try {
-    console.log("NWC TRANSACTIONS");
     const res = await wallet.req("list_transactions", {});
-    console.log("NWC TRANSACTIONS RESULT", res, res?.result);
     if (res?.result) {
       return res.result.transactions as NWCWalletTransaction[];
     }
