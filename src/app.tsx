@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Provider } from "jotai";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -9,17 +10,21 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ndk, { nwcNdk, NDKNWCContext, NDKContext } from "@/lib/ndk";
 import { queryClient } from "@/lib/query";
 
-import Layout from "@/pages/layout";
-import Home from "@/pages/home";
-import Group from "@/pages/group";
-import Event from "@/pages/event";
-import Wallet from "@/pages/wallet";
-import Settings from "@/pages/settings";
+const Layout = lazy(() => import("@/pages/layout"));
+const Home = lazy(() => import("@/pages/home"));
+const Group = lazy(() => import("@/pages/group"));
+const Event = lazy(() => import("@/pages/event"));
+const Wallet = lazy(() => import("@/pages/wallet"));
+const Settings = lazy(() => import("@/pages/settings"));
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: (
+      <Suspense fallback={<div>Loading...</div>}>
+        <Layout />
+      </Suspense>
+    ),
     loader: async () => {
       console.log("CONNECTING NDK instances");
       await ndk.connect();
