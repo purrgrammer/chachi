@@ -325,7 +325,7 @@ export function ConnectWallet() {
         nwcNdk.addExplicitRelay(relay);
       }
       const nwc = new NDKNWCWallet(nwcNdk, {
-        timeout: 10_000,
+        timeout: 20_000,
         pairingCode: connectString,
       });
       try {
@@ -815,9 +815,7 @@ function CashuWalletSettings({ wallet }: { wallet: NDKCashuWallet }) {
             <div className="w-full flex items-center justify-center">
               <div className="flex flex-row gap-0 items-center">
                 <Bitcoin className="size-12 text-muted-foreground" />
-                <span className="text-6xl font-mono">
-                  {formatShortNumber(balance)}
-                </span>
+                <span className="text-6xl font-mono">{balance}</span>
               </div>
             </div>
             <WalletActions
@@ -1058,7 +1056,7 @@ function NWCWalletSettings({ wallet }: { wallet: NDKNWCWallet }) {
         <div className="flex flex-row gap-0 items-center">
           <Bitcoin className="size-12 text-muted-foreground" />
           <span className="text-6xl font-mono">
-            {typeof amount === "number" ? formatShortNumber(amount) : "-"}
+            {typeof amount === "number" ? amount : "-"}
           </span>
         </div>
       </div>
@@ -1115,10 +1113,12 @@ function Balance({
   amount,
   unit = "sat",
   classNames,
+  short = true,
 }: {
   amount?: number;
   unit?: Unit;
   classNames?: BalanceClassnames;
+  short?: boolean;
 }) {
   return (
     <div className="flex flex-row gap-0.5 items-center">
@@ -1140,7 +1140,7 @@ function Balance({
         />
       )}
       <span className={cn("text-sm font-mono", classNames?.text)}>
-        {amount ? formatShortNumber(amount) : "-"}
+        {amount ? (short ? formatShortNumber(amount) : amount) : "-"}
       </span>
     </div>
   );
@@ -1179,7 +1179,7 @@ export function NWCWalletBalanceAmount({
   classNames?: BalanceClassnames;
 }) {
   const { data: amount } = useNWCBalance(wallet);
-  return <Balance amount={amount} classNames={classNames} />;
+  return <Balance short={false} amount={amount} classNames={classNames} />;
 }
 
 function NWCWalletBalance({ wallet }: { wallet: NDKNWCWallet }) {
@@ -1200,7 +1200,14 @@ export function CashuWalletBalanceAmount({
 }) {
   const balances = wallet.mintBalances || {};
   const balance = Object.values(balances).reduce((acc, b) => acc + b, 0);
-  return <Balance amount={balance} unit="sat" classNames={classNames} />;
+  return (
+    <Balance
+      short={false}
+      amount={balance}
+      unit="sat"
+      classNames={classNames}
+    />
+  );
 }
 
 function CashuWalletBalance({ wallet }: { wallet: NDKCashuWallet }) {
@@ -1214,7 +1221,7 @@ function CashuWalletBalance({ wallet }: { wallet: NDKCashuWallet }) {
         <WalletIcon className="size-4 text-muted-foreground" />
         <span className="text-sm">{name}</span>
       </div>
-      <Balance amount={amount} unit="sat" />
+      <Balance short={false} amount={amount} unit="sat" />
     </div>
   );
 }

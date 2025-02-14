@@ -403,14 +403,12 @@ export function useReactions(
   live = true,
 ) {
   const ndk = useNDK();
-  return useStream(
-    {
-      kinds,
-      ...new NDKEvent(ndk, event).filter(),
-    },
-    relays,
-    live,
-  );
+  const filter = {
+    kinds,
+    ...new NDKEvent(ndk, event).filter(),
+  };
+  console.log("USREACTIONS", filter);
+  return useStream(filter, relays, live);
 }
 
 // Relays

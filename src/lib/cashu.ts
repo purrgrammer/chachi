@@ -31,7 +31,14 @@ export function useMintList(pubkey: string) {
         )
         .then((ev: NDKEvent | null) => {
           if (ev) {
-            return ev.tags.filter((t) => t[0] === "mint").map((t) => t[1]);
+            const mints = ev.tags
+              .filter((t) => t[0] === "mint")
+              .map((t) => t[1]);
+            const pubkey = ev.tags.find((t) => t[0] === "pubkey")?.[1];
+            const relays = ev.tags
+              .filter((t) => t[0] === "relay")
+              .map((t) => t[1]);
+            return { mints, pubkey, relays };
           }
           throw new Error("No mint list found");
         }),

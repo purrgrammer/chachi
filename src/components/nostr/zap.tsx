@@ -13,7 +13,6 @@ import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
 import { User } from "@/components/nostr/user";
 import { Event, Address } from "@/components/nostr/event";
 import { NDKKind } from "@nostr-dev-kit/ndk";
-import { useNDK } from "@/lib/ndk";
 import { validateZap, Zap as ZapType } from "@/lib/nip-57";
 import { formatShortNumber } from "@/lib/number";
 import {
@@ -22,7 +21,7 @@ import {
   useIncreaseZapAmount,
   useZap,
 } from "@/lib/zap";
-import { useProfile, useRelayList, useRelaySet } from "@/lib/nostr";
+import { useProfile, useRelayList } from "@/lib/nostr";
 import {
   Dialog,
   DialogContent,
@@ -32,7 +31,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useGroup } from "@/lib/nostr/groups";
-import { usePubkey } from "@/lib/account";
 import type { Group, Emoji } from "@/lib/types";
 
 export function NewZapDialog({
@@ -63,8 +61,6 @@ export function NewZapDialog({
   const { data: profile } = useProfile(event.pubkey);
   const name = profile?.name || event.pubkey.slice(0, 6);
   const { data: relayList } = useRelayList(event.pubkey);
-  const ndk = useNDK();
-  const pubkey = usePubkey();
   const relays =
     relayList && group
       ? [group.relay, ...relayList]
@@ -73,7 +69,6 @@ export function NewZapDialog({
         : group
           ? [group.relay]
           : [];
-  const relaySet = useRelaySet(relays);
   const sendZap = useZap(event.pubkey, relays, event);
 
   function onOpenChange(open: boolean) {
@@ -90,47 +85,33 @@ export function NewZapDialog({
   async function onZap() {
     try {
       setIsZapping(true);
-      sendZap(message, Number(amount), [
-        ...(group ? [["h", group.id, group.relay]] : []),
-        ...(group && metadata?.pubkey
-          ? [["a", `${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`]]
-          : []),
-        ...customEmojis.flatMap((e) =>
-          e.name && e.image ? [["emoji", e.name, e.image]] : [],
-        ),
-      ]);
-      // todo: nutzaps
-      if (pubkey) {
-        ndk
-          .fetchEvent(
-            {
-              kinds: [NDKKind.Zap],
-              "#e": [event.id],
-              "#p": [pubkey],
-            },
-            {
-              closeOnEose: true,
-            },
-            relaySet,
-          )
-          .then((ev) => {
-            if (ev) {
-              console.log("ZAPPPEV", ev.rawEvent());
-              const zap = validateZap(ev.rawEvent() as NostrEvent);
-              if (zap) {
-                console.log("ZAPPP", zap);
-              }
-            }
-          })
-          .catch((err) => console.error(err));
-      }
+      await sendZap(
+        message,
+        Number(amount) * 1000,
+        [
+          ...(group ? [["h", group.id, group.relay]] : []),
+          ...(group && metadata?.pubkey
+            ? [["a", `${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`]]
+            : []),
+          ...customEmojis.flatMap((e) =>
+            e.name && e.image ? [["emoji", e.name, e.image]] : [],
+          ),
+        ],
+        (nutzap) => {
+          onOpenChange(false);
+          toast.success(
+            t("zap.dialog.success", {
+              amount: formatShortNumber(nutzap.amount),
+            }),
+          );
+        },
+      );
       increaseZapAmount(Number(amount));
     } catch (err) {
       console.error(err);
       toast.error(t("zap.dialog.error"));
     } finally {
       setIsZapping(false);
-      onOpenChange(false);
     }
   }
 

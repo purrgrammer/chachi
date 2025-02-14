@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { Button } from "@/components/ui/button";
+import { useMintList } from "@/lib/cashu";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { cn } from "@/lib/utils";
 import { ProfileDrawer } from "@/components/nostr/profile";
@@ -41,6 +42,7 @@ import {
 import { Name } from "@/components/nostr/name";
 import { Zaps, Reactions } from "@/components/nostr/reactions";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useCopy } from "@/lib/hooks";
 import { useNDK } from "@/lib/ndk";
 import { Avatar } from "@/components/nostr/avatar";
 import { useEvent, useRelaySet } from "@/lib/nostr";
@@ -159,6 +161,7 @@ export function ChatMessage({
 }) {
   const { t } = useTranslation();
   const [settings] = useSettings();
+  const { data: mintList } = useMintList(event.pubkey);
   const relay = group?.relay;
   const ndk = useNDK();
   const relaySet = useRelaySet(group ? [group.relay] : []);
@@ -239,6 +242,7 @@ export function ChatMessage({
       isSingleEmbed) &&
     !isReplyingTo &&
     !isDeleted;
+  const [, copy] = useCopy();
 
   useEffect(() => {
     if (isFocused && ref.current) {
@@ -267,16 +271,6 @@ export function ChatMessage({
       }, 0);
     }
   }, [isNew]);
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(content);
-      toast.success(t("chat.message.copy.success"));
-    } catch (err) {
-      console.error(err);
-      toast.error(t("chat.message.copy.error"));
-    }
-  }
 
   function enableMessageActions() {
     setShowMessageActions(true);
@@ -527,17 +521,22 @@ export function ChatMessage({
                 <SmilePlus className="w-4 h-4" />
               </ContextMenuShortcut>
             </ContextMenuItem>
+            {mintList?.pubkey ? (
+              <ContextMenuItem
+                className="cursor-pointer"
+                onClick={() => setShowingZapDialog(true)}
+              >
+                {t("chat.message.tip.action")}
+                <ContextMenuShortcut>
+                  <Bitcoin className="w-4 h-4" />
+                </ContextMenuShortcut>
+              </ContextMenuItem>
+            ) : null}
+            <ContextMenuSeparator />
             <ContextMenuItem
               className="cursor-pointer"
-              onClick={() => setShowingZapDialog(true)}
+              onClick={() => copy(content)}
             >
-              {t("chat.message.tip.action")}
-              <ContextMenuShortcut>
-                <Bitcoin className="w-4 h-4" />
-              </ContextMenuShortcut>
-            </ContextMenuItem>
-            <ContextMenuSeparator />
-            <ContextMenuItem className="cursor-pointer" onClick={() => copy()}>
               {t("chat.message.copy.action")}
               <ContextMenuShortcut>
                 <Copy className="w-4 h-4" />

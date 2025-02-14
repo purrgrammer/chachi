@@ -5,11 +5,14 @@ import { useQuery } from "@tanstack/react-query";
 import {
   NDKEvent,
   NDKKind,
+  NDKNutzap,
   NDKUser,
   NDKZapper,
   NDKSubscriptionCacheUsage,
 } from "@nostr-dev-kit/ndk";
+import { useMintList } from "@/lib/cashu";
 import { useNDK } from "@/lib/ndk";
+import { defaultMints } from "@/lib/wallet";
 import { useRelaySet } from "@/lib/nostr";
 import { NostrEvent } from "nostr-tools";
 import { LNURL } from "@/lib/query";
@@ -105,15 +108,22 @@ export function fetchInvoice(
 
 export function useZap(pubkey: string, relays: string[], event?: NostrEvent) {
   const ndk = useNDK();
+  const { data: mintList } = useMintList(pubkey);
+  const relaySet = useRelaySet(relays);
   return useCallback(
-    async (content: string, amount: number, tags: string[][]) => {
-      return new Promise((resolve, reject) => {
+    async (
+      content: string,
+      amount: number,
+      tags: string[][],
+      onZap: (z: NDKNutzap) => void,
+    ) => {
+      // todo: filter mint list for mints that can mitn tokens
+      return new Promise(async (resolve, reject) => {
         try {
           const zapped = event ? new NDKEvent(ndk, event) : null;
           const zapper = new Zapper(
             zapped ? zapped : new NDKUser({ pubkey }),
             amount,
-            "sat",
             {
               comment: content,
               ndk,
@@ -121,10 +131,30 @@ export function useZap(pubkey: string, relays: string[], event?: NostrEvent) {
             },
             { relays },
           );
+          zapper.unit = "sat";
           zapper.on("complete", (res) => {
             resolve(res);
           });
-          zapper.zap();
+          const nutzap = await zapper.zapNip61(
+            {
+              amount,
+              pubkey,
+            },
+            {
+              // @ts-expect-error: needed to override default comment
+              paymentDescription: content,
+              relays: mintList?.relays || relays,
+              mints: mintList?.mints.reverse() || defaultMints,
+              p2pk: mintList?.pubkey || pubkey,
+              allowIntramintFallback: true,
+              unit: "sat",
+            },
+          );
+          if (nutzap instanceof NDKNutzap) {
+            console.log("NUTZAP", nutzap);
+            onZap(nutzap);
+            nutzap.publish(relaySet);
+          }
         } catch (err) {
           reject(err);
         }
@@ -221,11 +251,10 @@ export class Zapper extends NDKZapper {
   constructor(
     target: NDKEvent | NDKUser,
     amount: number,
-    unit: string = "msat",
     options = {},
     config: ZapperConfig = { relays: [] },
   ) {
-    super(target, amount, unit, options);
+    super(target, amount, "sat", options);
     this.config = config;
   }
 

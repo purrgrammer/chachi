@@ -49,10 +49,7 @@ export const walletsAtom = atomWithStorage<ChachiWallet[]>(
 );
 export const activeWalletAtom = atom<NDKWallet | null>(null);
 
-export const defaultMints = [
-  "https://mint.0xchat.com",
-  "https://mint.coinos.io",
-];
+export const defaultMints = ["https://mint.0xchat.com"];
 
 export function useChachiWallet() {
   const { t } = useTranslation();
@@ -117,7 +114,7 @@ export function useChachiWallet() {
         nwcNdk.addExplicitRelay(relay);
       }
       const nwc = new NDKNWCWallet(nwcNdk, {
-        timeout: 10_000,
+        timeout: 20_000,
         pairingCode: defaultWallet.connection,
       });
       nwc.on("ready", () => {

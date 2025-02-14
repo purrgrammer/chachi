@@ -17,6 +17,8 @@ const Group = lazy(() => import("@/pages/group"));
 const Event = lazy(() => import("@/pages/event"));
 const Wallet = lazy(() => import("@/pages/wallet"));
 const Settings = lazy(() => import("@/pages/settings"));
+const Mint = lazy(() => import("@/pages/mint"));
+const Nutzaps = lazy(() => import("@/pages/nutzaps"));
 
 const LoadingScreen = () => {
   return (
@@ -123,6 +125,14 @@ const router = createBrowserRouter([
       {
         path: "/e/:nlink",
         element: <Event />,
+      },
+      {
+        path: "/mint/:url",
+        element: <Mint />,
+      },
+      {
+        path: "/nutzaps",
+        element: <Nutzaps />,
       },
     ],
   },

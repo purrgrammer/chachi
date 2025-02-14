@@ -1,33 +1,14 @@
 import { validateNutzap } from "@/lib/nip-61";
-import { Bitcoin, Euro, DollarSign } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Landmark, Bitcoin, Euro, DollarSign } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
-import { Avatar } from "@/components/nostr/avatar";
 import { Event, Address } from "@/components/nostr/event";
 import { formatShortNumber } from "@/lib/number";
+import { MintName, MintIcon } from "@/components/mint";
 import { RichText } from "@/components/rich-text";
 import { User } from "@/components/nostr/user";
-import { usePubkey } from "@/lib/account";
 import { HUGE_AMOUNT } from "@/lib/zap";
 import { Group } from "@/lib/types";
-
-// todo: reply, react
-// todo: avatar
-export function ChatNutzap({ event }: { event: NostrEvent }) {
-  const pubkey = usePubkey();
-  const isMine = event.pubkey === pubkey;
-  return (
-    <div className="flex flex-row gap-2 items-end">
-      {isMine ? null : <Avatar pubkey={event.pubkey} className="size-7" />}
-      <div
-        className={`z-0 relative rounded-md border-none rounded-md my-0.5 max-w-[18rem] sm:max-w-sm md:max-w-md ${isMine ? "ml-auto" : ""}`}
-      >
-        <div className="py-2 px-4 pb-2 bg-background/80 rounded-md">
-          <Nutzap event={event} showAuthor={false} animateGradient />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function E({
   id,
@@ -129,6 +110,21 @@ export function Nutzap({
       <RichText tags={event.tags.concat(zap.tags)} group={group}>
         {zap.content}
       </RichText>
+      {zap.mint ? (
+        <div className="flex flex-row gap-1 items-center justify-end">
+          <Landmark className="size-3" />
+          <MintIcon url={zap.mint} className="size-3" />
+          <Link
+            to={`/mint/${zap.mint.replace(/^https:\/\//, "")}`}
+            className="leading-tight"
+          >
+            <MintName
+              url={zap.mint}
+              className="text-xs hover:underline hover:decoration-dotted"
+            />
+          </Link>
+        </div>
+      ) : null}
     </div>
   ) : (
     <span className="text-xs text-muted-foreground">Invalid zap</span>

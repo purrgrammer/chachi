@@ -1,74 +1,298 @@
-import React, { useState, useEffect, forwardRef, ForwardedRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  forwardRef,
+  ForwardedRef,
+} from "react";
 import { toast } from "sonner";
+import { useInView } from "framer-motion";
+import {
+  Reply as ReplyIcon,
+  SmilePlus,
+  Bitcoin,
+  Copy,
+  ShieldBan,
+  Trash,
+} from "lucide-react";
 import { NostrEvent, UnsignedEvent } from "nostr-tools";
+import { Avatar } from "@/components/nostr/avatar";
 import { NDKKind, NDKEvent } from "@nostr-dev-kit/ndk";
+import { useSettings } from "@/lib/settings";
 import { Badge } from "@/components/ui/badge";
 import { Name } from "@/components/nostr/name";
 import { useGroupAdminsList } from "@/lib/nostr/groups";
 import { useMembers } from "@/lib/messages";
 import { ChatInput } from "@/components/nostr/chat/input";
-import { ChatNutzap } from "@/components/nostr/nutzap";
+import { Emoji as EmojiType, EmojiPicker } from "@/components/emoji-picker";
+import { Emoji } from "@/components/emoji";
 import { Chat } from "@/components/nostr/chat/chat";
 import { New } from "@/components/nostr/new";
+import { NewZapDialog } from "@/components/nostr/zap";
 import { NewZap } from "@/components/nostr/zap";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet } from "@/lib/nostr";
+import { useMintList } from "@/lib/cashu";
 import { useDeletions } from "@/lib/nostr/chat";
 import { usePubkey, useCanSign } from "@/lib/account";
 import type { Group } from "@/lib/types";
+import { useCopy } from "@/lib/hooks";
 import { useRelayInfo } from "@/lib/relay";
 import {
   useGroupchat,
-  useSaveLastSeen,
   useMemoizedLastSeen,
   useNewMessage,
+  saveLastSeen,
+  useSaveLastSeen,
+  saveGroupEvent,
 } from "@/lib/messages";
 import { DELETE_GROUP } from "@/lib/kinds";
+import { Nutzap } from "@/components/nostr/nutzap";
 import { useTranslation } from "react-i18next";
 
-//export function ChatZap({
-//  event,
-//  className,
-//}: {
-//  event: NostrEvent;
-//  className?: string;
-//}) {
-//  // todo: get amount from proofs
-//  const amount = 420;
-//  const total = 420;
-//  const receiver = event.pubkey;
-//  return (
-//    <div
-//      className={cn(
-//        "flex flex-row rounded-lg bg-accent border-2 w-fit max-w-xs sm:max-w-sm md:max-w-md ",
-//        className,
-//      )}
-//    >
-//      <div className="p-1 px-2">
-//        <div className="flex flex-row gap-2 items-center">
-//          <h3 className="text-sm font-semibold">
-//            <Name pubkey={event.pubkey} />
-//          </h3>
-//          {receiver ? (
-//            <>
-//              <Coins className="size-3 text-muted-foreground" />
-//              <h3 className="text-sm font-semibold">
-//                <Name pubkey={receiver} />
-//              </h3>
-//            </>
-//          ) : null}
-//        </div>
-//        <RichText tags={event.tags}>{event.content}</RichText>
-//      </div>
-//      <div className="flex items-center px-2 rounded-r-lg bg-background">
-//        <span className="text-muted-foreground">
-//          <Bitcoin className="size-4" />
-//        </span>
-//        <span className="font-mono text-lg">{total}</span>
-//      </div>
-//    </div>
-//  );
-//}
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuLabel,
+  ContextMenuSeparator,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  ContextMenuShortcut,
+} from "@/components/ui/context-menu";
+import { Reactions } from "@/components/nostr/reactions";
+
+interface ChatNutzapProps {
+  event: NostrEvent;
+  group: Group;
+  setReplyingTo?: (event: NostrEvent) => void;
+  deleteEvent?: (event: NostrEvent) => void;
+  canDelete?: (event: NostrEvent) => boolean;
+}
+
+function ChatNutzap({
+  event,
+  group,
+  setReplyingTo,
+  canDelete,
+  deleteEvent,
+}: ChatNutzapProps) {
+  // todo: gestures
+  const ndk = useNDK();
+  const ref = useRef<HTMLDivElement | null>(null);
+  const isInView = useInView(ref);
+  const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
+  const [showingZapDialog, setShowingZapDialog] = useState(false);
+  const { data: mintList } = useMintList(event.pubkey);
+  const { data: adminsList } = useGroupAdminsList(group);
+  const admins = adminsList || [];
+  const pubkey = usePubkey();
+  const isMine = event.pubkey === pubkey;
+  const amIAdmin = pubkey && admins.includes(pubkey);
+  const relaySet = useRelaySet([group.relay]);
+  const { t } = useTranslation();
+  const [, copy] = useCopy();
+  const [settings] = useSettings();
+
+  // todo: extract to hook
+  async function react(e: EmojiType) {
+    try {
+      const ev = new NDKEvent(ndk, {
+        kind: NDKKind.Reaction,
+        content: e.native ? e.native : e.shortcodes,
+      } as NostrEvent);
+      ev.tag(new NDKEvent(ndk, event));
+      if (e.src) {
+        ev.tags.push(["emoji", e.name, e.src]);
+      }
+      await ev.publish(relaySet);
+      if (e.native) {
+        // TODO add translation
+        toast.success(`Reacted with ${e.native}`);
+      } else if (e.src) {
+        // nit: info icon
+        toast(
+          <div className="flex flex-row gap-2 items-center">
+            {t("chat.message.react.with")}
+            <Emoji
+              name={e.name}
+              image={e.src}
+              className="inline-block w-5 h-5"
+            />
+          </div>,
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(t("chat.message.react.error"));
+    } finally {
+      setShowingEmojiPicker(false);
+    }
+  }
+
+  async function kick(e: NostrEvent) {
+    try {
+      const ev = new NDKEvent(ndk, {
+        kind: NDKKind.GroupAdminRemoveUser,
+        content: "",
+        tags: [
+          ...(group ? [["h", group.id, group.relay]] : []),
+          ["p", e.pubkey],
+        ],
+      } as NostrEvent);
+      await ev.publish(relaySet);
+      toast.success(t("chat.user.kick.success"));
+      if (group) {
+        saveGroupEvent(ev.rawEvent() as NostrEvent, group);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(t("chat.user.kick.error"));
+    }
+  }
+
+  return (
+    <>
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          <div
+            ref={ref}
+            className={`z-0 rounded-md border-none rounded-md my-0.5 max-w-[18rem] sm:max-w-sm md:max-w-md ${isMine ? "ml-auto" : ""}`}
+          >
+            <div className="flex flex-col gap-0">
+              <div className="flex flex-row gap-2 items-end">
+                {isMine ? null : (
+                  <Avatar pubkey={event.pubkey} className="size-7" />
+                )}
+                <div className="relative py-2 px-4 pb-2 bg-background/80 rounded-md">
+                  <Nutzap event={event} showAuthor={false} animateGradient />
+                </div>
+              </div>
+              <Reactions event={event} live={isInView} />
+            </div>
+          </div>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem
+            className="cursor-pointer"
+            onClick={() => setReplyingTo?.(event)}
+          >
+            {t("chat.message.reply.action")}
+            <ContextMenuShortcut>
+              <ReplyIcon className="w-4 h-4" />
+            </ContextMenuShortcut>
+          </ContextMenuItem>
+          <ContextMenuItem
+            className="cursor-pointer"
+            onClick={() => setShowingEmojiPicker(true)}
+          >
+            {t("chat.message.react.action")}
+            <ContextMenuShortcut>
+              <SmilePlus className="w-4 h-4" />
+            </ContextMenuShortcut>
+          </ContextMenuItem>
+          {mintList?.pubkey ? (
+            <ContextMenuItem
+              className="cursor-pointer"
+              onClick={() => setShowingZapDialog(true)}
+            >
+              {t("chat.message.tip.action")}
+              <ContextMenuShortcut>
+                <Bitcoin className="w-4 h-4" />
+              </ContextMenuShortcut>
+            </ContextMenuItem>
+          ) : null}
+          <ContextMenuSeparator />
+          <ContextMenuItem
+            className="cursor-pointer"
+            onClick={() => copy(event.content)}
+          >
+            {t("chat.message.copy.action")}
+            <ContextMenuShortcut>
+              <Copy className="w-4 h-4" />
+            </ContextMenuShortcut>
+          </ContextMenuItem>
+          {amIAdmin && event.pubkey !== pubkey ? (
+            <>
+              <ContextMenuSeparator />
+              <ContextMenuLabel>{t("group.info.admin")}</ContextMenuLabel>
+              <ContextMenuItem
+                className="cursor-pointer"
+                onClick={() => kick(event)}
+              >
+                {t("chat.user.kick.action")}
+                <ContextMenuShortcut>
+                  <ShieldBan className="w-4 h-4" />
+                </ContextMenuShortcut>
+              </ContextMenuItem>
+              {deleteEvent ? (
+                <ContextMenuItem
+                  className="cursor-pointer"
+                  onClick={() => deleteEvent(event)}
+                >
+                  {t("chat.message.delete.action")}
+                  <ContextMenuShortcut>
+                    <Trash className="w-4 h-4" />
+                  </ContextMenuShortcut>
+                </ContextMenuItem>
+              ) : null}
+            </>
+          ) : deleteEvent && canDelete?.(event) ? (
+            <ContextMenuItem
+              className="cursor-pointer"
+              onClick={() => deleteEvent(event)}
+            >
+              {t("chat.message.delete.action")}
+              <ContextMenuShortcut>
+                <Trash className="w-4 h-4 text-destructive" />
+              </ContextMenuShortcut>
+            </ContextMenuItem>
+          ) : null}
+          {settings.devMode ? (
+            <>
+              <ContextMenuSeparator />
+              <ContextMenuLabel className="text-xs font-light">
+                {t("chat.debug")}
+              </ContextMenuLabel>
+              <ContextMenuItem
+                className="cursor-pointer"
+                onClick={() => console.log(event)}
+              >
+                Log
+              </ContextMenuItem>
+              {group ? (
+                <ContextMenuItem
+                  className="cursor-pointer"
+                  onClick={() => saveLastSeen(event, group)}
+                >
+                  {t("chat.message.save-as-last-seen")}
+                </ContextMenuItem>
+              ) : null}
+            </>
+          ) : null}
+        </ContextMenuContent>
+      </ContextMenu>
+      {showingEmojiPicker ? (
+        <EmojiPicker
+          open={showingEmojiPicker}
+          onOpenChange={(open) => setShowingEmojiPicker(open)}
+          onEmojiSelect={react}
+        >
+          <div className="pointer-events-none">
+            <Nutzap event={event} showAuthor={false} />
+          </div>
+        </EmojiPicker>
+      ) : null}
+      {showingZapDialog ? (
+        <NewZapDialog
+          open
+          event={event}
+          group={group}
+          onClose={() => setShowingZapDialog(false)}
+        />
+      ) : null}
+    </>
+  );
+}
 
 //function JoinGroup({ group }: { group: Group }) {
 //  const ndk = useNDK();
@@ -153,7 +377,6 @@ export const GroupChat = forwardRef(
       undefined,
     );
     const newMessage = useNewMessage(group);
-    const saveLastSeen = useSaveLastSeen(group);
     const { events: deleteEvents } = useDeletions(group);
     const isRelayGroup = group.id === "_";
     const canIPoast =
@@ -169,9 +392,10 @@ export const GroupChat = forwardRef(
         ));
     const { t } = useTranslation();
     const lastSeen = useMemoizedLastSeen(group);
+    const saveLast = useSaveLastSeen(group);
 
     useEffect(() => {
-      return () => saveLastSeen();
+      return () => saveLast();
     }, [group.id, group.relay]);
 
     function onNewMessage(ev: NostrEvent) {
@@ -220,7 +444,16 @@ export const GroupChat = forwardRef(
           deleteEvent={deleteEvent}
           messageKinds={[NDKKind.GroupChat]}
           components={{
-            [NDKKind.Nutzap]: ({ event }) => <ChatNutzap event={event} />,
+            [NDKKind.Nutzap]: ({ event }) => (
+              <ChatNutzap
+                key={event.id}
+                event={event}
+                group={group}
+                setReplyingTo={setReplyingTo}
+                canDelete={canDelete}
+                deleteEvent={deleteEvent}
+              />
+            ),
             [NDKKind.GroupAdminAddUser]: (props) => (
               <UserActivity {...props} action="join" />
             ),

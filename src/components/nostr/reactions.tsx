@@ -16,6 +16,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { validateZap, Zap } from "@/lib/nip-57";
+import { validateNutzap, Nutzap } from "@/lib/nip-61";
 import { cn, groupBy } from "@/lib/utils";
 import { CUSTOM_EMOJI_CONTENT_REGEX } from "@/lib/emoji";
 
@@ -146,6 +147,34 @@ function Reaction({
   );
 }
 
+function NutzapReaction({ nutzap }: { nutzap: Nutzap }) {
+  // todo: USD/EUR amounts
+  const account = useAccount();
+  const me = account?.pubkey;
+  const iZapped = nutzap.pubkey === me;
+  return (
+    <div
+      className={`px-1.5 py-1 text-foreground bg-background/90 dark:bg-background/30 rounded-xl ${iZapped ? "bg-primary/20 dark:bg-primary/50" : ""} transition-color`}
+    >
+      <div className="flex flex-row items-center gap-1.5">
+        <Bitcoin className="size-4 text-muted-foreground" />
+        <span className="text-sm font-mono">
+          {formatShortNumber(nutzap.amount)}
+        </span>
+        <Avatar pubkey={nutzap.pubkey} className="size-4" />
+        {nutzap.content ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="text-xs line-clamp-1">{nutzap.content}</span>
+            </TooltipTrigger>
+            <TooltipContent>{nutzap.content}</TooltipContent>
+          </Tooltip>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 function ZapReaction({ zap }: { zap: Zap }) {
   // todo: USD/EUR amounts
   const account = useAccount();
@@ -206,6 +235,11 @@ export function Reactions({
     .map(validateZap)
     .filter((z) => z !== null)
     .sort((a, b) => b.amount - a.amount) as Zap[];
+  const nutzaps = events
+    .filter((r) => r.kind === NDKKind.Nutzap)
+    .map(validateNutzap)
+    .filter((z) => z !== null)
+    .sort((a, b) => b.amount - a.amount) as Nutzap[];
   const reactions = events.filter((r) => r.kind === NDKKind.Reaction);
   const hasReactions = zaps.length > 0 || reactions.length > 0;
 
@@ -223,6 +257,9 @@ export function Reactions({
     >
       {zaps.map((zap) => (
         <ZapReaction key={zap.id} zap={zap} />
+      ))}
+      {nutzaps.map((zap) => (
+        <NutzapReaction key={zap.id} nutzap={zap} />
       ))}
       {Object.entries(byContent)
         .sort((a, b) => {
@@ -259,7 +296,7 @@ export function Zaps({
   return (
     <Reactions
       event={event}
-      kinds={[NDKKind.Zap]}
+      kinds={[NDKKind.Zap, NDKKind.Nutzap]}
       relays={relays}
       className={className}
       live={live}
