@@ -3,6 +3,7 @@ import { NostrEvent } from "nostr-tools";
 
 export interface Zap {
   id: string;
+  created_at: number;
   amount: number;
   pubkey: string;
   content: string;
@@ -28,6 +29,7 @@ export function validateZapRequest(
       ? {
           id: req.id,
           pubkey: req.pubkey,
+          created_at: req.created_at,
           amount,
           content: req.content,
           e: req.tags.find((t) => t[0] === "e")?.[1],

@@ -23,6 +23,7 @@
       "connect": "Connect"
     },
     "logout": "Log out",
+    "zaps": "Zaps",
     "language": "Language",
     "theme": {
       "trigger": "Theme",
@@ -578,5 +579,11 @@
     "relays": {
       "title": "Relays"
     }
+  },
+  "nutzaps": {
+    "title": "Zaps",
+    "log-in": "Log in to see your zaps",
+    "invalid": "Invalid zap",
+    "redeem": "Redeem"
   }
 }

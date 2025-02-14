@@ -131,7 +131,7 @@ const router = createBrowserRouter([
         element: <Mint />,
       },
       {
-        path: "/nutzaps",
+        path: "/zaps",
         element: <Nutzaps />,
       },
     ],

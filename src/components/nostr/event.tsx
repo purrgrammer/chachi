@@ -124,3 +124,37 @@ export function Address({
     <EventNotFound />
   );
 }
+
+export function E({
+  id,
+  group,
+  pubkey,
+}: {
+  id: string;
+  pubkey?: string;
+  group?: Group;
+}) {
+  return (
+    <Event
+      id={id}
+      group={group}
+      pubkey={pubkey}
+      relays={[]}
+      showReactions={false}
+    />
+  );
+}
+
+export function A({ address, group }: { address: string; group?: Group }) {
+  const [k, pubkey, d] = address.split(":");
+  return (
+    <Address
+      kind={Number(k)}
+      pubkey={pubkey}
+      identifier={d}
+      group={group}
+      relays={[]}
+      showReactions={false}
+    />
+  );
+}

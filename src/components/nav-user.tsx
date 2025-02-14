@@ -9,6 +9,7 @@ import {
   Languages,
   Palette,
   Settings,
+  Zap,
 } from "lucide-react";
 import { Login } from "@/components/nostr/login";
 import { Avatar } from "@/components/nostr/avatar";
@@ -103,6 +104,10 @@ export function NavUser() {
               <DropdownMenuItem onClick={() => navigate("/settings")}>
                 <Settings className="text-muted-foreground size-4" />
                 {t("user.settings")}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/zaps")}>
+                <Zap className="text-muted-foreground size-4" />
+                {t("user.zaps")}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuSub>

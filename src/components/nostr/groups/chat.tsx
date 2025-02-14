@@ -156,7 +156,7 @@ function ChatNutzap({
         <ContextMenuTrigger asChild>
           <div
             ref={ref}
-            className={`z-0 rounded-md border-none rounded-md my-0.5 max-w-[18rem] sm:max-w-sm md:max-w-md ${isMine ? "ml-auto" : ""}`}
+            className={`z-0 rounded-md border-none rounded-md my-1 max-w-[18rem] sm:max-w-sm md:max-w-md ${isMine ? "ml-auto" : ""}`}
           >
             <div className="flex flex-col gap-0">
               <div className="flex flex-row gap-2 items-end">

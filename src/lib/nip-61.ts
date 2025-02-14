@@ -2,6 +2,7 @@ import { NostrEvent } from "nostr-tools";
 
 export interface Nutzap {
   id: string;
+  created_at: number;
   amount: number;
   unit: "sat" | "msat" | "eur" | "usd" | string;
   pubkey: string;
@@ -30,6 +31,7 @@ export function validateNutzap(zap: NostrEvent): Nutzap | null {
     return amount && mint
       ? {
           id: zap.id,
+          created_at: zap.created_at,
           pubkey: zap.pubkey,
           amount,
           mint,

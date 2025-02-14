@@ -1,48 +1,21 @@
-import { validateNutzap } from "@/lib/nip-61";
+import { validateNutzap, Nutzap as NutzapType } from "@/lib/nip-61";
 import { Link } from "react-router-dom";
 import { Landmark, Bitcoin, Euro, DollarSign } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
-import { Event, Address } from "@/components/nostr/event";
+import { E, A } from "@/components/nostr/event";
 import { formatShortNumber } from "@/lib/number";
 import { MintName, MintIcon } from "@/components/mint";
-import { RichText } from "@/components/rich-text";
+import { Emoji } from "@/components/emoji";
+import {
+  useRichText,
+  RichText,
+  BlockFragment,
+  EmojiFragment,
+} from "@/components/rich-text";
 import { User } from "@/components/nostr/user";
 import { HUGE_AMOUNT } from "@/lib/zap";
+import { usePubkey } from "@/lib/account";
 import { Group } from "@/lib/types";
-
-function E({
-  id,
-  group,
-  pubkey,
-}: {
-  id: string;
-  pubkey?: string;
-  group?: Group;
-}) {
-  return (
-    <Event
-      id={id}
-      group={group}
-      pubkey={pubkey}
-      relays={[]}
-      showReactions={false}
-    />
-  );
-}
-
-function A({ address, group }: { address: string; group?: Group }) {
-  const [k, pubkey, d] = address.split(":");
-  return (
-    <Address
-      kind={Number(k)}
-      pubkey={pubkey}
-      identifier={d}
-      group={group}
-      relays={[]}
-      showReactions={false}
-    />
-  );
-}
 
 export function NutzapDetail({
   event,
@@ -62,6 +35,55 @@ export function NutzapPreview({
   group?: Group;
 }) {
   return <Nutzap event={event} group={group} animateGradient={true} />;
+}
+
+function NutzapContent({
+  event,
+  group,
+  zap,
+}: {
+  event: NostrEvent;
+  group?: Group;
+  zap: NutzapType;
+}) {
+  const fragments = useRichText(
+    event.content.trim(),
+    {
+      events: true,
+      images: true,
+      video: true,
+      audio: true,
+      emojis: true,
+      urls: true,
+      ecash: true,
+    },
+    event.tags,
+  );
+  const pubkey = usePubkey();
+  const isSingleCustomEmoji =
+    fragments.length === 1 &&
+    fragments[0].type === "block" &&
+    fragments[0].nodes.length === 1 &&
+    fragments[0].nodes[0].type === "emoji";
+  const singleCustomEmoji = isSingleCustomEmoji
+    ? ((fragments[0] as BlockFragment).nodes[0] as EmojiFragment)
+    : null;
+  return isSingleCustomEmoji && singleCustomEmoji ? (
+    <div
+      className={event.pubkey === pubkey ? "flex items-end justify-end" : ""}
+    >
+      <Emoji
+        key={singleCustomEmoji.name}
+        name={singleCustomEmoji.name}
+        image={singleCustomEmoji.image}
+        className={`w-32 h-32 aspect-auto rounded-md`}
+      />
+    </div>
+  ) : (
+    <RichText tags={event.tags.concat(zap.tags)} group={group}>
+      {zap.content}
+    </RichText>
+  );
 }
 
 export function Nutzap({
@@ -107,9 +129,7 @@ export function Nutzap({
       ) : zap.a ? (
         <A address={zap.a} group={group} />
       ) : null}
-      <RichText tags={event.tags.concat(zap.tags)} group={group}>
-        {zap.content}
-      </RichText>
+      <NutzapContent event={event} zap={zap} />
       {zap.mint ? (
         <div className="flex flex-row gap-1 items-center justify-end">
           <Landmark className="size-3" />
