@@ -52,7 +52,7 @@ export function ChatBubble({ event, group }: ChatBubbleProps) {
           <GroupName group={chatGroup} className="text-xs" />
         </div>
       ) : null}
-      <ChatMessage event={event} group={group} admins={[]} />
+      <ChatMessage event={event} group={group} admins={[]} className="" />
     </div>
   );
 }

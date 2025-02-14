@@ -106,6 +106,10 @@ export function fetchInvoice(
   ).then((r) => r.json());
 }
 
+function shuffle<T>(array: T[]): T[] {
+  return array.sort(() => Math.random() - 0.5);
+}
+
 export function useZap(pubkey: string, relays: string[], event?: NostrEvent) {
   const ndk = useNDK();
   const { data: mintList } = useMintList(pubkey);
@@ -144,7 +148,7 @@ export function useZap(pubkey: string, relays: string[], event?: NostrEvent) {
               // @ts-expect-error: needed to override default comment
               paymentDescription: content,
               relays: mintList?.relays || relays,
-              mints: mintList?.mints.reverse() || defaultMints,
+              mints: mintList ? shuffle(mintList.mints) : defaultMints,
               p2pk: mintList?.pubkey || pubkey,
               allowIntramintFallback: true,
               unit: "sat",

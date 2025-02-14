@@ -138,7 +138,7 @@ export function NewZapDialog({
               </motion.div>
             ) : (
               <motion.div
-                className="flex flex-col items-center justify-center gap-2 w-full"
+                className="flex flex-col items-center justify-center gap-2"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}

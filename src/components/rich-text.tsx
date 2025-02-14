@@ -208,7 +208,7 @@ function toNode(
         href={fragment.url}
         target="_blank"
         rel="noopener noreferrer"
-        className={cn("underline decoration-dotted", classNames.urls)}
+        className={cn("break-all underline decoration-dotted", classNames.urls)}
       >
         {fragment.url}
       </a>
