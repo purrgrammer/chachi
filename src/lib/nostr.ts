@@ -14,6 +14,7 @@ import NDK, {
 import { relaysAtom } from "@/app/store";
 import { useNDK } from "@/lib/ndk";
 import { isRelayURL } from "@/lib/relay";
+import { dedupeBy } from "@/lib/utils";
 import { EVENT, ADDRESS, PROFILE, RELAY_LIST } from "@/lib/query";
 
 interface NostrREQResult<A> {
@@ -36,22 +37,26 @@ export function useEvent({
   pubkey,
   relays,
 }: {
-  id: string;
+  id?: string;
   pubkey?: string;
   relays: string[];
 }) {
   const ndk = useNDK();
 
   return useQuery({
+    enabled: Boolean(id),
     queryKey: [EVENT, id ? id : "empty"],
     queryFn: async () => {
+      if (!id) throw new Error("No id");
       const relayList =
         pubkey && relays.length === 0
           ? await fetchRelayList(ndk, pubkey)
           : relays.length > 0
             ? relays
-            : ["wss://relay.nostr.band"];
-      const relaySet = NDKRelaySet.fromRelayUrls(relayList, ndk);
+            : null;
+      const relaySet = relayList
+        ? NDKRelaySet.fromRelayUrls(relayList, ndk)
+        : undefined;
       return ndk
         .fetchEvent(
           { ids: [id] },
@@ -254,7 +259,7 @@ export function useStream(
       const newEvents = [...events];
       const rawEvent = event.rawEvent() as NostrEvent;
       insertEventIntoDescendingList(newEvents, rawEvent);
-      setEvents(newEvents);
+      setEvents(dedupeBy(newEvents, "id"));
     });
 
     sub.on("eose", () => {
@@ -407,7 +412,6 @@ export function useReactions(
     kinds,
     ...new NDKEvent(ndk, event).filter(),
   };
-  console.log("USREACTIONS", filter);
   return useStream(filter, relays, live);
 }
 

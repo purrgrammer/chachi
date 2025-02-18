@@ -3,37 +3,24 @@ import { HandCoins, Bitcoin, Euro, DollarSign, RotateCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Token, getDecodedToken } from "@cashu/cashu-ts";
-import {
-  NDKCashuWallet,
-  NDKWebLNWallet,
-  NDKNWCWallet,
-} from "@nostr-dev-kit/ndk-wallet";
 import { Button } from "@/components/ui/button";
 import { usePubkey } from "@/lib/account";
 import { formatShortNumber } from "@/lib/number";
 import { cn } from "@/lib/utils";
-import { useWallet } from "@/lib/wallet";
+import { useCashuWallet } from "@/lib/wallet";
 
 function RedeemToken({ token }: { token: string }) {
   const [isRedeeming, setIsRedeeming] = useState(false);
   const { t } = useTranslation();
-  const wallet = useWallet();
+  const wallet = useCashuWallet();
 
-  // todo: use wallet
   async function redeem() {
     if (!wallet) return;
 
     try {
       setIsRedeeming(true);
-      if (wallet instanceof NDKCashuWallet) {
-        // todo: if not a token in our mints, swap to our mint and redeem
-        await wallet.receiveToken(token);
-        toast.success(`Ecash redeemed`);
-      } else if (wallet instanceof NDKWebLNWallet) {
-        console.log("TODO: WebLN Wallet");
-      } else if (wallet instanceof NDKNWCWallet) {
-        console.log("TODO: NWC Wallet");
-      }
+      await wallet.receiveToken(token);
+      toast.success(`Ecash redeemed`);
     } catch (err) {
       toast.error(
         `Error redeeming token: ${(err as Error | undefined)?.message || "Unknown error"}`,

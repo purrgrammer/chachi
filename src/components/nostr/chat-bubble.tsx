@@ -41,12 +41,11 @@ export function ChatBubble({ event, group }: ChatBubbleProps) {
   const isForwarded =
     chatGroup.id &&
     chatGroup.relay &&
-    group &&
-    (group.id !== chatGroup.id || group.relay !== chatGroup.relay);
+    (group?.id !== chatGroup.id || group?.relay !== chatGroup.relay);
   return (
     <div className="flex flex-col gap-0.5">
       {isForwarded ? (
-        <div className="flex flex-row gap-1 items-center text-muted-foreground">
+        <div className="flex flex-row gap-1 items-center text-muted-foreground ml-9">
           <Forward className="size-4" />
           <span className="text-xs">{t("chat.message.forward.forwarded")}</span>
           <GroupName group={chatGroup} className="text-xs" />

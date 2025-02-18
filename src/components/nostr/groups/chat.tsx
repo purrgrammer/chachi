@@ -164,10 +164,20 @@ function ChatNutzap({
                   <Avatar pubkey={event.pubkey} className="size-7" />
                 )}
                 <div className="relative py-2 px-4 pb-2 bg-background/80 rounded-md">
-                  <Nutzap event={event} showAuthor={false} animateGradient />
+                  <Nutzap
+                    event={event}
+                    group={group}
+                    showAuthor={false}
+                    animateGradient
+                  />
                 </div>
               </div>
-              <Reactions event={event} live={isInView} />
+              <Reactions
+                event={event}
+                relays={[group.relay]}
+                kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
+                live={isInView}
+              />
             </div>
           </div>
         </ContextMenuTrigger>
@@ -286,6 +296,7 @@ function ChatNutzap({
         <NewZapDialog
           open
           event={event}
+          pubkey={event.pubkey}
           group={group}
           onClose={() => setShowingZapDialog(false)}
         />

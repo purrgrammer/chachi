@@ -40,7 +40,7 @@ import {
   ContextMenuShortcut,
 } from "@/components/ui/context-menu";
 import { Name } from "@/components/nostr/name";
-import { Zaps, Reactions } from "@/components/nostr/reactions";
+import { Reactions } from "@/components/nostr/reactions";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCopy } from "@/lib/hooks";
 import { useNDK } from "@/lib/ndk";
@@ -444,23 +444,18 @@ export function ChatMessage({
                   {content}
                 </RichText>
               )}
-              <div className="space-y-1">
-                <Zaps
-                  event={event}
-                  relays={[...(relay ? [relay] : [])]}
-                  live={true}
-                  className="pt-1"
-                />
-                <Reactions
-                  event={event}
-                  relays={[...(relay ? [relay] : [])]}
-                  live={isInView}
-                />
-              </div>
+              <Reactions
+                className="pt-1"
+                event={event}
+                relays={[...(relay ? [relay] : [])]}
+                kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
+                live={isInView}
+              />
               {showingZapDialog ? (
                 <NewZapDialog
                   open
                   event={event}
+                  pubkey={event.pubkey}
                   group={group}
                   onClose={() => setShowingZapDialog(false)}
                 />

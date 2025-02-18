@@ -1,10 +1,10 @@
 import { validateNutzap, Nutzap as NutzapType } from "@/lib/nip-61";
-import { Link } from "react-router-dom";
-import { Landmark, Bitcoin, Euro, DollarSign } from "lucide-react";
+import { Bitcoin, Euro, DollarSign, Banknote } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { E, A } from "@/components/nostr/event";
 import { formatShortNumber } from "@/lib/number";
-import { MintName, MintIcon } from "@/components/mint";
+import { Pubkey } from "@/components/nostr/pubkey";
+import { MintLink } from "@/components/mint";
 import { Emoji } from "@/components/emoji";
 import {
   useRichText,
@@ -16,6 +16,7 @@ import { User } from "@/components/nostr/user";
 import { HUGE_AMOUNT } from "@/lib/zap";
 import { usePubkey } from "@/lib/account";
 import { Group } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 export function NutzapDetail({
   event,
@@ -37,25 +38,24 @@ export function NutzapPreview({
   return <Nutzap event={event} group={group} animateGradient={true} />;
 }
 
-function NutzapContent({
+export function NutzapContent({
   event,
   group,
   zap,
+  classNames,
 }: {
   event: NostrEvent;
   group?: Group;
   zap: NutzapType;
+  classNames?: {
+    singleCustomEmoji?: string;
+    onlyEmojis?: string;
+  };
 }) {
   const fragments = useRichText(
     event.content.trim(),
     {
-      events: true,
-      images: true,
-      video: true,
-      audio: true,
       emojis: true,
-      urls: true,
-      ecash: true,
     },
     event.tags,
   );
@@ -68,6 +68,10 @@ function NutzapContent({
   const singleCustomEmoji = isSingleCustomEmoji
     ? ((fragments[0] as BlockFragment).nodes[0] as EmojiFragment)
     : null;
+  const isOnlyEmojis =
+    /^\p{Emoji_Presentation}{1}\s*\p{Emoji_Presentation}{0,4}$/u.test(
+      event.content.trim(),
+    );
   return isSingleCustomEmoji && singleCustomEmoji ? (
     <div
       className={event.pubkey === pubkey ? "flex items-end justify-end" : ""}
@@ -76,9 +80,16 @@ function NutzapContent({
         key={singleCustomEmoji.name}
         name={singleCustomEmoji.name}
         image={singleCustomEmoji.image}
-        className={`w-32 h-32 aspect-auto rounded-md`}
+        className={cn(
+          `w-32 h-32 aspect-auto rounded-md`,
+          classNames?.singleCustomEmoji,
+        )}
       />
     </div>
+  ) : isOnlyEmojis ? (
+    <span className={cn("text-7xl", classNames?.onlyEmojis)}>
+      {event.content.trim()}
+    </span>
   ) : (
     <RichText tags={event.tags.concat(zap.tags)} group={group}>
       {zap.content}
@@ -109,41 +120,39 @@ export function Nutzap({
         <div className="flex items-center">
           <span className="text-muted-foreground">
             {zap.unit === "sat" ? (
-              <Bitcoin className="size-4" />
+              <Bitcoin className="size-6" />
             ) : zap.unit === "eur" ? (
-              <Euro className="size-4" />
+              <Euro className="size-6" />
             ) : zap.unit === "usd" ? (
-              <DollarSign className="size-4" />
-            ) : null}
+              <DollarSign className="size-6" />
+            ) : (
+              <Banknote className="size-6" />
+            )}
           </span>
-          <span className="font-mono text-lg">
+          <span className="font-mono text-2xl">
             {formatShortNumber(zap.amount)}
           </span>
         </div>
         {zap.p ? (
-          <User pubkey={zap.p} classNames={{ avatar: "size-4" }} />
+          <User
+            pubkey={zap.p}
+            classNames={{ avatar: "size-5", name: "text-md" }}
+          />
         ) : null}
       </div>
       {zap.e ? (
-        <E id={zap.e} group={group} pubkey={zap.p} />
+        <E id={zap.e} group={group} pubkey={zap.p} showReactions={false} />
       ) : zap.a ? (
-        <A address={zap.a} group={group} />
+        <A address={zap.a} group={group} showReactions={false} />
       ) : null}
       <NutzapContent event={event} zap={zap} />
+      {zap.p2pk ? <Pubkey isCashu pubkey={zap.p2pk} /> : null}
       {zap.mint ? (
-        <div className="flex flex-row gap-1 items-center justify-end">
-          <Landmark className="size-3" />
-          <MintIcon url={zap.mint} className="size-3" />
-          <Link
-            to={`/mint/${zap.mint.replace(/^https:\/\//, "")}`}
-            className="leading-tight"
-          >
-            <MintName
-              url={zap.mint}
-              className="text-xs hover:underline hover:decoration-dotted"
-            />
-          </Link>
-        </div>
+        <MintLink
+          includeLandmark
+          url={zap.mint}
+          classNames={{ icon: "size-3", name: "text-xs" }}
+        />
       ) : null}
     </div>
   ) : (

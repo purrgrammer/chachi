@@ -129,10 +129,12 @@ export function E({
   id,
   group,
   pubkey,
+  showReactions,
 }: {
   id: string;
   pubkey?: string;
   group?: Group;
+  showReactions?: boolean;
 }) {
   return (
     <Event
@@ -140,12 +142,20 @@ export function E({
       group={group}
       pubkey={pubkey}
       relays={[]}
-      showReactions={false}
+      showReactions={showReactions}
     />
   );
 }
 
-export function A({ address, group }: { address: string; group?: Group }) {
+export function A({
+  address,
+  group,
+  showReactions,
+}: {
+  address: string;
+  group?: Group;
+  showReactions?: boolean;
+}) {
   const [k, pubkey, d] = address.split(":");
   return (
     <Address
@@ -154,7 +164,7 @@ export function A({ address, group }: { address: string; group?: Group }) {
       identifier={d}
       group={group}
       relays={[]}
-      showReactions={false}
+      showReactions={showReactions}
     />
   );
 }

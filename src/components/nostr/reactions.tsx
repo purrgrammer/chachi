@@ -1,15 +1,14 @@
-"use client";
-
 import { useState, useContext } from "react";
 import { Bitcoin } from "lucide-react";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { Avatar } from "@/components/nostr/avatar";
+import { RichText } from "@/components/rich-text";
 import { Button } from "@/components/ui/button";
 import { useRelaySet, useReactions } from "@/lib/nostr";
 import { formatShortNumber } from "@/lib/number";
 import { NDKContext } from "@/lib/ndk";
-import { useAccount } from "@/lib/account";
+import { usePubkey } from "@/lib/account";
 import {
   Tooltip,
   TooltipContent,
@@ -19,6 +18,8 @@ import { validateZap, Zap } from "@/lib/nip-57";
 import { validateNutzap, Nutzap } from "@/lib/nip-61";
 import { cn, groupBy } from "@/lib/utils";
 import { CUSTOM_EMOJI_CONTENT_REGEX } from "@/lib/emoji";
+import { HUGE_AMOUNT } from "@/lib/zap";
+import { useMintList } from "@/lib/cashu";
 
 function Reacters({
   reactions,
@@ -78,8 +79,7 @@ function Reaction({
   const emojiImage = reactions[0].tags.find(
     (t) => t[0] === "emoji" && t[1] === emojiName,
   )?.[2];
-  const account = useAccount();
-  const me = account?.pubkey;
+  const me = usePubkey();
   const iReacted = reactions.some((r) => r.pubkey === me);
 
   async function react(content: string) {
@@ -149,27 +149,40 @@ function Reaction({
 
 function NutzapReaction({ nutzap }: { nutzap: Nutzap }) {
   // todo: USD/EUR amounts
-  const account = useAccount();
-  const me = account?.pubkey;
-  const iZapped = nutzap.pubkey === me;
   return (
     <div
-      className={`px-1.5 py-1 text-foreground bg-background/90 dark:bg-background/30 rounded-xl ${iZapped ? "bg-primary/20 dark:bg-primary/50" : ""} transition-color`}
+      className={`p-1 text-foreground transition-color ${nutzap.amount >= HUGE_AMOUNT ? "bg-animated-gradient" : "bg-gradient"} rounded-xl`}
     >
       <div className="flex flex-row items-center gap-1.5">
-        <Bitcoin className="size-4 text-muted-foreground" />
-        <span className="text-sm font-mono">
-          {formatShortNumber(nutzap.amount)}
-        </span>
-        <Avatar pubkey={nutzap.pubkey} className="size-4" />
         {nutzap.content ? (
           <Tooltip>
             <TooltipTrigger asChild>
-              <span className="text-xs line-clamp-1">{nutzap.content}</span>
+              <RichText
+                className="text-xs"
+                options={{ inline: true }}
+                tags={nutzap.tags}
+              >
+                {nutzap.content.trim()}
+              </RichText>
             </TooltipTrigger>
-            <TooltipContent>{nutzap.content}</TooltipContent>
+            <TooltipContent>
+              <RichText
+                className="text-xs"
+                options={{ inline: true }}
+                tags={nutzap.tags}
+              >
+                {nutzap.content.trim()}
+              </RichText>
+            </TooltipContent>
           </Tooltip>
         ) : null}
+        <div className="flex flex-row items-center gap-0.5">
+          <Bitcoin className="size-4 text-muted-foreground" />
+          <span className="text-sm font-mono">
+            {formatShortNumber(nutzap.amount)}
+          </span>
+        </div>
+        <Avatar pubkey={nutzap.pubkey} className="size-4" />
       </div>
     </div>
   );
@@ -177,28 +190,43 @@ function NutzapReaction({ nutzap }: { nutzap: Nutzap }) {
 
 function ZapReaction({ zap }: { zap: Zap }) {
   // todo: USD/EUR amounts
-  const account = useAccount();
-  const me = account?.pubkey;
+  const me = usePubkey();
   const iZapped = zap.pubkey === me;
   return (
     <div
-      className={`px-1.5 py-1 text-foreground bg-background/90 dark:bg-background/30 rounded-xl ${iZapped ? "bg-primary/20 dark:bg-primary/50" : ""} transition-color`}
+      className={`p-1 text-foreground bg-background/90 dark:bg-background/30 rounded-xl ${iZapped ? "bg-primary/20 dark:bg-primary/50" : ""} transition-color`}
     >
       <div className="flex flex-row items-center gap-1.5">
-        <Bitcoin className="size-4 text-muted-foreground" />
-        <span className="text-sm font-mono">
-          {formatShortNumber(zap.amount)}
-        </span>
-        <Avatar pubkey={zap.pubkey} className="size-4" />
         {zap.content ? (
           <Tooltip>
             <TooltipTrigger asChild>
-              <span className="text-xs line-clamp-1">{zap.content}</span>
+              <RichText
+                className="text-xs"
+                tags={zap.tags}
+                options={{ inline: true }}
+              >
+                {zap.content.trim()}
+              </RichText>
             </TooltipTrigger>
-            <TooltipContent>{zap.content}</TooltipContent>
+            <TooltipContent>
+              <RichText
+                className="text-xs"
+                tags={zap.tags}
+                options={{ inline: true }}
+              >
+                {zap.content.trim()}
+              </RichText>
+            </TooltipContent>
           </Tooltip>
         ) : null}
+        <div className="flex flex-row items-center gap-0.5">
+          <Bitcoin className="size-4 text-muted-foreground" />
+          <span className="text-sm font-mono">
+            {formatShortNumber(zap.amount)}
+          </span>
+        </div>
       </div>
+      <Avatar pubkey={zap.pubkey} className="size-4" />
     </div>
   );
 }
@@ -241,7 +269,8 @@ export function Reactions({
     .filter((z) => z !== null)
     .sort((a, b) => b.amount - a.amount) as Nutzap[];
   const reactions = events.filter((r) => r.kind === NDKKind.Reaction);
-  const hasReactions = zaps.length > 0 || reactions.length > 0;
+  const hasReactions =
+    zaps.length > 0 || reactions.length > 0 || nutzaps.length > 0;
 
   const byContent = groupBy(reactions, (r: NostrEvent) => {
     return r.content === "+" ? "👍" : r.content === "-" ? "👎" : r.content;
@@ -302,4 +331,25 @@ export function Zaps({
       live={live}
     />
   );
+}
+
+export function Nutzaps({
+  event,
+  className,
+  live,
+}: {
+  event: NostrEvent;
+  className?: string;
+  live?: boolean;
+}) {
+  const { data: mintList } = useMintList(event.pubkey);
+  return mintList ? (
+    <Reactions
+      event={event}
+      kinds={[NDKKind.Nutzap]}
+      relays={mintList.relays}
+      className={className}
+      live={live}
+    />
+  ) : null;
 }

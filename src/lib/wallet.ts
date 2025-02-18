@@ -22,121 +22,181 @@ import {
 import { useNDK, useNWCNDK } from "@/lib/ndk";
 import type { Zap } from "@/lib/nip-57";
 import { usePubkey } from "@/lib/account";
+import { cashuAtom } from "@/app/store";
 import { useRelays, useRelaySet } from "@/lib/nostr";
 
 export type ChachiWallet =
+  | { type: "nip60" }
   | { type: "nwc"; connection: string }
-  | { type: "webln" }
-  | { type: "nip60" };
+  | { type: "webln" };
 
-export const walletAtom = atomWithStorage<NostrEvent | null>(
-  "cashu-wallet",
-  null,
-  createJSONStorage<NostrEvent | null>(() => localStorage),
-  { getOnInit: true },
-);
-export const defaultWalletAtom = atomWithStorage<ChachiWallet | null>(
-  "default-wallet",
-  null,
-  createJSONStorage<ChachiWallet | null>(() => localStorage),
-  { getOnInit: true },
-);
+export const cashuWalletAtom = atom<NDKCashuWallet | null>(null);
 export const walletsAtom = atomWithStorage<ChachiWallet[]>(
   "wallets",
   [],
   createJSONStorage<ChachiWallet[]>(() => localStorage),
   { getOnInit: true },
 );
-export const activeWalletAtom = atom<NDKWallet | null>(null);
 
 export const defaultMints = ["https://mint.0xchat.com"];
+
+export function useCashuWallet() {
+  return useAtomValue(cashuWalletAtom);
+}
 
 export function useChachiWallet() {
   const { t } = useTranslation();
   const ndk = useNDK();
   const nwcNdk = useNWCNDK();
-  const ev = useAtomValue(walletAtom);
   const pubkey = usePubkey();
-  const relays = useRelays();
-  const relaySet = useRelaySet(relays);
-  const defaultWallet = useAtomValue(defaultWalletAtom);
-  const [wallet, setWallet] = useAtom(activeWalletAtom);
+  const [wallets] = useWallets();
+  const [, setNDKWallets] = useAtom(ndkWalletsAtom);
+  const [cashuWallet, setCashuWallet] = useAtom(cashuWalletAtom);
+  const cashu = useAtomValue(cashuAtom);
 
   useEffect(() => {
-    if (ev && pubkey && defaultWallet && defaultWallet.type === "nip60") {
-      ndk
-        .fetchEvent(
-          {
-            kinds: [NDKKind.CashuWallet],
-            authors: [pubkey],
-          },
-          {
-            closeOnEose: true,
-          },
-          relaySet,
-        )
-        .then((ev) => {
-          if (!ev) {
-            console.error("Wallet not found");
+    Promise.allSettled(
+      wallets.map(async (w) => {
+        if (w.type === "nwc") {
+          return createNWCWallet(w.connection, nwcNdk);
+        } else if (w.type === "webln") {
+          return createWebLNWallet();
+        }
+        throw new Error("Unsupported wallet type");
+      }),
+    ).then((results) => {
+      const newWallets = results
+        .map((r) => (r.status === "fulfilled" ? r.value : null))
+        .filter((w) => w) as NDKWallet[];
+      setNDKWallets((wallets) => [...wallets, ...newWallets]);
+    });
+  }, []);
+
+  //  useEffect(() => {
+  //    //if (pubkey && defaultWallet && defaultWallet.type === "nip60") {
+  //    //  ndk
+  //    //    .fetchEvent(
+  //    //      {
+  //    //        kinds: [NDKKind.CashuWallet],
+  //    //        authors: [pubkey],
+  //    //      },
+  //    //      {
+  //    //        closeOnEose: true,
+  //    //      },
+  //    //      relaySet,
+  //    //    )
+  //    //    .then((ev) => {
+  //    //      if (!ev) {
+  //    //        console.error("Wallet not found");
+  //    //        return;
+  //    //      }
+  //    //      const event = new NDKEvent(ndk, ev);
+  //    //      event
+  //    //        .decrypt(new NDKUser({ pubkey }), ndk.signer, "nip44")
+  //    //        .then(() => {
+  //    //          NDKCashuWallet.from(event)
+  //    //            .then((w) => {
+  //    //              if (!w) return;
+  //    //              ndk.wallet = w;
+  //    //              setWallet(w);
+  //    //    	  setNDKWallets((wallets) => [...wallets, w]);
+  //    //              //fixme: this is trying to /mint/bolt11 already minted tokens?
+  //    //              w.start();
+  //    //              const name = w.walletId || event.dTag;
+  //    //              w.on("ready", () =>
+  //    //                toast.success(t("wallet.ready", { name })),
+  //    //              );
+  //    //            })
+  //    //            .catch((err) => {
+  //    //              console.error(err);
+  //    //              toast.error(t("wallet.sync-error"));
+  //    //            });
+  //    //        });
+  //    //    });
+  //    //  return () => {
+  //    //    if (wallet instanceof NDKCashuWallet) {
+  //    //      wallet?.stop();
+  //    //    }
+  //    //  };
+  //    //} else
+  //   if (defaultWallet?.type === "nwc") {
+  //	    const existing = ndkWallets.find(w => w instanceof NDKNWCWallet && w.pairingCode === defaultWallet.connection)
+  //	    if (existing) {
+  //		    ndk.wallet = existing;
+  //		    setWallet(existing);
+  //		    return;
+  //	    }
+  //      const u = new URL(defaultWallet.connection);
+  //      const relayUrls = u.searchParams.getAll("relay");
+  //      for (const relay of relayUrls) {
+  //        nwcNdk.addExplicitRelay(relay);
+  //      }
+  //      const nwc = new NDKNWCWallet(nwcNdk, {
+  //        timeout: 20_000,
+  //        pairingCode: defaultWallet.connection,
+  //      });
+  //      nwc.on("ready", () => {
+  //        setWallet(nwc);
+  //        ndk.wallet = nwc;
+  //		  setNDKWallets((wallets) => [...wallets, nwc]);
+  //      });
+  //    } else if (defaultWallet?.type === "webln") {
+  //	    const existing = ndkWallets.find((w: NDKWallet) => w instanceof NDKWebLNWallet)
+  //	    if (existing) {
+  //		    ndk.wallet = existing;
+  //		    setWallet(existing);
+  //		    return;
+  //	    }
+  //      const w = new NDKWebLNWallet();
+  //      setWallet(w);
+  //      ndk.wallet = w;
+  //setNDKWallets((wallets) => [...wallets, w]);
+  //    }
+  //  }, [defaultWallet]);
+
+  useEffect(() => {
+    if (cashu && pubkey && !cashuWallet) {
+      createCashuWallet(cashu, ndk)
+        .then((w) => {
+          if (!w) {
+            toast.error(t("wallet.sync-error"));
             return;
           }
-          const event = new NDKEvent(ndk, ev);
-          event
-            .decrypt(new NDKUser({ pubkey }), ndk.signer, "nip44")
-            .then(() => {
-              NDKCashuWallet.from(event)
-                .then((w) => {
-                  if (!w) return;
-                  ndk.wallet = w;
-                  setWallet(w);
-                  //fixme: this is trying to /mint/bolt11 already minted tokens?
-                  w.start();
-                  const name = w.walletId || event.dTag;
-                  w.on("ready", () =>
-                    toast.success(t("wallet.ready", { name })),
-                  );
-                })
-                .catch((err) => {
-                  console.error(err);
-                  toast.error(t("wallet.sync-error"));
-                });
-            });
+          setCashuWallet(w);
+          setNDKWallets((wallets) => [w, ...wallets]);
+          //fixme: this is trying to /mint/bolt11 already minted tokens?
+          w.start();
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error(t("wallet.sync-error"));
         });
-      return () => {
-        if (wallet instanceof NDKCashuWallet) {
-          wallet?.stop();
-        }
-      };
-    } else if (defaultWallet?.type === "nwc") {
-      const u = new URL(defaultWallet.connection);
-      const relayUrls = u.searchParams.getAll("relay");
-      for (const relay of relayUrls) {
-        nwcNdk.addExplicitRelay(relay);
-      }
-      const nwc = new NDKNWCWallet(nwcNdk, {
-        timeout: 20_000,
-        pairingCode: defaultWallet.connection,
-      });
-      nwc.on("ready", () => {
-        setWallet(nwc);
-        ndk.wallet = nwc;
-      });
-    } else if (defaultWallet?.type === "webln") {
-      const w = new NDKWebLNWallet();
-      setWallet(w);
-      ndk.wallet = w;
     }
-  }, [ev?.id, pubkey, defaultWallet]);
-
-  return wallet;
+  }, [cashu, cashuWallet, pubkey]);
 }
 
-export function useWallet() {
-  return useAtomValue(activeWalletAtom);
+export function useNDKWallet(): [
+  NDKWallet | undefined,
+  (wallet: NDKWallet) => NDKWallet,
+] {
+  const ndk = useNDK();
+  return [
+    ndk.wallet as NDKWallet | undefined,
+    (wallet: NDKWallet) => {
+      ndk.wallet = wallet;
+      return wallet;
+    },
+  ];
 }
 
 export function useWallets() {
   return useAtom(walletsAtom);
+}
+
+const ndkWalletsAtom = atom<NDKWallet[]>([]);
+
+export function useNDKWallets() {
+  return useAtom(ndkWalletsAtom);
 }
 
 export type Direction = "in" | "out";
@@ -203,7 +263,7 @@ export function useTransactions(pubkey: string, wallet: NDKCashuWallet) {
     {
       kinds: [NDKKind.WalletChange],
       authors: [pubkey],
-      ...wallet.event!.filter(),
+      //...wallet.event!.filter(),
     },
     wallet.relaySet?.relayUrls || [],
     async (ev: NostrEvent): Promise<Transaction | null> => {
@@ -253,20 +313,22 @@ export function useTransactions(pubkey: string, wallet: NDKCashuWallet) {
 }
 
 export function useDeposit() {
-  const wallet = useWallet();
   const { t } = useTranslation();
   return useCallback(
     async (
+      wallet: NDKWallet,
       amount: number,
       mint: string,
       onSuccess: () => void,
-      onError: () => void,
+      onError?: () => void,
     ) => {
       if (!wallet) throw new Error("No wallet");
       if (wallet instanceof NDKCashuWallet) {
         const deposit = wallet.deposit(amount, mint);
         deposit.on("success", onSuccess);
-        deposit.on("error", onError);
+        if (onError) {
+          deposit.on("error", onError);
+        }
         return deposit.start();
       } else if (wallet instanceof NDKNWCWallet) {
         const res = await wallet.makeInvoice(amount, t("wallet.deposit"));
@@ -276,14 +338,13 @@ export function useDeposit() {
         throw new Error("Deposit not supported for this wallet type");
       }
     },
-    [wallet],
+    [],
   );
 }
 
 export function useCreateWallet() {
-  // todo: cashu mint list
   const ndk = useNDK();
-  const [, setWallet] = useAtom(walletAtom);
+  const [, setWallets] = useAtom(walletsAtom);
   return async (mints: string[], relays: string[]) => {
     const wallet = new NDKCashuWallet(ndk);
     wallet.mints = mints ? mints : defaultMints;
@@ -302,7 +363,7 @@ export function useCreateWallet() {
       await ev.publish();
     }
     if (wallet.event) {
-      setWallet(wallet.event.rawEvent() as NostrEvent);
+      setWallets((wallets) => [...wallets, { type: "nip60" }]);
     }
   };
 }
@@ -340,37 +401,6 @@ export function useNutsack() {
     enabled: Boolean(pubkey) && relays?.length > 0,
     queryKey: ["nutsack", pubkey],
     queryFn: () => fetchCashuWallet(ndk, pubkey!, relays),
-  });
-}
-
-export function useDefaultWallet() {
-  return useAtom(defaultWalletAtom);
-}
-
-export function useCashuWallet(pubkey: string) {
-  const ndk = useNDK();
-  const relays = useRelays();
-  return useQuery({
-    enabled: Boolean(pubkey) && relays?.length > 0,
-    queryKey: ["cashu-wallet", pubkey],
-    queryFn: () => {
-      return ndk
-        .fetchEvent(
-          {
-            kinds: [NDKKind.CashuWallet],
-            authors: [pubkey],
-          },
-          {
-            closeOnEose: true,
-          },
-          NDKRelaySet.fromRelayUrls(relays, ndk),
-        )
-        .then(async (ev) => {
-          if (!ev) throw new Error("Wallet not found");
-          await ev.decrypt(new NDKUser({ pubkey }));
-          return ev.rawEvent() as NostrEvent;
-        });
-    },
   });
 }
 
@@ -434,5 +464,65 @@ export function useNWCTransactions(wallet: NDKNWCWallet) {
     queryKey: ["nwc-txs", wallet.walletId],
     queryFn: () => fetchNWCTransactions(wallet),
     staleTime: Infinity,
+  });
+}
+
+export function useCashu() {
+  return useAtomValue(cashuAtom);
+}
+
+function equalNWCStrings(a: string, b: string) {
+  const urlA = new URL(a);
+  const urlB = new URL(b);
+  return (
+    urlA.host === urlB.host &&
+    urlA.searchParams.get("secret") === urlB.searchParams.get("secret")
+  );
+}
+
+export function useNWCWallet(connection?: string) {
+  const [ndkWallets] = useNDKWallets();
+  return ndkWallets.find(
+    (w) =>
+      w instanceof NDKNWCWallet &&
+      connection &&
+      w.pairingCode &&
+      equalNWCStrings(w.pairingCode, connection),
+  ) as NDKNWCWallet | undefined;
+}
+
+export async function createCashuWallet(
+  event: NostrEvent,
+  ndk: NDK,
+): Promise<NDKCashuWallet> {
+  return new Promise(async (resolve, reject) => {
+    const ev = new NDKEvent(ndk, event);
+    await ev.decrypt(
+      new NDKUser({ pubkey: event.pubkey }),
+      ndk.signer,
+      "nip44",
+    );
+    const w = await NDKCashuWallet.from(ev);
+    if (!w) reject("Failed to create wallet");
+    w?.start();
+    w?.on("ready", () => {
+      resolve(w);
+    });
+  });
+}
+
+export async function createWebLNWallet() {
+  return new NDKWebLNWallet();
+}
+
+export async function createNWCWallet(connection: string, ndk: NDK) {
+  return new Promise<NDKNWCWallet>((resolve) => {
+    const nwc = new NDKNWCWallet(ndk, {
+      timeout: 20_000,
+      pairingCode: connection,
+    });
+    nwc.on("ready", () => {
+      resolve(nwc);
+    });
   });
 }

@@ -13,7 +13,7 @@ import {
 import { useMintList } from "@/lib/cashu";
 import { useNDK } from "@/lib/ndk";
 import { defaultMints } from "@/lib/wallet";
-import { useRelaySet } from "@/lib/nostr";
+import { useRelaySet, useRelays } from "@/lib/nostr";
 import { NostrEvent } from "nostr-tools";
 import { LNURL } from "@/lib/query";
 import { Zap, validateZap } from "@/lib/nip-57";
@@ -110,10 +110,15 @@ function shuffle<T>(array: T[]): T[] {
   return array.sort(() => Math.random() - 0.5);
 }
 
-export function useZap(pubkey: string, relays: string[], event?: NostrEvent) {
+export function useNutzap(
+  pubkey: string,
+  relays: string[],
+  event?: NostrEvent,
+) {
   const ndk = useNDK();
+  const myRelays = useRelays();
   const { data: mintList } = useMintList(pubkey);
-  const relaySet = useRelaySet(relays);
+  const relaySet = useRelaySet(Array.from(new Set(relays.concat(myRelays))));
   return useCallback(
     async (
       content: string,
@@ -127,7 +132,7 @@ export function useZap(pubkey: string, relays: string[], event?: NostrEvent) {
           const zapped = event ? new NDKEvent(ndk, event) : null;
           const zapper = new Zapper(
             zapped ? zapped : new NDKUser({ pubkey }),
-            amount,
+            Number(amount) * 1000,
             {
               comment: content,
               ndk,
@@ -135,13 +140,12 @@ export function useZap(pubkey: string, relays: string[], event?: NostrEvent) {
             },
             { relays },
           );
-          zapper.unit = "sat";
           zapper.on("complete", (res) => {
             resolve(res);
           });
           const nutzap = await zapper.zapNip61(
             {
-              amount,
+              amount: Number(amount) * 1000,
               pubkey,
             },
             {
@@ -151,14 +155,44 @@ export function useZap(pubkey: string, relays: string[], event?: NostrEvent) {
               mints: mintList ? shuffle(mintList.mints) : defaultMints,
               p2pk: mintList?.pubkey || pubkey,
               allowIntramintFallback: true,
-              unit: "sat",
             },
           );
           if (nutzap instanceof NDKNutzap) {
-            console.log("NUTZAP", nutzap);
             onZap(nutzap);
             nutzap.publish(relaySet);
           }
+        } catch (err) {
+          reject(err);
+        }
+      });
+    },
+    [pubkey, relays, event],
+  );
+}
+
+export function useZap(pubkey: string, relays: string[], event?: NostrEvent) {
+  const ndk = useNDK();
+  const myRelays = useRelays();
+  const allRelays = Array.from(new Set(relays.concat(myRelays)));
+  return useCallback(
+    async (content: string, amount: number, tags: string[][]) => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const zapped = event ? new NDKEvent(ndk, event) : null;
+          const zapper = new Zapper(
+            zapped ? zapped : new NDKUser({ pubkey }),
+            Number(amount) * 1000,
+            {
+              comment: content,
+              ndk,
+              tags,
+            },
+            { relays: allRelays },
+          );
+          zapper.on("complete", (res) => {
+            resolve(res);
+          });
+          zapper.zap().then(resolve);
         } catch (err) {
           reject(err);
         }
@@ -258,7 +292,7 @@ export class Zapper extends NDKZapper {
     options = {},
     config: ZapperConfig = { relays: [] },
   ) {
-    super(target, amount, "sat", options);
+    super(target, amount, "msat", options);
     this.config = config;
   }
 

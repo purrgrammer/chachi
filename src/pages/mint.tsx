@@ -1,11 +1,11 @@
 import { Landmark } from "lucide-react";
 import { Header } from "@/components/header";
-import { MintName, MintIcon } from "@/components/mint";
+import { MintName, MintIcon, Mint } from "@/components/mint";
 import { useParams } from "react-router-dom";
 
-export default function Mint() {
+export default function MintPage() {
   const { url } = useParams();
-  const mint = `https://${url}`;
+  const mint = decodeURIComponent(url || "");
   return (
     <div>
       <Header>
@@ -19,6 +19,7 @@ export default function Mint() {
           <Landmark className="size-5 text-muted-foreground" />
         </div>
       </Header>
+      <Mint url={mint} />
     </div>
   );
 }

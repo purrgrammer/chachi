@@ -19,9 +19,11 @@ import {
   HUGE_AMOUNT,
   useZapAmounts,
   useIncreaseZapAmount,
+  useNutzap,
   useZap,
 } from "@/lib/zap";
 import { useProfile, useRelayList } from "@/lib/nostr";
+import { useMintList } from "@/lib/cashu";
 import {
   Dialog,
   DialogContent,
@@ -31,22 +33,27 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useGroup } from "@/lib/nostr/groups";
+import { WalletSelector } from "@/components/wallet";
 import type { Group, Emoji } from "@/lib/types";
 
 export function NewZapDialog({
   open,
   onClose,
   event,
+  pubkey,
   group,
   trigger,
   reply,
+  zapType = "nip-61",
 }: {
   open?: boolean;
   onClose?: () => void;
-  event: NostrEvent;
+  event?: NostrEvent;
+  pubkey: string;
   group?: Group;
   trigger?: React.ReactNode;
   reply?: string;
+  zapType?: "nip-57" | "nip-61";
 }) {
   const { t } = useTranslation();
   const amounts = useZapAmounts();
@@ -58,18 +65,22 @@ export function NewZapDialog({
   const [invoice, setInvoice] = useState<string | null>(null);
   const [amount, setAmount] = useState("21");
   const [message, setMessage] = useState(reply || "");
-  const { data: profile } = useProfile(event.pubkey);
-  const name = profile?.name || event.pubkey.slice(0, 6);
-  const { data: relayList } = useRelayList(event.pubkey);
+  const { data: profile } = useProfile(pubkey);
+  const name = profile?.name || pubkey.slice(0, 6);
+  const { data: relayList } = useRelayList(pubkey);
+  const { data: mintList } = useMintList(pubkey);
   const relays =
-    relayList && group
-      ? [group.relay, ...relayList]
-      : relayList
-        ? relayList
-        : group
-          ? [group.relay]
-          : [];
-  const sendZap = useZap(event.pubkey, relays, event);
+    mintList && group
+      ? [group.relay, ...mintList.relays]
+      : relayList && group
+        ? [group.relay, ...relayList]
+        : relayList
+          ? relayList
+          : group
+            ? [group.relay]
+            : [];
+  const sendNutzap = useNutzap(pubkey, relays, event);
+  const sendZap = useZap(pubkey, relays, event);
 
   function onOpenChange(open: boolean) {
     setIsOpen(open);
@@ -85,10 +96,8 @@ export function NewZapDialog({
   async function onZap() {
     try {
       setIsZapping(true);
-      await sendZap(
-        message,
-        Number(amount) * 1000,
-        [
+      if (zapType === "nip-57") {
+        await sendZap(message.trim(), Number(amount), [
           ...(group ? [["h", group.id, group.relay]] : []),
           ...(group && metadata?.pubkey
             ? [["a", `${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`]]
@@ -96,16 +105,40 @@ export function NewZapDialog({
           ...customEmojis.flatMap((e) =>
             e.name && e.image ? [["emoji", e.name, e.image]] : [],
           ),
-        ],
-        (nutzap) => {
-          onOpenChange(false);
-          toast.success(
-            t("zap.dialog.success", {
-              amount: formatShortNumber(nutzap.amount),
-            }),
-          );
-        },
-      );
+        ]);
+        toast.success(
+          t("zap.dialog.success", {
+            amount: formatShortNumber(Number(amount)),
+          }),
+        );
+      } else {
+        await sendNutzap(
+          message.trim(),
+          Number(amount),
+          [
+            ...(group ? [["h", group.id, group.relay]] : []),
+            ...(group && metadata?.pubkey
+              ? [
+                  [
+                    "a",
+                    `${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`,
+                  ],
+                ]
+              : []),
+            ...customEmojis.flatMap((e) =>
+              e.name && e.image ? [["emoji", e.name, e.image]] : [],
+            ),
+          ],
+          (nutzap) => {
+            onOpenChange(false);
+            toast.success(
+              t("zap.dialog.success", {
+                amount: formatShortNumber(nutzap.amount),
+              }),
+            );
+          },
+        );
+      }
       increaseZapAmount(Number(amount));
     } catch (err) {
       console.error(err);
@@ -117,8 +150,8 @@ export function NewZapDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      {trigger}
-      <DialogContent className="max-w-sm">
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("zap.dialog.title", { name })}</DialogTitle>
           <DialogDescription>
@@ -144,12 +177,14 @@ export function NewZapDialog({
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <Embed
-                  event={event}
-                  group={group}
-                  relays={[]}
-                  showReactions={false}
-                />
+                {event ? (
+                  <Embed
+                    event={event}
+                    group={group}
+                    relays={[]}
+                    showReactions={false}
+                  />
+                ) : null}
                 <div className="flex flex-row gap-4 items-center mx-2">
                   <Input
                     type="number"
@@ -182,6 +217,7 @@ export function NewZapDialog({
                 />
               </motion.div>
             )}
+            <WalletSelector />
             {invoice ? null : (
               <motion.div className="w-full">
                 <Button
@@ -207,18 +243,17 @@ export function NewZap({ event, group }: { event: NostrEvent; group?: Group }) {
   return (
     <NewZapDialog
       event={event}
+      pubkey={event.pubkey}
       group={group}
       open={false}
       trigger={
-        <DialogTrigger asChild>
-          <Button
-            variant="action"
-            size="icon"
-            className="bg-primary rounded-full"
-          >
-            <Bitcoin />
-          </Button>
-        </DialogTrigger>
+        <Button
+          variant="action"
+          size="icon"
+          className="bg-primary rounded-full"
+        >
+          <Bitcoin />
+        </Button>
       }
     />
   );

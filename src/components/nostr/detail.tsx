@@ -69,6 +69,7 @@ import { useRelaySet, useRelays } from "@/lib/nostr";
 import { useReplies } from "@/lib/nostr/comments";
 import { useGroupAdminsList } from "@/lib/nostr/groups";
 import { useMyGroups, useOpenGroup, groupId } from "@/lib/groups";
+import { MintEventPreview, MintEventDetail } from "@/components/mint";
 import {
   POLL,
   REPO,
@@ -80,6 +81,7 @@ import {
   //GOAL,
   BOOK,
   //BOOK_CONTENT,
+  CASHU_MINT,
 } from "@/lib/kinds";
 import {
   Dialog,
@@ -113,7 +115,7 @@ type EventComponent = (props: {
   group?: Group;
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
-}) => JSX.Element;
+}) => JSX.Element | null;
 
 // todo: events with no header or alternative author (group metadata, zap?, stream)
 const eventDetails: Record<
@@ -242,6 +244,11 @@ const eventDetails: Record<
     preview: WikiPreview,
     detail: WikiDetail,
   },
+  [CASHU_MINT]: {
+    noHeader: true,
+    preview: MintEventPreview,
+    detail: MintEventDetail,
+  },
 };
 
 function ShareDialog({
@@ -293,7 +300,6 @@ function ShareDialog({
     } catch (err) {
       console.error(err);
       toast.error(t("share.error"));
-    } finally {
     }
   }
 

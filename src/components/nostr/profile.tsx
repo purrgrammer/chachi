@@ -7,7 +7,6 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { nip19 } from "nostr-tools";
-import { Zap, Landmark } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar } from "@/components/nostr/avatar";
 import { Name } from "@/components/nostr/name";
@@ -16,10 +15,9 @@ import { Group } from "@/components/nostr/group";
 import { InputCopy } from "@/components/ui/input-copy";
 import { groupId } from "@/lib/groups";
 import { RichText } from "@/components/rich-text";
-import { MintName, MintIcon } from "@/components/mint";
+import { LnAddress } from "@/components/ln";
 import { useUserGroups } from "@/lib/nostr/groups";
 import type { Group as GroupType } from "@/lib/types";
-import { useMintList } from "@/lib/cashu";
 
 function ProfileDrawerContent({
   pubkey,
@@ -31,7 +29,6 @@ function ProfileDrawerContent({
   const { data: profile } = useProfile(pubkey);
   const { data: groups } = useUserGroups(pubkey);
   const { data: relays } = useRelayList(pubkey);
-  const { data: mintList } = useMintList(pubkey);
   const about = profile?.about;
   // todo: rich text bio
   return (
@@ -42,18 +39,9 @@ function ProfileDrawerContent({
           <Name pubkey={pubkey} />
         </DrawerTitle>
         {profile?.lud16 ? (
-          <div className="flex flex-row items-center gap-1">
-            <Zap className="size-4 text-muted-foreground" />
-            <span className="font-mono text-xs">{profile.lud16}</span>
-          </div>
+          <LnAddress pubkey={pubkey} address={profile.lud16} />
         ) : null}
-        {mintList?.mints.map((mint) => (
-          <div key={mint} className="flex flex-row gap-1 items-center">
-            <Landmark className="size-4 text-muted-foreground" />
-            <MintIcon url={mint} className="size-3" />
-            <MintName url={mint} className="text-xs" />
-          </div>
-        ))}
+
         <InputCopy
           value={
             relays && relays.length > 0

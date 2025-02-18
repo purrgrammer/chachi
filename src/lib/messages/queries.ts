@@ -61,7 +61,10 @@ export async function getLastGroupMessage(group: Group) {
   const id = groupId(group);
   const msgs = await db.events
     .where("[group+kind]")
-    .equals([id, NDKKind.GroupChat])
+    .anyOf([
+      [id, NDKKind.GroupChat],
+      [id, NDKKind.Nutzap],
+    ])
     .sortBy("created_at");
   return msgs?.at(-1);
 }

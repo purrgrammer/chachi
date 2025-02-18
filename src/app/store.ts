@@ -1,5 +1,6 @@
 import { atom, useAtom } from "jotai";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
+import { NostrEvent } from "nostr-tools";
 import type { LoginMethod, Account, Group, Relay, EmojiSet } from "@/lib/types";
 
 // todo: navigation history
@@ -43,9 +44,9 @@ export const groupListAtom = atomWithStorage<GroupList>(
   { getOnInit: true },
 );
 export const groupsAtom = atom<Group[]>((get) => {
-  const { groups } = get(groupListAtom);
+  const { groups, privateGroups } = get(groupListAtom);
   // todo: deduplicate, show private
-  return groups; //.concat(privateGroups || []);
+  return groups.concat(privateGroups || []);
 });
 export const groupsContentAtom = atom<string>((get) => {
   return get(groupListAtom).content;
@@ -76,16 +77,16 @@ interface MintList {
   created_at: number;
   mints: string[];
   relays: string[];
-  p2pk?: string;
+  pubkey?: string;
 }
 
 export const mintListAtom = atomWithStorage<MintList>(
-  "mint-list",
+  "mints-list",
   {
     created_at: 0,
     mints: [],
     relays: [],
-    p2pk: undefined,
+    pubkey: undefined,
   },
   createJSONStorage<MintList>(() => localStorage),
   { getOnInit: true },
@@ -135,6 +136,13 @@ export const mediaServerListAtom = atomWithStorage<MediaServers>(
 export const mediaServersAtom = atom<string[]>((get) => {
   return get(mediaServerListAtom).servers;
 });
+
+export const cashuAtom = atomWithStorage<NostrEvent | null>(
+  "cashu",
+  null,
+  createJSONStorage<NostrEvent | null>(() => localStorage),
+  { getOnInit: true },
+);
 
 // Emojis
 interface EmojiList {

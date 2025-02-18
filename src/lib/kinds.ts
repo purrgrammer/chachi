@@ -13,3 +13,4 @@ export const GIF_SET = 30169 as NDKKind;
 export const GOAL = 9041 as NDKKind;
 export const BOOK = 30040 as NDKKind;
 export const BOOK_CONTENT = 30041 as NDKKind;
+export const CASHU_MINT = 38172 as NDKKind;

@@ -1,8 +1,9 @@
 import { QRCodeSVG } from "qrcode.react";
 import { useTranslation } from "react-i18next";
+import { NewZapDialog } from "@/components/nostr/zap";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Wallet, Copy, Check } from "lucide-react";
+import { Wallet, Copy, Check, Zap } from "lucide-react";
 import { useCopy } from "@/lib/hooks";
 
 export function Invoice({
@@ -55,5 +56,28 @@ export function Invoice({
         <Wallet /> {t("zap.dialog.wallet")}
       </Button>
     </div>
+  );
+}
+
+export function LnAddress({
+  pubkey,
+  address,
+}: {
+  pubkey: string;
+  address: string;
+}) {
+  return (
+    <NewZapDialog
+      zapType="nip-57"
+      pubkey={pubkey}
+      trigger={
+        <Button variant="ghost" size="tiny">
+          <div className="flex flex-row items-center gap-1">
+            <Zap className="size-4 text-muted-foreground" />
+            <span className="font-mono text-xs">{address}</span>
+          </div>
+        </Button>
+      }
+    />
   );
 }

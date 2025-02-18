@@ -1,6 +1,10 @@
-import { useMemo } from "react";
+import { useAtom } from "jotai";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { useMemo, useState, useEffect } from "react";
 import { z } from "zod";
 import { NostrEvent } from "nostr-tools";
+import { Pubkey } from "@/components/nostr/pubkey";
 import { useTranslation } from "react-i18next";
 import {
   Moon,
@@ -8,25 +12,34 @@ import {
   Zap as ZapIcon,
   SunMoon,
   Wallet as WalletIcon,
+  WalletCards,
   PlugZap,
   Puzzle,
   Landmark,
   Server,
+  HandCoins,
+  Languages,
+  Palette,
+  RefreshCw,
+  SquareArrowOutUpRight,
 } from "lucide-react";
-import { NDKCashuWallet, NDKNWCWallet } from "@nostr-dev-kit/ndk-wallet";
-import { InputCopy } from "@/components/ui/input-copy";
+import { NDKEvent, NDKKind, NDKRelaySet } from "@nostr-dev-kit/ndk";
+import {
+  NDKWallet,
+  NDKCashuWallet,
+  NDKWebLNWallet,
+  NDKNWCWallet,
+} from "@nostr-dev-kit/ndk-wallet";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { MintIcon, MintName } from "@/components/mint";
+import { MintLink } from "@/components/mint";
 import { RelayIcon, RelayName } from "@/components/nostr/relay";
 import {
   Form,
   FormField,
   FormItem,
-  FormLabel,
   FormControl,
-  FormDescription,
   FormMessage,
 } from "@/components/ui/form";
 import {
@@ -52,13 +65,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  useWallet,
-  useDefaultWallet,
-  useNutsack,
-  ChachiWallet,
-} from "@/lib/wallet";
+import { useWallets, useNDKWallets, useCashuWallet } from "@/lib/wallet";
+import { useNDK } from "@/lib/ndk";
+import { usePubkey } from "@/lib/account";
+import { mintListAtom } from "@/app/store";
 import { themes, Theme } from "@/theme";
+import { useRelays } from "@/lib/nostr";
 
 const uiSchema = z.object({
   language: z.enum(languages),
@@ -125,111 +137,124 @@ export function UI() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="language"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("settings.ui.language.title")}</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={(props: Language) => {
-                    field.onChange(props);
-                    changeLanguage(props);
-                  }}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder={t(
-                          "settings.ui.language.select-placeholder",
-                        )}
-                      >
-                        <UILanguage lang={language} />
-                      </SelectValue>
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {languages.map((lang) => (
-                      <SelectItem key={lang} value={lang}>
-                        <UILanguage lang={lang} />
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormDescription>
-                {t("settings.ui.language.description")}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="theme"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("settings.ui.theme.title")}</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={(props: Theme) => {
-                    field.onChange(props);
-                    changeTheme(props);
-                  }}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder={t("settings.ui.theme.select-placeholder")}
-                      >
-                        <UITheme theme={theme} />
-                      </SelectValue>
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {themes.map((theme) => (
-                      <SelectItem key={theme} value={theme}>
-                        <UITheme theme={theme} />
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormDescription>
-                {t("settings.ui.theme.description")}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-3"
+      >
+        <div className="flex flex-col gap-1.5">
+          <div className="flex flex-row gap-1 items-center flex-wrap">
+            <Languages className="size-4 text-muted-foreground" />
+            <h4 className="text-sm uppercase font-light text-muted-foreground">
+              {t("settings.ui.language.title")}
+            </h4>
+          </div>
+          <FormField
+            control={form.control}
+            name="language"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Select
+                    onValueChange={(props: Language) => {
+                      field.onChange(props);
+                      changeLanguage(props);
+                    }}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={t(
+                            "settings.ui.language.select-placeholder",
+                          )}
+                        >
+                          <UILanguage lang={language} />
+                        </SelectValue>
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {languages.map((lang) => (
+                        <SelectItem key={lang} value={lang}>
+                          <UILanguage lang={lang} />
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex flex-row gap-1 items-center flex-wrap">
+            <Palette className="size-4 text-muted-foreground" />
+            <h4 className="text-sm uppercase font-light text-muted-foreground">
+              {t("settings.ui.theme.title")}
+            </h4>
+          </div>
+          <FormField
+            control={form.control}
+            name="theme"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Select
+                    onValueChange={(props: Theme) => {
+                      field.onChange(props);
+                      changeTheme(props);
+                    }}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={t(
+                            "settings.ui.theme.select-placeholder",
+                          )}
+                        >
+                          <UITheme theme={theme} />
+                        </SelectValue>
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {themes.map((theme) => (
+                        <SelectItem key={theme} value={theme}>
+                          <UITheme theme={theme} />
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </form>
     </Form>
   );
 }
 
 function WalletSummary({
-  name,
   wallet,
-  event,
   showControls = false,
-  isDefault = false,
 }: {
-  name: string;
-  wallet: ChachiWallet;
-  event?: NostrEvent;
+  wallet: NDKWallet;
   showControls?: boolean;
-  isDefault?: boolean;
 }) {
   const { t } = useTranslation();
-  const ndkWallet = useWallet();
-  const [, setDefaultWallet] = useDefaultWallet();
-  const { relays, pubkey, lud16 } = useMemo(() => {
-    if (wallet.type === "nwc") {
-      const u = new URL(wallet.connection);
+  const ndk = useNDK();
+  const [, setWallets] = useWallets();
+  const [, setNDKWallets] = useNDKWallets();
+  const [p2pk, setP2pk] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const me = usePubkey();
+  const navigate = useNavigate();
+  const myRelays = useRelays();
+  const { pubkey, lud16 } = useMemo(() => {
+    if (wallet instanceof NDKNWCWallet) {
+      const u = new URL(wallet.pairingCode || "");
       const pubkey = u.host ?? u.pathname;
       const relays = u.searchParams.getAll("relay");
       const lud16 = u.searchParams.get("lud16");
@@ -238,22 +263,79 @@ function WalletSummary({
     return {};
   }, []);
 
-  function removeWallet() {
-    if (isDefault) {
-      setDefaultWallet(null);
+  function openWallet() {
+    if (wallet instanceof NDKCashuWallet) {
+      navigate("/wallet");
+    } else if (wallet instanceof NDKNWCWallet) {
+      navigate(`/wallet/nwc/${encodeURIComponent(wallet.pairingCode!)}`);
+    } else if (wallet instanceof NDKWebLNWallet) {
+      navigate("/wallet/webln");
     }
   }
 
-  function makeDefault(wallet: ChachiWallet) {
-    setDefaultWallet(wallet);
+  useEffect(() => {
+    if (wallet instanceof NDKCashuWallet) {
+      wallet.getP2pk().then((p2pk) => setP2pk(p2pk));
+    }
+  }, [wallet]);
+
+  function removeWallet() {
+    setWallets((wallets) =>
+      wallets.filter((w) => {
+        if (w.type === "nip60" && wallet.type === "nip-60") {
+          return false;
+        } else if (
+          w.type === "nwc" &&
+          wallet.type === "nwc" &&
+          wallet instanceof NDKNWCWallet
+        ) {
+          return w.connection !== wallet.pairingCode;
+        } else if (w.type === "webln" && wallet.type === "webln") {
+          return false;
+        }
+        return true;
+      }),
+    );
+    setNDKWallets((wallets) =>
+      wallets.filter((w) => w.walletId !== wallet.walletId),
+    );
+  }
+
+  async function syncWallet() {
+    if (!(wallet instanceof NDKCashuWallet)) {
+      return;
+    }
+
+    if (!p2pk) {
+      return;
+    }
+
+    try {
+      setIsSyncing(true);
+      const event = new NDKEvent(ndk, {
+        kind: NDKKind.CashuMintList,
+        tags: [
+          ["pubkey", p2pk],
+          ...myRelays.map((r) => ["relay", r]),
+          ...wallet.mints.map((m) => ["mint", m]),
+        ],
+      } as NostrEvent);
+      await event.publish(NDKRelaySet.fromRelayUrls(myRelays, ndk));
+      toast.success(t("settings.wallet.wallets.synced"));
+    } catch (err) {
+      console.error(err);
+      toast.error(t("settings.wallet.wallets.sync-error"));
+    } finally {
+      setIsSyncing(false);
+    }
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex flex-row justify-between">
+        <CardTitle className="flex flex-row justify-between font-normal">
           <div className="flex flex-row items-center gap-1.5">
-            {wallet.type === "nip60" ? (
+            {wallet.type === "nip-60" ? (
               <WalletIcon className="size-6 text-muted-foreground" />
             ) : wallet.type === "nwc" ? (
               <PlugZap className="size-6 text-muted-foreground" />
@@ -265,64 +347,74 @@ function WalletSummary({
                 pubkey={pubkey}
                 classNames={{ avatar: "size-5", name: "text-md" }}
               />
-            ) : (
-              <span className="">{name}</span>
-            )}
+            ) : me ? (
+              <User
+                pubkey={me}
+                classNames={{ avatar: "size-5", name: "text-md" }}
+              />
+            ) : null}
           </div>
-          {wallet.type === "nwc" &&
-          isDefault &&
-          ndkWallet instanceof NDKNWCWallet ? (
-            <NWCWalletBalanceAmount
-              wallet={ndkWallet}
-              classNames={{ icon: "size-5", text: "text-xl font-light" }}
-            />
-          ) : wallet.type === "nip60" &&
-            isDefault &&
-            ndkWallet instanceof NDKCashuWallet ? (
-            <CashuWalletBalanceAmount
-              wallet={ndkWallet}
-              classNames={{ icon: "size-5", text: "text-xl font-light" }}
-            />
-          ) : null}
+          <div className="flex flex-row items-center gap-1.5">
+            <Button variant="ghost" size="tiny" onClick={openWallet}>
+              <div className="flex flex-row items-center gap-1">
+                <SquareArrowOutUpRight />
+                {t("settings.wallet.wallets.open")}
+              </div>
+            </Button>
+          </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="grid gap-4">
-        {wallet.type === "nip60" && event ? (
-          <MintList
-            mints={event.tags.filter((t) => t[0] === "mint")?.map((t) => t[1])}
-          />
-        ) : null}
-        {wallet.type === "nwc" ? (
-          <div className="flex flex-col gap-2">
+      <CardContent>
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-0 items-center justify-center">
+            <div className="flex items-center justify-center">
+              {wallet.type === "nwc" && wallet instanceof NDKNWCWallet ? (
+                <NWCWalletBalanceAmount
+                  wallet={wallet}
+                  classNames={{ icon: "size-12", text: "text-6xl font-light" }}
+                />
+              ) : wallet.type === "nip-60" &&
+                wallet instanceof NDKCashuWallet ? (
+                <CashuWalletBalanceAmount
+                  wallet={wallet}
+                  classNames={{ icon: "size-12", text: "text-6xl font-light" }}
+                />
+              ) : null}
+            </div>
             {lud16 ? (
               <div className="flex flex-row gap-1 items-center">
-                <ZapIcon className="size-4 text-muted-foreground" />
-                <span className="text-sm">{lud16}</span>
+                <ZapIcon className="size-3 text-muted-foreground" />
+                <span className="text-xs font-mono">{lud16}</span>
               </div>
             ) : null}
-            <InputCopy value={wallet.connection} />
-            {relays ? <RelayList relays={relays} /> : null}
+            {p2pk ? <Pubkey pubkey={p2pk} /> : null}
           </div>
-        ) : null}
+          {wallet.type === "nip-60" && wallet instanceof NDKCashuWallet ? (
+            <MintList mints={wallet.mints} />
+          ) : null}
+        </div>
       </CardContent>
       {showControls ? (
         <CardFooter className="flex justify-end">
           <div className="flex flex-row gap-2 items-center justify-between">
-            <Button
-              onClick={removeWallet}
-              variant="destructive"
-              className="w-full"
-              size="sm"
-            >
-              {t("settings.wallet.wallets.remove")}
-            </Button>
-            {isDefault ? null : (
+            {wallet.type !== "nip-60" ? (
               <Button
-                variant="secondary"
+                onClick={removeWallet}
+                variant="destructive"
+                className="w-full"
                 size="sm"
-                onClick={() => makeDefault(wallet)}
               >
-                {t("settings.wallet.wallets.make-default")}
+                {t("settings.wallet.wallets.remove")}
+              </Button>
+            ) : (
+              <Button
+                onClick={syncWallet}
+                variant="outline"
+                className="w-full"
+                size="sm"
+              >
+                <RefreshCw className={isSyncing ? "animate-spin" : ""} />
+                {t("settings.wallet.wallets.sync")}
               </Button>
             )}
           </div>
@@ -368,10 +460,11 @@ function MintList({ mints }: { mints: string[] }) {
       </div>
       <div className="flex flex-col gap-0.5">
         {mints.map((t) => (
-          <div key={t} className="flex flex-row items-center gap-1">
-            <MintIcon url={t} className="size-4" />
-            <MintName url={t} className="text-sm" />
-          </div>
+          <MintLink
+            key={t}
+            url={t}
+            classNames={{ icon: "hidden size-4", name: "text-sm" }}
+          />
         ))}
       </div>
     </div>
@@ -380,35 +473,45 @@ function MintList({ mints }: { mints: string[] }) {
 
 export function Wallet() {
   const { t } = useTranslation();
-  const wallet = useWallet();
-  const [defaultWallet] = useDefaultWallet();
-  const { data: cashuWallet } = useNutsack();
-  console.log("NUTSACK", cashuWallet);
+  const [mintList] = useAtom(mintListAtom);
+  const cashuWallet = useCashuWallet();
+  const [ndkWallets] = useNDKWallets();
   return (
     <div className="flex flex-col gap-4">
-      {defaultWallet && wallet ? (
-        <div className="flex flex-col gap-2">
-          <WalletSummary
-            key={wallet.walletId}
-            name={wallet.walletId}
-            wallet={defaultWallet}
-            event={
-              wallet instanceof NDKCashuWallet
-                ? (wallet.event?.rawEvent() as NostrEvent)
-                : undefined
-            }
-            showControls
-            isDefault
-          />
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-0.5">
+          <div className="flex flex-row gap-1.5 items-center">
+            <HandCoins className="size-4 text-muted-foreground" />
+            <h3 className="text-sm uppercase font-light text-muted-foreground">
+              {t("settings.wallet.payments.title")}
+            </h3>
+          </div>
+          <p className="text-xs">{t("settings.wallet.payments.description")}</p>
         </div>
-      ) : (
-        <span className="text-xs text-muted-foreground">
-          {t("settings.wallet.default-wallet.none")}
-        </span>
-      )}
+        {!cashuWallet ? <CreateWallet /> : null}
+        {mintList ? (
+          <div className="flex flex-col gap-2 px-3">
+            {mintList.pubkey ? <Pubkey pubkey={mintList.pubkey} /> : null}
+            <div className="flex flex-row gap-4 items-start">
+              <MintList mints={mintList.mints} />
+              <RelayList relays={mintList.relays} />
+            </div>
+          </div>
+        ) : null}
+      </div>
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-row gap-1.5 items-center">
+          <WalletCards className="size-4 text-muted-foreground" />
+          <h3 className="text-sm uppercase font-light text-muted-foreground">
+            {t("settings.wallet.wallets.title")}
+          </h3>
+        </div>
+        {ndkWallets.map((w) => (
+          <WalletSummary key={w.walletId} wallet={w} showControls />
+        ))}
+      </div>
       <div className="flex flex-col gap-2">
         <ConnectWallet />
-        {cashuWallet ? null : <CreateWallet />}
       </div>
     </div>
   );

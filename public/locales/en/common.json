@@ -457,7 +457,10 @@
     "connect": "Connect",
     "not-found": "Wallet not found",
     "no-transactions": "No transactions found",
+    "no-coins": "No coins found",
     "make-default": "Make default",
+    "choose-wallet": "Choose wallet",
+    "choose-wallet-placeholder": "Choose a wallet to pay with",
     "make-default-error": "Failed to set wallet as default",
     "make-default-success": "Wallet set as default",
     "create": "Create wallet",
@@ -508,7 +511,9 @@
         "description": "Create a wallet to start sending and receiving zaps"
       }
     },
+    "coins": "Cash",
     "transactions": {
+      "title": "Transactions",
       "loading": "Loading transactions",
       "loading-error": "Error loading transactions"
     }
@@ -558,6 +563,10 @@
         "title": "Active wallet",
         "none": "No wallet selected"
       },
+      "payments": {
+        "title": "Payments",
+        "description": "Manage the mints and relays you'll use to receive payments"
+      },
       "wallets": {
         "title": "Wallets",
         "none": "No wallets",
@@ -570,7 +579,11 @@
         "delete-error": "Failed to delete wallet",
         "delete-success": "Wallet deleted",
         "create-error": "Failed to create wallet",
-        "create-success": "Wallet created"
+        "create-success": "Wallet created",
+        "sync": "Sync",
+        "synced": "Synced",
+        "sync-error": "Error syncing wallet",
+        "open": "Open"
       }
     },
     "media": {
@@ -584,6 +597,19 @@
     "title": "Zaps",
     "log-in": "Log in to see your zaps",
     "invalid": "Invalid zap",
-    "redeem": "Redeem"
+    "redeem": "Redeem",
+    "redeem-success": "Zap redeemed",
+    "redeem-error": "Failed to redeem zap",
+    "received": "Received",
+    "sent": "Sent",
+    "no-received": "Nothing to see here... yet",
+    "no-sent": "Nothing to see here... yet",
+    "open": "Open"
+  },
+  "mint": {
+    "contact": "Contact",
+    "version": "Version",
+    "features": "Features",
+    "nuts": "Nuts"
   }
 }

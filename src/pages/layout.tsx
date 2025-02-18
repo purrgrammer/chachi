@@ -1,4 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
+import { NostrEvent } from "nostr-tools";
 import { ReactNode, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import NDK, {
@@ -17,6 +18,7 @@ import {
   relayListAtom,
   relaysAtom,
   mintListAtom,
+  cashuAtom,
   groupListAtom,
   contactListAtom,
   mediaServerListAtom,
@@ -38,6 +40,7 @@ function useUserEvents() {
   const pubkey = account?.pubkey;
   const relays = useAtomValue(relaysAtom);
   const [mints, setMints] = useAtom(mintListAtom);
+  const [cashu, setCashu] = useAtom(cashuAtom);
   const [groupList, setGroupList] = useAtom(groupListAtom);
   const [relayList, setRelayList] = useAtom(relayListAtom);
   const [contactList, setContactList] = useAtom(contactListAtom);
@@ -124,7 +127,7 @@ function useUserEvents() {
     const filter = {
       kinds: [NDKKind.CashuMintList],
       authors: [pubkey],
-      ...(mints.created_at ? { since: mints.created_at } : {}),
+      //...(mints.created_at ? { since: mints.created_at } : {}),
     };
     const sub = ndk.subscribe(
       filter,
@@ -143,14 +146,44 @@ function useUserEvents() {
         const relays = event.tags
           .filter((t) => t[0] === "relay")
           .map((t) => t[1]);
-        const p2pk = event.tags.find((t) => t[0] === "p2pk")?.[1];
-        setMints({ created_at: event.created_at, mints, relays, p2pk });
+        const pubkey = event.tags.find((t) => t[0] === "pubkey")?.[1];
+        setMints({ created_at: event.created_at, mints, relays, pubkey });
+      }
+    });
+
+    console.log("MINTLIST", mints);
+    return () => sub.stop();
+  }, [pubkey]);
+
+  // Cashu wallet
+  useEffect(() => {
+    if (!pubkey) return;
+
+    const filter = {
+      kinds: [NDKKind.CashuWallet],
+      authors: [pubkey],
+      ...(cashu?.created_at ? { since: cashu.created_at } : {}),
+    };
+    const sub = ndk.subscribe(
+      filter,
+      {
+        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+        closeOnEose: false,
+      },
+      NDKRelaySet.fromRelayUrls(mints?.relays || outboxRelayUrls, ndk),
+    );
+
+    sub.on("event", async (event) => {
+      if (
+        event.created_at &&
+        event.created_at > (cashu ? cashu.created_at : 0)
+      ) {
+        setCashu(event.rawEvent() as NostrEvent);
       }
     });
 
     return () => sub.stop();
   }, [pubkey]);
-
   // Groups, contacts, media server and emoji list
   useEffect(() => {
     if (pubkey && relays.length > 0) {

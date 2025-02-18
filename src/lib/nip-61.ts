@@ -5,6 +5,7 @@ export interface Nutzap {
   created_at: number;
   amount: number;
   unit: "sat" | "msat" | "eur" | "usd" | string;
+  p2pk?: string;
   pubkey: string;
   content: string;
   mint: string;
@@ -14,7 +15,7 @@ export interface Nutzap {
   tags: string[][];
 }
 
-function sumProofs(proof: string): number {
+export function sumProofs(proof: string): number {
   const tokens = JSON.parse(proof);
   return Array.isArray(tokens)
     ? tokens.reduce((acc, t) => acc + t.amount, 0)
@@ -26,6 +27,11 @@ export function validateNutzap(zap: NostrEvent): Nutzap | null {
     const proofs = zap.tags.filter((t) => t[0] === "proof").map((t) => t[1]);
     if (proofs.length === 0) return null;
     const amount = proofs.reduce((acc, proof) => acc + sumProofs(proof), 0);
+    const proof = JSON.parse(proofs[0]);
+    const secret = JSON.parse(proof.secret);
+    const p2pkData =
+      Array.isArray(secret) && secret[0] === "P2PK" ? secret[1] : null;
+    const p2pk = p2pkData?.data;
     const unit = zap.tags.find((t) => t[0] === "unit")?.[1] || "msat";
     const mint = zap.tags.find((t) => t[0] === "u")?.[1];
     return amount && mint
@@ -37,6 +43,7 @@ export function validateNutzap(zap: NostrEvent): Nutzap | null {
           mint,
           unit: unit.startsWith("msat") ? "sat" : unit.toLowerCase(),
           content: zap.content,
+          p2pk,
           e: zap.tags.find((t) => t[0] === "e")?.[1],
           a: zap.tags.find((t) => t[0] === "a")?.[1],
           p: zap.tags.find((t) => t[0] === "p")?.[1],

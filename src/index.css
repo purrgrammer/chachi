@@ -35,6 +35,7 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
     --arrow: 220.9 39.3% 11%;
+    --bg-gradient-opacity: 0.2;
   }
 
   .dark {
@@ -67,6 +68,7 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --bg-gradient-opacity: 0.5;
   }
 
   .monochrome {
@@ -145,6 +147,13 @@
     background: linear-gradient(to bottom right, #ff902b, #f83838);
     border-radius: inherit;
   }
+  .bg-gradient {
+    background: linear-gradient(
+      to bottom right,
+      rgba(255, 144, 43, var(--bg-gradient-opacity)),
+      rgba(248, 56, 56, var(--bg-gradient-opacity))
+    );
+  }
   .border-animated-gradient:before {
     content: "";
     position: absolute;
@@ -166,6 +175,19 @@
     animation: animatedgradient 6s ease-in-out alternate infinite;
     background-size: 300% 300%;
     border-radius: inherit;
+  }
+  .bg-animated-gradient {
+    background: linear-gradient(
+      60deg,
+      rgba(43, 217, 255, var(--bg-gradient-opacity)),
+      rgba(140, 141, 237, var(--bg-gradient-opacity)),
+      rgba(248, 56, 217, var(--bg-gradient-opacity)),
+      rgba(248, 56, 56, var(--bg-gradient-opacity)),
+      rgba(255, 144, 43, var(--bg-gradient-opacity)),
+      rgba(221, 248, 56, var(--bg-gradient-opacity))
+    );
+    animation: animatedgradient 6s ease-in-out alternate infinite;
+    background-size: 300% 300%;
   }
 
   @keyframes animatedgradient {

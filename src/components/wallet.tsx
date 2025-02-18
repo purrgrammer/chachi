@@ -15,13 +15,15 @@ import {
   Bitcoin,
   Euro,
   DollarSign,
-  Coins,
+  Banknote,
   ArrowDownRight,
   ArrowUpRight,
   ScanQrCode,
   CircleSlash2,
+  List,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import {
@@ -37,17 +39,18 @@ import { Event } from "@/components/nostr/event";
 import { Label } from "@/components/ui/label";
 import { Invoice } from "@/components/ln";
 import { Zap, validateZapRequest } from "@/lib/nip-57";
-import { useNDK, useNWCNDK } from "@/lib/ndk";
+import { useNWCNDK } from "@/lib/ndk";
 import { useRelays } from "@/lib/nostr";
 import { formatShortNumber } from "@/lib/number";
 import { useHost } from "@/lib/hooks";
 import {
   defaultMints,
-  useWallet,
+  useNDKWallet,
+  useNDKWallets,
+  useCashuWallet,
   useDeposit,
   useCreateWallet,
   useTransactions,
-  useDefaultWallet,
   useWallets,
   useNWCBalance,
   useNWCInfo,
@@ -66,7 +69,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { User } from "@/components/nostr/user";
-import { MintIcon, MintName } from "@/components/mint";
+import { MintName, MintLink } from "@/components/mint";
 import { RelayIcon, RelayName } from "@/components/nostr/relay";
 import {
   Select,
@@ -138,7 +141,6 @@ export function CreateWallet() {
   const [selectedMints, setSelectedMints] = useState<string[]>(defaultMints);
   const [relays, setRelays] = useState<string[]>(myRelays);
   const [selectedRelays, setSelectedRelays] = useState<string[]>(myRelays);
-  const [, setDefaultWallet] = useDefaultWallet();
   const createWallet = useCreateWallet();
 
   function addToMints() {
@@ -159,7 +161,6 @@ export function CreateWallet() {
     try {
       setIsCreating(true);
       await createWallet(selectedMints, selectedRelays);
-      setDefaultWallet({ type: "nip60" });
     } catch (err) {
       console.error(err);
     } finally {
@@ -280,14 +281,13 @@ export function CreateWallet() {
 
 export function ConnectWallet() {
   const { t } = useTranslation();
-  const ndk = useNDK();
   const nwcNdk = useNWCNDK();
   const [isOpen, setIsOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isLoadingWebln, setIsLoadingWebln] = useState(false);
   const [connectString, setConnectString] = useState("");
-  const [, setDefaultWallet] = useDefaultWallet();
   const [, setWallets] = useWallets();
+  const [, setNDKWallets] = useNDKWallets();
   const isValidNwcString = connectString.startsWith("nostr+walletconnect://");
 
   function connectWebln() {
@@ -298,10 +298,8 @@ export function ConnectWallet() {
     try {
       setIsLoadingWebln(true);
       const wallet = new NDKWebLNWallet();
-      ndk.wallet = wallet;
-      // todo: set as active wallet
-      setDefaultWallet({ type: "webln" });
       setWallets((ws) => [{ type: "webln" }, ...ws]);
+      setNDKWallets((ws) => [...ws, wallet]);
       setIsOpen(false);
       toast.success(t("wallet.dialog.webln-connected"));
     } catch (e) {
@@ -330,13 +328,9 @@ export function ConnectWallet() {
       });
       try {
         setIsConnecting(true);
+        setWallets((ws) => [...ws, { type: "nwc", connection: connectString }]);
+        setNDKWallets((ws) => [...ws, nwc]);
         nwc.on("ready", () => {
-          setDefaultWallet({ type: "nwc", connection: connectString });
-          setWallets((ws) => [
-            { type: "nwc", connection: connectString },
-            ...ws,
-          ]);
-          ndk.wallet = nwc;
           setIsConnecting(false);
           setIsOpen(false);
           toast.success(t("wallet.dialog.nwc-connected"));
@@ -411,15 +405,14 @@ function Tx({ tx }: { tx: Transaction }) {
   const isCredit = tx.direction === "in";
   const amount = tx.unit === "msat" ? tx.amount / 1000 : tx.amount;
   const fee = tx.fee;
-  // fixme: p is target, pubkey is author
-  const p = tx.p || tx.zap?.pubkey || tx.zap?.p;
+  const p = tx.pubkey || tx.zap?.pubkey;
   const e = tx.e || tx.zap?.e;
   const component = (
     <div className="flex flex-row justify-between p-1 items-center hover:bg-accent rounded-sm">
       <div className="flex flex-row gap-2 items-center">
         {isCredit ? (
           p ? (
-            <div className="size-16 relative place-content-center">
+            <div className="size-16 relative flex items-center justify-center">
               <User
                 pubkey={p}
                 classNames={{
@@ -430,18 +423,13 @@ function Tx({ tx }: { tx: Transaction }) {
               />
               <ArrowDownRight className="size-5 text-green-200 absolute top-0 left-0" />
             </div>
-          ) : tx.mint ? (
-            <div className="size-16 relative place-content-center">
-              <MintIcon url={tx.mint} className="size-10" />
-              <ArrowDownRight className="size-5 text-green-200 absolute top-0 left-0" />
-            </div>
           ) : (
             <div className="size-16 relative">
               <ArrowDownRight className="size-14 text-green-200" />
             </div>
           )
         ) : p ? (
-          <div className="size-16 relative place-content-center">
+          <div className="size-16 relative flex items-center justify-center">
             <User
               pubkey={p}
               classNames={{
@@ -453,7 +441,7 @@ function Tx({ tx }: { tx: Transaction }) {
             <ArrowUpRight className="size-5 text-destructive absolute -top-1.5 right-0" />
           </div>
         ) : (
-          <div className="size-16 relative place-content-center">
+          <div className="size-16 relative flex items-center justify-center">
             <ArrowUpRight className="size-14 text-destructive" />
           </div>
         )}
@@ -470,15 +458,10 @@ function Tx({ tx }: { tx: Transaction }) {
             </div>
           )}
           {tx.mint ? (
-            <div className="flex flex-row items-center gap-1">
-              <Landmark className="size-3 text-muted-foreground" />
-              <div className="flex flex-row items-center gap-0.5">
-                <MintIcon url={tx.mint} className="size-3" />
-                <span className="text-xs text-muted-foreground line-clamp-1">
-                  <MintName url={tx.mint} />
-                </span>
-              </div>
-            </div>
+            <MintLink
+              url={tx.mint}
+              classNames={{ icon: "size-3", name: "text-xs" }}
+            />
           ) : null}
         </div>
       </div>
@@ -491,7 +474,7 @@ function Tx({ tx }: { tx: Transaction }) {
           ) : tx.unit === "usd" ? (
             <DollarSign className="size-6 text-muted-foreground" />
           ) : (
-            <Coins className="size-6 text-muted-foreground" />
+            <Banknote className="size-6 text-muted-foreground" />
           )}
           <span className="font-mono text-3xl">
             {formatShortNumber(amount)}
@@ -509,7 +492,7 @@ function Tx({ tx }: { tx: Transaction }) {
             ) : tx.unit === "usd" ? (
               <DollarSign className="size-3 text-muted-foreground" />
             ) : (
-              <Coins className="size-3 text-muted-foreground" />
+              <Banknote className="size-3 text-muted-foreground" />
             )}
             <span className="font-mono text-xs">{formatShortNumber(fee)}</span>
           </div>
@@ -526,6 +509,92 @@ function Tx({ tx }: { tx: Transaction }) {
     </Dialog>
   ) : (
     component
+  );
+}
+
+interface ProofInfo {
+  mint: string;
+  state: string; // "available"
+  tokenId?: string;
+  timestamp: number;
+  proof: CashuProof;
+}
+
+interface CashuProof {
+  id: string;
+  amount: number;
+  C: string;
+  secret: string;
+}
+
+function Proof({ info }: { info: ProofInfo }) {
+  return (
+    <div className="p-2">
+      <div className="flex flex-row items-center justify-between">
+        <MintLink
+          url={info.mint}
+          classNames={{ icon: "size-8", name: "text-md" }}
+        />
+        <div className="flex flex-row gap-0.5 items-center">
+          <Bitcoin className="size-6 text-muted-foreground" />
+          <span className="text-2xl font-mono">
+            {formatShortNumber(info.proof.amount)}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function WalletSelector() {
+  const { t } = useTranslation();
+  const [wallet, setWallet] = useNDKWallet();
+  const [wallets] = useNDKWallets();
+  function onWalletChange(walletId: string) {
+    const w = wallets.find((w) => w.walletId === walletId);
+    if (w) {
+      setWallet(w);
+    }
+  }
+  return (
+    <div className="flex flex-col gap-2 w-full">
+      <div className="flex flex-row items-center gap-1">
+        <WalletIcon className="size-4 text-muted-foreground" />
+        <h4 className="text-sm text-muted-foreground uppercase font-light">
+          {t("wallet.choose-wallet")}
+        </h4>
+      </div>
+      <Select
+        disabled={wallets.length === 0}
+        onValueChange={onWalletChange}
+        defaultValue={wallet?.walletId}
+        value={wallet?.walletId}
+      >
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder={t("wallet.choose-wallet-placeholder")} />
+        </SelectTrigger>
+        <SelectContent>
+          {wallets.map((w) => (
+            <SelectItem key={w.walletId} value={w.walletId}>
+              <WalletBalance wallet={w} />
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+function CashuWalletCoins({ wallet }: { wallet: NDKCashuWallet }) {
+  const proofs = wallet.state.getProofEntries({});
+  return (
+    <ScrollArea className="h-80">
+      <div className="flex flex-col gap-1 pr-3">
+        {proofs.map((info: ProofInfo) => (
+          <Proof key={info.proof.C} info={info} />
+        ))}
+      </div>
+    </ScrollArea>
   );
 }
 
@@ -569,7 +638,7 @@ interface WalletActionsProps {
   onWithdraw: () => void;
   isWithdrawing: boolean;
   canWithdraw?: boolean;
-  scanQrCode: () => void;
+  scanQrCode?: () => void;
 }
 
 function WalletActions({
@@ -597,9 +666,11 @@ function WalletActions({
         )}
         {t("wallet.deposit.title")}
       </Button>
-      <Button variant="outline" size="bigIcon" onClick={scanQrCode}>
-        <ScanQrCode />
-      </Button>
+      {scanQrCode ? (
+        <Button variant="outline" size="bigIcon" onClick={scanQrCode}>
+          <ScanQrCode />
+        </Button>
+      ) : null}
       <Button
         variant="outline"
         className="flex-1"
@@ -723,6 +794,7 @@ function CashuDeposit({
     try {
       setIsDepositing(true);
       const pr = await deposit(
+        wallet,
         Number(amount),
         mint,
         () => {
@@ -823,7 +895,6 @@ function CashuWalletSettings({ wallet }: { wallet: NDKCashuWallet }) {
               isDepositing={showDeposit}
               onWithdraw={onWithdraw}
               isWithdrawing={showWithdraw}
-              scanQrCode={() => {}}
             />
           </div>
           <CashuDeposit
@@ -837,7 +908,28 @@ function CashuWalletSettings({ wallet }: { wallet: NDKCashuWallet }) {
             onOpenChange={setShowWithdraw}
           />
           {pubkey ? (
-            <WalletTransactions wallet={wallet} pubkey={pubkey} />
+            <Tabs defaultValue="transactions">
+              <TabsList className="w-full bg-background">
+                <TabsTrigger value="transactions">
+                  <div className="flex flex-row items-center gap-1.5">
+                    <List className="size-4" />
+                    {t("wallet.transactions.title")}
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger value="coins">
+                  <div className="flex flex-row items-center gap-1.5">
+                    <Banknote className="size-4" />
+                    {t("wallet.coins")}
+                  </div>
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="transactions">
+                <WalletTransactions wallet={wallet} pubkey={pubkey} />
+              </TabsContent>
+              <TabsContent value="coins">
+                <CashuWalletCoins wallet={wallet} />
+              </TabsContent>
+            </Tabs>
           ) : null}
           <div className="flex flex-col gap-1">
             <div className="flex flex-row gap-1 items-center">
@@ -846,13 +938,13 @@ function CashuWalletSettings({ wallet }: { wallet: NDKCashuWallet }) {
                 {t("wallet.mints")}
               </h4>
             </div>
-            <ul>
+            <ul className="p-1">
               {wallet.mints.map((m) => (
                 <li key={m} className="flex flex-row items-center gap-1.5">
-                  <MintIcon url={m} className="size-5" />
-                  <span className="text-sm font-mono">
-                    <MintName url={m} />
-                  </span>
+                  <MintLink
+                    url={m}
+                    classNames={{ icon: "size-4", name: "text-sm" }}
+                  />
                 </li>
               ))}
             </ul>
@@ -1040,10 +1132,6 @@ function NWCWalletSettings({ wallet }: { wallet: NDKNWCWallet }) {
     console.log("WITHDRAW");
   }
 
-  function scanQrCode() {
-    console.log("Scan");
-  }
-
   return (
     <div className="flex flex-col gap-2">
       {wallet.walletService ? (
@@ -1073,7 +1161,6 @@ function NWCWalletSettings({ wallet }: { wallet: NDKNWCWallet }) {
         onWithdraw={onWithdraw}
         isWithdrawing={isWithdrawing}
         canWithdraw={isWithdrawalSupported}
-        scanQrCode={scanQrCode}
       />
       <NWCWalletTransactions wallet={wallet} />
       {wallet.pairingCode ? (
@@ -1085,8 +1172,7 @@ function NWCWalletSettings({ wallet }: { wallet: NDKNWCWallet }) {
   );
 }
 
-export function WalletSettings() {
-  const wallet = useWallet();
+export function Wallet({ wallet }: { wallet: NDKWallet }) {
   const { t } = useTranslation();
 
   if (wallet instanceof NDKCashuWallet) {
@@ -1102,6 +1188,11 @@ export function WalletSettings() {
       </span>
     );
   }
+}
+
+export function WalletSettings() {
+  const wallet = useCashuWallet();
+  return wallet ? <Wallet wallet={wallet} /> : null;
 }
 
 interface BalanceClassnames {
@@ -1135,7 +1226,7 @@ function Balance({
           className={cn("size-4 text-muted-foreground", classNames?.icon)}
         />
       ) : (
-        <Coins
+        <Banknote
           className={cn("size-4 text-muted-foreground", classNames?.icon)}
         />
       )}
@@ -1213,13 +1304,19 @@ export function CashuWalletBalanceAmount({
 function CashuWalletBalance({ wallet }: { wallet: NDKCashuWallet }) {
   const balances = wallet.mintBalances || {};
   const balance = Object.values(balances).reduce((acc, b) => acc + b, 0);
-  const name = wallet.type;
   const amount = balance;
   return (
     <div className="flex flex-row w-full items-center justify-between">
       <div className="flex flex-row gap-2 items-center">
         <WalletIcon className="size-4 text-muted-foreground" />
-        <span className="text-sm">{name}</span>
+        <User
+          pubkey={wallet.event!.pubkey}
+          classNames={{
+            wrapper: "gap-1.5",
+            avatar: "size-4",
+            name: "font-normal",
+          }}
+        />
       </div>
       <Balance short={false} amount={amount} unit="sat" />
     </div>
