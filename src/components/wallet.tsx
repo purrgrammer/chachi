@@ -1151,12 +1151,6 @@ function NWCWalletSettings({ wallet }: { wallet: NDKNWCWallet }) {
 
   return (
     <div className="flex flex-col gap-2">
-      {wallet.walletService ? (
-        <User
-          pubkey={wallet.walletService.pubkey}
-          classNames={{ avatar: "size-6", wrapper: "gap-1" }}
-        />
-      ) : null}
       <div className="w-full flex items-center justify-center">
         <div className="flex flex-row gap-0 items-center">
           <Bitcoin className="size-12 text-muted-foreground" />
@@ -1260,22 +1254,17 @@ function WebLNWalletBalance({ wallet }: { wallet: NDKWebLNWallet }) {
 
 function NWCWalletName({ wallet }: { wallet: NDKNWCWallet }) {
   const name = wallet.walletId;
-  return (
-    <div className="flex flex-row gap-2 items-center">
-      <PlugZap className="size-4 text-muted-foreground" />
-      {wallet.walletService ? (
-        <User
-          pubkey={wallet.walletService.pubkey}
-          classNames={{
-            avatar: "size-4",
-            name: "font-normal",
-            wrapper: "gap-1",
-          }}
-        />
-      ) : (
-        <span>{name}</span>
-      )}
-    </div>
+  return wallet.walletService ? (
+    <User
+      pubkey={wallet.walletService.pubkey}
+      classNames={{
+        avatar: "size-4",
+        name: "font-normal",
+        wrapper: "gap-1",
+      }}
+    />
+  ) : (
+    <span>{name}</span>
   );
 }
 
@@ -1293,7 +1282,10 @@ export function NWCWalletBalanceAmount({
 function NWCWalletBalance({ wallet }: { wallet: NDKNWCWallet }) {
   return (
     <div className="flex flex-row w-full items-center justify-between">
-      <NWCWalletName wallet={wallet} />
+      <div className="flex flex-row gap-2 items-center">
+        <PlugZap className="size-4 text-muted-foreground" />
+        <NWCWalletName wallet={wallet} />
+      </div>
       <NWCWalletBalanceAmount wallet={wallet} />
     </div>
   );
@@ -1318,6 +1310,19 @@ export function CashuWalletBalanceAmount({
   );
 }
 
+function CashuWalletName({ wallet }: { wallet: NDKCashuWallet }) {
+  return wallet.event ? (
+    <User
+      pubkey={wallet.event.pubkey}
+      classNames={{
+        wrapper: "gap-1.5",
+        avatar: "size-4",
+        name: "font-normal",
+      }}
+    />
+  ) : null;
+}
+
 function CashuWalletBalance({ wallet }: { wallet: NDKCashuWallet }) {
   const balances = wallet.mintBalances || {};
   const balance = Object.values(balances).reduce((acc, b) => acc + b, 0);
@@ -1326,14 +1331,7 @@ function CashuWalletBalance({ wallet }: { wallet: NDKCashuWallet }) {
     <div className="flex flex-row w-full items-center justify-between">
       <div className="flex flex-row gap-2 items-center">
         <WalletIcon className="size-4 text-muted-foreground" />
-        <User
-          pubkey={wallet.event!.pubkey}
-          classNames={{
-            wrapper: "gap-1.5",
-            avatar: "size-4",
-            name: "font-normal",
-          }}
-        />
+        <CashuWalletName wallet={wallet} />
       </div>
       <Balance short={false} amount={amount} unit="sat" />
     </div>
@@ -1347,6 +1345,22 @@ export function WalletBalance({ wallet }: { wallet: NDKWallet }) {
     return <WebLNWalletBalance wallet={wallet} />;
   } else if (wallet instanceof NDKNWCWallet) {
     return <NWCWalletBalance wallet={wallet} />;
+  } else {
+    return null;
+  }
+}
+
+function WebLNWalletName({ wallet }: { wallet: NDKWebLNWallet }) {
+  return <span>{wallet.walletId}</span>;
+}
+
+export function WalletName({ wallet }: { wallet: NDKWallet }) {
+  if (wallet instanceof NDKCashuWallet) {
+    return <CashuWalletName wallet={wallet} />;
+  } else if (wallet instanceof NDKWebLNWallet) {
+    return <WebLNWalletName wallet={wallet} />;
+  } else if (wallet instanceof NDKNWCWallet) {
+    return <NWCWalletName wallet={wallet} />;
   } else {
     return null;
   }

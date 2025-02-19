@@ -1,5 +1,6 @@
+import { Wallet as WalletIcon } from "lucide-react";
 import { Header } from "@/components/header";
-import { WalletBalance, WalletSettings } from "@/components/wallet";
+import { WalletName, WalletSettings } from "@/components/wallet";
 import { useCashuWallet } from "@/lib/wallet";
 
 export default function Wallet() {
@@ -7,7 +8,10 @@ export default function Wallet() {
   return (
     <>
       <Header>
-        {cashuWallet ? <WalletBalance wallet={cashuWallet} /> : null}
+        <div className="flex flex-row items-center w-full justify-between">
+          {cashuWallet ? <WalletName wallet={cashuWallet} /> : null}
+          <WalletIcon className="size-5 text-muted-foreground" />
+        </div>
       </Header>
       <div className="p-4">
         <div className="flex items-center justify-center">
