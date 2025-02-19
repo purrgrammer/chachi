@@ -1157,10 +1157,10 @@ function NWCWalletSettings({ wallet }: { wallet: NDKNWCWallet }) {
       <WalletActions
         onDeposit={onDeposit}
         isDepositing={isDepositing}
-        canDeposit={isDepositSupported}
+        canDeposit={false}
         onWithdraw={onWithdraw}
         isWithdrawing={isWithdrawing}
-        canWithdraw={isWithdrawalSupported}
+        canWithdraw={false}
       />
       <NWCWalletTransactions wallet={wallet} />
       {wallet.pairingCode ? (

@@ -184,6 +184,7 @@ function useUserEvents() {
 
     return () => sub.stop();
   }, [pubkey]);
+
   // Groups, contacts, media server and emoji list
   useEffect(() => {
     if (pubkey && relays.length > 0) {
