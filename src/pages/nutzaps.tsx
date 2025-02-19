@@ -67,11 +67,15 @@ function Nutzap({
     try {
       if (wallet instanceof NDKCashuWallet) {
         await wallet.redeemNutzap(new NDKNutzap(ndk, event), {
-          onRedeemed: () => {
-            toast.success(t("nutzaps.redeem-success"));
+          onRedeemed: (proofs) => {
+            const amount = proofs.reduce((acc, proof) => acc + proof.amount, 0);
+            toast.success(
+              t("nutzaps.redeem-success", {
+                amount: formatShortNumber(amount),
+              }),
+            );
             setIsRedeemed(true);
           },
-          onTxEventCreated: (txEvent) => console.log("TXEVENT", txEvent),
         });
       }
     } catch (err) {

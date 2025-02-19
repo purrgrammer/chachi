@@ -134,6 +134,8 @@ export function NewZapDialog({
             toast.success(
               t("zap.dialog.success", {
                 amount: formatShortNumber(nutzap.amount),
+                name:
+                  profile?.name || profile?.display_name || pubkey.slice(0, 6),
               }),
             );
           },

@@ -531,8 +531,8 @@
       "copy": "Copy invoice",
       "wallet": "Open in wallet",
       "wallet-error": "Couldn't open wallet",
-      "error": "Failed to send zap",
-      "success": "{{ amount }} zap sent"
+      "error": "Failed to zap",
+      "success": "Zapped {{ amount }} to {{ name }}"
     }
   },
   "ecash": {
@@ -598,7 +598,7 @@
     "log-in": "Log in to see your zaps",
     "invalid": "Invalid zap",
     "redeem": "Redeem",
-    "redeem-success": "Zap redeemed",
+    "redeem-success": "Redeemed {{ amount }} zap",
     "redeem-error": "Failed to redeem zap",
     "received": "Received",
     "sent": "Sent",
