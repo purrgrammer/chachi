@@ -127,7 +127,7 @@ function useUserEvents() {
     const filter = {
       kinds: [NDKKind.CashuMintList],
       authors: [pubkey],
-      //...(mints.created_at ? { since: mints.created_at } : {}),
+      ...(mints.created_at ? { since: mints.created_at } : {}),
     };
     const sub = ndk.subscribe(
       filter,
@@ -151,7 +151,6 @@ function useUserEvents() {
       }
     });
 
-    console.log("MINTLIST", mints);
     return () => sub.stop();
   }, [pubkey]);
 
@@ -170,10 +169,10 @@ function useUserEvents() {
         cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
         closeOnEose: false,
       },
-      NDKRelaySet.fromRelayUrls(mints?.relays || outboxRelayUrls, ndk),
+      NDKRelaySet.fromRelayUrls(outboxRelayUrls, ndk),
     );
 
-    sub.on("event", async (event) => {
+    sub.on("event", (event) => {
       if (
         event.created_at &&
         event.created_at > (cashu ? cashu.created_at : 0)
