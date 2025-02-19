@@ -13,6 +13,7 @@ import {
 import { NDKRelaySet } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { Empty } from "@/components/empty";
+import { Name } from "@/components/nostr/name";
 import { Loading } from "@/components/loading";
 import { useNavigate } from "react-router-dom";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
@@ -497,6 +498,49 @@ function DeleteGroupEventItem({
   ) : null;
 }
 
+function AsReply({
+  event,
+  group,
+  className,
+}: {
+  event: NostrEvent;
+  group?: Group;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "h-12 p-1 pl-2 border-l-4 rounded-md mb-1 bg-background/80 border-background dark:bg-background/40 dark:border-background/60 cursor-pointer",
+        className,
+      )}
+    >
+      <h4 className="text-sm font-semibold">
+        <Name pubkey={event.pubkey} />
+      </h4>
+      <RichText
+        group={group}
+        tags={event.tags}
+        options={{
+          inline: true,
+          mentions: true,
+          urls: true,
+          emojis: true,
+          images: false,
+          video: false,
+          audio: false,
+          youtube: false,
+          events: false,
+          hashtags: true,
+          ecash: false,
+        }}
+        className="break-all line-clamp-1"
+      >
+        {event.content}
+      </RichText>
+    </div>
+  );
+}
+
 export function FeedEmbed({
   event,
   group,
@@ -781,6 +825,7 @@ export function Embed({
   showReactions = true,
   options = {},
   relays = [],
+  asReply = false,
 }: {
   event: NostrEvent;
   group?: Group;
@@ -791,11 +836,15 @@ export function Embed({
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
   relays: string[];
+  asReply?: boolean;
 }) {
   const userRelays = useRelays();
   const components = eventDetails[event.kind];
   // NIP-31
   const alt = event.tags.find((t) => t[0] === "alt")?.[1];
+  if (asReply) {
+    return <AsReply event={event} group={group} className={className} />;
+  }
   return (
     <div
       className={cn(

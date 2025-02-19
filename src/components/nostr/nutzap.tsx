@@ -3,8 +3,6 @@ import { Bitcoin, Euro, DollarSign, Banknote } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { E, A } from "@/components/nostr/event";
 import { formatShortNumber } from "@/lib/number";
-import { Pubkey } from "@/components/nostr/pubkey";
-import { MintLink } from "@/components/mint";
 import { Emoji } from "@/components/emoji";
 import {
   useRichText,
@@ -111,49 +109,51 @@ export function Nutzap({
   const zap = validateNutzap(event);
   return zap ? (
     <div
-      className={`flex flex-col gap-2 ${animateGradient ? "rounded-md border-gradient" : ""} ${animateGradient && zap.amount >= HUGE_AMOUNT ? "border-animated-gradient" : ""}`}
+      className={`flex flex-col gap-0 ${animateGradient ? "rounded-md border-gradient" : ""} ${animateGradient && zap.amount >= HUGE_AMOUNT ? "border-animated-gradient" : ""}`}
     >
-      <div className="flex flex-row gap-10 justify-between">
+      <div className="flex flex-row gap-10 items-center justify-between">
         {showAuthor ? (
           <User pubkey={zap.pubkey} classNames={{ avatar: "size-4" }} />
         ) : null}
         <div className="flex items-center">
           <span className="text-muted-foreground">
             {zap.unit === "sat" ? (
-              <Bitcoin className="size-6" />
+              <Bitcoin className="size-5" />
             ) : zap.unit === "eur" ? (
-              <Euro className="size-6" />
+              <Euro className="size-5" />
             ) : zap.unit === "usd" ? (
-              <DollarSign className="size-6" />
+              <DollarSign className="size-5" />
             ) : (
-              <Banknote className="size-6" />
+              <Banknote className="size-5" />
             )}
           </span>
-          <span className="font-mono text-2xl">
+          <span className="font-mono text-lg">
             {formatShortNumber(zap.amount)}
           </span>
         </div>
         {zap.p ? (
           <User
             pubkey={zap.p}
-            classNames={{ avatar: "size-5", name: "text-md" }}
+            classNames={{
+              wrapper: "gap-1.5",
+              avatar: "size-4",
+              name: "text-md font-normal",
+            }}
           />
         ) : null}
       </div>
       {zap.e ? (
-        <E id={zap.e} group={group} pubkey={zap.p} showReactions={false} />
+        <E
+          id={zap.e}
+          group={group}
+          pubkey={zap.p}
+          showReactions={false}
+          asReply
+        />
       ) : zap.a ? (
-        <A address={zap.a} group={group} showReactions={false} />
+        <A address={zap.a} group={group} showReactions={false} asReply />
       ) : null}
       <NutzapContent event={event} zap={zap} />
-      {zap.p2pk ? <Pubkey isCashu pubkey={zap.p2pk} /> : null}
-      {zap.mint ? (
-        <MintLink
-          includeLandmark
-          url={zap.mint}
-          classNames={{ icon: "size-3", name: "text-xs" }}
-        />
-      ) : null}
     </div>
   ) : (
     <span className="text-xs text-muted-foreground">Invalid zap</span>

@@ -140,7 +140,7 @@ function ChatNutzap({
         <ContextMenuTrigger asChild>
           <div
             ref={ref}
-            className={`z-0 rounded-md border-none rounded-md my-1 max-w-[18rem] sm:max-w-sm md:max-w-md ${isMine ? "ml-auto" : ""}`}
+            className={`z-0 border-none my-1 max-w-[18rem] sm:max-w-sm md:max-w-md ${isMine ? "ml-auto" : ""}`}
           >
             <div className="flex flex-col gap-0">
               <div className="flex flex-row gap-2 items-end">
@@ -153,7 +153,7 @@ function ChatNutzap({
                     }
                   />
                 )}
-                <div className="flex flex-col gap-1 relative py-2 px-4 pb-2 bg-background/80 rounded-md">
+                <div className="flex flex-col gap-1 relative p-1 px-2 bg-background/80 rounded-md">
                   <Nutzap
                     event={event}
                     group={group}
@@ -278,7 +278,7 @@ function ChatNutzap({
           onEmojiSelect={react}
         >
           <div className="pointer-events-none">
-            <Nutzap event={event} showAuthor={false} />
+            <Nutzap event={event} group={group} showAuthor={false} />
           </div>
         </EmojiPicker>
       ) : null}

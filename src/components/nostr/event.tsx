@@ -41,6 +41,7 @@ export function Event({
   pubkey,
   className,
   showReactions = true,
+  asReply,
 }: {
   id: string;
   relays: string[];
@@ -48,6 +49,7 @@ export function Event({
   group?: Group;
   className?: string;
   showReactions?: boolean;
+  asReply?: boolean;
 }) {
   const { data: event, status } = useEvent({ id, pubkey, relays });
 
@@ -70,6 +72,7 @@ export function Event({
       className={className}
       relays={relays}
       showReactions={showReactions}
+      asReply={asReply}
     />
   ) : (
     <EventNotFound />
@@ -84,6 +87,7 @@ export function Address({
   relays,
   className,
   showReactions = true,
+  asReply,
 }: {
   group?: Group;
   pubkey: string;
@@ -92,6 +96,7 @@ export function Address({
   relays: string[];
   className?: string;
   showReactions?: boolean;
+  asReply?: boolean;
 }) {
   const { data: event, status } = useAddress({
     pubkey,
@@ -119,6 +124,7 @@ export function Address({
       className={className}
       relays={relays}
       showReactions={showReactions}
+      asReply={asReply}
     />
   ) : (
     <EventNotFound />
@@ -129,20 +135,25 @@ export function E({
   id,
   group,
   pubkey,
+  relays,
   showReactions,
+  asReply,
 }: {
   id: string;
   pubkey?: string;
   group?: Group;
+  relays?: string[];
   showReactions?: boolean;
+  asReply?: boolean;
 }) {
   return (
     <Event
       id={id}
       group={group}
       pubkey={pubkey}
-      relays={[]}
+      relays={relays ? relays : group ? [group.relay] : []}
       showReactions={showReactions}
+      asReply={asReply}
     />
   );
 }
@@ -150,11 +161,15 @@ export function E({
 export function A({
   address,
   group,
+  relays,
   showReactions,
+  asReply,
 }: {
   address: string;
   group?: Group;
+  relays?: string[];
   showReactions?: boolean;
+  asReply?: boolean;
 }) {
   const [k, pubkey, d] = address.split(":");
   return (
@@ -163,8 +178,9 @@ export function A({
       pubkey={pubkey}
       identifier={d}
       group={group}
-      relays={[]}
+      relays={relays ? relays : group ? [group.relay] : []}
       showReactions={showReactions}
+      asReply={asReply}
     />
   );
 }
