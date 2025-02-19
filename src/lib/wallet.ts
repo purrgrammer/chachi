@@ -216,6 +216,7 @@ export interface Transaction {
   e?: string;
   p?: string;
   pubkey?: string;
+  tags: string[][];
   zap: Zap | null;
 }
 
@@ -278,7 +279,10 @@ export function useTransactions(pubkey: string, wallet: NDKCashuWallet) {
         const mint = tags.find((t) => t[0] === "mint")?.[1];
         const description = tags.find((t) => t[0] === "description")?.[1];
         const e = tags.find(
-          (t) => t[0] === "e" && !["created", "destroyed"].includes(t[3]),
+          (t) =>
+            t[0] === "e" &&
+            !["created", "destroyed", "redeemed"].includes(t[3]) &&
+            t[4] !== pubkey,
         )?.[1];
         const token = tags.find(
           (t) => t[0] === "e" && ["created", "destroyed"].includes(t[3]),
@@ -297,6 +301,7 @@ export function useTransactions(pubkey: string, wallet: NDKCashuWallet) {
             e,
             token,
             p,
+            tags: event.tags,
             zap: null,
           };
         } else {
@@ -498,7 +503,6 @@ export async function createCashuWallet(
   return new Promise(async (resolve, reject) => {
     const ev = new NDKEvent(ndk, event);
     const w = await NDKCashuWallet.from(ev);
-    console.log("DECCRYPTEED WALLET", w);
     if (!w) {
       reject("Failed to create wallet");
       return;

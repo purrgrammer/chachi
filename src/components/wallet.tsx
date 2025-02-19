@@ -32,6 +32,7 @@ import {
   NDKWebLNWallet,
   NDKNWCWallet,
 } from "@nostr-dev-kit/ndk-wallet";
+import { RichText } from "@/components/rich-text";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -450,9 +451,21 @@ function Tx({ tx }: { tx: Transaction }) {
         )}
         <div className="flex flex-col items-start gap-0.5">
           {tx.description && !tx.zap ? (
-            <span className="text-md line-clamp-1">{tx.description}</span>
+            <RichText
+              tags={tx.tags}
+              className="text-md line-clamp-1"
+              options={{ inline: true }}
+            >
+              {tx.description}
+            </RichText>
           ) : tx.zap?.content ? (
-            <span className="text-md line-clamp-1">{tx.zap.content}</span>
+            <RichText
+              tags={tx.zap.tags}
+              className="text-md line-clamp-1"
+              options={{ inline: true }}
+            >
+              {tx.zap.content}
+            </RichText>
           ) : (
             <div className="flex flex-col gap-0 items-start">
               <span className="text-md text-muted-foreground">
@@ -591,7 +604,7 @@ export function WalletSelector() {
 function CashuWalletCoins({ wallet }: { wallet: NDKCashuWallet }) {
   const proofs = wallet.state.getProofEntries({});
   return (
-    <ScrollArea className="h-80">
+    <ScrollArea className="h-[28rem]">
       <div className="flex flex-col gap-1 pr-3">
         {proofs.map((info: ProofInfo) => (
           <Proof key={info.proof.C} info={info} />
@@ -614,10 +627,10 @@ function WalletTransactions({
     return [...transactions].sort((a, b) => b.created_at - a.created_at);
   }, [transactions]);
   return (
-    <ScrollArea className="h-80">
+    <ScrollArea className="h-[28rem]">
       <div className="flex flex-col gap-2 pr-3">
         {sorted.length === 0 ? (
-          <div className="h-80 flex items-center justify-center">
+          <div className="h-[28rem] flex items-center justify-center">
             <div className="flex flex-col items-center gap-2 text-muted-foreground">
               <CircleSlash2 className="size-6" />
               <span className="text-sm text-muted-foreground">
@@ -1070,6 +1083,7 @@ function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
         invoice: nwcTx.invoice,
         direction: nwcTx.type === "incoming" ? "in" : ("out" as Direction),
         description: nwcTx.description,
+        tags: [],
         zap: nwcTx.description
           ? tryParseZap(nwcTx.description, nwcTx.invoice)
           : null,
@@ -1086,7 +1100,7 @@ function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
   return (
     <>
       {isLoading || isError ? (
-        <div className="flex items-center justify-center w-full h-80">
+        <div className="flex items-center justify-center w-full h-[28rem]">
           <div className="flex flex-col items-center justify-center text-muted-foreground">
             {isError ? (
               <ServerCrash className="size-5 text-destructive" />
@@ -1105,7 +1119,7 @@ function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
           </div>
         </div>
       ) : (
-        <ScrollArea className="h-80">
+        <ScrollArea className="h-[28rem]">
           <div className="flex flex-col gap-2 pr-2.5">
             {transactions.map((tx) => (
               <Tx key={tx.id} tx={tx} />
