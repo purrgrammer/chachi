@@ -1,12 +1,11 @@
 import { useAtom } from "jotai";
-import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useMemo, useState, useEffect } from "react";
 import { z } from "zod";
-import { NostrEvent } from "nostr-tools";
 import { Pubkey } from "@/components/nostr/pubkey";
 import { useTranslation } from "react-i18next";
 import {
+  Settings,
   Moon,
   Sun,
   Zap as ZapIcon,
@@ -20,10 +19,8 @@ import {
   HandCoins,
   Languages,
   Palette,
-  RefreshCw,
   SquareArrowOutUpRight,
 } from "lucide-react";
-import { NDKEvent, NDKKind, NDKRelaySet } from "@nostr-dev-kit/ndk";
 import {
   NDKWallet,
   NDKCashuWallet,
@@ -51,6 +48,7 @@ import {
 } from "@/components/ui/select";
 import {
   CreateWallet,
+  EditWallet,
   ConnectWallet,
   NWCWalletBalanceAmount,
   CashuWalletBalanceAmount,
@@ -66,11 +64,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useWallets, useNDKWallets, useCashuWallet } from "@/lib/wallet";
-import { useNDK } from "@/lib/ndk";
 import { usePubkey } from "@/lib/account";
 import { mintListAtom } from "@/app/store";
 import { themes, Theme } from "@/theme";
-import { useRelays } from "@/lib/nostr";
 
 const uiSchema = z.object({
   language: z.enum(languages),
@@ -244,14 +240,11 @@ function WalletSummary({
   showControls?: boolean;
 }) {
   const { t } = useTranslation();
-  const ndk = useNDK();
   const [, setWallets] = useWallets();
   const [, setNDKWallets] = useNDKWallets();
   const [p2pk, setP2pk] = useState<string | null>(null);
-  const [isSyncing, setIsSyncing] = useState(false);
   const me = usePubkey();
   const navigate = useNavigate();
-  const myRelays = useRelays();
   const { pubkey, lud16 } = useMemo(() => {
     if (wallet instanceof NDKNWCWallet) {
       const u = new URL(wallet.pairingCode || "");
@@ -299,35 +292,6 @@ function WalletSummary({
     setNDKWallets((wallets) =>
       wallets.filter((w) => w.walletId !== wallet.walletId),
     );
-  }
-
-  async function syncWallet() {
-    if (!(wallet instanceof NDKCashuWallet)) {
-      return;
-    }
-
-    if (!p2pk) {
-      return;
-    }
-
-    try {
-      setIsSyncing(true);
-      const event = new NDKEvent(ndk, {
-        kind: NDKKind.CashuMintList,
-        tags: [
-          ["pubkey", p2pk],
-          ...myRelays.map((r) => ["relay", r]),
-          ...wallet.mints.map((m) => ["mint", m]),
-        ],
-      } as NostrEvent);
-      await event.publish(NDKRelaySet.fromRelayUrls(myRelays, ndk));
-      toast.success(t("settings.wallet.wallets.synced"));
-    } catch (err) {
-      console.error(err);
-      toast.error(t("settings.wallet.wallets.sync-error"));
-    } finally {
-      setIsSyncing(false);
-    }
   }
 
   return (
@@ -407,15 +371,16 @@ function WalletSummary({
                 {t("settings.wallet.wallets.remove")}
               </Button>
             ) : (
-              <Button
-                onClick={syncWallet}
-                variant="outline"
-                className="w-full"
-                size="sm"
-              >
-                <RefreshCw className={isSyncing ? "animate-spin" : ""} />
-                {t("settings.wallet.wallets.sync")}
-              </Button>
+              <>
+                {wallet instanceof NDKCashuWallet ? (
+                  <EditWallet wallet={wallet}>
+                    <Button variant="outline" className="w-full" size="sm">
+                      <Settings />
+                      {t("settings.wallet.settings")}
+                    </Button>
+                  </EditWallet>
+                ) : null}
+              </>
             )}
           </div>
         </CardFooter>
@@ -463,7 +428,7 @@ function MintList({ mints }: { mints: string[] }) {
           <MintLink
             key={t}
             url={t}
-            classNames={{ icon: "hidden size-4", name: "text-sm" }}
+            classNames={{ icon: "size-4", name: "text-sm" }}
           />
         ))}
       </div>

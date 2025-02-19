@@ -1,8 +1,10 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
+import { NostrEvent } from "nostr-tools";
 import { InputCopy } from "@/components/ui/input-copy";
 import {
   Wallet as WalletIcon,
   PlugZap,
+  Save,
   Puzzle,
   Cable,
   RotateCw,
@@ -21,11 +23,13 @@ import {
   ScanQrCode,
   CircleSlash2,
   List,
+  Settings,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { NDKEvent, NDKKind, NDKRelaySet } from "@nostr-dev-kit/ndk";
 import {
   NDKWallet,
   NDKCashuWallet,
@@ -40,7 +44,7 @@ import { Event } from "@/components/nostr/event";
 import { Label } from "@/components/ui/label";
 import { Invoice } from "@/components/ln";
 import { Zap, validateZapRequest } from "@/lib/nip-57";
-import { useNWCNDK } from "@/lib/ndk";
+import { useNDK, useNWCNDK } from "@/lib/ndk";
 import { useRelays } from "@/lib/nostr";
 import { formatShortNumber } from "@/lib/number";
 import { useHost } from "@/lib/hooks";
@@ -273,6 +277,191 @@ export function CreateWallet() {
             onClick={onCreate}
           >
             <WalletIcon /> {t("wallet.create")}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function EditWallet({
+  wallet,
+  children,
+}: {
+  wallet: NDKCashuWallet;
+  children?: React.ReactNode;
+}) {
+  const { t } = useTranslation();
+  const myRelays = useRelays();
+  const ndk = useNDK();
+  const [isEditing, setIsEditing] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [mint, setMint] = useState("");
+  const [relay, setRelay] = useState("");
+  const [mints, setMints] = useState<string[]>(wallet.mints);
+  const [selectedMints, setSelectedMints] = useState<string[]>(wallet.mints);
+  const [relays, setRelays] = useState<string[]>(
+    wallet.relaySet?.relayUrls || myRelays,
+  );
+  const [selectedRelays, setSelectedRelays] = useState<string[]>(
+    wallet.relaySet?.relayUrls || myRelays,
+  );
+
+  function addToMints() {
+    // todo: check if valid mint
+    setMints([...mints, mint]);
+    setSelectedMints([...selectedMints, mint]);
+    setMint("");
+  }
+
+  function addToRelays() {
+    // todo: check valid relay URL
+    setRelays([...relays, relay]);
+    setSelectedRelays([...selectedRelays, relay]);
+    setRelay("");
+  }
+
+  async function onEdit() {
+    try {
+      setIsEditing(true);
+      wallet.mints = selectedMints;
+      wallet.relaySet = NDKRelaySet.fromRelayUrls(selectedRelays, ndk);
+      await wallet.publish();
+      // todo: cashu mint list
+      const p2pk = await wallet.getP2pk();
+      const event = new NDKEvent(ndk, {
+        kind: NDKKind.CashuMintList,
+        tags: [
+          ["pubkey", p2pk],
+          ...selectedRelays.map((r) => ["relay", r]),
+          ...wallet.mints.map((m) => ["mint", m]),
+        ],
+      } as NostrEvent);
+      await event.publish(NDKRelaySet.fromRelayUrls(myRelays, ndk));
+      toast.success(t("wallet.saved"));
+    } catch (err) {
+      console.error(err);
+      toast.error(t("wallet.save-error"));
+    } finally {
+      setIsEditing(false);
+      setIsOpen(false);
+    }
+  }
+
+  function selectMint(mint: string) {
+    setSelectedMints([...selectedMints, mint]);
+  }
+
+  function deselectMint(mint: string) {
+    setSelectedMints(selectedMints.filter((m) => m !== mint));
+  }
+
+  function selectRelay(relay: string) {
+    setSelectedRelays([...selectedRelays, relay]);
+  }
+
+  function deselectRelay(relay: string) {
+    setSelectedRelays(selectedRelays.filter((r) => r !== relay));
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        {children ? (
+          children
+        ) : (
+          <Button variant="ghost" size="icon">
+            <Settings />
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t("wallet.settings.title")}</DialogTitle>
+          <DialogDescription>
+            {t("wallet.settings.description")}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="w-full flex flex-col gap-4">
+          <WalletBalance wallet={wallet} />
+          <div className="flex flex-col gap-0.5">
+            <Label>{t("wallet.mints")}</Label>
+            <span className="text-xs text-muted-foreground">
+              {t("wallet.mints-description")}
+            </span>
+            <div className="flex flex-col gap-1 my-2 mx-3">
+              {mints.map((m) => (
+                <Mint
+                  key={m}
+                  url={m}
+                  disabled={
+                    selectedMints.length === 1 && selectedMints[0] === m
+                  }
+                  isSelected={selectedMints.includes(m)}
+                  onSelectChange={(checked) =>
+                    checked ? selectMint(m) : deselectMint(m)
+                  }
+                />
+              ))}
+            </div>
+            <div className="flex flex-row gap-2">
+              <Input
+                className="w-full"
+                value={mint}
+                onChange={(e) => setMint(e.target.value)}
+                placeholder="https://"
+              />
+              <Button disabled={mint.trim().length === 0} onClick={addToMints}>
+                <Plus /> {t("wallet.add-mint")}
+              </Button>
+            </div>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <Label>{t("wallet.relays")}</Label>
+            <span className="text-xs text-muted-foreground">
+              {t("wallet.relays-description")}
+            </span>
+            <div className="flex flex-col gap-1 my-2 mx-3">
+              {relays.map((r) => (
+                <Relay
+                  key={r}
+                  url={r}
+                  disabled={
+                    selectedRelays.length === 1 && selectedRelays[0] === r
+                  }
+                  isSelected={selectedRelays.includes(r)}
+                  onSelectChange={(checked) =>
+                    checked ? selectRelay(r) : deselectRelay(r)
+                  }
+                />
+              ))}
+            </div>
+            <div className="flex flex-row gap-2">
+              <Input
+                className="w-full"
+                value={relay}
+                onChange={(e) => setRelay(e.target.value)}
+                placeholder="wss://"
+              />
+              <Button
+                disabled={!relay.trim().startsWith("wss://")}
+                onClick={addToRelays}
+              >
+                <PackagePlus /> {t("wallet.add-relay")}
+              </Button>
+            </div>
+          </div>
+          <Button
+            disabled={
+              isEditing ||
+              selectedRelays.length === 0 ||
+              selectedMints.length === 0
+            }
+            className="w-full"
+            onClick={onEdit}
+          >
+            {isEditing ? <RotateCw className="animate-spin" /> : <Save />}{" "}
+            {t("wallet.save")}
           </Button>
         </div>
       </DialogContent>

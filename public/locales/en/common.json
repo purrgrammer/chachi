@@ -464,6 +464,10 @@
     "make-default-error": "Failed to set wallet as default",
     "make-default-success": "Wallet set as default",
     "create": "Create wallet",
+    "settings": "Wallet settings",
+    "save": "Save changes",
+    "saved": "Changes saved",
+    "save-error": "Failed to save changes",
     "mints": "Mints",
     "add-mint": "Add mint",
     "relays": "Relays",
@@ -557,6 +561,7 @@
     },
     "wallet": {
       "title": "Wallet",
+      "settings": "Settings",
       "mints": "Mints",
       "relays": "Relays",
       "default-wallet": {
