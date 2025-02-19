@@ -502,6 +502,7 @@ export async function createCashuWallet(
     );
     console.log("DECCRYPTEED", ev);
     const w = await NDKCashuWallet.from(ev);
+    console.log("DECCRYPTEED WALLET", w);
     if (!w) reject("Failed to create wallet");
     w?.start();
     w?.on("ready", () => {

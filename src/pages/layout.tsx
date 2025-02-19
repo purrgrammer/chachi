@@ -161,7 +161,7 @@ function useUserEvents() {
     const filter = {
       kinds: [NDKKind.CashuWallet],
       authors: [pubkey],
-      ...(cashu?.created_at ? { since: cashu.created_at } : {}),
+      ...(cashu && cashu.created_at ? { since: cashu.created_at } : {}),
     };
     const sub = ndk.subscribe(
       filter,
@@ -169,14 +169,15 @@ function useUserEvents() {
         cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
         closeOnEose: false,
       },
-      NDKRelaySet.fromRelayUrls(outboxRelayUrls, ndk),
+      NDKRelaySet.fromRelayUrls(
+        relays.map((r) => r.url),
+        ndk,
+      ),
     );
 
     sub.on("event", (event) => {
-      if (
-        event.created_at &&
-        event.created_at > (cashu ? cashu.created_at : 0)
-      ) {
+      const lastSeen = cashu ? cashu.created_at : 0;
+      if (event.created_at && event.created_at > lastSeen) {
         setCashu(event.rawEvent() as NostrEvent);
       }
     });
