@@ -49,6 +49,7 @@ export function useChachiWallet() {
   const ndk = useNDK();
   const nwcNdk = useNWCNDK();
   const pubkey = usePubkey();
+  const relays = useRelays();
   const [wallets] = useWallets();
   const [, setNDKWallets] = useAtom(ndkWalletsAtom);
   const [cashuWallet, setCashuWallet] = useAtom(cashuWalletAtom);
@@ -156,7 +157,7 @@ export function useChachiWallet() {
 
   useEffect(() => {
     if (cashu && pubkey && !cashuWallet) {
-      createCashuWallet(cashu, ndk)
+      createCashuWallet(cashu, ndk, relays)
         .then((w) => {
           if (!w) {
             toast.error(t("wallet.sync-error"));
@@ -492,14 +493,19 @@ export function useNWCWallet(connection?: string) {
 export async function createCashuWallet(
   event: NostrEvent,
   ndk: NDK,
+  relays: string[],
 ): Promise<NDKCashuWallet> {
   return new Promise(async (resolve, reject) => {
     const ev = new NDKEvent(ndk, event);
     const w = await NDKCashuWallet.from(ev);
     console.log("DECCRYPTEED WALLET", w);
-    if (!w) reject("Failed to create wallet");
-    w?.start();
-    w?.on("ready", () => {
+    if (!w) {
+      reject("Failed to create wallet");
+      return;
+    }
+    w.relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
+    w.start();
+    w.on("ready", () => {
       resolve(w);
     });
   });
