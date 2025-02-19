@@ -189,7 +189,6 @@ function NutzapReaction({ nutzap }: { nutzap: Nutzap }) {
 }
 
 function ZapReaction({ zap }: { zap: Zap }) {
-  // todo: USD/EUR amounts
   const me = usePubkey();
   const iZapped = zap.pubkey === me;
   return (
@@ -201,7 +200,7 @@ function ZapReaction({ zap }: { zap: Zap }) {
           <Tooltip>
             <TooltipTrigger asChild>
               <RichText
-                className="text-xs"
+                className="text-xs line-clamp-1"
                 tags={zap.tags}
                 options={{ inline: true }}
               >
@@ -225,8 +224,8 @@ function ZapReaction({ zap }: { zap: Zap }) {
             {formatShortNumber(zap.amount)}
           </span>
         </div>
+        <Avatar pubkey={zap.pubkey} className="size-4" />
       </div>
-      <Avatar pubkey={zap.pubkey} className="size-4" />
     </div>
   );
 }
