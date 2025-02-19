@@ -287,6 +287,7 @@ export function useRequest(
       {
         closeOnEose: true,
         skipOptimisticPublishEvent: true,
+        cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
       },
       relaySet,
     );
