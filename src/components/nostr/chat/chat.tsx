@@ -287,22 +287,6 @@ export function ChatMessage({
         ev.tags.push(["emoji", e.name, e.src]);
       }
       await ev.publish(relaySet);
-      if (e.native) {
-        // TODO add translation
-        toast.success(`Reacted with ${e.native}`);
-      } else if (e.src) {
-        // nit: info icon
-        toast(
-          <div className="flex flex-row gap-2 items-center">
-            {t("chat.message.react.with")}
-            <Emoji
-              name={e.name}
-              image={e.src}
-              className="inline-block w-5 h-5"
-            />
-          </div>,
-        );
-      }
     } catch (err) {
       console.error(err);
       toast.error(t("chat.message.react.error"));
