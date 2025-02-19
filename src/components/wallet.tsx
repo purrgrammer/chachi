@@ -941,7 +941,7 @@ function CashuWalletSettings({ wallet }: { wallet: NDKCashuWallet }) {
                 {t("wallet.mints")}
               </h4>
             </div>
-      <ul className="p-1 flex flex-col gap-0.5">
+            <ul className="p-1 flex flex-col gap-0.5">
               {wallet.mints.map((m) => (
                 <li key={m} className="flex flex-row items-center gap-1.5">
                   <MintLink

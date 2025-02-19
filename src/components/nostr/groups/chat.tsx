@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { NostrEvent, UnsignedEvent } from "nostr-tools";
 import { Avatar } from "@/components/nostr/avatar";
+import { ProfileDrawer } from "@/components/nostr/profile";
 import { NDKKind, NDKEvent } from "@nostr-dev-kit/ndk";
 import { useSettings } from "@/lib/settings";
 import { Badge } from "@/components/ui/badge";
@@ -161,7 +162,13 @@ function ChatNutzap({
             <div className="flex flex-col gap-0">
               <div className="flex flex-row gap-2 items-end">
                 {isMine ? null : (
-                  <Avatar pubkey={event.pubkey} className="size-7" />
+                  <ProfileDrawer
+                    group={group}
+                    pubkey={event.pubkey}
+                    trigger={
+                      <Avatar pubkey={event.pubkey} className="size-7" />
+                    }
+                  />
                 )}
                 <div className="relative py-2 px-4 pb-2 bg-background/80 rounded-md">
                   <Nutzap
