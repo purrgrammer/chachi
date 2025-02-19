@@ -31,7 +31,7 @@ export function Invoice({
           includeMargin
           size={256}
           marginSize={4}
-          value={`lightning://${invoice}`}
+          value={invoice}
           imageSettings={
             picture
               ? {
