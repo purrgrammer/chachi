@@ -158,7 +158,7 @@ function NutzapReaction({ nutzap }: { nutzap: Nutzap }) {
           <Tooltip>
             <TooltipTrigger asChild>
               <RichText
-                className="text-xs"
+                className="text-xs line-clamp-1"
                 options={{ inline: true }}
                 tags={nutzap.tags}
               >
