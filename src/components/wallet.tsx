@@ -406,17 +406,18 @@ function Tx({ tx }: { tx: Transaction }) {
   const isCredit = tx.direction === "in";
   const amount = tx.unit === "msat" ? tx.amount / 1000 : tx.amount;
   const fee = tx.fee;
-  const p = tx.pubkey || tx.zap?.pubkey;
+  const target = tx.p || tx.zap?.p;
+  const author = tx.pubkey || tx.zap?.pubkey;
   const e = tx.e || tx.zap?.e;
   // todo: a
   const component = (
     <div className="flex flex-row justify-between p-1 items-center hover:bg-accent rounded-sm">
       <div className="flex flex-row gap-2 items-center">
         {isCredit ? (
-          p ? (
+          author ? (
             <div className="size-16 relative flex items-center justify-center">
               <User
-                pubkey={p}
+                pubkey={author}
                 classNames={{
                   wrapper: "flex-col gap-0",
                   avatar: "size-10",
@@ -430,10 +431,10 @@ function Tx({ tx }: { tx: Transaction }) {
               <ArrowDownRight className="size-14 text-green-200" />
             </div>
           )
-        ) : p ? (
+        ) : target ? (
           <div className="size-16 relative flex items-center justify-center">
             <User
-              pubkey={p}
+              pubkey={target}
               classNames={{
                 wrapper: "flex-col gap-0",
                 avatar: "size-10",
@@ -506,7 +507,7 @@ function Tx({ tx }: { tx: Transaction }) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>{component}</DialogTrigger>
       <DialogContent className="bg-transparent border-none">
-        <Event id={e} relays={myRelays} pubkey={tx.p} showReactions={false} />
+        <Event id={e} relays={myRelays} pubkey={target} showReactions={false} />
       </DialogContent>
     </Dialog>
   ) : (
@@ -700,11 +701,11 @@ function RelayList({ relays }: { relays: string[] }) {
           {t("wallet.relays")}
         </h4>
       </div>
-      <ul>
+      <ul className="p-1 flex flex-col gap-0.5">
         {relays.map((r) => (
           <li key={r} className="flex flex-row items-center gap-1.5">
-            <RelayIcon relay={r} className="size-5" />
-            <span className="text-sm font-mono">
+            <RelayIcon relay={r} className="size-4" />
+            <span className="text-xs font-mono">
               <RelayName relay={r} />
             </span>
           </li>
@@ -940,7 +941,7 @@ function CashuWalletSettings({ wallet }: { wallet: NDKCashuWallet }) {
                 {t("wallet.mints")}
               </h4>
             </div>
-            <ul className="p-1">
+      <ul className="p-1 flex flex-col gap-0.5">
               {wallet.mints.map((m) => (
                 <li key={m} className="flex flex-row items-center gap-1.5">
                   <MintLink

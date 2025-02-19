@@ -1,8 +1,8 @@
 import { useState, useRef, useMemo, ReactNode } from "react";
 import { toast } from "sonner";
-import { Video, Eye } from "lucide-react";
+import { Video } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
-import { Blurhash } from "react-blurhash";
+//import { Blurhash } from "react-blurhash";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { RichText } from "@/components/rich-text";
 import {
@@ -139,91 +139,76 @@ export function NewImage({
   );
 }
 
-function BlurhashPreview({
-  alt,
-  url,
-  blurhash,
-  maxWidth,
-  width,
-  height,
-}: {
-  alt?: string;
-  url: string;
-  blurhash: string;
-  maxWidth: number;
-  width: number;
-  height: number;
-}) {
-  const { t } = useTranslation();
-  const [showOriginalImage, setShowOriginalImage] = useState(false);
-  const maxHeight = (height / width) * maxWidth;
-  function reveal() {
-    setShowOriginalImage(true);
-  }
-  return (
-    <div
-      className={`relative bg-accent ${showOriginalImage ? "" : "cursor-all-scroll"}`}
-      style={{
-        width: `${maxWidth}px`,
-        height: `${maxHeight}px`,
-      }}
-    >
-      {showOriginalImage ? (
-        <img
-          alt={alt}
-          className="aspect-image"
-          src={url}
-          style={{
-            width: `${maxWidth}px`,
-            height: `${maxHeight}px`,
-          }}
-        />
-      ) : (
-        <>
-          <Button
-            variant="secondary"
-            className="z-10 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-            onClick={reveal}
-          >
-            <Eye />
-            {t("media.reveal")}
-          </Button>
-          <Blurhash
-            hash={blurhash}
-            width={maxWidth}
-            height={(height / width) * maxWidth}
-          />
-        </>
-      )}
-    </div>
-  );
-}
+//function BlurhashPreview({
+//  alt,
+//  url,
+//  blurhash,
+//  maxWidth,
+//  width,
+//  height,
+//}: {
+//  alt?: string;
+//  url: string;
+//  blurhash: string;
+//  maxWidth: number;
+//  width: number;
+//  height: number;
+//}) {
+//  const { t } = useTranslation();
+//  const [showOriginalImage, setShowOriginalImage] = useState(false);
+//  const maxHeight = (height / width) * maxWidth;
+//  function reveal() {
+//    setShowOriginalImage(true);
+//  }
+//  return (
+//    <div
+//      className={`relative bg-accent ${showOriginalImage ? "" : "cursor-all-scroll"}`}
+//      style={{
+//        width: `${maxWidth}px`,
+//        height: `${maxHeight}px`,
+//      }}
+//    >
+//      {showOriginalImage ? (
+//        <img
+//          alt={alt}
+//          className="aspect-image"
+//          src={url}
+//          style={{
+//            width: `${maxWidth}px`,
+//            height: `${maxHeight}px`,
+//          }}
+//        />
+//      ) : (
+//        <>
+//          <Button
+//            variant="secondary"
+//            className="z-10 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+//            onClick={reveal}
+//          >
+//            <Eye />
+//            {t("media.reveal")}
+//          </Button>
+//          <Blurhash
+//            hash={blurhash}
+//            width={maxWidth}
+//            height={(height / width) * maxWidth}
+//          />
+//        </>
+//      )}
+//    </div>
+//  );
+//}
 
 function Imeta({ imeta }: { imeta: string[] }) {
   const parsed = useMemo(() => (imeta ? parseImeta(imeta) : null), [imeta]);
-  const ref = useRef<HTMLDivElement | null>(null);
   const url = parsed?.url;
-  const blurhash = parsed?.blurhash;
   const alt = parsed?.alt;
-  return blurhash && parsed?.width && parsed?.height && url ? (
-    <div ref={ref} className="min-w-[250px] md:min-w-[400px]">
-      {ref.current ? (
-        <BlurhashPreview
-          alt={alt}
-          url={url}
-          maxWidth={ref.current.clientWidth}
-          blurhash={blurhash}
-          width={parsed.width}
-          height={parsed.height}
-        />
-      ) : null}
-    </div>
-  ) : url ? (
+  return url ? (
     <img alt={alt} className="aspect-image" src={url} />
   ) : parsed?.fallback ? (
     <img alt={alt} className="aspect-image" src={parsed.fallback} />
   ) : (
-    <span className="text-sm text-muted-foreground">Image URL not found</span>
+    <span className="text-xs text-muted-foreground">Image URL not found</span>
   );
 }
 
