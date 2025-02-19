@@ -401,12 +401,14 @@ export function ConnectWallet() {
 
 function Tx({ tx }: { tx: Transaction }) {
   const { t } = useTranslation();
+  const myRelays = useRelays();
   const [isOpen, setIsOpen] = useState(false);
   const isCredit = tx.direction === "in";
   const amount = tx.unit === "msat" ? tx.amount / 1000 : tx.amount;
   const fee = tx.fee;
   const p = tx.pubkey || tx.zap?.pubkey;
   const e = tx.e || tx.zap?.e;
+  // todo: a
   const component = (
     <div className="flex flex-row justify-between p-1 items-center hover:bg-accent rounded-sm">
       <div className="flex flex-row gap-2 items-center">
@@ -504,7 +506,7 @@ function Tx({ tx }: { tx: Transaction }) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>{component}</DialogTrigger>
       <DialogContent className="bg-transparent border-none">
-        <Event id={e} relays={[]} pubkey={tx.p} showReactions={false} />
+        <Event id={e} relays={myRelays} pubkey={tx.p} showReactions={false} />
       </DialogContent>
     </Dialog>
   ) : (
