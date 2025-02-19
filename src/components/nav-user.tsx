@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/navigation";
 import {
   ChevronsUpDown,
   LogOut,
