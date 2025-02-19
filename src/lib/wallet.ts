@@ -164,8 +164,6 @@ export function useChachiWallet() {
           }
           setCashuWallet(w);
           setNDKWallets((wallets) => [w, ...wallets]);
-          //fixme: this is trying to /mint/bolt11 already minted tokens?
-          w.start();
         })
         .catch((err) => {
           console.error(err);
@@ -502,6 +500,7 @@ export async function createCashuWallet(
       ndk.signer,
       "nip44",
     );
+    console.log("DECCRYPTEED", ev);
     const w = await NDKCashuWallet.from(ev);
     if (!w) reject("Failed to create wallet");
     w?.start();

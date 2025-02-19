@@ -1117,14 +1117,14 @@ function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
 function NWCWalletSettings({ wallet }: { wallet: NDKNWCWallet }) {
   const { data: amount } = useNWCBalance(wallet);
   const { data: info } = useNWCInfo(wallet);
-  const isDepositSupported = info?.methods.includes("make_invoice");
-  const isWithdrawalSupported = info?.methods.includes("pay_invoice");
+  //const isDepositSupported = info?.methods.includes("make_invoice");
+  //const isWithdrawalSupported = info?.methods.includes("pay_invoice");
   const [isDepositing, setIsDepositing] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
 
   function onDeposit() {
     setIsDepositing(true);
-    console.log("DEPOSIT");
+    console.log("DEPOSIT", info);
   }
 
   function onWithdraw() {
