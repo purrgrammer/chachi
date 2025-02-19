@@ -177,7 +177,10 @@ function useUserEvents() {
 
     sub.on("event", (event) => {
       const lastSeen = cashu ? cashu.created_at : 0;
-      if (event.created_at && event.created_at > lastSeen) {
+      if (
+        event.created_at &&
+        event.created_at > lastSeen
+      ) {
         setCashu(event.rawEvent() as NostrEvent);
       }
     });

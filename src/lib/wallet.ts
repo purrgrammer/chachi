@@ -495,12 +495,6 @@ export async function createCashuWallet(
 ): Promise<NDKCashuWallet> {
   return new Promise(async (resolve, reject) => {
     const ev = new NDKEvent(ndk, event);
-    await ev.decrypt(
-      new NDKUser({ pubkey: event.pubkey }),
-      ndk.signer,
-      "nip44",
-    );
-    console.log("DECCRYPTEED", ev);
     const w = await NDKCashuWallet.from(ev);
     console.log("DECCRYPTEED WALLET", w);
     if (!w) reject("Failed to create wallet");
