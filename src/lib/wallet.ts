@@ -426,6 +426,11 @@ export function useNWCBalance(wallet: NDKNWCWallet) {
   });
 }
 
+export function useCashuBalance(wallet: NDKCashuWallet) {
+  const balances = wallet?.mintBalances || {};
+  return Object.values(balances).reduce((acc, b) => acc + b, 0);
+}
+
 export function useNWCInfo(wallet: NDKNWCWallet) {
   return useQuery({
     queryKey: ["nwc-info", wallet.walletId],

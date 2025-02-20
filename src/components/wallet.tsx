@@ -66,6 +66,7 @@ import {
   useNWCBalance,
   useNWCInfo,
   useNWCTransactions,
+  useCashuBalance,
   Transaction,
   Unit,
   Direction,
@@ -1406,8 +1407,7 @@ function CashuWalletSettings({ wallet }: { wallet: NDKCashuWallet }) {
   const [showWithdraw, setShowWithdraw] = useState(false);
   const pubkey = usePubkey();
   const { t } = useTranslation();
-  const balances = wallet?.mintBalances || {};
-  const balance = Object.values(balances).reduce((acc, b) => acc + b, 0);
+  const balance = useCashuBalance(wallet);
 
   async function onDeposit() {
     setShowDeposit(true);
@@ -1820,8 +1820,7 @@ export function CashuWalletBalanceAmount({
   wallet: NDKCashuWallet;
   classNames?: BalanceClassnames;
 }) {
-  const balances = wallet.mintBalances || {};
-  const balance = Object.values(balances).reduce((acc, b) => acc + b, 0);
+  const balance = useCashuBalance(wallet);
   return (
     <Balance
       short={false}
@@ -1846,16 +1845,14 @@ function CashuWalletName({ wallet }: { wallet: NDKCashuWallet }) {
 }
 
 function CashuWalletBalance({ wallet }: { wallet: NDKCashuWallet }) {
-  const balances = wallet.mintBalances || {};
-  const balance = Object.values(balances).reduce((acc, b) => acc + b, 0);
-  const amount = balance;
+  const balance = useCashuBalance(wallet);
   return (
     <div className="flex flex-row w-full items-center justify-between">
       <div className="flex flex-row gap-2 items-center">
         <WalletIcon className="size-4 text-muted-foreground" />
         <CashuWalletName wallet={wallet} />
       </div>
-      <Balance short={false} amount={amount} unit="sat" />
+      <Balance short={false} amount={balance} unit="sat" />
     </div>
   );
 }
