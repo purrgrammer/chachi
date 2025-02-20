@@ -1,10 +1,11 @@
-import { useMemo } from "react";
 import { useRelayInfo } from "@/lib/relay";
 import { useHost } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 
+// todo: RelayLink
+
 export function RelayName({ relay }: { relay: string }) {
-  const host = useMemo(() => new URL(relay).hostname, [relay]);
+  const host = useHost(relay);
   const { data: metadata } = useRelayInfo(relay);
   return metadata?.name || host || relay;
 }

@@ -917,7 +917,7 @@ function RelayList({ relays }: { relays: string[] }) {
         {relays.map((r) => (
           <li key={r} className="flex flex-row items-center gap-1.5">
             <RelayIcon relay={r} className="size-4" />
-            <span className="text-xs font-mono">
+            <span className="text-sm">
               <RelayName relay={r} />
             </span>
           </li>
