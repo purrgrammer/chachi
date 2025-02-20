@@ -600,6 +600,7 @@
   },
   "nutzaps": {
     "title": "Zaps",
+    "redeemed": "Redeemed",
     "log-in": "Log in to see your zaps",
     "invalid": "Invalid zap",
     "redeem": "Redeem",

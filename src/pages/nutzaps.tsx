@@ -15,9 +15,9 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { NDKEvent, NDKNutzap } from "@nostr-dev-kit/ndk";
 import { NDKCashuWallet } from "@nostr-dev-kit/ndk-wallet";
 import { NostrEvent } from "nostr-tools";
-import { NDKNutzap } from "@nostr-dev-kit/ndk";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { HUGE_AMOUNT } from "@/lib/zap";
 import { E, A } from "@/components/nostr/event";
@@ -66,17 +66,23 @@ function Nutzap({
     setIsRedeeming(true);
     try {
       if (wallet instanceof NDKCashuWallet) {
-        await wallet.redeemNutzap(new NDKNutzap(ndk, event), {
-          onRedeemed: (proofs) => {
-            const amount = proofs.reduce((acc, proof) => acc + proof.amount, 0);
-            toast.success(
-              t("nutzaps.redeem-success", {
-                amount: formatShortNumber(amount),
-              }),
-            );
-            setIsRedeemed(true);
-          },
-        });
+        const nutzap = NDKNutzap.from(new NDKEvent(ndk, event));
+        if (nutzap) {
+          await wallet.redeemNutzap(nutzap, {
+            onRedeemed: (proofs) => {
+              const amount = proofs.reduce(
+                (acc, proof) => acc + proof.amount,
+                0,
+              );
+              toast.success(
+                t("nutzaps.redeem-success", {
+                  amount: formatShortNumber(amount),
+                }),
+              );
+              setIsRedeemed(true);
+            },
+          });
+        }
       }
     } catch (err) {
       console.error(err);
