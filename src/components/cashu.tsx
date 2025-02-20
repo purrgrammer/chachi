@@ -1,3 +1,4 @@
+import { QRCodeSVG } from "qrcode.react";
 import { useState, useEffect } from "react";
 import { HandCoins, Bitcoin, Euro, DollarSign, RotateCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -7,7 +8,51 @@ import { Button } from "@/components/ui/button";
 import { usePubkey } from "@/lib/account";
 import { formatShortNumber } from "@/lib/number";
 import { cn } from "@/lib/utils";
+import { Copy, Check } from "lucide-react";
+import { useCopy } from "@/lib/hooks";
 import { useCashuWallet } from "@/lib/wallet";
+
+export function EcashToken({
+  token,
+  picture,
+}: {
+  token: string;
+  picture?: string;
+}) {
+  const [copied, copy] = useCopy();
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col items-center justify-center gap-2 w-full">
+      <div className="h-[264px] qr-code">
+        <QRCodeSVG
+          className="rounded-sm svg-qr-code"
+          includeMargin
+          size={256}
+          marginSize={4}
+          value={token}
+          imageSettings={
+            picture
+              ? {
+                  src: picture,
+                  height: 48,
+                  width: 48,
+                  excavate: false,
+                }
+              : undefined
+          }
+        />
+      </div>
+      <Button
+        disabled={copied}
+        variant="secondary"
+        className="w-[256px] transition-colors"
+        onClick={() => copy(token)}
+      >
+        {copied ? <Check /> : <Copy />} {t("zap.dialog.copy")}
+      </Button>
+    </div>
+  );
+}
 
 function RedeemToken({ token }: { token: string }) {
   const [isRedeeming, setIsRedeeming] = useState(false);

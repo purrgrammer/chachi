@@ -495,20 +495,27 @@
     },
     "deposit": {
       "title": "Receive",
+      "description": "Deposit funds into a mint or redeem ecash tokens",
       "mint": "Mint",
       "amount": "Amount",
       "confirm": "Confirm",
       "success": "Deposit successful",
-      "error": "Failed to deposit"
+      "error": "Failed to deposit",
+      "receive-cash": "Ecash",
+      "redeem": "Redeem",
+      "redeem-error": "Failed to redeem ecash",
+      "redeem-success": "Ecash redeemed"
     },
     "withdraw": {
       "title": "Send",
-      "description": "Pay a lightning invoice, send money to a profile or a lightning address",
+      "description": "Pay a lightning invoice, send money to a profile or a lightning address or create ecash",
+      "placeholder": "Lightning invoice, profile or address",
       "to": "To",
       "confirm": "Pay",
       "error": "Failed to withdraw",
       "unrecognized-invoice": "Unrecognized invoice",
       "to-wallet": "Choose a wallet to withdraw to",
+      "confirm-cash": "Create ecash",
       "no-wallet": "No wallet selected",
       "success": "Withdrawal successful",
       "confirm-wallet": "Withdraw"

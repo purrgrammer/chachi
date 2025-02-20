@@ -37,9 +37,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {...props}
       />
     ) : (
-      <div className={cn("flex flex-row gap-1 w-full", className)}>
+      <div className={cn("flex flex-row gap-2 w-full", className)}>
         {leftIcon ? (
-          <div className="text-muted-foreground">{leftIcon}</div>
+          <div className="flex items-center justify-center text-muted-foreground">
+            {leftIcon}
+          </div>
         ) : null}
         <input
           type={type}

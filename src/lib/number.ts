@@ -14,3 +14,25 @@ export function formatShortNumber(n: number) {
     return `${intl.format(n / 1e9)}G`;
   }
 }
+
+export function decomposeIntoPowers(total: number): number[] {
+  if (total <= 0) return [];
+
+  const result = [];
+  let remaining = total;
+
+  while (remaining > 0) {
+    let power = Math.floor(Math.log2(remaining));
+    let number = Math.pow(2, power);
+
+    if (number === 0) {
+      result.push(1);
+      break;
+    }
+
+    result.push(number);
+    remaining -= number;
+  }
+
+  return result;
+}
