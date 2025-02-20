@@ -1,6 +1,14 @@
 import { QRCodeSVG } from "qrcode.react";
 import { useState, useEffect } from "react";
-import { HandCoins, Bitcoin, Euro, DollarSign, RotateCw } from "lucide-react";
+import {
+  Copy,
+  Check,
+  HandCoins,
+  Bitcoin,
+  Euro,
+  DollarSign,
+  RotateCw,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Token, getDecodedToken } from "@cashu/cashu-ts";
@@ -8,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { usePubkey } from "@/lib/account";
 import { formatShortNumber } from "@/lib/number";
 import { cn } from "@/lib/utils";
-import { Copy, Check } from "lucide-react";
+import { HUGE_AMOUNT } from "@/lib/zap";
 import { useCopy } from "@/lib/hooks";
 import { useCashuWallet } from "@/lib/wallet";
 
@@ -70,18 +78,13 @@ function RedeemToken({ token }: { token: string }) {
       toast.error(
         `Error redeeming token: ${(err as Error | undefined)?.message || "Unknown error"}`,
       );
-      // todo: error state
     } finally {
       setIsRedeeming(false);
     }
   }
 
   return (
-    <Button
-      variant="outline"
-      disabled={!wallet || isRedeeming}
-      onClick={redeem}
-    >
+    <Button variant="ghost" disabled={!wallet || isRedeeming} onClick={redeem}>
       {isRedeeming ? <RotateCw className="animate-spin" /> : <HandCoins />}
       {t("ecash.redeem")}
     </Button>
@@ -100,7 +103,7 @@ export function CashuToken({
   const unit = ecash?.unit ?? "sat";
   const sum = ecash?.proofs.reduce((acc, t) => acc + t.amount, 0) ?? 0;
   const total = unit === "msat" ? sum / 1000 : sum;
-  const unitClassname = "size-10 text-muted-foreground";
+  const unitClassname = "size-5 text-muted-foreground";
 
   useEffect(() => {
     try {
@@ -117,8 +120,18 @@ export function CashuToken({
     return <p className="break-all font-mono">{token}</p>;
   }
   return (
-    <div className={cn("flex flex-col gap-1", className)}>
-      <div className="flex gap-5 items-center">
+    <div
+      className={cn(
+        "flex flex-col gap-1 p-1 px-2 border rounded-md relative bg-background/80 rounded-md",
+        className,
+      )}
+    >
+      <div
+        className={cn(
+          "border-gradient rounded-md",
+          sum >= HUGE_AMOUNT ? "border-animated-gradient" : "",
+        )}
+      >
         <div className="flex flex-row items-center">
           {unit === "sat" ? (
             <Bitcoin className={unitClassname} />
@@ -127,14 +140,10 @@ export function CashuToken({
           ) : unit === "usd" ? (
             <DollarSign className={unitClassname} />
           ) : null}
-          <span className="font-mono text-5xl">{formatShortNumber(total)}</span>
+          <span className="font-mono text-lg">{formatShortNumber(total)}</span>
         </div>
-        {ecash.memo ? (
-          <p className="text-3xl text-muted-foreground line-clamp-1">
-            {ecash.memo}
-          </p>
-        ) : null}
       </div>
+      {ecash.memo ? <p className="text-md line-clamp-2">{ecash.memo}</p> : null}
       {me ? <RedeemToken token={token} /> : null}
     </div>
   );
