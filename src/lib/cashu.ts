@@ -82,3 +82,21 @@ export function useNutzaps(pubkey: string) {
   }, [events]);
   return sorted;
 }
+
+export function useRedeemedNutzaps(pubkey: string): Set<string> {
+  const { data: relayList } = useRelayList(pubkey);
+  const { data: mintList } = useMintList(pubkey);
+  const relays = mintList ? mintList.relays : relayList || [];
+  const filter = {
+    kinds: [NDKKind.WalletChange],
+    authors: [pubkey],
+  };
+  const { events } = useRequest(filter, relays);
+  const redeemed = useMemo(() => {
+    const redemptions = events
+      .map((c) => c.tags.find((t) => t[0] === "e" && t[3] === "redeemed")?.[1])
+      .filter(Boolean) as string[];
+    return new Set(redemptions);
+  }, [events]);
+  return redeemed;
+}

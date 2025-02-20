@@ -40,20 +40,22 @@ import { Pubkey } from "@/components/nostr/pubkey";
 import { groupURL } from "@/lib/groups";
 import { useNDK } from "@/lib/ndk";
 import { useCashuWallet } from "@/lib/wallet";
-import { useNutzaps, useSentNutzaps } from "@/lib/cashu";
+import { useNutzaps, useRedeemedNutzaps, useSentNutzaps } from "@/lib/cashu";
 import { usePubkey } from "@/lib/account";
 import { cn } from "@/lib/utils";
 
 function Nutzap({
   event,
   showReceiver,
+  isRedeemed,
 }: {
   event: NostrEvent;
   showReceiver?: boolean;
+  isRedeemed?: boolean;
 }) {
   const zap = validateNutzap(event);
   const [isRedeeming, setIsRedeeming] = useState(false);
-  const [isRedeemed, setIsRedeemed] = useState(false);
+  const [redeemed, setRedeemed] = useState(isRedeemed);
   const wallet = useCashuWallet();
   const { t } = useTranslation();
   const ndk = useNDK();
@@ -79,7 +81,7 @@ function Nutzap({
                   amount: formatShortNumber(amount),
                 }),
               );
-              setIsRedeemed(true);
+              setRedeemed(true);
             },
           });
         }
@@ -145,14 +147,20 @@ function Nutzap({
             isHugeAmount ? "border-animated-gradient" : "",
           )}
         >
-          <NutzapContent
-            event={event}
-            zap={zap}
-            classNames={{
-              singleCustomEmoji: "h-12 w-12",
-              onlyEmojis: "text-5xl",
-            }}
-          />
+          {event.content.trim() ? (
+            <NutzapContent
+              event={event}
+              zap={zap}
+              classNames={{
+                singleCustomEmoji: "h-12 w-12",
+                onlyEmojis: "text-5xl",
+              }}
+            />
+          ) : (
+            <span className="text-xs text-muted-foreground">
+              {t("nutzaps.no-message")}
+            </span>
+          )}
           <div className="flex flex-col gap-3 items-center justify-center">
             <div className="flex flex-col items-end gap-0.5">
               <div className="flex flex-row items-center gap-1">
@@ -168,23 +176,6 @@ function Nutzap({
       </CardContent>
       <CardFooter className="bg-background/80">
         <div className="flex flex-col gap-2 w-full">
-          {zap.p === me ? (
-            <Button
-              disabled={!wallet || isRedeemed}
-              variant="ghost"
-              onClick={redeem}
-            >
-              {isRedeemed ? (
-                <Check />
-              ) : isRedeeming ? (
-                <RotateCw className="animate-spin" />
-              ) : (
-                <HandCoins />
-              )}
-              {isRedeemed ? t("nutzaps.redeemed") : t("nutzaps.redeem")}
-            </Button>
-          ) : null}
-
           <div className="flex flex-row items-center justify-between">
             <div className="">
               {zap.p2pk ? <Pubkey isCashu pubkey={zap.p2pk} /> : null}
@@ -194,25 +185,45 @@ function Nutzap({
                 classNames={{ icon: "size-3", name: "text-xs text-foreground" }}
               />
             </div>
-            {zap.e || zap.a ? (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="tiny">
-                    <div className="flex flex-row items-center gap-1">
-                      <SquareArrowOutUpRight />
-                      {t("nutzaps.open")}
-                    </div>
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-transparent border-none">
-                  {zap.e ? (
-                    <E id={zap.e} pubkey={zap.p} showReactions={false} />
-                  ) : zap.a ? (
-                    <A address={zap.a} showReactions={false} />
-                  ) : null}
-                </DialogContent>
-              </Dialog>
-            ) : null}
+            <div className="flex flex-row gap-1 items-center">
+              {zap.p === me ? (
+                <Button
+                  disabled={!wallet || redeemed}
+                  variant="ghost"
+                  size="tiny"
+                  onClick={redeem}
+                >
+                  {redeemed ? (
+                    <Check className="text-green-500" />
+                  ) : isRedeeming ? (
+                    <RotateCw className="animate-spin" />
+                  ) : (
+                    <HandCoins />
+                  )}
+                  {redeemed ? t("nutzaps.redeemed") : t("nutzaps.redeem")}
+                </Button>
+              ) : null}
+
+              {zap.e || zap.a ? (
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="tiny">
+                      <div className="flex flex-row items-center gap-1">
+                        <SquareArrowOutUpRight />
+                        {t("nutzaps.open")}
+                      </div>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="bg-transparent border-none">
+                    {zap.e ? (
+                      <E id={zap.e} pubkey={zap.p} showReactions={false} />
+                    ) : zap.a ? (
+                      <A address={zap.a} showReactions={false} />
+                    ) : null}
+                  </DialogContent>
+                </Dialog>
+              ) : null}
+            </div>
           </div>
         </div>
       </CardFooter>
@@ -223,6 +234,7 @@ function Nutzap({
 function MyNutzaps({ pubkey }: { pubkey: string }) {
   const { t } = useTranslation();
   const nutzaps = useNutzaps(pubkey);
+  const redeemed = useRedeemedNutzaps(pubkey);
   const sentNutzaps = useSentNutzaps();
   return (
     <div className="flex items-center justify-center p-2">
@@ -252,7 +264,11 @@ function MyNutzaps({ pubkey }: { pubkey: string }) {
                 </div>
               ) : null}
               {nutzaps.map((event) => (
-                <Nutzap key={event.id} event={event} />
+                <Nutzap
+                  key={event.id}
+                  event={event}
+                  isRedeemed={redeemed.has(event.id)}
+                />
               ))}
             </div>
           </TabsContent>
