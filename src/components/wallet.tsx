@@ -45,7 +45,7 @@ import { Label } from "@/components/ui/label";
 import { Invoice } from "@/components/ln";
 import { Zap, validateZapRequest } from "@/lib/nip-57";
 import { useNDK, useNWCNDK } from "@/lib/ndk";
-import { useRelays } from "@/lib/nostr";
+import { useRelays, useEvent } from "@/lib/nostr";
 import { formatShortNumber } from "@/lib/number";
 import { useHost } from "@/lib/hooks";
 import {
@@ -597,8 +597,20 @@ function Tx({ tx }: { tx: Transaction }) {
   const amount = tx.unit === "msat" ? tx.amount / 1000 : tx.amount;
   const fee = tx.fee;
   const target = tx.p || tx.zap?.p;
-  const author = tx.pubkey || tx.zap?.pubkey;
-  const e = tx.e || tx.zap?.e;
+  const nutzapId = tx.tags.find(
+    (t) => t[0] === "e" && t[3] === "redeemed",
+  )?.[1];
+  const nutzapPubkey = tx.tags.find(
+    (t) => t[0] === "e" && t[3] === "redeemed",
+  )?.[4];
+  const { data: nutzap } = useEvent({
+    id: nutzapId,
+    pubkey: nutzapPubkey,
+    relays: myRelays,
+  });
+  const author = nutzap?.pubkey || tx.pubkey || tx.zap?.pubkey;
+  const e = nutzap?.tags.find((t) => t[0] === "e")?.[1] || tx.e || tx.zap?.e;
+  const description = nutzap?.content || tx.description || tx.zap?.content;
   // todo: a
   const component = (
     <div className="flex flex-row justify-between p-1 items-center hover:bg-accent rounded-sm">
@@ -639,13 +651,13 @@ function Tx({ tx }: { tx: Transaction }) {
           </div>
         )}
         <div className="flex flex-col items-start gap-0.5">
-          {tx.description && !tx.zap ? (
+          {description && !tx.zap ? (
             <RichText
               tags={tx.tags}
               className="text-md line-clamp-1"
               options={{ inline: true }}
             >
-              {tx.description}
+              {description}
             </RichText>
           ) : tx.zap?.content ? (
             <RichText
@@ -742,9 +754,7 @@ function Proof({ info }: { info: ProofInfo }) {
         />
         <div className="flex flex-row gap-0.5 items-center">
           <Bitcoin className="size-6 text-muted-foreground" />
-          <span className="text-2xl font-mono">
-            {formatShortNumber(info.proof.amount)}
-          </span>
+          <span className="text-2xl font-mono">{info.proof.amount}</span>
         </div>
       </div>
     </div>
