@@ -64,6 +64,7 @@ import { Reactions } from "@/components/nostr/reactions";
 interface ChatNutzapProps {
   event: NostrEvent;
   group: Group;
+  scroll?: boolean;
   setReplyingTo?: (event: NostrEvent) => void;
   deleteEvent?: (event: NostrEvent) => void;
   canDelete?: (event: NostrEvent) => boolean;
@@ -72,6 +73,7 @@ interface ChatNutzapProps {
 function ChatNutzap({
   event,
   group,
+  scroll,
   setReplyingTo,
   canDelete,
   deleteEvent,
@@ -92,6 +94,12 @@ function ChatNutzap({
   const { t } = useTranslation();
   const [, copy] = useCopy();
   const [settings] = useSettings();
+
+  useEffect(() => {
+    if (scroll && ref.current) {
+      ref.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [scroll]);
 
   // todo: extract to hook
   async function react(e: EmojiType) {
@@ -450,6 +458,7 @@ export const GroupChat = forwardRef(
                 key={event.id}
                 event={event}
                 group={group}
+                scroll={sentMessage?.id === event.id}
                 setReplyingTo={setReplyingTo}
                 canDelete={canDelete}
                 deleteEvent={deleteEvent}
@@ -502,7 +511,7 @@ export const GroupChat = forwardRef(
             }
           >
             {replyingTo ? (
-              <NewZap event={replyingTo} group={group} />
+              <NewZap event={replyingTo} group={group} onZap={onNewMessage} />
             ) : (
               <New group={group} />
             )}

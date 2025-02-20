@@ -494,7 +494,7 @@
       "nwc-connected": "Connected to remote wallet"
     },
     "deposit": {
-      "title": "Deposit",
+      "title": "Receive",
       "mint": "Mint",
       "amount": "Amount",
       "confirm": "Confirm",
@@ -502,10 +502,16 @@
       "error": "Failed to deposit"
     },
     "withdraw": {
-      "title": "Withdraw",
+      "title": "Send",
+      "description": "Pay a lightning invoice, send money to a profile or a lightning address",
       "to": "To",
-      "confirm": "Confirm",
-      "to-description": "The invoice or lightning address you want to send the funds to"
+      "confirm": "Pay",
+      "error": "Failed to withdraw",
+      "unrecognized-invoice": "Unrecognized invoice",
+      "to-wallet": "Choose a wallet to withdraw to",
+      "no-wallet": "No wallet selected",
+      "success": "Withdrawal successful",
+      "confirm-wallet": "Withdraw"
     },
     "settings": {
       "title": "Wallet settings",

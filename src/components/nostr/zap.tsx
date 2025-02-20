@@ -39,6 +39,7 @@ import type { Group, Emoji } from "@/lib/types";
 export function NewZapDialog({
   open,
   onClose,
+  onZap,
   event,
   pubkey,
   group,
@@ -48,6 +49,7 @@ export function NewZapDialog({
 }: {
   open?: boolean;
   onClose?: () => void;
+  onZap?: (e: NostrEvent) => void;
   event?: NostrEvent;
   pubkey: string;
   group?: Group;
@@ -93,7 +95,7 @@ export function NewZapDialog({
     }
   }
 
-  async function onZap() {
+  async function zap() {
     try {
       setIsZapping(true);
       if (zapType === "nip-57") {
@@ -131,6 +133,7 @@ export function NewZapDialog({
           ],
           (nutzap) => {
             onOpenChange(false);
+            onZap?.(nutzap.rawEvent() as NostrEvent);
             toast.success(
               t("zap.dialog.success", {
                 amount: formatShortNumber(nutzap.amount),
@@ -224,7 +227,7 @@ export function NewZapDialog({
               <motion.div className="w-full">
                 <Button
                   disabled={!amount || isZapping}
-                  onClick={onZap}
+                  onClick={zap}
                   className="w-full mt-3"
                 >
                   <Bitcoin className="text-muted-foreground" />
@@ -241,13 +244,22 @@ export function NewZapDialog({
   );
 }
 
-export function NewZap({ event, group }: { event: NostrEvent; group?: Group }) {
+export function NewZap({
+  event,
+  group,
+  onZap,
+}: {
+  event: NostrEvent;
+  group?: Group;
+  onZap: (e: NostrEvent) => void;
+}) {
   return (
     <NewZapDialog
       event={event}
       pubkey={event.pubkey}
       group={group}
       open={false}
+      onZap={onZap}
       trigger={
         <Button
           variant="action"

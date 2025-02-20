@@ -310,7 +310,7 @@ export function useRequest(
 
 // Users
 
-function fetchProfile(ndk: NDK, pubkey: string, relays: string[]) {
+export function fetchProfile(ndk: NDK, pubkey: string, relays: string[]) {
   // todo: use NDK helpers to fech profile
   return ndk
     .fetchEvent(

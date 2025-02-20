@@ -14,7 +14,7 @@ import { useGroupAdminsList } from "@/lib/nostr/groups";
 import { useMembers } from "@/lib/messages";
 import { cn, dedupeBy } from "@/lib/utils";
 import { Highlight } from "@/components/highlight";
-import { usePubkey } from "@/lib/account";
+import { usePubkey, useFollows } from "@/lib/account";
 import { emojis } from "@/lib/emoji";
 import type { Group, Emoji, Profile } from "@/lib/types";
 
@@ -88,6 +88,7 @@ interface AutocompleteTextareaProps extends TextareaProps {
   setReplyingTo?: (event: NostrEvent | undefined) => void;
   submitOnEnter?: boolean;
   focusAfterSubmit?: boolean;
+  disableEmojiAutocomplete?: boolean;
 }
 
 export function AutocompleteTextarea({
@@ -102,9 +103,11 @@ export function AutocompleteTextarea({
   setReplyingTo,
   submitOnEnter,
   focusAfterSubmit,
+  disableEmojiAutocomplete,
   ...props
 }: AutocompleteTextareaProps) {
   const ref = useRef<HTMLTextAreaElement | null>(null);
+  const follows = useFollows();
   const { data: adminList } = useGroupAdminsList(group);
   const members = useMembers(group);
   const admins = adminList || [];
@@ -125,7 +128,9 @@ export function AutocompleteTextarea({
   const [autocompleteTerm, setAutocompleteTerm] = useState("");
   const [autocompleteEmojiTerm, setAutocompleteEmojiTerm] = useState("");
 
-  const profiles = useProfiles(members ?? []);
+  const profiles = useProfiles(
+    group && members ? members : follows ? follows : [],
+  );
   const profileList = profiles.map((p) => p.data).filter(Boolean);
   const autocompleteProfiles =
     autocompleteTerm && isAutocompleting
@@ -240,7 +245,10 @@ export function AutocompleteTextarea({
       setIsAutocompleting(true);
       setAutocompleteEmojiTerm("");
       setIsAutocompletingEmoji(false);
-    } else if (emojiAutocompleteRegex.test(value)) {
+    } else if (
+      !disableEmojiAutocomplete &&
+      emojiAutocompleteRegex.test(value)
+    ) {
       setAutocompleteTerm("");
       setIsAutocompleting(false);
       const term = value.slice(value.lastIndexOf(":") + 1);
@@ -290,7 +298,7 @@ export function AutocompleteTextarea({
             setReplyingTo={setReplyingTo}
           />
         ) : null}
-        {isAutocompletingEmoji && (
+        {!disableEmojiAutocomplete && isAutocompletingEmoji && (
           <Autocomplete
             topOffset={topOffset}
             width={ref.current?.clientWidth ?? 0}
