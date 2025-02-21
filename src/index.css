@@ -281,6 +281,16 @@
       clip-path: circle(50%);
     }
   }
+
+  .qr-scanner {
+    svg {
+      path {
+        stroke: hsl(var(--background));
+        stroke-width: 2;
+        opacity: 0.4;
+      }
+    }
+  }
 }
 
 em-emoji-picker {

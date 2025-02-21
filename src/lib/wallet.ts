@@ -23,7 +23,7 @@ import { useNDK, useNWCNDK } from "@/lib/ndk";
 import type { Zap } from "@/lib/nip-57";
 import { usePubkey } from "@/lib/account";
 import { cashuAtom } from "@/app/store";
-import { useRelays, useRelaySet } from "@/lib/nostr";
+import { useRelays } from "@/lib/nostr";
 
 export type ChachiWallet =
   | { type: "nip60" }
@@ -222,20 +222,18 @@ export interface Transaction {
 
 function useStreamMap(
   filter: NDKFilter | NDKFilter[],
-  relays: string[],
+  relaySet: NDKRelaySet,
   transform: (ev: NostrEvent) => Promise<Transaction | null>,
 ) {
   const ndk = useNDK();
-  const relaySet = useRelaySet(relays);
   const [events, setEvents] = useState<Transaction[]>([]);
 
   useEffect(() => {
     const sub = ndk.subscribe(
       filter,
       {
-        cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
+        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
         closeOnEose: false,
-        skipOptimisticPublishEvent: true,
       },
       relaySet,
     );
@@ -259,13 +257,14 @@ export function useTransactions(pubkey: string, wallet: NDKCashuWallet) {
   // todo: implement for NWC wallet
   // todo: implement for webln wallet
   const ndk = useNDK();
+  const myRelays = useRelays();
   return useStreamMap(
     {
       kinds: [NDKKind.WalletChange],
       authors: [pubkey],
       //...wallet.event!.filter(),
     },
-    wallet.relaySet?.relayUrls || [],
+    wallet.relaySet || NDKRelaySet.fromRelayUrls(myRelays, ndk),
     async (ev: NostrEvent): Promise<Transaction | null> => {
       try {
         const event = new NDKEvent(ndk, ev);
@@ -316,33 +315,59 @@ export function useTransactions(pubkey: string, wallet: NDKCashuWallet) {
   );
 }
 
-export function useDeposit() {
+export interface DepositOptions {
+  amount: number;
+  description?: string;
+  mint?: string; // cashu wallets
+}
+
+export function useDeposit(wallet: NDKWallet) {
   const { t } = useTranslation();
   return useCallback(
     async (
-      wallet: NDKWallet,
-      amount: number,
-      mint: string,
+      options: DepositOptions,
       onSuccess: () => void,
-      onError?: () => void,
+      onError?: (err?: Error | string) => void,
     ) => {
       if (!wallet) throw new Error("No wallet");
       if (wallet instanceof NDKCashuWallet) {
-        const deposit = wallet.deposit(amount, mint);
+        const deposit = wallet.deposit(options.amount, options.mint);
         deposit.on("success", onSuccess);
         if (onError) {
           deposit.on("error", onError);
         }
         return deposit.start();
       } else if (wallet instanceof NDKNWCWallet) {
-        const res = await wallet.makeInvoice(amount, t("wallet.deposit"));
-        // @ts-expect-error: wrongly typed
-        return res.invoice;
-      } else {
-        throw new Error("Deposit not supported for this wallet type");
+        // todo: detect deposit
+        try {
+          const res = await wallet.makeInvoice(
+            options.amount,
+            options.description || t("wallet.deposit"),
+          );
+          // @ts-expect-error: wrongly typed
+          return res.invoice;
+        } catch (err) {
+          if (err instanceof Error) {
+            onError?.(err);
+          }
+        }
+      } else if (wallet instanceof NDKWebLNWallet) {
+        try {
+          const res = await wallet.provider
+            ?.makeInvoice({
+              amount: options.amount,
+              defaultMemo: options.description || t("wallet.deposit"),
+            })
+            .catch(onError);
+          return res?.paymentRequest;
+        } catch (err) {
+          if (err instanceof Error) {
+            onError?.(err);
+          }
+        }
       }
     },
-    [],
+    [wallet],
   );
 }
 
@@ -514,6 +539,7 @@ export async function createCashuWallet(
     }
     w.relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
     w.start();
+    resolve(w);
     w.on("ready", () => {
       resolve(w);
     });

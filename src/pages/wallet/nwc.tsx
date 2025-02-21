@@ -10,9 +10,9 @@ export default function NWCWallet() {
   return (
     <>
       <Header>
-        <div className="flex flex-row items-center w-full justify-between">
-          {wallet ? <WalletName wallet={wallet} /> : null}
+        <div className="flex flex-row items-center gap-2">
           <PlugZap className="size-5 text-muted-foreground" />
+          {wallet ? <WalletName wallet={wallet} /> : null}
         </div>
       </Header>
       <div className="p-4">

@@ -504,11 +504,13 @@
       "receive-cash": "Ecash",
       "redeem": "Redeem",
       "redeem-error": "Failed to redeem ecash",
-      "redeem-success": "Ecash redeemed"
+      "redeem-success": "Ecash redeemed",
+      "from-wallet": "Choose a wallet to pay this invoice",
+      "confirm-wallet": "Pay"
     },
     "withdraw": {
       "title": "Send",
-      "description": "Pay a lightning invoice, send money to a profile or a lightning address or create ecash",
+      "description": "Pay a lightning invoice, send money to a profile or a lightning address",
       "placeholder": "Lightning invoice, profile or address",
       "to": "To",
       "confirm": "Pay",
