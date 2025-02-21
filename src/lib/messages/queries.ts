@@ -92,11 +92,15 @@ export async function getGroupsSortedByLastMessage(groups: Group[]) {
   return sorted;
 }
 
-export function getLastSeen(group: Group, kind = NDKKind.GroupChat) {
-  return db.lastSeen
+export async function getLastSeen(group: Group) {
+  const results = await db.lastSeen
     .where("[group+kind]")
-    .equals([groupId(group), kind])
-    .first();
+    .anyOf([
+      [groupId(group), NDKKind.GroupChat],
+      [groupId(group), NDKKind.Nutzap],
+    ])
+    .sortBy("created_at");
+  return results.at(-1);
 }
 
 export async function getGroupMentionsAfter(

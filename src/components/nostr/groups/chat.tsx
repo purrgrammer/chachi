@@ -40,7 +40,7 @@ import { useCopy } from "@/lib/hooks";
 import { useRelayInfo } from "@/lib/relay";
 import {
   useGroupchat,
-  useMemoizedLastSeen,
+  useLastSeen,
   useNewMessage,
   saveLastSeen,
   useSaveLastSeen,
@@ -400,7 +400,7 @@ export const GroupChat = forwardRef(
             e.tags.find((t) => t[0] === "p" && t[1] === me),
         ));
     const { t } = useTranslation();
-    const lastSeen = useMemoizedLastSeen(group);
+    const lastSeen = useLastSeen(group);
     const saveLast = useSaveLastSeen(group);
 
     useEffect(() => {

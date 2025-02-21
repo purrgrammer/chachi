@@ -45,10 +45,9 @@ import { RichText } from "@/components/rich-text";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Event } from "@/components/nostr/event";
+import { Event, A } from "@/components/nostr/event";
 import { Label } from "@/components/ui/label";
 import { Invoice } from "@/components/ln";
-import { Zap, validateZapRequest } from "@/lib/nip-57";
 import { useNDK, useNWCNDK } from "@/lib/ndk";
 import { useRelays, useEvent } from "@/lib/nostr";
 import { formatShortNumber, decomposeIntoPowers } from "@/lib/number";
@@ -67,9 +66,9 @@ import {
   useNWCInfo,
   useNWCTransactions,
   useCashuBalance,
+  refreshWallet,
   Transaction,
   Unit,
-  Direction,
 } from "@/lib/wallet";
 import { usePubkey } from "@/lib/account";
 import {
@@ -334,7 +333,6 @@ export function EditWallet({
       wallet.mints = selectedMints;
       wallet.relaySet = NDKRelaySet.fromRelayUrls(selectedRelays, ndk);
       await wallet.publish();
-      // todo: cashu mint list
       const p2pk = await wallet.getP2pk();
       const event = new NDKEvent(ndk, {
         kind: NDKKind.CashuMintList,
@@ -617,6 +615,7 @@ function Tx({ tx }: { tx: Transaction }) {
   });
   const author = nutzap?.pubkey || tx.pubkey || tx.zap?.pubkey;
   const e = nutzap?.tags.find((t) => t[0] === "e")?.[1] || tx.e || tx.zap?.e;
+  const a = nutzap?.tags.find((t) => t[0] === "a")?.[1] || tx.a || tx.zap?.a;
   const description = nutzap?.content || tx.description || tx.zap?.content;
   // todo: a
   const component = (
@@ -724,11 +723,20 @@ function Tx({ tx }: { tx: Transaction }) {
       </div>
     </div>
   );
-  return e ? (
+  return e || a ? (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>{component}</DialogTrigger>
       <DialogContent className="bg-transparent border-none">
-        <Event id={e} relays={myRelays} pubkey={target} showReactions={false} />
+        {e ? (
+          <Event
+            id={e}
+            relays={myRelays}
+            pubkey={target}
+            showReactions={false}
+          />
+        ) : a ? (
+          <A address={a} showReactions={false} />
+        ) : null}
       </DialogContent>
     </Dialog>
   ) : (
@@ -842,7 +850,7 @@ export function WalletSelector() {
 }
 
 function CashuWalletCoins({ wallet }: { wallet: NDKCashuWallet }) {
-  const proofs = wallet.state.getProofEntries({});
+  const proofs = wallet.state.getProofEntries({ onlyAvailable: true });
   return (
     <ScrollArea className="h-[28rem]">
       <div className="flex flex-col gap-1 pr-3">
@@ -986,6 +994,9 @@ function Withdraw({
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) {
+  const [lnAddress, setLnAddress] = useState("");
+  const [pubkey, setPubkey] = useState("");
+  const [relays, setRelays] = useState<string[]>([]);
   const [ecash, setEcash] = useState<Token | null>(null);
   const [token, setToken] = useState<string>("");
   const [amount, setAmount] = useState("21");
@@ -993,6 +1004,7 @@ function Withdraw({
   const otherWallets = ndkWallets.filter((w) => w.walletId !== wallet.walletId);
   const [toWallet, setToWallet] = useState<NDKWallet | null>(null);
   const [invoice, setInvoice] = useState("");
+  const [message, setMessage] = useState("");
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const { t } = useTranslation();
   const isAmountValid = amount && Number(amount) > 0;
@@ -1006,6 +1018,7 @@ function Withdraw({
     if (!open) {
       setToWallet(null);
       setInvoice("");
+      setMessage("");
       setAmount("21");
       setToken("");
       setEcash(null);
@@ -1029,6 +1042,7 @@ function Withdraw({
         const result = await wallet.lnPay({ pr: content });
         if (result?.preimage) {
           toast.success(t("wallet.withdraw.success"));
+          refreshWallet(wallet);
         }
       } else {
         toast.error(t("wallet.withdraw.unrecognized-invoice"));
@@ -1041,6 +1055,7 @@ function Withdraw({
     } finally {
       setIsWithdrawing(false);
       setInvoice("");
+      setMessage("");
     }
   }
 
@@ -1153,15 +1168,17 @@ function Withdraw({
     try {
       setIsWithdrawing(true);
       if (toWallet instanceof NDKNWCWallet) {
-        // todo: invalidate balances and tx lists
-        const result = await toWallet.makeInvoice(Number(amount) * 1000, "");
+        const result = await toWallet.makeInvoice(
+          Number(amount) * 1000,
+          message,
+        );
         // @ts-expect-error: incorrect return type
         await wallet.lnPay({ pr: result.invoice });
         toast.success(t("wallet.withdraw.success"));
       } else if (toWallet instanceof NDKWebLNWallet) {
         const result = await toWallet.provider?.makeInvoice({
           amount: Number(amount) * 1000,
-          defaultMemo: "",
+          defaultMemo: message,
         });
         // @ts-expect-error: incorrect return type
         await wallet.lnPay({ pr: result.paymentRequest });
@@ -1175,14 +1192,20 @@ function Withdraw({
           toast.success(t("wallet.withdraw.success")),
         );
         deposit.on("error", () => toast.success(t("wallet.withdraw.error")));
-        await deposit.start();
+        const result = await deposit.start();
+        // @ts-expect-error: incorrect return type
+        await wallet.lnPay({ pr: result.paymentRequest });
+        toast.success(t("wallet.withdraw.success"));
       }
+      refreshWallet(wallet);
+      refreshWallet(toWallet);
       onClose();
     } catch (err) {
       toast.error(t("wallet.withdraw.error"));
     } finally {
       setIsWithdrawing(false);
       setInvoice("");
+      setMessage("");
     }
   }
 
@@ -1208,9 +1231,10 @@ function Withdraw({
               <div className="mx-2">
                 <Label>{t("wallet.deposit.amount")}</Label>
                 <AmountInput amount={amount} setAmount={setAmount} />
-                <Label>{t("wallet.withdraw.to")}</Label>
               </div>
+              <Label className="mx-2">{t("wallet.withdraw.to")}</Label>
               <AutocompleteTextarea
+                className="rounded-sm shadow-none text-sm"
                 message={invoice}
                 placeholder={t("wallet.withdraw.placeholder")}
                 setMessage={setInvoice}
@@ -1219,6 +1243,20 @@ function Withdraw({
                 submitOnEnter={false}
                 disableEmojiAutocomplete
               />
+              {pubkey || lnAddress ? (
+                <>
+                  <Label className="mx-2">{t("wallet.withdraw.message")}</Label>
+                  <AutocompleteTextarea
+                    className="rounded-sm shadow-none text-sm"
+                    message={message}
+                    placeholder={t("wallet.withdraw.message-placeholder")}
+                    setMessage={setMessage}
+                    minRows={3}
+                    maxRows={6}
+                    submitOnEnter={false}
+                  />
+                </>
+              ) : null}
               <div className="mx-2 flex flex-row items-center gap-2">
                 <Button
                   disabled={isWithdrawing || !invoice || !isAmountValid}
@@ -1358,6 +1396,7 @@ function Deposit({
         console.log("TODO");
       }
       toast.success(t("wallet.deposit.redeem-success"));
+      refreshWallet(wallet);
       onOpenChange?.(false);
     } catch (err) {
       console.error(err);
@@ -1390,8 +1429,10 @@ function Deposit({
     try {
       setIsDepositing(true);
       // @ts-expect-error: incorrect typing?
-      await wallet.lnPay({ pr: invoice });
+      await toWallet.lnPay({ pr: invoice });
       toast.success(t("wallet.withdraw.success"));
+      refreshWallet(wallet);
+      refreshWallet(toWallet);
       handleOpenChange(false);
     } catch (err) {
       toast.error(t("wallet.withdraw.error"));
@@ -1411,7 +1452,9 @@ function Deposit({
             </div>
           </DialogTitle>
           <DialogDescription>
-            {t("wallet.deposit.description")}
+            {wallet instanceof NDKCashuWallet
+              ? t("wallet.deposit.cashu-description")
+              : t("wallet.deposit.description")}
           </DialogDescription>
         </DialogHeader>
         {invoice ? (
@@ -1584,40 +1627,9 @@ function WebLNWalletSettings({ wallet }: { wallet: NDKWebLNWallet }) {
   return <>{wallet.walletId}</>;
 }
 
-function tryParseZap(raw: string, invoice: string): Zap | null {
-  try {
-    return validateZapRequest(raw, invoice);
-  } catch (err) {
-    return null;
-  }
-}
-
 function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
-  const { data: txs, isLoading, isError } = useNWCTransactions(wallet);
+  const { data: transactions, isLoading, isError } = useNWCTransactions(wallet);
   const { t } = useTranslation();
-
-  const transactions = useMemo(() => {
-    if (!txs) return [];
-
-    const asTxs = txs.map((nwcTx) => {
-      return {
-        id: nwcTx.preimage || nwcTx.invoice,
-        created_at: nwcTx.created_at,
-        amount: nwcTx.amount / 1000,
-        fee: nwcTx.fees_paid ? nwcTx.fees_paid / 1000 : 0,
-        unit: "sat" as Unit,
-        invoice: nwcTx.invoice,
-        direction: nwcTx.type === "incoming" ? "in" : ("out" as Direction),
-        description: nwcTx.description,
-        tags: [],
-        zap: nwcTx.description
-          ? tryParseZap(nwcTx.description, nwcTx.invoice)
-          : null,
-      };
-    });
-    asTxs.sort((a, b) => b.created_at - a.created_at);
-    return asTxs;
-  }, [txs]);
 
   return (
     <>
@@ -1643,9 +1655,7 @@ function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
       ) : (
         <ScrollArea className="h-[28rem]">
           <div className="flex flex-col gap-2 pr-2.5">
-            {transactions.map((tx) => (
-              <Tx key={tx.id} tx={tx} />
-            ))}
+            {transactions?.map((tx) => <Tx key={tx.id} tx={tx} />)}
           </div>
         </ScrollArea>
       )}

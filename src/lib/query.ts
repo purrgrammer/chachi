@@ -14,3 +14,6 @@ export const GROUP_MEMBERS = "group-members";
 export const GROUP_ADMINS = "group-admins";
 export const GROUP_ROLES = "group-roles";
 export const LNURL = "lnurl";
+export const WALLET_INFO = "wallet-info";
+export const WALLET_BALANCE = "wallet-balance";
+export const WALLET_TXS = "wallet-txs";

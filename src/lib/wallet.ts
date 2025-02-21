@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import {
+  queryClient,
+  WALLET_INFO,
+  WALLET_BALANCE,
+  WALLET_TXS,
+} from "@/lib/query";
 import { toast } from "sonner";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { useTranslation } from "react-i18next";
@@ -20,7 +26,7 @@ import {
   NDKNWCWallet,
 } from "@nostr-dev-kit/ndk-wallet";
 import { useNDK, useNWCNDK } from "@/lib/ndk";
-import type { Zap } from "@/lib/nip-57";
+import { Zap, validateZapRequest } from "@/lib/nip-57";
 import { usePubkey } from "@/lib/account";
 import { cashuAtom } from "@/app/store";
 import { useRelays } from "@/lib/nostr";
@@ -214,6 +220,7 @@ export interface Transaction {
   token?: string;
   invoice?: string;
   e?: string;
+  a?: string;
   p?: string;
   pubkey?: string;
   tags: string[][];
@@ -283,6 +290,7 @@ export function useTransactions(pubkey: string, wallet: NDKCashuWallet) {
             !["created", "destroyed", "redeemed"].includes(t[3]) &&
             t[4] !== pubkey,
         )?.[1];
+        const a = tags.find((t) => t[0] === "a")?.[1];
         const token = tags.find(
           (t) => t[0] === "e" && ["created", "destroyed"].includes(t[3]),
         )?.[1];
@@ -298,6 +306,7 @@ export function useTransactions(pubkey: string, wallet: NDKCashuWallet) {
             mint,
             description,
             e,
+            a,
             token,
             p,
             tags: event.tags,
@@ -397,45 +406,9 @@ export function useCreateWallet() {
   };
 }
 
-async function fetchCashuWallet(
-  ndk: NDK,
-  pubkey: string,
-  relays: string[],
-): Promise<NostrEvent | null> {
-  return ndk
-    .fetchEvent(
-      {
-        kinds: [NDKKind.CashuWallet],
-        authors: [pubkey],
-      },
-      {
-        closeOnEose: true,
-      },
-      NDKRelaySet.fromRelayUrls(relays, ndk),
-    )
-    .then(async (ev) => {
-      if (ev) {
-        await ev.decrypt(new NDKUser({ pubkey }));
-        return ev.rawEvent() as NostrEvent;
-      }
-      throw new Error("Wallet not found");
-    });
-}
-
-export function useNutsack() {
-  const ndk = useNDK();
-  const pubkey = usePubkey();
-  const relays = useRelays();
-  return useQuery({
-    enabled: Boolean(pubkey) && relays?.length > 0,
-    queryKey: ["nutsack", pubkey],
-    queryFn: () => fetchCashuWallet(ndk, pubkey!, relays),
-  });
-}
-
 export function useNWCBalance(wallet: NDKNWCWallet) {
   return useQuery({
-    queryKey: ["nwc-balance", wallet.walletId],
+    queryKey: [WALLET_BALANCE, wallet.walletId],
     queryFn: async () => {
       try {
         const res = await wallet.req("get_balance", {});
@@ -452,13 +425,13 @@ export function useNWCBalance(wallet: NDKNWCWallet) {
 }
 
 export function useCashuBalance(wallet: NDKCashuWallet) {
-  const balances = wallet?.mintBalances || {};
-  return Object.values(balances).reduce((acc, b) => acc + b, 0);
+  const proofs = wallet.state.getProofEntries({ onlyAvailable: true });
+  return proofs.reduce((acc, b) => acc + b.proof.amount, 0);
 }
 
 export function useNWCInfo(wallet: NDKNWCWallet) {
   return useQuery({
-    queryKey: ["nwc-info", wallet.walletId],
+    queryKey: [WALLET_INFO, wallet.walletId],
     queryFn: async () => {
       return wallet.getInfo();
     },
@@ -478,15 +451,41 @@ interface NWCWalletTransaction {
   type: "incoming" | "outgoing";
 }
 
+function tryParseZap(raw: string, invoice: string): Zap | null {
+  try {
+    return validateZapRequest(raw, invoice);
+  } catch (err) {
+    return null;
+  }
+}
+
 async function fetchNWCTransactions(
   wallet: NDKNWCWallet,
-): Promise<NWCWalletTransaction[]> {
+): Promise<Transaction[]> {
   try {
     const res = await wallet.req("list_transactions", {});
-    if (res?.result) {
-      return res.result.transactions as NWCWalletTransaction[];
+    if (!res?.result?.transactions) {
+      throw new Error("Could not load wallet transactions");
     }
-    throw new Error("Could not load wallet transactions");
+    const txs = res.result.transactions as NWCWalletTransaction[];
+    const sorted = txs.map((nwcTx) => {
+      return {
+        id: nwcTx.preimage || nwcTx.invoice,
+        created_at: nwcTx.created_at,
+        amount: nwcTx.amount / 1000,
+        fee: nwcTx.fees_paid ? nwcTx.fees_paid / 1000 : 0,
+        unit: "sat" as Unit,
+        invoice: nwcTx.invoice,
+        direction: nwcTx.type === "incoming" ? "in" : ("out" as Direction),
+        description: nwcTx.description,
+        tags: [],
+        zap: nwcTx.description?.startsWith("{")
+          ? tryParseZap(nwcTx.description, nwcTx.invoice)
+          : null,
+      };
+    });
+    sorted.sort((a, b) => b.created_at - a.created_at);
+    return sorted;
   } catch (err) {
     console.error(err);
     throw err;
@@ -495,7 +494,7 @@ async function fetchNWCTransactions(
 
 export function useNWCTransactions(wallet: NDKNWCWallet) {
   return useQuery({
-    queryKey: ["nwc-txs", wallet.walletId],
+    queryKey: [WALLET_TXS, wallet.walletId],
     queryFn: () => fetchNWCTransactions(wallet),
     staleTime: Infinity,
   });
@@ -560,4 +559,11 @@ export async function createNWCWallet(connection: string, ndk: NDK) {
       resolve(nwc);
     });
   });
+}
+
+export function refreshWallet(wallet: NDKWallet) {
+  queryClient.invalidateQueries({
+    queryKey: [WALLET_BALANCE, wallet.walletId],
+  });
+  queryClient.invalidateQueries({ queryKey: [WALLET_TXS, wallet.walletId] });
 }

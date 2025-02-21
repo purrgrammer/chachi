@@ -61,7 +61,7 @@ export function QRScanner({ onScan }: { onScan: (result: string) => void }) {
             <span className="text-sm text-red-500">
               {error.message || "Something went wrong"}
             </span>
-          ) : (
+          ) : isOpen ? (
             <Scanner
               allowMultiple={false}
               styles={{ finderBorder: 0 }}
@@ -72,7 +72,7 @@ export function QRScanner({ onScan }: { onScan: (result: string) => void }) {
               onError={onError}
               onScan={onScanned}
             />
-          )}
+          ) : null}
         </div>
       </DrawerContent>
     </Drawer>

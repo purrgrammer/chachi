@@ -495,7 +495,8 @@
     },
     "deposit": {
       "title": "Receive",
-      "description": "Deposit funds into a mint or redeem ecash tokens",
+      "cashu-description": "Deposit funds into a mint or redeem ecash tokens",
+      "description": "Deposit funds into your wallet",
       "mint": "Mint",
       "amount": "Amount",
       "confirm": "Confirm",
@@ -520,6 +521,8 @@
       "confirm-cash": "Create ecash",
       "no-wallet": "No wallet selected",
       "success": "Withdrawal successful",
+      "message": "Message",
+      "message-placeholder": "Write an optional message",
       "confirm-wallet": "Withdraw"
     },
     "settings": {

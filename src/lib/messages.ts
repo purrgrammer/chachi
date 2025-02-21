@@ -130,22 +130,15 @@ export function useLastMessage(group: Group) {
   );
 }
 
-export function useLastSeen(group: Group, kind = NDKKind.GroupChat) {
-  return useLiveQuery(
-    () => getLastSeen(group, kind),
-    [group.id, group.relay, kind],
-  );
-}
-
-export function useMemoizedLastSeen(group: Group, kind = NDKKind.GroupChat) {
+export function useLastSeen(group: Group) {
   const [memoized, setMemoized] = useState<LastSeen | null>(null);
   useEffect(() => {
-    getLastSeen(group, kind).then((lastSeen) => {
+    getLastSeen(group).then((lastSeen) => {
       if (lastSeen) {
         setMemoized(lastSeen);
       }
     });
-  }, [group.id, group.relay, kind]);
+  }, [group.id, group.relay]);
   return memoized;
 }
 
