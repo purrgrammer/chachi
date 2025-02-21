@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { decode } from "light-bolt11-decoder";
 import { useQuery } from "@tanstack/react-query";
 import {
   queryClient,
@@ -469,6 +470,7 @@ async function fetchNWCTransactions(
     }
     const txs = res.result.transactions as NWCWalletTransaction[];
     const sorted = txs.map((nwcTx) => {
+      const decoded = nwcTx.invoice ? decode(nwcTx.invoice) : null;
       return {
         id: nwcTx.preimage || nwcTx.invoice,
         created_at: nwcTx.created_at,
@@ -477,7 +479,9 @@ async function fetchNWCTransactions(
         unit: "sat" as Unit,
         invoice: nwcTx.invoice,
         direction: nwcTx.type === "incoming" ? "in" : ("out" as Direction),
-        description: nwcTx.description,
+        description:
+          nwcTx.description ||
+          decoded?.sections?.find((s) => s.name === "description")?.value,
         tags: [],
         zap: nwcTx.description?.startsWith("{")
           ? tryParseZap(nwcTx.description, nwcTx.invoice)

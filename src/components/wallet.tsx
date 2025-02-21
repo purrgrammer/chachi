@@ -1,4 +1,6 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { decode } from "light-bolt11-decoder";
+import debounce from "lodash.debounce";
 import { Token, getDecodedToken, getEncodedToken } from "@cashu/cashu-ts";
 import { NostrEvent } from "nostr-tools";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
@@ -28,6 +30,7 @@ import {
   CircleSlash2,
   List,
   Settings,
+  Zap as ZapIcon,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -49,8 +52,9 @@ import { Event, A } from "@/components/nostr/event";
 import { Label } from "@/components/ui/label";
 import { Invoice } from "@/components/ln";
 import { useNDK, useNWCNDK } from "@/lib/ndk";
-import { useRelays, useEvent } from "@/lib/nostr";
+import { useRelays, useEvent, useProfile } from "@/lib/nostr";
 import { formatShortNumber, decomposeIntoPowers } from "@/lib/number";
+import { LNURLParams, fetchLnurl, fetchInvoice } from "@/lib/lnurl";
 import { useHost } from "@/lib/hooks";
 import {
   defaultMints,
@@ -660,16 +664,30 @@ function Tx({ tx }: { tx: Transaction }) {
           {description && !tx.zap ? (
             <RichText
               tags={nutzap?.tags || tx.tags}
-              className="text-md text-start line-clamp-1"
-              options={{ inline: true }}
+              className="text-md break-all text-start line-clamp-1"
+              options={{
+                inline: true,
+                events: false,
+                ecash: false,
+                video: false,
+                images: false,
+                audio: false,
+              }}
             >
               {description}
             </RichText>
           ) : tx.zap?.content.trim() ? (
             <RichText
               tags={tx.zap.tags}
-              className="text-md line-clamp-1"
-              options={{ inline: true }}
+              className="text-md break-all text-start line-clamp-1"
+              options={{
+                inline: true,
+                events: false,
+                ecash: false,
+                video: false,
+                images: false,
+                audio: false,
+              }}
             >
               {tx.zap.content.trim()}
             </RichText>
@@ -962,6 +980,77 @@ function WalletActions({
   );
 }
 
+interface AnalyzeTargetCallbacks {
+  onPubkey: (pubkey: string) => void;
+  onLnAddress: (lnAddress: string, params: LNURLParams) => void;
+  onLnurl: (lnurl: string, params: LNURLParams) => void;
+  onInvoice: (invoice: string) => void;
+  //onEcash?: (ecash: Token) => void;
+  //onCashuRequest?: (request: CashuRequest) => void;
+}
+
+function isLnurl(s: string) {
+  return s.startsWith("LNURL");
+}
+function isLnAddress(s: string) {
+  return s.includes("@");
+}
+function isLnInvoice(s: string) {
+  return s.startsWith("ln");
+}
+
+async function _analyzeTarget(
+  content: string,
+  callbacks: AnalyzeTargetCallbacks,
+) {
+  const { onPubkey, onLnAddress, onLnurl, onInvoice } = callbacks;
+  const isNostrProfile =
+    content.startsWith("nostr:npub") || content.startsWith("nostr:nprofile");
+  const lnurl = isLnurl(content);
+  const lnAddress = isLnAddress(content);
+  const invoice = isLnInvoice(content);
+  // todo: ecash
+  // todo: cashu request
+  if (isNostrProfile) {
+    try {
+      const decoded = nip19.decode(content.replace(/^nostr:/, ""));
+      console.log("NOSTRDEC", decoded);
+      if (decoded?.type === "npub") {
+        onPubkey(decoded.data);
+      }
+      if (decoded?.type === "nprofile") {
+        onPubkey(decoded.data.pubkey);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  } else if (lnurl) {
+    try {
+      const params = await fetchLnurl(content);
+      onLnurl(content, params);
+    } catch (err) {
+      console.error(err);
+    }
+  } else if (lnAddress) {
+    try {
+      const params = await fetchLnurl(content);
+      onLnAddress(content, params);
+    } catch (err) {
+      console.error(err);
+    }
+  } else if (invoice) {
+    try {
+      const decoded = decode(content);
+      if (decoded) {
+        onInvoice(content);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+}
+const analyzeTarget = debounce(_analyzeTarget, 200);
+
 //function RelayList({ relays }: { relays: string[] }) {
 //  const { t } = useTranslation();
 //  return (
@@ -1003,59 +1092,131 @@ function Withdraw({
   const [ndkWallets] = useNDKWallets();
   const otherWallets = ndkWallets.filter((w) => w.walletId !== wallet.walletId);
   const [toWallet, setToWallet] = useState<NDKWallet | null>(null);
+  const [target, setTarget] = useState("");
   const [invoice, setInvoice] = useState("");
   const [message, setMessage] = useState("");
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const { t } = useTranslation();
   const isAmountValid = amount && Number(amount) > 0;
-  const content = invoice.trim();
-  const isNostrProfile =
-    content.startsWith("nostr:npub") || content.startsWith("nostr:nprofile");
-  const isLnAddress = content.includes("@");
-  const isLnInvoice = content.startsWith("ln");
+  const { data: profile } = useProfile(pubkey, relays);
+  const [lnurl, setLnurl] = useState<LNURLParams | null>(null);
+  const cantPayToPubkey = !lnurl?.callback;
+  const isPayToPubkey = Boolean(pubkey);
+  const isPayToLnAddress = Boolean(lnAddress);
+  const isPayToLnurl = Boolean(lnurl);
 
   function onClose(open?: boolean) {
     if (!open) {
       setToWallet(null);
       setInvoice("");
+      setTarget("");
       setMessage("");
       setAmount("21");
       setToken("");
+      setPubkey("");
+      setRelays([]);
+      setLnAddress("");
       setEcash(null);
     }
     onOpenChange?.(Boolean(open));
   }
 
-  async function onWithdraw() {
-    // todo: ln address, cashu payment request
+  useEffect(() => {
+    if (pubkey && profile && profile.pubkey === pubkey && profile.lud16) {
+      fetchLnurl(profile.lud16).then(setLnurl);
+    }
+  }, [pubkey, profile]);
+
+  async function payToPubkey() {
     try {
       setIsWithdrawing(true);
-      if (isNostrProfile) {
-        const decoded = nip19.decode(content.replace(/^nostr:/, ""));
-        if (decoded) {
-          // todo: pubkey, amount
-        }
-      } else if (isLnAddress) {
-        // todo: amount
-      } else if (isLnInvoice) {
-        // @ts-expect-error: Reeeee
-        const result = await wallet.lnPay({ pr: content });
-        if (result?.preimage) {
-          toast.success(t("wallet.withdraw.success"));
-          refreshWallet(wallet);
-        }
-      } else {
-        toast.error(t("wallet.withdraw.unrecognized-invoice"));
+      if (!lnurl) {
         return;
       }
+      const invoice = await fetchInvoice(lnurl, Number(amount), message);
+      // @ts-expect-error: ree
+      await wallet.lnPay({ pr: invoice });
+      // todo: create tx out if cashu wallet
+      toast.success(
+        t("wallet.withdraw.p2pk-success", {
+          amount: amount,
+          name: profile?.name || profile?.display_name || pubkey.slice(0, 8),
+        }),
+      );
+      refreshWallet(wallet);
+      onClose(false);
+    } catch (err) {
+      console.error(err);
+      toast.error(t("wallet.withdraw.error"));
+    } finally {
+      setIsWithdrawing(false);
+    }
+  }
+
+  async function payToLnAddress() {
+    try {
+      setIsWithdrawing(true);
+      if (!lnurl) {
+        return;
+      }
+      const invoice = await fetchInvoice(lnurl, Number(amount), message);
+      // @ts-expect-error: ree
+      await wallet.lnPay({ pr: invoice });
+      // todo: create tx out if cashu wallet
+      toast.success(
+        t("wallet.withdraw.lud16-success", {
+          amount: amount,
+          lud16: lnAddress,
+        }),
+      );
+      refreshWallet(wallet);
+      onClose(false);
+    } catch (err) {
+      console.error(err);
+      toast.error(t("wallet.withdraw.error"));
+    } finally {
+      setIsWithdrawing(false);
+      onClose(false);
+    }
+  }
+
+  async function payToLnurl() {
+    try {
+      setIsWithdrawing(true);
+      if (!lnurl) {
+        return;
+      }
+      const invoice = await fetchInvoice(lnurl, Number(amount), message);
+      // @ts-expect-error: ree
+      await wallet.lnPay({ pr: invoice });
+      // todo: create tx out if cashu wallet
+      toast.success(
+        t("wallet.withdraw.amount-success", {
+          amount: amount,
+        }),
+      );
+      refreshWallet(wallet);
+      onClose(false);
+    } catch (err) {
+      console.error(err);
+      toast.error(t("wallet.withdraw.error"));
+    } finally {
+      setIsWithdrawing(false);
+      onClose(false);
+    }
+  }
+
+  async function onWithdraw() {
+    try {
+      setIsWithdrawing(true);
+      // todo
       onClose();
     } catch (err) {
       console.error(err);
       toast.error(t("wallet.withdraw.error"));
     } finally {
       setIsWithdrawing(false);
-      setInvoice("");
-      setMessage("");
+      onClose(false);
     }
   }
 
@@ -1157,6 +1318,7 @@ function Withdraw({
     } finally {
       setIsWithdrawing(false);
       setInvoice("");
+      setTarget("");
     }
   }
 
@@ -1204,8 +1366,32 @@ function Withdraw({
       toast.error(t("wallet.withdraw.error"));
     } finally {
       setIsWithdrawing(false);
+      setTarget("");
       setInvoice("");
       setMessage("");
+    }
+  }
+
+  function onTargetChange(newTarget: string) {
+    const content = newTarget.trim();
+    setTarget(content);
+    try {
+      analyzeTarget(content, {
+        onPubkey: (pubkey) => {
+          setPubkey(pubkey);
+        },
+        onLnAddress: (address, params) => {
+          setLnAddress(address);
+          setLnurl(params);
+        },
+        onLnurl: (url, params) => {
+          setTarget(url);
+          setLnurl(params);
+        },
+        onInvoice: setInvoice,
+      });
+    } catch (err) {
+      console.error(err);
     }
   }
 
@@ -1227,24 +1413,56 @@ function Withdraw({
           {ecash && token ? (
             <EcashToken token={token} />
           ) : (
-            <div className="flex flex-col gap-1">
-              <div className="mx-2">
-                <Label>{t("wallet.deposit.amount")}</Label>
-                <AmountInput amount={amount} setAmount={setAmount} />
-              </div>
-              <Label className="mx-2">{t("wallet.withdraw.to")}</Label>
-              <AutocompleteTextarea
-                className="rounded-sm shadow-none text-sm"
-                message={invoice}
-                placeholder={t("wallet.withdraw.placeholder")}
-                setMessage={setInvoice}
-                minRows={1}
-                maxRows={1}
-                submitOnEnter={false}
-                disableEmojiAutocomplete
-              />
-              {pubkey || lnAddress ? (
+            <div className="flex flex-col gap-2">
+              {pubkey ? (
+                <div className="flex flex-row items-center justify-between mx-2 mb-3">
+                  <User
+                    pubkey={pubkey}
+                    classNames={{
+                      avatar: "size-6",
+                      name: "font-normal",
+                      wrapper: "gap-2",
+                    }}
+                  />
+                  {profile?.pubkey === pubkey && profile.lud16 ? (
+                    <div className="flex flex-row items-center gap-1.5">
+                      <ZapIcon className="size-3 text-muted-foreground" />
+                      <span className="font-mono text-xs">{profile.lud16}</span>
+                    </div>
+                  ) : null}
+                </div>
+              ) : lnAddress ? (
+                <div className="flex flex-row items-center gap-1.5">
+                  <ZapIcon className="size-3 text-muted-foreground" />
+                  <span className="font-mono text-sm">{lnAddress}</span>
+                </div>
+              ) : invoice ? (
+                <Invoice invoice={invoice} />
+              ) : (
                 <>
+                  <div className="flex flex-col gap-0">
+                    <Label className="mx-2">{t("wallet.withdraw.to")}</Label>
+                    <AutocompleteTextarea
+                      className="rounded-sm shadow-none text-sm"
+                      message={target}
+                      setMessage={onTargetChange}
+                      placeholder={t("wallet.withdraw.placeholder")}
+                      minRows={1}
+                      maxRows={2}
+                      submitOnEnter={false}
+                      disableEmojiAutocomplete
+                    />
+                  </div>
+                </>
+              )}
+              {!invoice ? (
+                <div className="mx-2">
+                  <Label>{t("wallet.deposit.amount")}</Label>
+                  <AmountInput amount={amount} setAmount={setAmount} />
+                </div>
+              ) : null}
+              {pubkey || lnAddress ? (
+                <div className="flex flex-col gap-0">
                   <Label className="mx-2">{t("wallet.withdraw.message")}</Label>
                   <AutocompleteTextarea
                     className="rounded-sm shadow-none text-sm"
@@ -1255,34 +1473,66 @@ function Withdraw({
                     maxRows={6}
                     submitOnEnter={false}
                   />
-                </>
+                </div>
               ) : null}
               <div className="mx-2 flex flex-row items-center gap-2">
                 <Button
-                  disabled={isWithdrawing || !invoice || !isAmountValid}
-                  onClick={onWithdraw}
+                  disabled={
+                    isWithdrawing ||
+                    !target ||
+                    !isAmountValid ||
+                    (isPayToPubkey && cantPayToPubkey)
+                  }
+                  onClick={
+                    isPayToPubkey
+                      ? payToPubkey
+                      : isPayToLnAddress
+                        ? payToLnAddress
+                        : isPayToLnurl
+                          ? payToLnurl
+                          : onWithdraw
+                  }
                   className="w-full flex-1"
                   variant="outline"
                 >
-                  <Coins />
+                  {isWithdrawing ? (
+                    <RotateCw className="animate-spin" />
+                  ) : isPayToLnAddress ? (
+                    <ZapIcon />
+                  ) : (
+                    <Coins />
+                  )}
                   {t("wallet.withdraw.confirm")}
+                  {isPayToPubkey ? (
+                    <User
+                      pubkey={pubkey}
+                      classNames={{
+                        wrapper: "gap-1",
+                        avatar: "size-4",
+                        name: "text-xs",
+                      }}
+                    />
+                  ) : null}
                 </Button>
-                {wallet instanceof NDKCashuWallet && (
-                  <Button
-                    disabled={isWithdrawing || !isAmountValid}
-                    onClick={onWithdrawCash}
-                    className="w-full flex-1"
-                    variant="outline"
-                  >
-                    <Banknote />
-                    {t("wallet.withdraw.confirm-cash")}
-                  </Button>
-                )}
+                {wallet instanceof NDKCashuWallet &&
+                  !isPayToPubkey &&
+                  !isPayToLnAddress &&
+                  !isPayToLnurl && (
+                    <Button
+                      disabled={isWithdrawing || !isAmountValid}
+                      onClick={onWithdrawCash}
+                      className="w-full flex-1"
+                      variant="outline"
+                    >
+                      <Banknote />
+                      {t("wallet.withdraw.confirm-cash")}
+                    </Button>
+                  )}
               </div>
             </div>
           )}
         </div>
-        {otherWallets.length > 0 ? (
+        {otherWallets.length > 0 && !pubkey && !lnAddress && !invoice ? (
           <>
             <p className="mx-auto text-xs text-muted-foreground">
               {t("user.login.or")}
@@ -1522,7 +1772,9 @@ function Deposit({
                 {t("wallet.deposit.confirm")}
               </Button>
             </div>
-            {wallet instanceof NDKCashuWallet ? (
+            {ecash &&
+            wallet instanceof NDKCashuWallet &&
+            wallet.mints.includes(ecash.mint) ? (
               <>
                 <p className="my-2 mx-auto text-xs text-muted-foreground">
                   {t("user.login.or")}

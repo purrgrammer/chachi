@@ -355,14 +355,15 @@ export function useProfiles(pubkeys: string[]) {
   });
 }
 
-export function useProfile(pubkey: string, relays: string[] = []) {
+export function useProfile(pubkey?: string, relays: string[] = []) {
   const ndk = useNDK();
 
   // todo: use user#fetchProfile?
   return useQuery({
-    queryKey: [PROFILE, pubkey],
+    enabled: Boolean(pubkey),
+    queryKey: [PROFILE, pubkey ? pubkey : "-"],
     queryFn: () => {
-      return fetchProfile(ndk, pubkey, relays);
+      return pubkey ? fetchProfile(ndk, pubkey, relays) : null;
     },
     staleTime: Infinity,
     gcTime: 1 * 60 * 1000,

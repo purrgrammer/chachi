@@ -9,9 +9,11 @@ import { useCopy } from "@/lib/hooks";
 export function Invoice({
   invoice,
   picture,
+  showSummary,
 }: {
   invoice: string;
   picture?: string;
+  showSummary?: boolean;
 }) {
   const [copied, copy] = useCopy();
   const { t } = useTranslation();
@@ -44,17 +46,23 @@ export function Invoice({
           }
         />
       </div>
-      <Button
-        disabled={copied}
-        variant="secondary"
-        className="w-[256px] transition-colors"
-        onClick={() => copy(invoice)}
-      >
-        {copied ? <Check /> : <Copy />} {t("zap.dialog.copy")}
-      </Button>
-      <Button className="w-[256px]" onClick={openWallet}>
-        <Wallet /> {t("zap.dialog.wallet")}
-      </Button>
+      {showSummary ? (
+        <span>{invoice.slice(0, 4)}</span>
+      ) : (
+        <>
+          <Button
+            disabled={copied}
+            variant="secondary"
+            className="w-[256px] transition-colors"
+            onClick={() => copy(invoice)}
+          >
+            {copied ? <Check /> : <Copy />} {t("zap.dialog.copy")}
+          </Button>
+          <Button className="w-[256px]" onClick={openWallet}>
+            <Wallet /> {t("zap.dialog.wallet")}
+          </Button>
+        </>
+      )}
     </div>
   );
 }

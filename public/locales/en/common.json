@@ -521,6 +521,9 @@
       "confirm-cash": "Create ecash",
       "no-wallet": "No wallet selected",
       "success": "Withdrawal successful",
+      "p2pk-success": "Sent {{ amount }} to {{ name }}",
+      "lud16-success": "Sent {{ amount }} to {{ lud16 }}",
+      "amount-success": "Sent {{ amount }}",
       "message": "Message",
       "message-placeholder": "Write an optional message",
       "confirm-wallet": "Withdraw"

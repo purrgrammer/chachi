@@ -158,8 +158,15 @@ function NutzapReaction({ nutzap }: { nutzap: Nutzap }) {
           <Tooltip>
             <TooltipTrigger asChild>
               <RichText
-                className="text-xs line-clamp-1"
-                options={{ inline: true }}
+                className="text-xs break-all line-clamp-1"
+                options={{
+                  inline: true,
+                  events: false,
+                  ecash: false,
+                  video: false,
+                  images: false,
+                  audio: false,
+                }}
                 tags={nutzap.tags}
               >
                 {nutzap.content.trim()}
@@ -167,8 +174,15 @@ function NutzapReaction({ nutzap }: { nutzap: Nutzap }) {
             </TooltipTrigger>
             <TooltipContent>
               <RichText
-                className="text-xs"
-                options={{ inline: true }}
+                className="text-xs break-all"
+                options={{
+                  inline: true,
+                  events: false,
+                  ecash: false,
+                  video: false,
+                  images: false,
+                  audio: false,
+                }}
                 tags={nutzap.tags}
               >
                 {nutzap.content.trim()}
@@ -202,7 +216,14 @@ function ZapReaction({ zap }: { zap: Zap }) {
               <RichText
                 className="text-xs line-clamp-1"
                 tags={zap.tags}
-                options={{ inline: true }}
+                options={{
+                  inline: true,
+                  events: false,
+                  ecash: false,
+                  video: false,
+                  images: false,
+                  audio: false,
+                }}
               >
                 {zap.content.trim()}
               </RichText>
@@ -211,7 +232,14 @@ function ZapReaction({ zap }: { zap: Zap }) {
               <RichText
                 className="text-xs"
                 tags={zap.tags}
-                options={{ inline: true }}
+                options={{
+                  inline: true,
+                  events: false,
+                  ecash: false,
+                  video: false,
+                  images: false,
+                  audio: false,
+                }}
               >
                 {zap.content.trim()}
               </RichText>
