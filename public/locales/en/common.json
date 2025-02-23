@@ -515,18 +515,19 @@
       "placeholder": "Lightning invoice, profile or address",
       "to": "To",
       "confirm": "Pay",
-      "error": "Failed to withdraw",
+      "error": "Failed to send",
       "unrecognized-invoice": "Unrecognized invoice",
-      "to-wallet": "Choose a wallet to withdraw to",
-      "confirm-cash": "Create ecash",
+      "to-wallet": "Choose a wallet to send to",
+      "choose-wallet": "Send to wallet",
+      "confirm-cash": "Send ecash",
       "no-wallet": "No wallet selected",
-      "success": "Withdrawal successful",
+      "success": "Send successful",
       "p2pk-success": "Sent {{ amount }} to {{ name }}",
       "lud16-success": "Sent {{ amount }} to {{ lud16 }}",
       "amount-success": "Sent {{ amount }}",
       "message": "Message",
       "message-placeholder": "Write an optional message",
-      "confirm-wallet": "Withdraw"
+      "confirm-wallet": "Send"
     },
     "settings": {
       "title": "Wallet settings",
@@ -550,6 +551,7 @@
       "title": "Zap {{ name }}",
       "description": "Send a tip to {{ name }}",
       "amount": "Amount",
+      "invoice": "Invoice",
       "message": "Message",
       "message-placeholder": "Add a message",
       "tip": "Zap {{ amount }}",
@@ -581,7 +583,7 @@
       }
     },
     "wallet": {
-      "title": "Wallet",
+      "title": "Wallets",
       "settings": "Settings",
       "mints": "Mints",
       "relays": "Relays",
@@ -639,5 +641,12 @@
     "version": "Version",
     "features": "Features",
     "nuts": "Nuts"
+  },
+  "ln": {
+    "send": {
+      "title": "Send {{ amount }}",
+      "show-qr": "Show QR",
+      "hide-qr": "Hide QR"
+    }
   }
 }

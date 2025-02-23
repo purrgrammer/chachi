@@ -22,6 +22,7 @@ import NDK, {
 } from "@nostr-dev-kit/ndk";
 import {
   NDKWallet,
+  NDKWalletChange,
   NDKCashuWallet,
   NDKWebLNWallet,
   NDKNWCWallet,
@@ -31,6 +32,7 @@ import { Zap, validateZapRequest } from "@/lib/nip-57";
 import { usePubkey } from "@/lib/account";
 import { cashuAtom } from "@/app/store";
 import { useRelays } from "@/lib/nostr";
+import { decomposeIntoPowers } from "@/lib/number";
 
 export type ChachiWallet =
   | { type: "nip60" }
@@ -464,7 +466,11 @@ async function fetchNWCTransactions(
   wallet: NDKNWCWallet,
 ): Promise<Transaction[]> {
   try {
-    const res = await wallet.req("list_transactions", {});
+    // todo: keep txs in memory and sync from timestamp
+    const res = await wallet.req("list_transactions", {
+      limit: 50,
+      unpaid: false,
+    });
     if (!res?.result?.transactions) {
       throw new Error("Could not load wallet transactions");
     }
@@ -570,4 +576,83 @@ export function refreshWallet(wallet: NDKWallet) {
     queryKey: [WALLET_BALANCE, wallet.walletId],
   });
   queryClient.invalidateQueries({ queryKey: [WALLET_TXS, wallet.walletId] });
+}
+
+export async function createCashuOutTxEvent(
+  wallet: NDKCashuWallet,
+  paymentRequest: { amount: number; description?: string },
+  paymentResult: {
+    fee?: number;
+    mint: string;
+    stateUpdate?: any;
+    result: { proofs: any[]; mint: string };
+    proofsChange: any;
+  },
+): Promise<NDKWalletChange> {
+  const { amount, description } = paymentRequest;
+  const { fee, mint, stateUpdate } = paymentResult;
+
+  const historyEvent = new NDKWalletChange(wallet.ndk);
+  if (wallet.event) historyEvent.tags.push(wallet.event.tagReference());
+  historyEvent.direction = "out";
+  historyEvent.amount = amount ?? 0;
+  historyEvent.mint = mint;
+  if (description) historyEvent.description = description;
+
+  if (fee) historyEvent.fee = fee;
+  if (stateUpdate?.created)
+    historyEvent.createdTokens = [paymentResult.stateUpdate.created];
+  if (stateUpdate?.deleted)
+    historyEvent.destroyedTokenIds = paymentResult.stateUpdate.deleted;
+  if (stateUpdate?.reserved)
+    historyEvent.reservedTokens = [paymentResult.stateUpdate.reserved];
+
+  await historyEvent.sign();
+  await historyEvent.publish(wallet.relaySet);
+
+  return historyEvent;
+}
+
+export async function mintEcash(w: NDKCashuWallet, totalAmount: number) {
+  let result;
+  const amounts = decomposeIntoPowers(totalAmount);
+  for (const mint of w.mints) {
+    const wallet = await w.cashuWallet(mint);
+    const mintProofs = await w.state.getProofs({ mint });
+    result = await wallet.send(totalAmount, mintProofs, {
+      proofsWeHave: mintProofs,
+      includeFees: true,
+      outputAmounts: {
+        sendAmounts: amounts,
+      },
+    });
+
+    if (result.send.length > 0) {
+      const change = {
+        store: result?.keep ?? [],
+        destroy: result.send,
+        mint,
+      };
+      const updateRes = await w.state.update(change);
+      // create a change event
+      createCashuOutTxEvent(
+        w,
+        {
+          description: "Create ecash",
+          amount: amounts.reduce((acc, amount) => acc + amount, 0),
+        },
+        {
+          result: { proofs: result.send, mint },
+          proofsChange: change,
+          stateUpdate: updateRes,
+          mint,
+          fee: 0,
+        },
+      );
+      return {
+        mint,
+        proofs: result.send,
+      };
+    }
+  }
 }

@@ -13,9 +13,9 @@ export function InputCopy({
   const [copied, copy] = useCopy();
 
   return (
-    <div className="bg-red-100 w-full">
+    <div className="w-full">
       <Input
-        className="h-8 h-10 font-mono text-xs text-ellipsis bg-background"
+        className="font-mono text-xs text-ellipsis bg-background"
         type={isSecret ? "password" : "text"}
         value={value}
         rightIcon={copied ? <Check /> : <Copy />}

@@ -264,11 +264,11 @@ export function ChatMessage({
 
   useEffect(() => {
     if (isNew && ref.current) {
-      setTimeout(() => {
-        ref.current?.scrollIntoView({
-          behavior: "smooth",
-        });
-      }, 0);
+      console.log("SCROLL INTO NEW MESSAGE", isNew);
+      ref.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
   }, [isNew]);
 

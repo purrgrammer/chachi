@@ -53,14 +53,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {rightIcon && onRightIconClick ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn("text-muted-foreground", rightIconClassName)}
-            onClick={onRightIconClick}
-          >
-            {rightIcon}
-          </Button>
+          <div className="flex items-center justify-center">
+            <Button
+              variant="ghost"
+              size="smallIcon"
+              className={cn("text-muted-foreground", rightIconClassName)}
+              onClick={onRightIconClick}
+            >
+              {rightIcon}
+            </Button>
+          </div>
         ) : null}
       </div>
     );
