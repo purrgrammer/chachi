@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { atom, useAtom } from "jotai";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ import { NewZapDialog } from "@/components/nostr/zap";
 import { Badge } from "@/components/ui/badge";
 import {
   useRichText,
+  EventFragment,
   BlockFragment,
   EmojiFragment,
   RichText,
@@ -201,6 +202,20 @@ export function ChatMessage({
     },
     event.tags,
   );
+  const eventFragmentIds = useMemo(() => {
+    return fragments.flatMap((f) => {
+      if (f.type === "block") {
+        return f.nodes
+          .filter((n) => n.type === "event")
+          .map((n) => (n as EventFragment).id);
+      } else if (f.type === "event") {
+        return [(f as EventFragment).id];
+      } else {
+        return [];
+      }
+    });
+  }, [fragments]);
+  const showReply = replyTo && !eventFragmentIds.includes(replyTo);
   const isSingleCustomEmoji =
     fragments.length === 1 &&
     fragments[0].type === "block" &&
@@ -240,7 +255,7 @@ export function ChatMessage({
       isOnlyVideo ||
       isOnlyAudio ||
       isSingleEmbed) &&
-    !isReplyingTo &&
+    (!isReplyingTo || !showReply) &&
     !isDeleted;
   const [, copy] = useCopy();
 
@@ -378,7 +393,9 @@ export function ChatMessage({
                   {isAdmin ? <Crown className="w-3 h-3" /> : null}
                 </div>
               ) : null}
-              {(replyTo || (replyRoot && showRootReply)) && isReplyingTo ? (
+              {(replyTo || (replyRoot && showRootReply)) &&
+              isReplyingTo &&
+              showReply ? (
                 <Reply
                   group={group}
                   admins={admins}
