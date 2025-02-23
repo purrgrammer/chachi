@@ -1,26 +1,33 @@
-import { AtSign, Lock } from "lucide-react";
+import { LucideIcon, AtSign, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Pubkey({
   pubkey,
   isCashu,
   className,
+  iconClassname,
+  textClassname,
+  chunkSize = 16,
+  Icon = AtSign,
 }: {
   pubkey: string;
   isCashu?: boolean;
   className?: string;
+  iconClassname?: string;
+  textClassname?: string;
+  chunkSize?: number;
+  Icon?: LucideIcon;
 }) {
   const pk = isCashu ? pubkey.replace(/^02/, "") : pubkey;
+  const show = `${pk.slice(0, chunkSize)}…${pk.slice(-chunkSize)}`;
   return (
     <div className={cn("flex flex-row items-center gap-1.5", className)}>
       {isCashu ? (
-        <Lock className="size-3 text-muted-foreground" />
+        <Lock className={cn("size-3 text-muted-foreground", iconClassname)} />
       ) : (
-        <AtSign className="size-3 text-muted-foreground" />
+        <Icon className={cn("size-3 text-muted-foreground", iconClassname)} />
       )}
-      <span className="text-xs font-mono">
-        {pk.slice(0, 4)}…{pk.slice(-4)}
-      </span>
+      <span className={cn("text-xs font-mono", textClassname)}>{show}</span>
     </div>
   );
 }

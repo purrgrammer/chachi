@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from "react";
+import { InputCopy } from "@/components/ui/input-copy";
 import { decode } from "light-bolt11-decoder";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import debounce from "lodash.debounce";
 import { Token, getDecodedToken, getEncodedToken } from "@cashu/cashu-ts";
 import { NostrEvent } from "nostr-tools";
@@ -31,8 +33,10 @@ import {
   List,
   Settings,
   Zap as ZapIcon,
+  KeySquare,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Pubkey } from "@/components/nostr/pubkey";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -464,6 +468,38 @@ export function CashuWalletSettings({
                 <PackagePlus /> {t("wallet.add-relay")}
               </Button>
             </div>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <Label>{t("wallet.keys")}</Label>
+            <span className="text-xs text-muted-foreground">
+              {t("wallet.keys-description")}
+            </span>
+            <ScrollArea className="h-20">
+              <div className="flex flex-col gap-3 my-2 mx-3">
+                {wallet.p2pks.map((p2pk) => {
+                  const privkey = wallet.privkeys.get(p2pk)?.privateKey;
+                  return (
+                    <div className="flex flex-col gap-1">
+                      <Pubkey
+                        key={p2pk}
+                        pubkey={p2pk}
+                        isCashu
+                        iconClassname="size-4"
+                        textClassname="text-sm"
+                      />
+                      {/* @ts-expect-error: fix this */}
+                      {privkey ? (
+                        <InputCopy
+                          leftIcon={<KeySquare className="size-4" />}
+                          isSecret
+                          value={privkey}
+                        />
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollArea>
           </div>
           <Button
             disabled={

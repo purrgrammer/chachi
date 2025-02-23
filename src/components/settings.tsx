@@ -48,7 +48,7 @@ import {
 } from "@/components/ui/select";
 import {
   CreateWallet,
-  EditWallet,
+  CashuWalletSettings,
   ConnectWallet,
   NWCWalletBalanceAmount,
   CashuWalletBalanceAmount,
@@ -373,12 +373,12 @@ function WalletSummary({
             ) : (
               <>
                 {wallet instanceof NDKCashuWallet ? (
-                  <EditWallet wallet={wallet}>
+                  <CashuWalletSettings wallet={wallet}>
                     <Button variant="outline" className="w-full" size="sm">
                       <Settings />
                       {t("settings.wallet.settings")}
                     </Button>
-                  </EditWallet>
+                  </CashuWalletSettings>
                 ) : null}
               </>
             )}
