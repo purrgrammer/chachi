@@ -194,7 +194,13 @@ function toNode(
 
   if (fragment.type === "image") {
     return (
-      <Image url={fragment.url} className={cn("my-1", classNames.image)} />
+      <Image
+        url={fragment.url}
+        className={cn(
+          "my-1 max-h-[36rem] bg-background/90 object-contain",
+          classNames.image,
+        )}
+      />
     );
   }
 
