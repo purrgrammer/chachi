@@ -33,6 +33,7 @@ import { usePubkey } from "@/lib/account";
 import { cashuAtom } from "@/app/store";
 import { useRelays } from "@/lib/nostr";
 import { decomposeIntoPowers } from "@/lib/number";
+import { fetchMintInfo, fetchMintKeys } from "@/lib/cashu";
 
 export type ChachiWallet =
   | { type: "nip60" }
@@ -547,6 +548,14 @@ export async function createCashuWallet(
       return;
     }
     w.relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
+    w.onMintInfoNeeded = async (mint: string) => {
+      const info = await fetchMintInfo(mint);
+      return info;
+    };
+    w.onMintKeysNeeded = async (mint: string) => {
+      const keys = await fetchMintKeys(mint);
+      return keys;
+    };
     w.start();
     resolve(w);
     w.on("ready", () => {

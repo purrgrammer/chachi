@@ -17,3 +17,6 @@ export const LNURL = "lnurl";
 export const WALLET_INFO = "wallet-info";
 export const WALLET_BALANCE = "wallet-balance";
 export const WALLET_TXS = "wallet-txs";
+export const MINT_INFO = "cashu:mint-info";
+export const MINT_KEYS = "cashu:mint-keys";
+export const MINT_LIST = "cashu:mint-list";
