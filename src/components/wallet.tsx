@@ -33,7 +33,7 @@ import {
   List,
   Settings,
   Zap as ZapIcon,
-  KeySquare,
+  //KeySquare,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Pubkey } from "@/components/nostr/pubkey";
