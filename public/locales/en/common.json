@@ -452,6 +452,8 @@
   },
   "wallet": {
     "title": "Incoming payment",
+    "keys": "Keys",
+    "keys-description": "Your wallet keys, it's important to keep them safe and backed up",
     "debit": "Payment",
     "credit": "Payment",
     "connect": "Connect",

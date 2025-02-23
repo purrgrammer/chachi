@@ -299,7 +299,7 @@ export function CreateWallet() {
   );
 }
 
-export function EditWallet({
+export function CashuWalletSettings({
   wallet,
   children,
 }: {
@@ -2013,7 +2013,7 @@ function Deposit({
   );
 }
 
-function CashuWalletSettings({ wallet }: { wallet: NDKCashuWallet }) {
+function CashuWallet({ wallet }: { wallet: NDKCashuWallet }) {
   const [showDeposit, setShowDeposit] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
   const pubkey = usePubkey();
@@ -2083,7 +2083,7 @@ function CashuWalletSettings({ wallet }: { wallet: NDKCashuWallet }) {
   );
 }
 
-function WebLNWalletSettings({ wallet }: { wallet: NDKWebLNWallet }) {
+function WebLNWallet({ wallet }: { wallet: NDKWebLNWallet }) {
   return <>{wallet.walletId}</>;
 }
 
@@ -2121,7 +2121,7 @@ function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
   );
 }
 
-function NWCWalletSettings({ wallet }: { wallet: NDKNWCWallet }) {
+function NWCWallet({ wallet }: { wallet: NDKNWCWallet }) {
   const { data: amount } = useNWCBalance(wallet);
   const { data: info } = useNWCInfo(wallet);
   const isDepositSupported = info?.methods.includes("make_invoice");
@@ -2177,11 +2177,11 @@ export function Wallet({ wallet }: { wallet: NDKWallet }) {
   const { t } = useTranslation();
 
   if (wallet instanceof NDKCashuWallet) {
-    return <CashuWalletSettings wallet={wallet} />;
+    return <CashuWallet wallet={wallet} />;
   } else if (wallet instanceof NDKWebLNWallet) {
-    return <WebLNWalletSettings wallet={wallet} />;
+    return <WebLNWallet wallet={wallet} />;
   } else if (wallet instanceof NDKNWCWallet) {
-    return <NWCWalletSettings wallet={wallet} />;
+    return <NWCWallet wallet={wallet} />;
   } else {
     return (
       <span className="text-xs text-muted-foreground">
@@ -2191,7 +2191,7 @@ export function Wallet({ wallet }: { wallet: NDKWallet }) {
   }
 }
 
-export function WalletSettings() {
+export function ChachiWallet() {
   const wallet = useCashuWallet();
   return wallet ? <Wallet wallet={wallet} /> : null;
 }
