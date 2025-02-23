@@ -487,10 +487,9 @@ export function CashuWalletSettings({
                         iconClassname="size-4"
                         textClassname="text-sm"
                       />
-                      {/* @ts-expect-error: fix this */}
                       {privkey ? (
                         <InputCopy
-                          leftIcon={<KeySquare className="size-4" />}
+                          //leftIcon={<KeySquare className="size-4" />}
                           isSecret
                           value={privkey}
                         />
