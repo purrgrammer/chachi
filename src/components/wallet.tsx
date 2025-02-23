@@ -2080,7 +2080,7 @@ function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
   return (
     <>
       {isLoading || isError ? (
-        <div className="flex items-center justify-center w-full h-full">
+        <div className="flex items-center justify-center w-full h-[73vh]">
           <div className="flex flex-col items-center justify-center text-muted-foreground">
             {isError ? (
               <ServerCrash className="size-5 text-destructive" />
