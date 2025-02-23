@@ -63,7 +63,9 @@ export function Invoice({
               </div>
               <div className="flex flex-row items-center gap-0">
                 <Bitcoin className="size-8 text-muted-foreground" />
-                <span className="font-mono text-4xl">{Number(amount) / 1000}</span>
+                <span className="font-mono text-4xl">
+                  {Number(amount) / 1000}
+                </span>
               </div>
             </div>
           ) : null}
@@ -113,7 +115,9 @@ export function Invoice({
               onClick={onConfirm}
             >
               <HandCoins />{" "}
-              {t("ln.send.title", { amount: formatShortNumber(Number(amount) / 1000) })}
+              {t("ln.send.title", {
+                amount: formatShortNumber(Number(amount) / 1000),
+              })}
             </Button>
           ) : null}
         </>

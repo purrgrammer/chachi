@@ -15,7 +15,7 @@ export default function NWCWallet() {
           {wallet ? <WalletName wallet={wallet} /> : null}
         </div>
       </Header>
-      <div className="p-4">
+      <div className="p-4 h-[94vh]">
         <div className="flex items-center justify-center">
           <div className="w-full max-w-96">
             {wallet ? <Wallet wallet={wallet} /> : null}

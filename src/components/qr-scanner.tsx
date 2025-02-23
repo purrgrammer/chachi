@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";
+import { useTranslation } from "react-i18next";
 import {
   Drawer,
   DrawerContent,
@@ -11,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, QrCode, ScanQrCode } from "lucide-react";
 
 export function QRScanner({ onScan }: { onScan: (result: string) => void }) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -38,7 +40,7 @@ export function QRScanner({ onScan }: { onScan: (result: string) => void }) {
     <Drawer open={isOpen} onOpenChange={handleOpenChange}>
       <DrawerTrigger asChild>
         <Button
-          aria-label="Scan QR"
+          aria-label={t("qr.scan")}
           variant="outline"
           size="bigIcon"
           disabled={isLoading}
@@ -52,14 +54,14 @@ export function QRScanner({ onScan }: { onScan: (result: string) => void }) {
             <div className="flex flex-row items-center gap-2">
               <QrCode className="text-muted-foreground size-4" />
 
-              <span>Scan QR Code</span>
+              <span>{t("qr.scan")}</span>
             </div>
           </DrawerTitle>
         </DrawerHeader>
         <div className="pb-4">
           {error ? (
             <span className="text-sm text-red-500">
-              {error.message || "Something went wrong"}
+              {error.message || t("qr.scan-error")}
             </span>
           ) : isOpen ? (
             <Scanner

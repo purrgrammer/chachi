@@ -44,7 +44,6 @@ import {
   NDKNWCWallet,
 } from "@nostr-dev-kit/ndk-wallet";
 import { RichText } from "@/components/rich-text";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Event, A } from "@/components/nostr/event";
@@ -884,17 +883,15 @@ export function WalletSelector() {
 function CashuWalletCoins({ wallet }: { wallet: NDKCashuWallet }) {
   const proofs = wallet.state.getProofEntries({ onlyAvailable: true });
   return (
-    <ScrollArea className="h-[28rem]">
-      <div className="flex flex-col gap-1 pr-3">
-        {proofs.map((info: ProofInfo) => (
-          <Proof key={info.proof.C} info={info} />
-        ))}
-      </div>
-    </ScrollArea>
+    <div className="flex flex-col gap-2 pr-0.5 h-[68vh] overflow-y-scroll pretty-scrollbar">
+      {proofs.map((info: ProofInfo) => (
+        <Proof key={info.proof.C} info={info} />
+      ))}
+    </div>
   );
 }
 
-function WalletTransactions({
+function CashuWalletTransactions({
   wallet,
   pubkey,
 }: {
@@ -907,27 +904,26 @@ function WalletTransactions({
     return [...transactions].sort((a, b) => b.created_at - a.created_at);
   }, [transactions]);
   return (
-    <ScrollArea className="h-[28rem]">
-      <div className="flex flex-col gap-2 pr-3">
-        {sorted.length === 0 ? (
-          <div className="h-[28rem] flex items-center justify-center">
-            <div className="flex flex-col items-center gap-2 text-muted-foreground">
-              <CircleSlash2 className="size-6" />
-              <span className="text-sm text-muted-foreground">
-                {t("wallet.no-transactions")}
-              </span>
-            </div>
+    <div className="flex flex-col gap-2 pr-0.5 h-[68vh] overflow-y-scroll pretty-scrollbar">
+      {sorted.length === 0 ? (
+        <div className="h-[28rem] flex items-center justify-center">
+          <div className="flex flex-col items-center gap-2 text-muted-foreground">
+            <CircleSlash2 className="size-6" />
+            <span className="text-sm text-muted-foreground">
+              {t("wallet.no-transactions")}
+            </span>
           </div>
-        ) : null}
-        {sorted.map((tx) => (
-          <Tx key={tx.id} tx={tx} />
-        ))}
-      </div>
-    </ScrollArea>
+        </div>
+      ) : null}
+      {sorted.map((tx) => (
+        <Tx key={tx.id} tx={tx} />
+      ))}
+    </div>
   );
 }
 
 interface WalletActionsProps {
+	wallet: NDKWallet;
   onDeposit: () => void;
   isDepositing: boolean;
   canDeposit?: boolean;
@@ -943,6 +939,7 @@ interface WalletActionsProps {
 // - confirm
 
 function WalletActions({
+	wallet,
   onDeposit,
   isDepositing,
   canDeposit = true,
@@ -951,14 +948,39 @@ function WalletActions({
   canWithdraw = true,
 }: WalletActionsProps) {
   const { t } = useTranslation();
+  const [pubkey, setPubkey] = useState("");
+  const [lnAddress, setLnAddress] = useState("");
+  const [lnurl, setLnurl] = useState("");
+  const [invoice, setInvoice] = useState("");
+  const canPay = pubkey || lnAddress || lnurl || invoice;
 
-  function onScan(result: string) {
-    // todo: ln invoice
-    // todo: npub,nprofile
-    // todo: lnurl
-    // todo: ecash
-    // todo: cashu request
-    console.log("SCANNED", result);
+  function onPayOpenChange(open: boolean) {
+    if (!open) {
+      setPubkey("");
+      setLnAddress("");
+      setLnurl("");
+      setInvoice("");
+    }
+  }
+
+  async function onScan(content: string) {
+    try {
+      await analyzeTarget(content.trim(), {
+        onPubkey: (pubkey) => {
+          setPubkey(pubkey);
+        },
+        onLnAddress: (address) => {
+          setLnAddress(address);
+        },
+        onLnurl: (url) => {
+          setLnurl(url);
+        },
+        onInvoice: setInvoice,
+      });
+    } catch (err) {
+      toast.error(t("qr.unknown"));
+      console.error(err);
+    }
   }
 
   return (
@@ -977,6 +999,45 @@ function WalletActions({
         {t("wallet.deposit.title")}
       </Button>
       <QRScanner onScan={onScan} />
+      {canPay ? (
+        <Dialog open={Boolean(canPay)} onOpenChange={onPayOpenChange}>
+          <DialogContent>
+            {pubkey ? (
+              <SendToPubkey
+                wallet={wallet}
+                pubkey={pubkey}
+                isWithdrawing={isWithdrawing}
+                setIsWithdrawing={() => {}}
+                onOpenChange={onPayOpenChange}
+              />
+            ) : lnAddress ? (
+              <SendToLnAddress
+                wallet={wallet}
+                lnAddress={lnAddress}
+                isWithdrawing={isWithdrawing}
+                setIsWithdrawing={() => {}}
+                onOpenChange={onPayOpenChange}
+              />
+            ) : lnurl ? (
+              <SendToLnurl
+                wallet={wallet}
+                url={lnurl}
+                isWithdrawing={isWithdrawing}
+                setIsWithdrawing={() => {}}
+                onOpenChange={onPayOpenChange}
+              />
+            ) : invoice ? (
+              <PayInvoice
+                wallet={wallet}
+                invoice={invoice}
+                isWithdrawing={isWithdrawing}
+                setIsWithdrawing={() => {}}
+                onOpenChange={onPayOpenChange}
+              />
+            ) : null}
+          </DialogContent>
+        </Dialog>
+      ) : null}
       <Button
         variant="outline"
         className="flex-1"
@@ -1356,7 +1417,7 @@ function PayInvoice({
   setIsWithdrawing,
   onOpenChange,
 }: PayInvoiceProps) {
-	const { t } = useTranslation();
+  const { t } = useTranslation();
 
   async function payInvoice() {
     try {
@@ -1404,9 +1465,7 @@ function SendToWallet({
       setIsWithdrawing(true);
       // todo: out tx if cashu
       if (toWallet instanceof NDKNWCWallet) {
-        const result = await toWallet.makeInvoice(
-          Number(amount) * 1000, ""
-        );
+        const result = await toWallet.makeInvoice(Number(amount) * 1000, "");
         // @ts-expect-error: incorrect return type
         await wallet.lnPay({ pr: result.invoice });
         toast.success(t("wallet.withdraw.success"));
@@ -1965,6 +2024,7 @@ function CashuWalletSettings({ wallet }: { wallet: NDKCashuWallet }) {
           </div>
         </div>
         <WalletActions
+	wallet={wallet}
           onDeposit={onDeposit}
           isDepositing={showDeposit}
           onWithdraw={onWithdraw}
@@ -1998,7 +2058,7 @@ function CashuWalletSettings({ wallet }: { wallet: NDKCashuWallet }) {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="transactions">
-            <WalletTransactions wallet={wallet} pubkey={pubkey} />
+            <CashuWalletTransactions wallet={wallet} pubkey={pubkey} />
           </TabsContent>
           <TabsContent value="coins">
             <CashuWalletCoins wallet={wallet} />
@@ -2020,7 +2080,7 @@ function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
   return (
     <>
       {isLoading || isError ? (
-        <div className="flex items-center justify-center w-full h-[28rem]">
+        <div className="flex items-center justify-center w-full h-full">
           <div className="flex flex-col items-center justify-center text-muted-foreground">
             {isError ? (
               <ServerCrash className="size-5 text-destructive" />
@@ -2039,11 +2099,9 @@ function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
           </div>
         </div>
       ) : (
-        <ScrollArea className="h-[28rem]">
-          <div className="flex flex-col gap-2 pr-2.5">
-            {transactions?.map((tx) => <Tx key={tx.id} tx={tx} />)}
-          </div>
-        </ScrollArea>
+        <div className="flex flex-col gap-2 pr-0.5 h-[73vh] overflow-y-scroll pretty-scrollbar">
+          {transactions?.map((tx) => <Tx key={tx.id} tx={tx} />)}
+        </div>
       )}
     </>
   );
@@ -2077,6 +2135,7 @@ function NWCWalletSettings({ wallet }: { wallet: NDKNWCWallet }) {
           </div>
         </div>
         <WalletActions
+	wallet={wallet}
           onDeposit={onDeposit}
           isDepositing={isDepositing}
           canDeposit={isDepositSupported}

@@ -16,9 +16,9 @@ export default function Wallet() {
           {cashuWallet ? <EditWallet wallet={cashuWallet} /> : null}
         </div>
       </Header>
-      <div className="p-4">
+      <div className="p-4 h-[94vh]">
         <div className="flex items-center justify-center">
-          <div className="w-full max-w-96">
+          <div className="w-full h-full max-w-96">
             <WalletSettings />
           </div>
         </div>
