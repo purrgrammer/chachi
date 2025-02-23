@@ -24,6 +24,7 @@ export function sumProofs(proof: string): number {
 
 export function validateNutzap(zap: NostrEvent): Nutzap | null {
   try {
+    const id = zap.id;
     const proofs = zap.tags.filter((t) => t[0] === "proof").map((t) => t[1]);
     if (proofs.length === 0) return null;
     const amount = proofs.reduce((acc, proof) => acc + sumProofs(proof), 0);
@@ -34,13 +35,13 @@ export function validateNutzap(zap: NostrEvent): Nutzap | null {
     const p2pk = p2pkData?.data;
     const unit = zap.tags.find((t) => t[0] === "unit")?.[1] || "msat";
     const mint = zap.tags.find((t) => t[0] === "u")?.[1];
-    return amount && mint
+    return id && amount && mint
       ? {
-          id: zap.id,
-          created_at: zap.created_at,
-          pubkey: zap.pubkey,
+          id,
           amount,
           mint,
+          created_at: zap.created_at,
+          pubkey: zap.pubkey,
           unit: unit.startsWith("msat") ? "sat" : unit.toLowerCase(),
           content: zap.content,
           p2pk,
