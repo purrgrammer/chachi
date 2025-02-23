@@ -923,7 +923,7 @@ function CashuWalletTransactions({
 }
 
 interface WalletActionsProps {
-	wallet: NDKWallet;
+  wallet: NDKWallet;
   onDeposit: () => void;
   isDepositing: boolean;
   canDeposit?: boolean;
@@ -939,7 +939,7 @@ interface WalletActionsProps {
 // - confirm
 
 function WalletActions({
-	wallet,
+  wallet,
   onDeposit,
   isDepositing,
   canDeposit = true,
@@ -1002,6 +1002,17 @@ function WalletActions({
       {canPay ? (
         <Dialog open={Boolean(canPay)} onOpenChange={onPayOpenChange}>
           <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                <div className="flex flex-row items-center gap-1">
+                  {t("wallet.withdraw.title")}{" "}
+                  <ArrowUpRight className="text-muted-foreground" />
+                </div>
+              </DialogTitle>
+              <DialogDescription>
+                {t("wallet.withdraw.description")}
+              </DialogDescription>
+            </DialogHeader>
             {pubkey ? (
               <SendToPubkey
                 wallet={wallet}
@@ -1070,7 +1081,10 @@ async function _analyzeTarget(
 ) {
   const { onPubkey, onLnAddress, onLnurl, onInvoice } = callbacks;
   const isNostrProfile =
-    content.startsWith("nostr:npub") || content.startsWith("nostr:nprofile");
+    content.startsWith("nostr:npub") ||
+    content.startsWith("npub") ||
+    content.startsWith("nostr:nprofile") ||
+    content.startsWith("profile");
   const lnurl = isLnurl(content);
   const lnAddress = isLightningAddress(content);
   const invoice = isLnInvoice(content);
@@ -2024,7 +2038,7 @@ function CashuWalletSettings({ wallet }: { wallet: NDKCashuWallet }) {
           </div>
         </div>
         <WalletActions
-	wallet={wallet}
+          wallet={wallet}
           onDeposit={onDeposit}
           isDepositing={showDeposit}
           onWithdraw={onWithdraw}
@@ -2135,7 +2149,7 @@ function NWCWalletSettings({ wallet }: { wallet: NDKNWCWallet }) {
           </div>
         </div>
         <WalletActions
-	wallet={wallet}
+          wallet={wallet}
           onDeposit={onDeposit}
           isDepositing={isDepositing}
           canDeposit={isDepositSupported}
