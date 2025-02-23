@@ -71,6 +71,7 @@ export function QRScanner({ onScan }: { onScan: (result: string) => void }) {
                 container: "qr-scanner",
               }}
               scanDelay={100}
+              components={{ audio: false }}
               onError={onError}
               onScan={onScanned}
             />
