@@ -11,12 +11,12 @@ import {
   MessageSquareShare,
   Ban,
 } from "lucide-react";
+import { NewZapDialog } from "@/components/nostr/zap";
 import { NDKRelaySet } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { Empty } from "@/components/empty";
 import { Name } from "@/components/nostr/name";
 import { Loading } from "@/components/loading";
-import { NewZapDialog } from "@/components/nostr/zap";
 import { useNavigate } from "react-router-dom";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import {
@@ -372,6 +372,8 @@ function EventMenu({
     group.id !== "_" &&
     event.tags.find((t) => t[0] === "h")?.[1] === group.id;
   const { t } = useTranslation();
+  const [showZapDialog, setShowZapDialog] = useState(false);
+  const { data: mintList } = useMintList(event.pubkey);
 
   function showDetail() {
     const ev = new NDKEvent(ndk, event);
@@ -389,6 +391,17 @@ function EventMenu({
 
   return (
     <>
+      {showZapDialog ? (
+        <NewZapDialog
+          open={showZapDialog}
+          onClose={() => setShowZapDialog(false)}
+          event={event}
+          pubkey={event.pubkey}
+          group={group}
+          onZap={() => setShowZapDialog(false)}
+          zapType={mintList?.pubkey ? "nip-61" : "nip-57"}
+        />
+      ) : null}
       {shareGroup ? (
         <ShareDialog
           open={showShareDialog}
@@ -412,6 +425,10 @@ function EventMenu({
                 <span>{t("action-open")}</span>
               </DropdownMenuItem>
             ) : null}
+            <DropdownMenuItem onClick={() => setShowZapDialog(true)}>
+              <Bitcoin />
+              <span>{t("action-zap")}</span>
+            </DropdownMenuItem>
             {isGroupEvent && group ? (
               <DropdownMenuItem onClick={() => shareIn(group)}>
                 <MessageSquareShare />
