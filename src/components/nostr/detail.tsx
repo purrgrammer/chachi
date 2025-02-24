@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Maximize,
+  Bitcoin,
   Reply,
   SmilePlus,
   Trash,
@@ -15,6 +16,7 @@ import { NostrEvent } from "nostr-tools";
 import { Empty } from "@/components/empty";
 import { Name } from "@/components/nostr/name";
 import { Loading } from "@/components/loading";
+import { NewZapDialog } from "@/components/nostr/zap";
 import { useNavigate } from "react-router-dom";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import {
@@ -64,6 +66,7 @@ import { Emoji as PickerEmoji, EmojiPicker } from "@/components/emoji-picker";
 import { Poll, PollResults } from "@/components/nostr/poll";
 import { CalendarEvent } from "@/components/nostr/calendar";
 import { ReplyDialog } from "@/components/nostr/reply";
+import { useMintList } from "@/lib/cashu";
 import { getRelayHost } from "@/lib/relay";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet, useRelays } from "@/lib/nostr";
@@ -565,12 +568,16 @@ export function FeedEmbed({
   const canSign = useCanSign();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showReplyDialog, setShowReplyDialog] = useState(false);
+  const [zapType, setZapType] = useState<"nip-57" | "nip-61">("nip-61");
+  const [showZapDialog, setShowZapDialog] = useState(false);
   const components = eventDetails[event.kind];
   const [isDeleted, setIsDeleted] = useState(false);
   const relaySet = useRelaySet(group ? [group.relay] : userRelays);
   // NIP-31
   const alt = event.tags.find((t) => t[0] === "alt")?.[1];
   const { t } = useTranslation();
+  const isRelayGroup = group?.id === "_";
+  const { data: mintList } = useMintList(event.pubkey);
 
   function openEmojiPicker() {
     setShowEmojiPicker(true);
@@ -578,6 +585,11 @@ export function FeedEmbed({
 
   function openReplyDialog() {
     setShowReplyDialog(true);
+  }
+
+  function openZapDialog(type: "nip-61" | "nip-57") {
+    setZapType(type);
+    setShowZapDialog(true);
   }
 
   async function onReply(content: string, tags: string[][]) {
@@ -680,7 +692,7 @@ export function FeedEmbed({
         <Reactions
           event={event}
           relays={[...(group ? [group.relay] : []), ...relays, ...userRelays]}
-          kinds={[NDKKind.Zap, NDKKind.Reaction]}
+          kinds={[NDKKind.Zap, NDKKind.Nutzap, NDKKind.Reaction]}
         />
       ) : null}
     </div>
@@ -745,6 +757,27 @@ export function FeedEmbed({
                   <SmilePlus className="w-4 h-4" />
                 </ContextMenuShortcut>
               </ContextMenuItem>
+              {isRelayGroup ? (
+                <ContextMenuItem
+                  className="cursor-pointer"
+                  onClick={() => openZapDialog("nip-57")}
+                >
+                  {t("chat.message.zap.action")}
+                  <ContextMenuShortcut>
+                    <Bitcoin className="w-4 h-4" />
+                  </ContextMenuShortcut>
+                </ContextMenuItem>
+              ) : mintList?.pubkey ? (
+                <ContextMenuItem
+                  className="cursor-pointer"
+                  onClick={() => openZapDialog("nip-61")}
+                >
+                  {t("chat.message.zap.action")}
+                  <ContextMenuShortcut>
+                    <Bitcoin className="w-4 h-4" />
+                  </ContextMenuShortcut>
+                </ContextMenuItem>
+              ) : null}
               {group ? (
                 <DeleteGroupEventItem
                   event={event}
@@ -778,6 +811,17 @@ export function FeedEmbed({
           <SmilePlus className="absolute right-2 top-3 z-0 size-6" />
         </>
       )}
+      {showZapDialog ? (
+        <NewZapDialog
+          open={showZapDialog}
+          onZap={() => setShowZapDialog(false)}
+          onClose={() => setShowZapDialog(false)}
+          event={event}
+          pubkey={event.pubkey}
+          group={group}
+          zapType={zapType}
+        />
+      ) : null}
       {showEmojiPicker && canSign ? (
         <EmojiPicker
           open={showEmojiPicker}
@@ -890,7 +934,7 @@ export function Embed({
           <Reactions
             event={event}
             relays={[...(group ? [group.relay] : []), ...relays, ...userRelays]}
-            kinds={[NDKKind.Zap, NDKKind.Reaction]}
+            kinds={[NDKKind.Zap, NDKKind.Nutzap, NDKKind.Reaction]}
           />
         ) : null}
       </div>

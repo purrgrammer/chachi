@@ -225,6 +225,12 @@
         "success": "Copied to clipboard",
         "error": "Can't copy to clipboard"
       },
+      "redeem": {
+        "action": "Redeem"
+      },
+      "zap": {
+        "action": "Zap"
+      },
       "react": {
         "action": "React",
         "with": "Reacted with ",
