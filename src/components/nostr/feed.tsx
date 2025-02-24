@@ -26,7 +26,7 @@ const Feed = forwardRef(
       group,
       filter,
       live = true,
-      onlyRelays = false,
+      onlyRelays = true,
       newPost,
       className,
       outboxRelays = [],

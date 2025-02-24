@@ -86,8 +86,6 @@ export function Issues({
         outboxRelays={
           repoRelays?.length && repoRelays?.length > 0 ? repoRelays : relays
         }
-        live={true}
-        onlyRelays={group?.id === "_"}
       />
     </div>
   );

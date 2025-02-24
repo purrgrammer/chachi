@@ -26,9 +26,6 @@ export const GroupVideos = forwardRef(
         ref={ref}
         className={className}
         group={group}
-        live={true}
-        onlyRelays={group.id === "_"}
-        outboxRelays={[group.relay]}
         newPost={
           <NewVideo group={group}>
             <Button size="sm" variant="outline">

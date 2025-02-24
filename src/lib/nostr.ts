@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useAtomValue } from "jotai";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { nip19 } from "nostr-tools";
@@ -13,8 +13,7 @@ import NDK, {
 } from "@nostr-dev-kit/ndk";
 import { relaysAtom } from "@/app/store";
 import { useNDK } from "@/lib/ndk";
-import { isRelayURL } from "@/lib/relay";
-import { dedupeBy } from "@/lib/utils";
+import { isRelayURL, discoveryRelays, profileRelays, fallbackRelays } from "@/lib/relay";
 import { EVENT, ADDRESS, PROFILE, RELAY_LIST } from "@/lib/query";
 
 interface NostrREQResult<A> {
@@ -26,9 +25,12 @@ interface NostrREQResult<A> {
 export function useRelaySet(relays: string[]): NDKRelaySet | undefined {
   const ndk = useNDK();
   const relayUrls = relays.filter(isRelayURL);
+  const relaySet = useMemo(() => {
   return relayUrls.length > 0 && ndk
     ? NDKRelaySet.fromRelayUrls(relayUrls, ndk)
     : undefined;
+  }, [relayUrls]);
+  return relaySet;
 }
 
 // todo: rename useEventId
@@ -99,7 +101,7 @@ export function useAddress({
           ? await fetchRelayList(ndk, pubkey)
           : relays.length > 0
             ? relays
-            : ["wss://relay.nostr.band"];
+            : fallbackRelays;
       const relaySet = NDKRelaySet.fromRelayUrls(relayList, ndk);
       return ndk
         .fetchEvent(
@@ -249,8 +251,8 @@ export function useStream(
           : live
             ? NDKSubscriptionCacheUsage.PARALLEL
             : NDKSubscriptionCacheUsage.ONLY_CACHE,
-        closeOnEose: !live,
         skipOptimisticPublishEvent: true,
+        closeOnEose: !live,
       },
       relaySet,
     );
@@ -259,7 +261,7 @@ export function useStream(
       const newEvents = [...events];
       const rawEvent = event.rawEvent() as NostrEvent;
       insertEventIntoDescendingList(newEvents, rawEvent);
-      setEvents(dedupeBy(newEvents, "id"));
+      setEvents(newEvents);
     });
 
     sub.on("eose", () => {
@@ -322,7 +324,7 @@ export function fetchProfile(ndk: NDK, pubkey: string, relays: string[]) {
       NDKRelaySet.fromRelayUrls(
         relays.length > 0
           ? relays
-          : ["wss://purplepag.es", "wss://relay.nostr.band"],
+          : profileRelays, 
         ndk,
       ),
     )
@@ -345,10 +347,7 @@ export function useProfiles(pubkeys: string[]) {
       return {
         queryKey: [PROFILE, pubkey],
         queryFn: () =>
-          fetchProfile(ndk, pubkey, [
-            "wss://purplepag.es",
-            "wss://relay.nostr.band",
-          ]),
+          fetchProfile(ndk, pubkey, profileRelays),
         staleTime: Infinity,
       };
     }),
@@ -379,7 +378,7 @@ async function fetchRelayList(ndk: NDK, pubkey: string) {
       },
       { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.PARALLEL },
       NDKRelaySet.fromRelayUrls(
-        ["wss://purplepag.es", "wss://relay.nostr.band"],
+        discoveryRelays,
         ndk,
       ),
     )

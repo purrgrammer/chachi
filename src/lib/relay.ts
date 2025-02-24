@@ -2,6 +2,21 @@
 
 import { useQuery } from "@tanstack/react-query";
 
+export const discoveryRelays = [
+	"wss://purplepag.es",
+	"wss://relay.nostr.band",
+	"wss://relaydiscovery.com",
+];
+
+export const profileRelays = [
+	"wss://purplepag.es",
+	"wss://relay.nostr.band",
+];
+
+export const fallbackRelays = [
+	"wss://relay.nostr.band",
+]
+
 export const nip29Relays = [
   "wss://groups.0xchat.com",
   "wss://groups.fiatjaf.com",
