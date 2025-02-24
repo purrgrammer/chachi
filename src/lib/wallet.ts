@@ -395,18 +395,16 @@ export function useCreateWallet() {
     wallet.mints = mints ? mints : defaultMints;
     wallet.relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
     const p2pk = await wallet.getP2pk();
+    const ev = new NDKEvent(ndk, {
+      kind: NDKKind.CashuMintList,
+      tags: [
+        ...relays.map((r) => ["relay", r]),
+        ...mints.map((m) => ["mint", m]),
+        ["pubkey", p2pk],
+      ],
+    } as NostrEvent);
+    await ev.publish();
     await wallet.publish();
-    if (p2pk) {
-      const ev = new NDKEvent(ndk, {
-        kind: NDKKind.CashuMintList,
-        tags: [
-          ...relays.map((r) => ["relay", r]),
-          ...mints.map((m) => ["mint", m]),
-          ["pubkey", p2pk],
-        ],
-      } as NostrEvent);
-      await ev.publish();
-    }
     if (wallet.event) {
       setWallets((wallets) => [...wallets, { type: "nip60" }]);
     }
