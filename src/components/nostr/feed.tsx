@@ -12,7 +12,7 @@ import type { Group } from "@/lib/types";
 
 interface FeedProps extends React.HTMLAttributes<HTMLDivElement> {
   group?: Group;
-  outboxRelays: string[];
+  outboxRelays?: string[];
   filter: NDKFilter | NDKFilter[];
   live?: boolean;
   onlyRelays?: boolean;
