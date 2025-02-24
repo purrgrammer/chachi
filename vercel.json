@@ -1,5 +1,8 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }],
+  "rewrites": [
+    { "source": "/.well-known/nostr.json", "destination": "/nostr.json" },
+    { "source": "/(.*)", "destination": "/" }
+  ],
   "headers": [
     {
       "source": "/.well-known/nostr.json",
@@ -8,10 +11,23 @@
           "key": "Content-Type",
           "value": "application/json"
         },
-	{
-		"key": "Access-Control-Allow-Origin",
-		"value": "*"
-	}
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "/nostr.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
       ]
     }
   ]
