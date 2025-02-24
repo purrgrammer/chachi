@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { NutzapContent } from "@/components/nostr/nutzap";
 import {
+  X,
   Zap as ZapIcon,
   Bitcoin,
   HandCoins,
@@ -42,6 +43,7 @@ import { useCashuWallet } from "@/lib/wallet";
 import { useNutzaps, useSentNutzaps } from "@/lib/cashu";
 import { Nutzap as NutzapEvent } from "@/lib/db";
 import { usePubkey } from "@/lib/account";
+import { saveNutzap } from "@/lib/nutzaps";
 import { cn } from "@/lib/utils";
 
 function Nutzap({
@@ -54,6 +56,7 @@ function Nutzap({
   const zap = validateNutzap(event);
   const [isRedeeming, setIsRedeeming] = useState(false);
   const redeemed = event.status === "redeemed" || event.status === "spent";
+  const failed = event.status === "failed";
   const wallet = useCashuWallet();
   const { t } = useTranslation();
   const ndk = useNDK();
@@ -80,11 +83,15 @@ function Nutzap({
                 }),
               );
             },
+            onTxEventCreated: (txEvent) => {
+              saveNutzap(event, "redeemed", txEvent.id, txEvent.created_at);
+            },
           });
         }
       }
     } catch (err) {
       console.error(err);
+      saveNutzap(event, "failed");
       toast.error(t("nutzaps.redeem-error"));
     } finally {
       setIsRedeeming(false);
@@ -187,19 +194,25 @@ function Nutzap({
             <div className="flex flex-row gap-1 items-center">
               {zap.p === me ? (
                 <Button
-                  disabled={!wallet || redeemed}
+                  disabled={!wallet || failed || redeemed}
                   variant="ghost"
                   size="tiny"
                   onClick={redeem}
                 >
-                  {redeemed ? (
+                  {failed ? (
+                    <X className="text-red-500" />
+                  ) : redeemed ? (
                     <Check className="text-green-500" />
                   ) : isRedeeming ? (
                     <RotateCw className="animate-spin" />
                   ) : (
                     <HandCoins />
                   )}
-                  {redeemed ? t("nutzaps.redeemed") : t("nutzaps.redeem")}
+                  {failed
+                    ? t("nutzaps.failed")
+                    : redeemed
+                      ? t("nutzaps.redeemed")
+                      : t("nutzaps.redeem")}
                 </Button>
               ) : null}
 

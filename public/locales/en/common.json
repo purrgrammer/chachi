@@ -627,6 +627,7 @@
     "no-message": "No message",
     "title": "Zaps",
     "redeemed": "Redeemed",
+    "failed": "Failed",
     "log-in": "Log in to see your zaps",
     "invalid": "Invalid zap",
     "redeem": "Redeem",
