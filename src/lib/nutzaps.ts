@@ -110,7 +110,7 @@ export function useNutzapMonitor() {
       saveNutzap(event.rawEvent() as NostrEvent, "failed");
     });
 
-    //console.log("NUTZAP MONITOR START", knownNutzaps);
+    console.log("NUTZAP MONITOR START", knownNutzaps);
     monitor.start({
       knownNutzaps,
       pageSize: MONITOR_PAGE_SIZE,
