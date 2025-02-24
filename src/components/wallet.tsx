@@ -1225,7 +1225,6 @@ function SendToPubkey({
       const invoice = await fetchInvoice(lnurl, Number(amount), message);
       // @ts-expect-error: ree
       await wallet.lnPay({ pr: invoice });
-      // todo: create tx out if cashu wallet
       toast.success(
         t("wallet.withdraw.p2pk-success", {
           amount: amount,
@@ -1326,7 +1325,6 @@ function SendToLnAddress({
       const invoice = await fetchInvoice(lnurl, Number(amount), message);
       // @ts-expect-error: ree
       await wallet.lnPay({ pr: invoice });
-      // todo: create tx out if cashu wallet
       toast.success(
         t("wallet.withdraw.lud16-success", {
           amount: amount,
@@ -1407,7 +1405,6 @@ function SendToLnurl({
       const invoice = await fetchInvoice(lnurl, Number(amount), message);
       // @ts-expect-error: ree
       await wallet.lnPay({ pr: invoice });
-      // todo: create tx out if cashu wallet
       toast.success(
         t("wallet.withdraw.amount-success", {
           amount: amount,
@@ -1479,6 +1476,7 @@ function PayInvoice({
       setIsWithdrawing(true);
       // @ts-expect-error: ree
       await wallet.lnPay({ pr: invoice });
+      refreshWallet(wallet);
       onOpenChange(false);
     } catch (err) {
       console.error(err);

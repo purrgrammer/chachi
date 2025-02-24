@@ -169,10 +169,14 @@ export function useResetState() {
   const [, setContactList] = useAtom(contactListAtom);
   const [, setMediaServersList] = useAtom(mediaServerListAtom);
   const [, setEmojiList] = useAtom(emojiListAtom);
+  const [, setCashu] = useAtom(cashuAtom);
+  const [, setMintList] = useAtom(mintListAtom);
 
   return () => {
     setAccount(null);
     setLoginMethod(null);
+    setCashu(null);
+    setMintList({ created_at: 0, mints: [], relays: [] });
     setGroupList({ created_at: 0, content: "", groups: [] });
     setRelayList({ created_at: 0, relays: [] });
     setContactList({ created_at: 0, pubkeys: [] });
