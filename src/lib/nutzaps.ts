@@ -61,16 +61,14 @@ export function useNutzapMonitor() {
     () =>
       getKnownNutzaps().then(
         (zs) => new Set(zs.map((z) => z.id).filter(Boolean)),
-      ),
-    [],
-    new Set<string>([]),
+      )
   );
 
   useEffect(() => {
     if (!cashuWallet) return;
     if (!pubkey) return;
+    if (!knownNutzaps) return;
     if (nutzapMonitor) return;
-    //console.log("NUTZAP MONITOR START");
 
     const monitor = new NDKNutzapMonitor(
       ndk,
@@ -78,6 +76,7 @@ export function useNutzapMonitor() {
       cashuWallet.relaySet,
     );
     monitor.wallet = cashuWallet;
+
     setNutzapMonitor(monitor);
 
     monitor.on("seen", (event) => {
@@ -115,5 +114,5 @@ export function useNutzapMonitor() {
       knownNutzaps,
       pageSize: MONITOR_PAGE_SIZE,
     });
-  }, [cashuWallet, pubkey, nutzapMonitor]);
+  }, [cashuWallet, pubkey, nutzapMonitor, knownNutzaps]);
 }
