@@ -63,7 +63,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useWallets, useNDKWallets, useCashuWallet } from "@/lib/wallet";
+import {
+  walletId,
+  useWallets,
+  useNDKWallets,
+  useCashuWallet,
+} from "@/lib/wallet";
 import { usePubkey } from "@/lib/account";
 import { mintListAtom } from "@/app/store";
 import { themes, Theme } from "@/theme";
@@ -290,7 +295,7 @@ function WalletSummary({
       }),
     );
     setNDKWallets((wallets) =>
-      wallets.filter((w) => w.walletId !== wallet.walletId),
+      wallets.filter((w) => walletId(w) !== walletId(wallet)),
     );
   }
 
@@ -472,7 +477,7 @@ export function Wallet() {
           </h3>
         </div>
         {ndkWallets.map((w) => (
-          <WalletSummary key={w.walletId} wallet={w} showControls />
+          <WalletSummary key={walletId(w)} wallet={w} showControls />
         ))}
       </div>
       <div className="flex flex-col gap-2">

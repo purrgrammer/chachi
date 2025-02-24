@@ -7,7 +7,7 @@ export function Pubkey({
   className,
   iconClassname,
   textClassname,
-  chunkSize = 16,
+  chunkSize = 8,
   Icon = AtSign,
 }: {
   pubkey: string;

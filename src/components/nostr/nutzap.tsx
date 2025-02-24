@@ -107,6 +107,7 @@ export function Nutzap({
   showAuthor?: boolean;
 }) {
   const zap = validateNutzap(event);
+  const groupRelay = event.tags.find((t) => t[0] === "h")?.[2];
   return zap ? (
     <div
       className={`flex flex-col gap-0 ${animateGradient ? "rounded-md border-gradient" : ""} ${animateGradient && zap.amount >= HUGE_AMOUNT ? "border-animated-gradient" : ""}`}
@@ -147,11 +148,18 @@ export function Nutzap({
           id={zap.e}
           group={group}
           pubkey={zap.p}
+          relays={groupRelay ? [groupRelay] : []}
           showReactions={false}
           asReply
         />
       ) : zap.a ? (
-        <A address={zap.a} group={group} showReactions={false} asReply />
+        <A
+          address={zap.a}
+          group={group}
+          showReactions={false}
+          asReply
+          relays={groupRelay ? [groupRelay] : []}
+        />
       ) : null}
       <NutzapContent event={event} zap={zap} />
     </div>

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
 import { useQuery } from "@tanstack/react-query";
 import { NDKEvent, NDKKind, NDKRelaySet } from "@nostr-dev-kit/ndk";
 import { useNDK } from "@/lib/ndk";
@@ -7,6 +8,7 @@ import { useRelays, useRelayList, useRequest } from "@/lib/nostr";
 import { dedupeBy } from "@/lib/utils";
 import { usePubkey } from "@/lib/account";
 import { queryClient, MINT_INFO, MINT_KEYS, MINT_LIST } from "@/lib/query";
+import { getNutzaps } from "@/lib/nutzaps";
 
 export function useMintInfo(url: string) {
   return useQuery({
@@ -98,31 +100,18 @@ export function useSentNutzaps() {
   return sorted;
 }
 
-export function useNutzaps(pubkey: string) {
-  const { data: relayList } = useRelayList(pubkey);
-  const { data: mintList } = useMintList(pubkey);
-  const filter = {
-    kinds: [NDKKind.Nutzap],
-    "#p": [pubkey],
-    ...(mintList ? { "#u": mintList.mints } : {}),
-  };
-  const relays = mintList ? mintList.relays : relayList || [];
-  const { events } = useRequest(filter, relays);
-  const sorted = useMemo(() => {
-    const s = dedupeBy(events, "id");
-    s.sort((a, b) => b.created_at - a.created_at);
-    return s;
-  }, [events]);
-  return sorted;
+export function useNutzaps() {
+  return useLiveQuery(() => getNutzaps(), [], []);
 }
 
-export function useRedeemedNutzaps(pubkey: string): Set<string> {
-  const { data: relayList } = useRelayList(pubkey);
-  const { data: mintList } = useMintList(pubkey);
+export function useRedeemedNutzaps(): Set<string> {
+  const pubkey = usePubkey();
+  const { data: relayList } = useRelayList(pubkey!);
+  const { data: mintList } = useMintList(pubkey!);
   const relays = mintList ? mintList.relays : relayList || [];
   const filter = {
     kinds: [NDKKind.WalletChange],
-    authors: [pubkey],
+    authors: [pubkey!],
   };
   const { events } = useRequest(filter, relays);
   const redeemed = useMemo(() => {

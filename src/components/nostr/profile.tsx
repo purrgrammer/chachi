@@ -30,7 +30,6 @@ function ProfileDrawerContent({
   const { data: groups } = useUserGroups(pubkey);
   const { data: relays } = useRelayList(pubkey);
   const about = profile?.about;
-  // todo: rich text bio
   return (
     <div className="flex flex-col gap-4 mx-auto w-full max-w-sm mb-8">
       <DrawerHeader className="flex flex-col items-center gap-3">

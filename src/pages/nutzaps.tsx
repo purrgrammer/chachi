@@ -17,7 +17,6 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { NDKEvent, NDKNutzap } from "@nostr-dev-kit/ndk";
 import { NDKCashuWallet } from "@nostr-dev-kit/ndk-wallet";
-import { NostrEvent } from "nostr-tools";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { HUGE_AMOUNT } from "@/lib/zap";
 import { E, A } from "@/components/nostr/event";
@@ -40,22 +39,21 @@ import { Pubkey } from "@/components/nostr/pubkey";
 import { groupURL } from "@/lib/groups";
 import { useNDK } from "@/lib/ndk";
 import { useCashuWallet } from "@/lib/wallet";
-import { useNutzaps, useRedeemedNutzaps, useSentNutzaps } from "@/lib/cashu";
+import { useNutzaps, useSentNutzaps } from "@/lib/cashu";
+import { Nutzap as NutzapEvent } from "@/lib/db";
 import { usePubkey } from "@/lib/account";
 import { cn } from "@/lib/utils";
 
 function Nutzap({
   event,
   showReceiver,
-  isRedeemed,
 }: {
-  event: NostrEvent;
+  event: NutzapEvent;
   showReceiver?: boolean;
-  isRedeemed?: boolean;
 }) {
   const zap = validateNutzap(event);
   const [isRedeeming, setIsRedeeming] = useState(false);
-  const [redeemed, setRedeemed] = useState(isRedeemed);
+  const redeemed = event.status === "redeemed" || event.status === "spent";
   const wallet = useCashuWallet();
   const { t } = useTranslation();
   const ndk = useNDK();
@@ -81,7 +79,6 @@ function Nutzap({
                   amount: formatShortNumber(amount),
                 }),
               );
-              setRedeemed(true);
             },
           });
         }
@@ -178,7 +175,9 @@ function Nutzap({
         <div className="flex flex-col gap-2 w-full">
           <div className="flex flex-row items-center justify-between">
             <div className="">
-              {zap.p2pk ? <Pubkey isCashu pubkey={zap.p2pk} /> : null}
+              {zap.p2pk ? (
+                <Pubkey isCashu pubkey={zap.p2pk} chunkSize={8} />
+              ) : null}
               <MintLink
                 includeLandmark
                 url={zap.mint}
@@ -231,10 +230,9 @@ function Nutzap({
   );
 }
 
-function MyNutzaps({ pubkey }: { pubkey: string }) {
+function MyNutzaps() {
   const { t } = useTranslation();
-  const nutzaps = useNutzaps(pubkey);
-  const redeemed = useRedeemedNutzaps(pubkey);
+  const nutzaps = useNutzaps();
   const sentNutzaps = useSentNutzaps();
   return (
     <div className="flex items-center justify-center p-2">
@@ -264,11 +262,7 @@ function MyNutzaps({ pubkey }: { pubkey: string }) {
                 </div>
               ) : null}
               {nutzaps.map((event) => (
-                <Nutzap
-                  key={event.id}
-                  event={event}
-                  isRedeemed={redeemed.has(event.id)}
-                />
+                <Nutzap key={event.id} event={event} />
               ))}
             </div>
           </TabsContent>
@@ -304,7 +298,7 @@ export default function Nutzaps() {
         </div>
       </Header>
       {pubkey ? (
-        <MyNutzaps pubkey={pubkey} />
+        <MyNutzaps />
       ) : (
         <span className="text-sm text-muted-foreground">
           {t("nutzaps.log-in")}

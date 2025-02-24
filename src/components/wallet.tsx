@@ -80,6 +80,7 @@ import {
   useCashuBalance,
   refreshWallet,
   mintEcash,
+  walletId,
   Transaction,
   Unit,
 } from "@/lib/wallet";
@@ -483,6 +484,7 @@ export function CashuWalletSettings({
                       <Pubkey
                         key={p2pk}
                         pubkey={p2pk}
+                        chunkSize={16}
                         isCashu
                         iconClassname="size-4"
                         textClassname="text-sm"
@@ -657,12 +659,12 @@ function Tx({ tx }: { tx: Transaction }) {
     pubkey: nutzapPubkey,
     relays: myRelays,
   });
+  const groupRelay = nutzap?.tags.find((t) => t[0] === "h")?.[2];
   const author = nutzap?.pubkey || tx.pubkey || tx.zap?.pubkey;
   const e = nutzap?.tags.find((t) => t[0] === "e")?.[1] || tx.e || tx.zap?.e;
   const a = nutzap?.tags.find((t) => t[0] === "a")?.[1] || tx.a || tx.zap?.a;
   const description = nutzap?.content || tx.description || tx.zap?.content;
   const iconClassname = "w-16 h-12 relative flex items-center justify-center";
-  // todo: a
   const icon = (
     <div>
       {isCredit ? (
@@ -792,16 +794,20 @@ function Tx({ tx }: { tx: Transaction }) {
   return e || a ? (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>{component}</DialogTrigger>
-      <DialogContent className="bg-transparent border-none">
+      <DialogContent>
         {e ? (
           <Event
             id={e}
-            relays={myRelays}
             pubkey={target}
+            relays={groupRelay ? [groupRelay] : []}
             showReactions={false}
           />
         ) : a ? (
-          <A address={a} showReactions={false} />
+          <A
+            address={a}
+            showReactions={false}
+            relays={groupRelay ? [groupRelay] : []}
+          />
         ) : null}
       </DialogContent>
     </Dialog>
@@ -852,8 +858,8 @@ export function CustomWalletSelector({
   onWalletSelected: (wallet: NDKWallet) => void;
 }) {
   const { t } = useTranslation();
-  function onWalletChange(walletId: string) {
-    const w = wallets.find((w) => w.walletId === walletId);
+  function onWalletChange(id: string) {
+    const w = wallets.find((w) => walletId(w) === id);
     if (w) {
       onWalletSelected(w);
     }
@@ -867,7 +873,7 @@ export function CustomWalletSelector({
       </SelectTrigger>
       <SelectContent>
         {wallets.map((w) => (
-          <SelectItem key={w.walletId} value={w.walletId}>
+          <SelectItem key={walletId(w)} value={walletId(w)}>
             <WalletName wallet={w} />
           </SelectItem>
         ))}
@@ -880,8 +886,8 @@ export function WalletSelector() {
   const { t } = useTranslation();
   const [wallet, setWallet] = useNDKWallet();
   const [wallets] = useNDKWallets();
-  function onWalletChange(walletId: string) {
-    const w = wallets.find((w) => w.walletId === walletId);
+  function onWalletChange(id: string) {
+    const w = wallets.find((w) => walletId(w) === id);
     if (w) {
       setWallet(w);
     }
@@ -897,15 +903,15 @@ export function WalletSelector() {
       <Select
         disabled={wallets.length === 0}
         onValueChange={onWalletChange}
-        defaultValue={wallet?.walletId}
-        value={wallet?.walletId}
+        defaultValue={wallet ? walletId(wallet) : undefined}
+        value={wallet ? walletId(wallet) : undefined}
       >
         <SelectTrigger className="w-full">
           <SelectValue placeholder={t("wallet.choose-wallet-placeholder")} />
         </SelectTrigger>
         <SelectContent>
           {wallets.map((w) => (
-            <SelectItem key={w.walletId} value={w.walletId}>
+            <SelectItem key={walletId(w)} value={walletId(w)}>
               <WalletName wallet={w} />
             </SelectItem>
           ))}
@@ -1501,7 +1507,9 @@ function SendToWallet({
   const { t } = useTranslation();
   const [amount, setAmount] = useState("21");
   const [ndkWallets] = useNDKWallets();
-  const otherWallets = ndkWallets.filter((w) => w.walletId !== wallet.walletId);
+  const otherWallets = ndkWallets.filter(
+    (w) => walletId(w) !== walletId(wallet),
+  );
   const [toWallet, setToWallet] = useState<NDKWallet | null>(null);
   const isAmountValid = amount && Number(amount) > 0;
 
@@ -1656,7 +1664,9 @@ function Withdraw({
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [lnurl, setLnurl] = useState<string | null>(null);
   const [ndkWallets] = useNDKWallets();
-  const otherWallets = ndkWallets.filter((w) => w.walletId !== wallet.walletId);
+  const otherWallets = ndkWallets.filter(
+    (w) => walletId(w) !== walletId(wallet),
+  );
 
   function onClose(open?: boolean) {
     if (!open) {
@@ -1848,7 +1858,9 @@ function Deposit({
   const deposit = useDeposit(wallet);
   const { t } = useTranslation();
   const [ndkWallets] = useNDKWallets();
-  const otherWallets = ndkWallets.filter((w) => w.walletId !== wallet.walletId);
+  const otherWallets = ndkWallets.filter(
+    (w) => walletId(w) !== walletId(wallet),
+  );
   const [toWallet, setToWallet] = useState<NDKWallet | null>(null);
   const isAmountValid = amount && Number(amount) > 0;
 
@@ -2119,7 +2131,7 @@ function CashuWallet({ wallet }: { wallet: NDKCashuWallet }) {
 }
 
 function WebLNWallet({ wallet }: { wallet: NDKWebLNWallet }) {
-  return <>{wallet.walletId}</>;
+  return <>{walletId(wallet)}</>;
 }
 
 function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
@@ -2274,11 +2286,11 @@ function Balance({
 }
 
 function WebLNWalletBalance({ wallet }: { wallet: NDKWebLNWallet }) {
-  return <>{wallet.walletId}</>;
+  return <>{walletId(wallet)}</>;
 }
 
 function NWCWalletName({ wallet }: { wallet: NDKNWCWallet }) {
-  const name = wallet.walletId;
+  const name = walletId(wallet);
   return wallet.walletService ? (
     <User
       pubkey={wallet.walletService.pubkey}
@@ -2373,7 +2385,7 @@ export function WalletBalance({ wallet }: { wallet: NDKWallet }) {
 }
 
 function WebLNWalletName({ wallet }: { wallet: NDKWebLNWallet }) {
-  return <span>{wallet.walletId}</span>;
+  return <span>{walletId(wallet)}</span>;
 }
 
 export function WalletName({ wallet }: { wallet: NDKWallet }) {

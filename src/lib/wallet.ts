@@ -34,6 +34,7 @@ import { cashuAtom } from "@/app/store";
 import { useRelays } from "@/lib/nostr";
 import { decomposeIntoPowers } from "@/lib/number";
 import { fetchMintInfo, fetchMintKeys } from "@/lib/cashu";
+import { useNutzapMonitor } from "@/lib/nutzaps";
 
 export type ChachiWallet =
   | { type: "nip60" }
@@ -64,6 +65,8 @@ export function useChachiWallet() {
   const [, setNDKWallets] = useAtom(ndkWalletsAtom);
   const [cashuWallet, setCashuWallet] = useAtom(cashuWalletAtom);
   const cashu = useAtomValue(cashuAtom);
+
+  useNutzapMonitor();
 
   useEffect(() => {
     Promise.allSettled(
@@ -412,7 +415,7 @@ export function useCreateWallet() {
 
 export function useNWCBalance(wallet: NDKNWCWallet) {
   return useQuery({
-    queryKey: [WALLET_BALANCE, wallet.walletId],
+    queryKey: [WALLET_BALANCE, walletId(wallet)],
     queryFn: async () => {
       try {
         const res = await wallet.req("get_balance", {});
@@ -435,7 +438,7 @@ export function useCashuBalance(wallet: NDKCashuWallet) {
 
 export function useNWCInfo(wallet: NDKNWCWallet) {
   return useQuery({
-    queryKey: [WALLET_INFO, wallet.walletId],
+    queryKey: [WALLET_INFO, walletId(wallet)],
     queryFn: async () => {
       return wallet.getInfo();
     },
@@ -505,7 +508,7 @@ async function fetchNWCTransactions(
 
 export function useNWCTransactions(wallet: NDKNWCWallet) {
   return useQuery({
-    queryKey: [WALLET_TXS, wallet.walletId],
+    queryKey: [WALLET_TXS, walletId(wallet)],
     queryFn: () => fetchNWCTransactions(wallet),
     staleTime: Infinity,
   });
@@ -582,9 +585,9 @@ export async function createNWCWallet(connection: string, ndk: NDK) {
 
 export function refreshWallet(wallet: NDKWallet) {
   queryClient.invalidateQueries({
-    queryKey: [WALLET_BALANCE, wallet.walletId],
+    queryKey: [WALLET_BALANCE, walletId(wallet)],
   });
-  queryClient.invalidateQueries({ queryKey: [WALLET_TXS, wallet.walletId] });
+  queryClient.invalidateQueries({ queryKey: [WALLET_TXS, walletId(wallet)] });
 }
 
 export async function createCashuOutTxEvent(
@@ -664,4 +667,11 @@ export async function mintEcash(w: NDKCashuWallet, totalAmount: number) {
       };
     }
   }
+}
+
+export function walletId(w: NDKWallet): string {
+  if (w.type === "nwc" && w instanceof NDKNWCWallet) {
+    return `nwc:${w.pairingCode}`;
+  }
+  return w.walletId;
 }
