@@ -57,11 +57,10 @@ export function useNutzapMonitor() {
   const pubkey = usePubkey();
   const [nutzapMonitor, setNutzapMonitor] = useAtom(nutzapMonitorAtom);
   const cashuWallet = useCashuWallet();
-  const knownNutzaps = useLiveQuery(
-    () =>
-      getKnownNutzaps().then(
-        (zs) => new Set(zs.map((z) => z.id).filter(Boolean)),
-      )
+  const knownNutzaps = useLiveQuery(() =>
+    getKnownNutzaps().then(
+      (zs) => new Set(zs.map((z) => z.id).filter(Boolean)),
+    ),
   );
 
   useEffect(() => {
