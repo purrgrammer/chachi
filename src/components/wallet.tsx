@@ -564,7 +564,7 @@ export function ConnectWallet() {
         nwcNdk.addExplicitRelay(relay);
       }
       const nwc = new NDKNWCWallet(nwcNdk, {
-        timeout: 20_000,
+        timeout: 5_000,
         pairingCode: connectString,
       });
       try {

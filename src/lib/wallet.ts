@@ -574,7 +574,7 @@ export async function createWebLNWallet() {
 export async function createNWCWallet(connection: string, ndk: NDK) {
   return new Promise<NDKNWCWallet>((resolve) => {
     const nwc = new NDKNWCWallet(ndk, {
-      timeout: 20_000,
+      timeout: 5_000,
       pairingCode: connection,
     });
     nwc.on("ready", () => {
