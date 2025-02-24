@@ -8,6 +8,7 @@ import React, {
 import { toast } from "sonner";
 import { useInView } from "framer-motion";
 import {
+  HandCoins,
   Reply as ReplyIcon,
   SmilePlus,
   Bitcoin,
@@ -18,8 +19,10 @@ import {
 import { NostrEvent, UnsignedEvent } from "nostr-tools";
 import { Avatar } from "@/components/nostr/avatar";
 import { ProfileDrawer } from "@/components/nostr/profile";
-import { NDKKind, NDKEvent } from "@nostr-dev-kit/ndk";
+import { NDKNutzap, NDKKind, NDKEvent } from "@nostr-dev-kit/ndk";
+import { NDKCashuWallet } from "@nostr-dev-kit/ndk-wallet";
 import { useSettings } from "@/lib/settings";
+import { formatShortNumber } from "@/lib/number";
 import { Badge } from "@/components/ui/badge";
 import { Name } from "@/components/nostr/name";
 import { useGroupAdminsList } from "@/lib/nostr/groups";
@@ -60,6 +63,8 @@ import {
   ContextMenuShortcut,
 } from "@/components/ui/context-menu";
 import { Reactions } from "@/components/nostr/reactions";
+import { useCashuWallet } from "@/lib/wallet";
+import { saveNutzap } from "@/lib/nutzaps";
 
 interface ChatNutzapProps {
   event: NostrEvent;
@@ -81,14 +86,17 @@ function ChatNutzap({
   // todo: gestures
   const ndk = useNDK();
   const ref = useRef<HTMLDivElement | null>(null);
+  const wallet = useCashuWallet();
   const isInView = useInView(ref);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
   const [showingZapDialog, setShowingZapDialog] = useState(false);
+  const [isRedeeming, setIsRedeeming] = useState(false);
   const { data: mintList } = useMintList(event.pubkey);
   const { data: adminsList } = useGroupAdminsList(group);
   const admins = adminsList || [];
   const pubkey = usePubkey();
   const isMine = event.pubkey === pubkey;
+  const isToMe = event.tags.some((t) => t[0] === "p" && t[1] === pubkey);
   const amIAdmin = pubkey && admins.includes(pubkey);
   const relaySet = useRelaySet([group.relay]);
   const { t } = useTranslation();
@@ -139,6 +147,39 @@ function ChatNutzap({
     } catch (err) {
       console.error(err);
       toast.error(t("chat.user.kick.error"));
+    }
+  }
+
+  async function redeem() {
+    setIsRedeeming(true);
+    try {
+      if (wallet instanceof NDKCashuWallet) {
+        const nutzap = NDKNutzap.from(new NDKEvent(ndk, event));
+        if (nutzap) {
+          await wallet.redeemNutzap(nutzap, {
+            onRedeemed: (proofs) => {
+              const amount = proofs.reduce(
+                (acc, proof) => acc + proof.amount,
+                0,
+              );
+              toast.success(
+                t("nutzaps.redeem-success", {
+                  amount: formatShortNumber(amount),
+                }),
+              );
+            },
+            onTxEventCreated: (txEvent) => {
+              saveNutzap(event, "redeemed", txEvent.id, txEvent.created_at);
+            },
+          });
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      saveNutzap(event, "failed");
+      toast.error(t("nutzaps.redeem-error"));
+    } finally {
+      setIsRedeeming(false);
     }
   }
 
@@ -206,6 +247,18 @@ function ChatNutzap({
               {t("chat.message.tip.action")}
               <ContextMenuShortcut>
                 <Bitcoin className="w-4 h-4" />
+              </ContextMenuShortcut>
+            </ContextMenuItem>
+          ) : null}
+          {isToMe ? (
+            <ContextMenuItem
+              className="cursor-pointer"
+              disabled={isRedeeming}
+              onClick={redeem}
+            >
+              {t("chat.message.redeem.action")}
+              <ContextMenuShortcut>
+                <HandCoins className="w-4 h-4" />
               </ContextMenuShortcut>
             </ContextMenuItem>
           ) : null}
