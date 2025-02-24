@@ -111,6 +111,7 @@ export function NewZapDialog({
         toast.success(
           t("zap.dialog.success", {
             amount: formatShortNumber(Number(amount)),
+            name: profile?.name || profile?.display_name || pubkey.slice(0, 6),
           }),
         );
       } else {
