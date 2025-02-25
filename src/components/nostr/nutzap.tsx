@@ -36,6 +36,11 @@ export function NutzapPreview({
   return <Nutzap event={event} group={group} animateGradient={true} />;
 }
 
+interface NutzapClassnames {
+  singleCustomEmoji?: string;
+  onlyEmojis?: string;
+}
+
 export function NutzapContent({
   event,
   group,
@@ -45,10 +50,7 @@ export function NutzapContent({
   event: NostrEvent;
   group?: Group;
   zap: NutzapType;
-  classNames?: {
-    singleCustomEmoji?: string;
-    onlyEmojis?: string;
-  };
+  classNames?: NutzapClassnames;
 }) {
   const fragments = useRichText(
     event.content.trim(),
@@ -101,12 +103,14 @@ export function Nutzap({
   animateGradient,
   showAuthor = true,
   onReplyClick,
+  classNames,
 }: {
   event: NostrEvent;
   group?: Group;
   animateGradient?: boolean;
   showAuthor?: boolean;
   onReplyClick?: (ev: NostrEvent) => void;
+  classNames?: NutzapClassnames;
 }) {
   const zap = validateNutzap(event);
   const groupRelay = event.tags.find((t) => t[0] === "h")?.[2];
@@ -165,7 +169,7 @@ export function Nutzap({
           onClick={onReplyClick}
         />
       ) : null}
-      <NutzapContent event={event} zap={zap} />
+      <NutzapContent event={event} zap={zap} classNames={classNames} />
     </div>
   ) : (
     <span className="text-xs text-muted-foreground">Invalid zap</span>

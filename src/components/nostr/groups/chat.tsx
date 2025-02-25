@@ -215,7 +215,7 @@ function ChatNutzap({
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <div
-            className={`w-full z-0 ${isFocused ? "bg-accent/30 rounded-lg" : ""}`}
+            className={`flex flex-row ${isMine ? "justify-end" : ""} w-full z-0 ${isFocused ? "bg-accent/30 rounded-lg" : ""}`}
           >
             <motion.div
               // Drag controls
@@ -231,7 +231,7 @@ function ChatNutzap({
                 }
               }}
               ref={ref}
-              className={`z-0 border-none my-1 max-w-[18rem] sm:max-w-sm md:max-w-md ${isMine ? "ml-auto" : ""}`}
+              className="z-0 border-none my-1 max-w-[18rem] sm:max-w-sm md:max-w-md"
             >
               <div className="flex flex-col gap-0">
                 <div className="flex flex-row gap-2 items-end">
@@ -251,6 +251,10 @@ function ChatNutzap({
                       showAuthor={false}
                       animateGradient
                       onReplyClick={onNutzapReplyClick}
+                      classNames={{
+                        singleCustomEmoji: isMine ? "ml-auto" : "",
+                        onlyEmojis: isMine ? "ml-auto" : "",
+                      }}
                     />
                     <Reactions
                       event={event}

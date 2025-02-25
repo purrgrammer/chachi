@@ -17,6 +17,7 @@ import {
   Puzzle,
   Cable,
   RotateCw,
+  RefreshCw,
   Network,
   ServerCrash,
   Plus,
@@ -922,9 +923,34 @@ export function WalletSelector() {
 }
 
 function CashuWalletCoins({ wallet }: { wallet: NDKCashuWallet }) {
+  const { t } = useTranslation();
+  const [isSyncing, setIsSyncing] = useState(false);
   const proofs = wallet.state.getProofEntries({ onlyAvailable: true });
+  async function syncProofs() {
+    try {
+      setIsSyncing(true);
+      await wallet.checkProofs();
+      toast.success(t("wallet.sync-success"));
+    } catch (err) {
+      console.error(err);
+      toast.success(t("wallet.sync-error"));
+    } finally {
+      setIsSyncing(false);
+    }
+  }
   return (
     <div className="flex flex-col gap-2 pr-0.5 h-[68vh] overflow-y-scroll pretty-scrollbar">
+      <div className="flex items-center justify-center">
+        <Button
+          disabled={isSyncing}
+          variant="outline"
+          size="tiny"
+          onClick={syncProofs}
+        >
+          {isSyncing ? <RotateCw className="animate-spin" /> : <RefreshCw />}
+          {t("wallet.sync")}
+        </Button>
+      </div>
       {proofs.map((info: ProofInfo) => (
         <Proof key={info.proof.C} info={info} />
       ))}
@@ -1790,6 +1816,7 @@ function Withdraw({
                       <WalletIcon />
                       {t("wallet.withdraw.choose-wallet")}
                     </Button>
+                    {/*
                     {wallet instanceof NDKCashuWallet && (
                       <Button
                         disabled={isWithdrawing}
@@ -1801,6 +1828,7 @@ function Withdraw({
                         {t("wallet.withdraw.confirm-cash")}
                       </Button>
                     )}
+		    */}
                   </div>
                 </>
               ) : null}

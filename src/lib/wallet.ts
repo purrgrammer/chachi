@@ -29,10 +29,9 @@ import {
 } from "@nostr-dev-kit/ndk-wallet";
 import { useNDK, useNWCNDK } from "@/lib/ndk";
 import { Zap, validateZapRequest } from "@/lib/nip-57";
-import { usePubkey } from "@/lib/account";
+import { usePubkey, useMintList } from "@/lib/account";
 import { cashuAtom } from "@/app/store";
 import { useRelays } from "@/lib/nostr";
-import { decomposeIntoPowers } from "@/lib/number";
 import { fetchMintInfo, fetchMintKeys } from "@/lib/cashu";
 import { useNutzapMonitor } from "@/lib/nutzaps";
 
@@ -61,6 +60,7 @@ export function useChachiWallet() {
   const nwcNdk = useNWCNDK();
   const pubkey = usePubkey();
   const relays = useRelays();
+  const mintList = useMintList();
   const [wallets] = useWallets();
   const [, setNDKWallets] = useAtom(ndkWalletsAtom);
   const [cashuWallet, setCashuWallet] = useAtom(cashuWalletAtom);
@@ -170,7 +170,7 @@ export function useChachiWallet() {
 
   useEffect(() => {
     if (cashu && pubkey && !cashuWallet) {
-      createCashuWallet(cashu, ndk, relays)
+      createCashuWallet(cashu, ndk, mintList ? mintList.relays : relays)
         .then((w) => {
           if (!w) {
             toast.error(t("wallet.sync-error"));
@@ -625,7 +625,7 @@ export async function createCashuOutTxEvent(
 
 export async function mintEcash(w: NDKCashuWallet, totalAmount: number) {
   let result;
-  const amounts = decomposeIntoPowers(totalAmount);
+  const amounts = [totalAmount];
   for (const mint of w.mints) {
     const wallet = await w.cashuWallet(mint);
     const mintProofs = await w.state.getProofs({ mint });
@@ -648,7 +648,7 @@ export async function mintEcash(w: NDKCashuWallet, totalAmount: number) {
       createCashuOutTxEvent(
         w,
         {
-          description: "Create ecash",
+          description: "Send ecash",
           amount: amounts.reduce((acc, amount) => acc + amount, 0),
         },
         {

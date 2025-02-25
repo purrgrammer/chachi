@@ -14,6 +14,7 @@ import {
   accountAtom,
   accountsAtom,
   followsAtom,
+  mintListAtom,
 } from "@/app/store";
 
 export function useAccount(): Account | null {
@@ -132,4 +133,8 @@ export function useNip46Login() {
       toast.error("Error logging in with NIP-46");
     }
   };
+}
+
+export function useMintList() {
+  return useAtomValue(mintListAtom);
 }
