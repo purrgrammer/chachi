@@ -425,7 +425,25 @@ export function useNWCBalance(wallet: NDKNWCWallet) {
         console.error(err);
       }
     },
-    staleTime: Infinity,
+  });
+}
+
+export function useWebLNBalance(wallet: NDKWebLNWallet) {
+  return useQuery({
+    enabled: Boolean(wallet.provider),
+    queryKey: [WALLET_BALANCE, walletId(wallet)],
+    queryFn: async () => {
+      try {
+        const provider = wallet.provider;
+        if (provider) {
+          const res = await provider?.getBalance?.();
+          return res?.balance ?? 0;
+        }
+        return 0;
+      } catch (err) {
+        console.error(err);
+      }
+    },
   });
 }
 
@@ -439,6 +457,17 @@ export function useNWCInfo(wallet: NDKNWCWallet) {
     queryKey: [WALLET_INFO, walletId(wallet)],
     queryFn: async () => {
       return wallet.getInfo();
+    },
+    staleTime: Infinity,
+  });
+}
+
+export function useWebLNInfo(wallet: NDKWebLNWallet) {
+  return useQuery({
+    enabled: Boolean(wallet.provider),
+    queryKey: [WALLET_INFO, walletId(wallet)],
+    queryFn: async () => {
+      return wallet.provider?.getInfo();
     },
     staleTime: Infinity,
   });
@@ -512,6 +541,15 @@ export function useNWCTransactions(wallet: NDKNWCWallet) {
   });
 }
 
+//export function useWebLNTransactions(wallet: NDKWebLNWallet) {
+//  return useQuery({
+//    enabled: Boolean(wallet.provider),
+//    queryKey: [WALLET_TXS, walletId(wallet)],
+//    queryFn: () => wallet.provider?.getTransactions(),
+//    staleTime: Infinity,
+//  });
+//}
+
 export function useCashu() {
   return useAtomValue(cashuAtom);
 }
@@ -534,6 +572,13 @@ export function useNWCWallet(connection?: string) {
       w.pairingCode &&
       equalNWCStrings(w.pairingCode, connection),
   ) as NDKNWCWallet | undefined;
+}
+
+export function useWebLNWallet() {
+  const [ndkWallets] = useNDKWallets();
+  return ndkWallets.find((w) => w.type === "webln") as
+    | NDKWebLNWallet
+    | undefined;
 }
 
 export async function createCashuWallet(

@@ -9,7 +9,7 @@ export function useReplies(event: NostrEvent, group?: Group, live = true) {
   const ev = new NDKEvent(ndk, event);
   return useStream(
     {
-      kinds: [1111 as NDKKind],
+      kinds: [1111 as NDKKind, NDKKind.Nutzap, NDKKind.Zap],
       ...(group ? { "#h": [group.id] } : {}),
       ...ev.filter(),
     },

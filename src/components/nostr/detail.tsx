@@ -688,7 +688,7 @@ export function FeedEmbed({
   );
 
   const body = (
-    <div className="py-1 px-4 pb-2 space-y-3">
+    <div className={cn("py-1 px-4 pb-2 space-y-3", components?.className)}>
       {components?.preview ? (
         components.preview({
           event,

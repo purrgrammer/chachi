@@ -56,6 +56,8 @@ import {
   ConnectWallet,
   NWCWalletBalanceAmount,
   CashuWalletBalanceAmount,
+  WebLNWalletBalanceAmount,
+  WalletName,
 } from "@/components/wallet";
 import { User } from "@/components/nostr/user";
 import { useTheme } from "@/components/theme-provider";
@@ -343,7 +345,7 @@ function WalletSummary({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex flex-row justify-between font-normal">
+        <CardTitle className="text-lg flex flex-row items-center justify-between font-normal">
           <div className="flex flex-row items-center gap-1.5">
             {wallet.type === "nip-60" ? (
               <WalletIcon className="size-6 text-muted-foreground" />
@@ -357,6 +359,8 @@ function WalletSummary({
                 pubkey={pubkey}
                 classNames={{ avatar: "size-5", name: "text-md" }}
               />
+            ) : wallet.type === "webln" ? (
+              <WalletName wallet={wallet} />
             ) : me ? (
               <User
                 pubkey={me}
@@ -386,6 +390,11 @@ function WalletSummary({
               ) : wallet.type === "nip-60" &&
                 wallet instanceof NDKCashuWallet ? (
                 <CashuWalletBalanceAmount
+                  wallet={wallet}
+                  classNames={{ icon: "size-12", text: "text-6xl font-light" }}
+                />
+              ) : wallet instanceof NDKWebLNWallet ? (
+                <WebLNWalletBalanceAmount
                   wallet={wallet}
                   classNames={{ icon: "size-12", text: "text-6xl font-light" }}
                 />

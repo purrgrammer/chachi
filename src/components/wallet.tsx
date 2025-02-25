@@ -78,6 +78,9 @@ import {
   useNWCBalance,
   useNWCInfo,
   useNWCTransactions,
+  useWebLNBalance,
+  useWebLNInfo,
+  //useWebLNTransactions,
   useCashuBalance,
   refreshWallet,
   mintEcash,
@@ -533,7 +536,7 @@ export function ConnectWallet() {
   const isValidNwcString = connectString.startsWith("nostr+walletconnect://");
 
   function connectWebln() {
-    if (!isLoadingWebln) {
+    if (isLoadingWebln) {
       toast.error(t("wallet.dialog.webln-unavailable"));
       return;
     }
@@ -2156,8 +2159,62 @@ function CashuWallet({ wallet }: { wallet: NDKCashuWallet }) {
   );
 }
 
+//function WebLNWalletTransactions({ wallet }: { wallet: NDKWebLNWallet }) {
+//	// todo: webln provider does not support this
+//	const { data: transactions, isLoading, isError } = useWebLNTransactions(wallet);
+//	return null;
+//}
+
 function WebLNWallet({ wallet }: { wallet: NDKWebLNWallet }) {
-  return <>{walletId(wallet)}</>;
+  const { data: balance } = useWebLNBalance(wallet);
+  const { data: info } = useWebLNInfo(wallet);
+
+  const canDeposit = info?.methods.includes("makeInvoice");
+  const canWithdraw = info?.methods.includes("sendPayment");
+  //const canListTransactions = info?.methods.includes("getTransactions");
+
+  const [showDeposit, setShowDeposit] = useState(false);
+  const [showWithdraw, setShowWithdraw] = useState(false);
+
+  async function onDeposit() {
+    setShowDeposit(true);
+  }
+
+  async function onWithdraw() {
+    setShowWithdraw(true);
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
+        <div className="w-full flex items-center justify-center">
+          <div className="flex flex-row gap-0 items-center">
+            <Bitcoin className="size-12 text-muted-foreground" />
+            <span className="text-6xl font-mono">{balance}</span>
+          </div>
+        </div>
+        <WalletActions
+          wallet={wallet}
+          onDeposit={onDeposit}
+          canDeposit={canDeposit}
+          isDepositing={showDeposit}
+          onWithdraw={onWithdraw}
+          canWithdraw={canWithdraw}
+          isWithdrawing={showWithdraw}
+        />
+      </div>
+      <Deposit
+        wallet={wallet}
+        open={showDeposit}
+        onOpenChange={setShowDeposit}
+      />
+      <Withdraw
+        wallet={wallet}
+        open={showWithdraw}
+        onOpenChange={setShowWithdraw}
+      />
+    </div>
+  );
 }
 
 function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
@@ -2312,7 +2369,19 @@ function Balance({
 }
 
 function WebLNWalletBalance({ wallet }: { wallet: NDKWebLNWallet }) {
-  return <>{walletId(wallet)}</>;
+  const { data: balance } = useWebLNBalance(wallet);
+  const { data: info } = useWebLNInfo(wallet);
+  return (
+    <div className="flex flex-row gap-10 w-full items-center justify-between">
+      <div className="flex flex-row gap-2 items-center">
+        <Puzzle className="size-4 text-muted-foreground" />
+        <span className="line-clamp-1">
+          {info?.node?.alias ? info.node.alias : "WebLN"}
+        </span>
+      </div>
+      <Balance short={false} amount={balance} unit="sat" />
+    </div>
+  );
 }
 
 function NWCWalletName({ wallet }: { wallet: NDKNWCWallet }) {
@@ -2372,6 +2441,24 @@ export function CashuWalletBalanceAmount({
   );
 }
 
+export function WebLNWalletBalanceAmount({
+  wallet,
+  classNames,
+}: {
+  wallet: NDKWebLNWallet;
+  classNames?: BalanceClassnames;
+}) {
+  const { data: balance } = useWebLNBalance(wallet);
+  return (
+    <Balance
+      short={false}
+      amount={balance}
+      unit="sat"
+      classNames={classNames}
+    />
+  );
+}
+
 function CashuWalletName({ wallet }: { wallet: NDKCashuWallet }) {
   return wallet.event ? (
     <User
@@ -2411,7 +2498,12 @@ export function WalletBalance({ wallet }: { wallet: NDKWallet }) {
 }
 
 function WebLNWalletName({ wallet }: { wallet: NDKWebLNWallet }) {
-  return <span>{walletId(wallet)}</span>;
+  const { data: info } = useWebLNInfo(wallet);
+  return (
+    <span className="line-clamp-1">
+      {info?.node?.alias ? info.node.alias : "WebLN"}
+    </span>
+  );
 }
 
 export function WalletName({ wallet }: { wallet: NDKWallet }) {

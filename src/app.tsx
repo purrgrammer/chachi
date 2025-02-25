@@ -17,6 +17,7 @@ const Group = lazy(() => import("@/pages/group"));
 const Event = lazy(() => import("@/pages/event"));
 const Wallet = lazy(() => import("@/pages/wallet"));
 const NWCWallet = lazy(() => import("@/pages/wallet/nwc"));
+const WebLNWallet = lazy(() => import("@/pages/wallet/webln"));
 const Settings = lazy(() => import("@/pages/settings"));
 const Mint = lazy(() => import("@/pages/mint"));
 const Nutzaps = lazy(() => import("@/pages/nutzaps"));
@@ -122,6 +123,10 @@ const router = createBrowserRouter([
       {
         path: "/wallet/nwc/:connection",
         element: <NWCWallet />,
+      },
+      {
+        path: "/wallet/webln",
+        element: <WebLNWallet />,
       },
       {
         path: "/settings",
