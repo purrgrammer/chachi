@@ -240,7 +240,7 @@ export function useStream(
   filter: NDKFilter | NDKFilter[],
   relays: string[],
   live = true,
-  onlyRelays = false,
+  onlyRelays = true,
 ): NostrREQResult<NostrEvent> {
   const ndk = useNDK();
   const relaySet = useRelaySet(relays);

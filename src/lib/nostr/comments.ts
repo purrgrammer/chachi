@@ -15,6 +15,6 @@ export function useReplies(event: NostrEvent, group?: Group, live = true) {
     },
     group ? [group.relay] : [],
     live,
-    group?.id === "_",
+    true,
   );
 }
