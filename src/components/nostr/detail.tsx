@@ -712,7 +712,7 @@ export function FeedEmbed({
       {showReactions ? (
         <Reactions
           event={event}
-          relays={[...(group ? [group.relay] : []), ...relays, ...userRelays]}
+          relays={group ? [group.relay] : [...relays, ...userRelays]}
           kinds={[NDKKind.Zap, NDKKind.Nutzap, NDKKind.Reaction]}
         />
       ) : null}
@@ -954,7 +954,7 @@ export function Embed({
         {showReactions ? (
           <Reactions
             event={event}
-            relays={[...(group ? [group.relay] : []), ...relays, ...userRelays]}
+            relays={group ? [group.relay] : [...relays, ...userRelays]}
             kinds={[NDKKind.Zap, NDKKind.Nutzap, NDKKind.Reaction]}
           />
         ) : null}

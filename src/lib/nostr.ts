@@ -263,10 +263,12 @@ export function useStream(
     );
 
     sub.on("event", (event) => {
-      const newEvents = [...events];
-      const rawEvent = event.rawEvent() as NostrEvent;
-      insertEventIntoDescendingList(newEvents, rawEvent);
-      setEvents(newEvents);
+      setEvents((events) => {
+        const newEvents = [...events];
+        const rawEvent = event.rawEvent() as NostrEvent;
+        insertEventIntoDescendingList(newEvents, rawEvent);
+        return newEvents;
+      });
     });
 
     sub.on("eose", () => {
