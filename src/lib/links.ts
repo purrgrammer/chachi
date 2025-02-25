@@ -15,7 +15,7 @@ export function eventLink(ev: NostrEvent, group?: Group) {
   if (group) {
     return group.id === "_"
       ? `/${getRelayHost(group.relay)}/e/${nlink}`
-      : `/${getRelayHost(group.relay)}/e/${nlink}`;
+      : `/${getRelayHost(group.relay)}/${group.id}/e/${nlink}`;
   }
   return `/e/${nlink}`;
 }
