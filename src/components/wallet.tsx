@@ -1555,7 +1555,7 @@ function SendToWallet({
         toast.success(t("wallet.withdraw.success"));
       } else if (toWallet instanceof NDKWebLNWallet) {
         const result = await toWallet.provider?.makeInvoice({
-          amount: Number(amount) * 1000,
+          amount: Number(amount),
         });
         // @ts-expect-error: incorrect return type
         await wallet.lnPay({ pr: result.paymentRequest });
