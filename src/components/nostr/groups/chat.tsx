@@ -15,6 +15,8 @@ import {
   Copy,
   ShieldBan,
   Trash,
+  Check,
+  X,
 } from "lucide-react";
 import { NostrEvent, UnsignedEvent } from "nostr-tools";
 import { Avatar } from "@/components/nostr/avatar";
@@ -64,6 +66,7 @@ import {
 } from "@/components/ui/context-menu";
 import { Reactions } from "@/components/nostr/reactions";
 import { useCashuWallet } from "@/lib/wallet";
+import { useNutzapStatus } from "@/lib/nutzaps";
 import { saveNutzap } from "@/lib/nutzaps";
 
 interface ChatNutzapProps {
@@ -93,6 +96,9 @@ function ChatNutzap({
   const [isRedeeming, setIsRedeeming] = useState(false);
   const { data: mintList } = useMintList(event.pubkey);
   const { data: adminsList } = useGroupAdminsList(group);
+  const nutzapStatus = useNutzapStatus(event.id);
+  const redeemed = nutzapStatus === "redeemed" || nutzapStatus === "spent";
+  const failed = nutzapStatus === "failed";
   const admins = adminsList || [];
   const pubkey = usePubkey();
   const isMine = event.pubkey === pubkey;
@@ -253,12 +259,22 @@ function ChatNutzap({
           {isToMe ? (
             <ContextMenuItem
               className="cursor-pointer"
-              disabled={isRedeeming}
+              disabled={isRedeeming || redeemed || failed}
               onClick={redeem}
             >
-              {t("chat.message.redeem.action")}
+              {failed
+                ? t("chat.message.redeem.failed")
+                : redeemed
+                  ? t("chat.message.redeem.redeemed")
+                  : t("chat.message.redeem.action")}
               <ContextMenuShortcut>
-                <HandCoins className="w-4 h-4" />
+                {failed ? (
+                  <X className="w-4 h-4 text-red-300" />
+                ) : redeemed ? (
+                  <Check className="w-4 h-4 text-green-500" />
+                ) : (
+                  <HandCoins className="w-4 h-4" />
+                )}
               </ContextMenuShortcut>
             </ContextMenuItem>
           ) : null}

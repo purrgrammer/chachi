@@ -262,11 +262,7 @@ export function NewZap({
       open={false}
       onZap={onZap}
       trigger={
-        <Button
-          variant="action"
-          size="icon"
-          className="bg-primary rounded-full"
-        >
+        <Button variant="action" size="icon">
           <Bitcoin />
         </Button>
       }

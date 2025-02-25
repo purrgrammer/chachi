@@ -23,6 +23,10 @@ export function getNutzaps() {
   return db.nutzaps.toArray();
 }
 
+export function useNutzapStatus(id: string) {
+  return useLiveQuery(() => db.nutzaps.get(id).then((n) => n?.status));
+}
+
 export function saveNutzap(
   ev: NostrEvent,
   status?: "redeemed" | "spent" | "failed",

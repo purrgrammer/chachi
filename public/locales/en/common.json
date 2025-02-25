@@ -226,7 +226,9 @@
         "error": "Can't copy to clipboard"
       },
       "redeem": {
-        "action": "Redeem"
+        "action": "Redeem",
+        "failed": "Failed",
+        "redeemed": "Redeemed"
       },
       "zap": {
         "action": "Zap"
