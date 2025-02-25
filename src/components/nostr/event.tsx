@@ -1,4 +1,5 @@
 import { useEvent, useAddress } from "@/lib/nostr";
+import { NostrEvent } from "nostr-tools";
 import { SearchSlash, Network, Ban } from "lucide-react";
 import { Embed } from "@/components/nostr/detail";
 import type { Group } from "@/lib/types";
@@ -42,6 +43,7 @@ export function Event({
   className,
   showReactions = true,
   asReply,
+  onClick,
 }: {
   id: string;
   relays: string[];
@@ -50,6 +52,7 @@ export function Event({
   className?: string;
   showReactions?: boolean;
   asReply?: boolean;
+  onClick?: (ev: NostrEvent) => void;
 }) {
   const { data: event, status } = useEvent({ id, pubkey, relays });
 
@@ -73,6 +76,7 @@ export function Event({
       relays={relays}
       showReactions={showReactions}
       asReply={asReply}
+      onClick={onClick}
     />
   ) : (
     <EventNotFound />
@@ -88,6 +92,7 @@ export function Address({
   className,
   showReactions = true,
   asReply,
+  onClick,
 }: {
   group?: Group;
   pubkey: string;
@@ -97,6 +102,7 @@ export function Address({
   className?: string;
   showReactions?: boolean;
   asReply?: boolean;
+  onClick?: (ev: NostrEvent) => void;
 }) {
   const { data: event, status } = useAddress({
     pubkey,
@@ -125,6 +131,7 @@ export function Address({
       relays={relays}
       showReactions={showReactions}
       asReply={asReply}
+      onClick={onClick}
     />
   ) : (
     <EventNotFound />
@@ -138,6 +145,7 @@ export function E({
   relays,
   showReactions,
   asReply,
+  onClick,
 }: {
   id: string;
   pubkey?: string;
@@ -145,6 +153,7 @@ export function E({
   relays?: string[];
   showReactions?: boolean;
   asReply?: boolean;
+  onClick?: (ev: NostrEvent) => void;
 }) {
   return (
     <Event
@@ -154,6 +163,7 @@ export function E({
       relays={relays ? relays : group ? [group.relay] : []}
       showReactions={showReactions}
       asReply={asReply}
+      onClick={onClick}
     />
   );
 }
@@ -164,12 +174,14 @@ export function A({
   relays,
   showReactions,
   asReply,
+  onClick,
 }: {
   address: string;
   group?: Group;
   relays?: string[];
   showReactions?: boolean;
   asReply?: boolean;
+  onClick?: (ev: NostrEvent) => void;
 }) {
   const [k, pubkey, d] = address.split(":");
   return (
@@ -181,6 +193,7 @@ export function A({
       relays={relays ? relays : group ? [group.relay] : []}
       showReactions={showReactions}
       asReply={asReply}
+      onClick={onClick}
     />
   );
 }

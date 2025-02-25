@@ -6,6 +6,7 @@ import React, {
   ForwardedRef,
 } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
 import { useInView } from "framer-motion";
@@ -56,7 +57,6 @@ import {
 import { DELETE_GROUP } from "@/lib/kinds";
 import { Nutzap } from "@/components/nostr/nutzap";
 import { useTranslation } from "react-i18next";
-
 import {
   ContextMenu,
   ContextMenuContent,
@@ -70,11 +70,14 @@ import { Reactions } from "@/components/nostr/reactions";
 import { useCashuWallet } from "@/lib/wallet";
 import { useNutzapStatus } from "@/lib/nutzaps";
 import { saveNutzap } from "@/lib/nutzaps";
+import { eventLink } from "@/lib/links";
 
 interface ChatNutzapProps {
   event: NostrEvent;
   group: Group;
-  scroll?: boolean;
+  admins: string[];
+  scrollTo?: NostrEvent;
+  setScrollTo?: (ev?: NostrEvent) => void;
   setReplyingTo?: (event: NostrEvent) => void;
   deleteEvent?: (event: NostrEvent) => void;
   canDelete?: (event: NostrEvent) => boolean;
@@ -83,8 +86,10 @@ interface ChatNutzapProps {
 function ChatNutzap({
   event,
   group,
-  scroll,
+  admins,
   setReplyingTo,
+  scrollTo,
+  setScrollTo,
   canDelete,
   deleteEvent,
 }: ChatNutzapProps) {
@@ -94,14 +99,13 @@ function ChatNutzap({
   const wallet = useCashuWallet();
   const isInView = useInView(ref);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
+  const navigate = useNavigate();
   const [showingZapDialog, setShowingZapDialog] = useState(false);
   const [isRedeeming, setIsRedeeming] = useState(false);
   const { data: mintList } = useMintList(event.pubkey);
-  const { data: adminsList } = useGroupAdminsList(group);
   const nutzapStatus = useNutzapStatus(event.id);
   const redeemed = nutzapStatus === "redeemed" || nutzapStatus === "spent";
   const failed = nutzapStatus === "failed";
-  const admins = adminsList || [];
   const pubkey = usePubkey();
   const isMine = event.pubkey === pubkey;
   const isToMe = event.tags.some((t) => t[0] === "p" && t[1] === pubkey);
@@ -112,12 +116,16 @@ function ChatNutzap({
   const [settings] = useSettings();
   const isMobile = useIsMobile();
   const canSign = useCanSign();
+  const isFocused = scrollTo?.id === event.id;
 
   useEffect(() => {
-    if (scroll && ref.current) {
-      ref.current.scrollIntoView({ behavior: "smooth" });
+    if (isFocused && ref.current) {
+      ref.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
     }
-  }, [scroll]);
+  }, [isFocused]);
 
   // todo: extract to hook
   async function react(e: EmojiType) {
@@ -193,54 +201,68 @@ function ChatNutzap({
     }
   }
 
+  function onNutzapReplyClick(ev: NostrEvent) {
+    // todo: use messageKinds here
+    if (ev.kind === NDKKind.Nutzap || ev.kind === NDKKind.GroupChat) {
+      setScrollTo?.(ev);
+    } else {
+      navigate(eventLink(ev, group));
+    }
+  }
+
   return (
     <>
       <ContextMenu>
         <ContextMenuTrigger asChild>
-          <motion.div
-            // Drag controls
-            drag={isMobile && !isMine && canSign ? "x" : false}
-            dragSnapToOrigin={true}
-            dragConstraints={{ left: 20, right: 20 }}
-            dragElastic={{ left: 0.2, right: 0.2 }}
-            onDragEnd={(_, info) => {
-              if (info.offset.x > 20) {
-                setReplyingTo?.(event);
-              } else if (info.offset.x < -20) {
-                setShowingEmojiPicker(true);
-              }
-            }}
-            ref={ref}
-            className={`z-0 border-none my-1 max-w-[18rem] sm:max-w-sm md:max-w-md ${isMine ? "ml-auto" : ""}`}
+          <div
+            className={`w-full z-0 ${isFocused ? "bg-accent/30 rounded-lg" : ""}`}
           >
-            <div className="flex flex-col gap-0">
-              <div className="flex flex-row gap-2 items-end">
-                {isMine ? null : (
-                  <ProfileDrawer
-                    group={group}
-                    pubkey={event.pubkey}
-                    trigger={
-                      <Avatar pubkey={event.pubkey} className="size-7" />
-                    }
-                  />
-                )}
-                <div className="flex flex-col gap-1 relative p-1 px-2 bg-background/80 rounded-md">
-                  <Nutzap
-                    event={event}
-                    group={group}
-                    showAuthor={false}
-                    animateGradient
-                  />
-                  <Reactions
-                    event={event}
-                    relays={[group.relay]}
-                    kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
-                    live={isInView}
-                  />
+            <motion.div
+              // Drag controls
+              drag={isMobile && !isMine && canSign ? "x" : false}
+              dragSnapToOrigin={true}
+              dragConstraints={{ left: 20, right: 20 }}
+              dragElastic={{ left: 0.2, right: 0.2 }}
+              onDragEnd={(_, info) => {
+                if (info.offset.x > 20) {
+                  setReplyingTo?.(event);
+                } else if (info.offset.x < -20) {
+                  setShowingEmojiPicker(true);
+                }
+              }}
+              ref={ref}
+              className={`z-0 border-none my-1 max-w-[18rem] sm:max-w-sm md:max-w-md ${isMine ? "ml-auto" : ""}`}
+            >
+              <div className="flex flex-col gap-0">
+                <div className="flex flex-row gap-2 items-end">
+                  {isMine ? null : (
+                    <ProfileDrawer
+                      group={group}
+                      pubkey={event.pubkey}
+                      trigger={
+                        <Avatar pubkey={event.pubkey} className="size-7" />
+                      }
+                    />
+                  )}
+                  <div className="flex flex-col gap-1 relative p-1 px-2 bg-background/80 rounded-md">
+                    <Nutzap
+                      event={event}
+                      group={group}
+                      showAuthor={false}
+                      animateGradient
+                      onReplyClick={onNutzapReplyClick}
+                    />
+                    <Reactions
+                      event={event}
+                      relays={[group.relay]}
+                      kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
+                      live={isInView}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuItem
@@ -453,6 +475,7 @@ export const GroupChat = forwardRef(
     const events = useGroupchat(group);
     const hasBeenDeleted = events.some((e) => e.kind === DELETE_GROUP);
     const [replyingTo, setReplyingTo] = useState<NostrEvent | undefined>();
+    const [scrollTo, setScrollTo] = useState<NostrEvent | undefined>();
     const previousMessageIds = events.slice(-3).map((e) => e.id.slice(0, 8));
     // heights
     const [inputHeight, setInputHeight] = useState(34);
@@ -528,21 +551,22 @@ export const GroupChat = forwardRef(
           newMessage={sentMessage}
           lastSeen={lastSeen ? lastSeen : undefined}
           deleteEvents={deleteEvents}
+          scrollTo={scrollTo}
+          setScrollTo={setScrollTo}
           // @ts-expect-error: these events are unsigned since they come from DB
           events={events}
           canDelete={canDelete}
           deleteEvent={deleteEvent}
           messageKinds={[NDKKind.GroupChat]}
           components={{
-            [NDKKind.Nutzap]: ({ event }) => (
+            [NDKKind.Nutzap]: ({ event, ...props }) => (
               <ChatNutzap
                 key={event.id}
                 event={event}
                 group={group}
-                scroll={sentMessage?.id === event.id}
-                setReplyingTo={setReplyingTo}
                 canDelete={canDelete}
                 deleteEvent={deleteEvent}
+                {...props}
               />
             ),
             [NDKKind.GroupAdminAddUser]: (props) => (

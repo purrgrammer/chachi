@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { atom, useAtom } from "jotai";
 import { toast } from "sonner";
 import {
   Crown,
@@ -56,18 +55,18 @@ import { useTranslation } from "react-i18next";
 import i18n from "i18next";
 import { getLanguage } from "@/i18n";
 
-const scrollToAtom = atom<string | null>(null);
-
 function Reply({
   group,
   admins,
   id,
   className,
+  setScrollTo,
 }: {
   group?: Group;
   admins: string[];
   id: string;
   className?: string;
+  setScrollTo?: (ev?: NostrEvent) => void;
 }) {
   const { t } = useTranslation();
   // todo: replying to picture, video, mention, custom emoji
@@ -75,16 +74,15 @@ function Reply({
     id,
     relays: group ? [group.relay] : [],
   });
-  const [, setScrollTo] = useAtom(scrollToAtom);
   const isAdmin = event?.pubkey ? admins.includes(event?.pubkey) : false;
   return (
     <div
       className={cn(
-        "h-12 p-1 pl-2 border-l-4 rounded-md mb-1 bg-background/80 border-background dark:bg-background/40 dark:border-background/60 cursor-pointer",
-        event ? "" : "animate-pulse place-content-center",
+        "h-12 p-1 pl-2 border-l-4 rounded-md mb-1 bg-background/80 border-background dark:bg-background/40 dark:border-background/60",
+        event ? "cursor-pointer" : "animate-pulse place-content-center",
         className,
       )}
-      onClick={() => setScrollTo(id)}
+      onClick={event ? () => setScrollTo?.(event) : undefined}
     >
       {event ? (
         <>
@@ -140,6 +138,8 @@ export function ChatMessage({
   richTextOptions,
   richTextClassnames = {},
   className,
+  scrollTo,
+  setScrollTo,
 }: {
   group?: Group;
   event: NostrEvent;
@@ -159,6 +159,8 @@ export function ChatMessage({
   richTextOptions?: RichTextOptions;
   richTextClassnames?: RichTextClassnames;
   className?: string;
+  scrollTo?: NostrEvent;
+  setScrollTo?: (ev?: NostrEvent) => void;
 }) {
   const { t } = useTranslation();
   const [settings] = useSettings();
@@ -166,7 +168,6 @@ export function ChatMessage({
   const relay = group?.relay;
   const ndk = useNDK();
   const relaySet = useRelaySet(group ? [group.relay] : []);
-  const [scrollTo] = useAtom(scrollToAtom);
   const [showMessageActions, setShowMessageActions] = useState(false);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
   const [showingZapDialog, setShowingZapDialog] = useState(false);
@@ -181,7 +182,7 @@ export function ChatMessage({
   const replyTo = legacyReply || quotedReply;
   const replyRoot = event.tags.find((t) => t[3] === "root")?.[1];
   const isReplyingTo = replyTo || replyRoot;
-  const isFocused = scrollTo === event.id;
+  const isFocused = scrollTo?.id === event.id;
   const isAdmin = author ? admins.includes(author) : false;
   const me = usePubkey();
   const canSign = useCanSign();
@@ -279,7 +280,6 @@ export function ChatMessage({
 
   useEffect(() => {
     if (isNew && ref.current) {
-      console.log("SCROLL INTO NEW MESSAGE", isNew);
       ref.current?.scrollIntoView({
         behavior: "smooth",
         block: "start",
@@ -395,6 +395,7 @@ export function ChatMessage({
               isReplyingTo &&
               showReply ? (
                 <Reply
+                  setScrollTo={setScrollTo}
                   group={group}
                   admins={admins}
                   id={isReplyingTo}
@@ -650,10 +651,23 @@ interface ChatProps extends MotionProps {
   messageKinds: NDKKind[];
   canDelete?: (event: NostrEvent) => boolean;
   deleteEvent?: (event: NostrEvent) => void;
-  components?: Record<number, React.ComponentType<{ event: NostrEvent }>>;
+  components?: Record<
+    number,
+    React.ComponentType<{
+      event: NostrEvent;
+      admins: string[];
+      scrollTo?: NostrEvent;
+      setScrollTo?: (ev?: NostrEvent) => void;
+      setReplyingTo?: (event: NostrEvent) => void;
+      deleteEvent?: (event: NostrEvent) => void;
+      canDelete?: (event: NostrEvent) => boolean;
+    }>
+  >;
   setReplyingTo?: (event: NostrEvent | undefined) => void;
   className?: string;
   style?: React.CSSProperties;
+  scrollTo?: NostrEvent;
+  setScrollTo?: (ev?: NostrEvent) => void;
   newMessage?: NostrEvent;
   showRootReply?: boolean;
   lastSeen?: { ref: string };
@@ -675,11 +689,12 @@ export function Chat({
   className,
   lastSeen,
   deleteEvents,
+  scrollTo,
+  setScrollTo,
 }: ChatProps) {
   // todo: check admin events against relay pubkey
   const groupedMessages = groupByDay(events);
   const lastMessage = events.filter((e) => e.kind === NDKKind.GroupChat).at(0);
-  const [, setScrollTo] = useAtom(scrollToAtom);
   const deletedIds = new Set(
     deleteEvents
       .map((e) => e.tags.find((t) => t[0] === "e")?.[1])
@@ -688,7 +703,7 @@ export function Chat({
   const me = usePubkey();
 
   useEffect(() => {
-    return () => setScrollTo(null);
+    return () => setScrollTo?.(undefined);
   }, [group?.id, group?.relay]);
 
   return (
@@ -732,9 +747,18 @@ export function Chat({
                 setReplyingTo={setReplyingTo}
                 isNew={newMessage?.id === event.id}
                 showRootReply={showRootReply}
+                scrollTo={scrollTo}
+                setScrollTo={setScrollTo}
               />
             ) : Component ? (
-              <Component key={event.id} event={event} />
+              <Component
+                key={event.id}
+                event={event}
+                admins={admins}
+                setReplyingTo={setReplyingTo}
+                scrollTo={scrollTo}
+                setScrollTo={setScrollTo}
+              />
             ) : null;
           })}
         </div>

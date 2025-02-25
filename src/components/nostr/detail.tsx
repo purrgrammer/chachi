@@ -522,17 +522,21 @@ function AsReply({
   event,
   group,
   className,
+  onClick,
 }: {
   event: NostrEvent;
   group?: Group;
   className?: string;
+  onClick?: (ev: NostrEvent) => void;
 }) {
   return (
     <div
       className={cn(
-        "h-12 p-1 pl-2 border-l-4 rounded-md mb-1 bg-background/80 border-background dark:bg-background/40 dark:border-background/60 cursor-pointer",
+        "h-12 p-1 pl-2 border-l-4 rounded-md mb-1 bg-background/80 border-background dark:bg-background/40 dark:border-background/60",
+        onClick ? "cursor-pointer" : "",
         className,
       )}
+      onClick={onClick ? () => onClick(event) : undefined}
     >
       <h4 className="text-sm font-semibold">
         <Name pubkey={event.pubkey} />
@@ -878,6 +882,7 @@ export function Embed({
   options = {},
   relays = [],
   asReply = false,
+  onClick,
 }: {
   event: NostrEvent;
   group?: Group;
@@ -889,13 +894,21 @@ export function Embed({
   classNames?: RichTextClassnames;
   relays: string[];
   asReply?: boolean;
+  onClick?: (ev: NostrEvent) => void;
 }) {
   const userRelays = useRelays();
   const components = eventDetails[event.kind];
   // NIP-31
   const alt = event.tags.find((t) => t[0] === "alt")?.[1];
   if (asReply) {
-    return <AsReply event={event} group={group} className={className} />;
+    return (
+      <AsReply
+        event={event}
+        group={group}
+        className={className}
+        onClick={onClick}
+      />
+    );
   }
   return (
     <div

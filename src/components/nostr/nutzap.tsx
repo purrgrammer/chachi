@@ -100,11 +100,13 @@ export function Nutzap({
   group,
   animateGradient,
   showAuthor = true,
+  onReplyClick,
 }: {
   event: NostrEvent;
   group?: Group;
   animateGradient?: boolean;
   showAuthor?: boolean;
+  onReplyClick?: (ev: NostrEvent) => void;
 }) {
   const zap = validateNutzap(event);
   const groupRelay = event.tags.find((t) => t[0] === "h")?.[2];
@@ -151,6 +153,7 @@ export function Nutzap({
           relays={groupRelay ? [groupRelay] : []}
           showReactions={false}
           asReply
+          onClick={onReplyClick}
         />
       ) : zap.a ? (
         <A
@@ -159,6 +162,7 @@ export function Nutzap({
           showReactions={false}
           asReply
           relays={groupRelay ? [groupRelay] : []}
+          onClick={onReplyClick}
         />
       ) : null}
       <NutzapContent event={event} zap={zap} />
