@@ -1,10 +1,13 @@
 import { useAtom } from "jotai";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useMemo, useState, useEffect } from "react";
+import { NostrEvent } from "nostr-tools";
 import { z } from "zod";
 import { Pubkey } from "@/components/nostr/pubkey";
 import { useTranslation } from "react-i18next";
 import {
+  Check,
   Settings,
   Moon,
   Sun,
@@ -21,6 +24,7 @@ import {
   Palette,
   SquareArrowOutUpRight,
 } from "lucide-react";
+import { NDKEvent, NDKKind, NDKRelaySet } from "@nostr-dev-kit/ndk";
 import {
   NDKWallet,
   NDKCashuWallet,
@@ -70,8 +74,11 @@ import {
   useCashuWallet,
 } from "@/lib/wallet";
 import { usePubkey } from "@/lib/account";
+import { useNDK } from "@/lib/ndk";
 import { mintListAtom } from "@/app/store";
 import { themes, Theme } from "@/theme";
+import { useRelays } from "@/lib/nostr";
+import { cn } from "@/lib/utils";
 
 const uiSchema = z.object({
   language: z.enum(languages),
@@ -244,12 +251,15 @@ function WalletSummary({
   wallet: NDKWallet;
   showControls?: boolean;
 }) {
+  const ndk = useNDK();
   const { t } = useTranslation();
   const [, setWallets] = useWallets();
   const [, setNDKWallets] = useNDKWallets();
   const [p2pk, setP2pk] = useState<string | null>(null);
+  const [mintList] = useAtom(mintListAtom);
   const me = usePubkey();
   const navigate = useNavigate();
+  const myRelays = useRelays();
   const { pubkey, lud16 } = useMemo(() => {
     if (wallet instanceof NDKNWCWallet) {
       const u = new URL(wallet.pairingCode || "");
@@ -260,6 +270,11 @@ function WalletSummary({
     }
     return {};
   }, []);
+  const isEnabled =
+    wallet instanceof NDKCashuWallet &&
+    p2pk &&
+    mintList?.pubkey &&
+    wallet.p2pks.includes(mintList.pubkey);
 
   function openWallet() {
     if (wallet instanceof NDKCashuWallet) {
@@ -276,6 +291,32 @@ function WalletSummary({
       wallet.getP2pk().then((p2pk) => setP2pk(p2pk));
     }
   }, [wallet]);
+
+  async function enableCashuWallet() {
+    try {
+      if (!(wallet instanceof NDKCashuWallet)) {
+        return;
+      }
+      const cashu = wallet as NDKCashuWallet;
+      if (!p2pk || !cashu.relaySet) {
+        toast.error(t("settings.wallet.enable-error"));
+        return;
+      }
+      const event = new NDKEvent(ndk, {
+        kind: NDKKind.CashuMintList,
+        tags: [
+          ["pubkey", p2pk],
+          ...cashu.relaySet.relayUrls.map((r) => ["relay", r]),
+          ...cashu.mints.map((m) => ["mint", m]),
+        ],
+      } as NostrEvent);
+      await event.publish(NDKRelaySet.fromRelayUrls(myRelays, ndk));
+      toast.success(t("settings.wallet.enable-success"));
+    } catch (err) {
+      toast.error(t("settings.wallet.enable-error"));
+      console.error(err);
+    }
+  }
 
   function removeWallet() {
     setWallets((wallets) =>
@@ -358,9 +399,17 @@ function WalletSummary({
             ) : null}
             {p2pk ? <Pubkey pubkey={p2pk} /> : null}
           </div>
-          {wallet.type === "nip-60" && wallet instanceof NDKCashuWallet ? (
-            <MintList mints={wallet.mints} />
-          ) : null}
+          <div className="flex flex-row justify-between">
+            {wallet instanceof NDKCashuWallet ? (
+              <MintList mints={wallet.mints} className="flex-1" />
+            ) : null}
+            {wallet instanceof NDKCashuWallet && wallet.relaySet ? (
+              <RelayList
+                relays={wallet.relaySet.relayUrls}
+                className="flex-1"
+              />
+            ) : null}
+          </div>
         </div>
       </CardContent>
       {showControls ? (
@@ -378,12 +427,29 @@ function WalletSummary({
             ) : (
               <>
                 {wallet instanceof NDKCashuWallet ? (
-                  <CashuWalletSettings wallet={wallet}>
-                    <Button variant="outline" className="w-full" size="sm">
-                      <Settings />
-                      {t("settings.wallet.settings")}
+                  <>
+                    <Button
+                      disabled={Boolean(isEnabled)}
+                      variant="outline"
+                      size="sm"
+                      onClick={enableCashuWallet}
+                    >
+                      {isEnabled ? (
+                        <Check className="text-green-500" />
+                      ) : (
+                        <HandCoins />
+                      )}
+                      {isEnabled
+                        ? t("settings.wallet.enabled")
+                        : t("settings.wallet.enable")}
                     </Button>
-                  </CashuWalletSettings>
+                    <CashuWalletSettings wallet={wallet}>
+                      <Button variant="outline" size="sm">
+                        <Settings />
+                        {t("settings.wallet.settings")}
+                      </Button>
+                    </CashuWalletSettings>
+                  </>
                 ) : null}
               </>
             )}
@@ -394,10 +460,16 @@ function WalletSummary({
   );
 }
 
-function RelayList({ relays }: { relays: string[] }) {
+function RelayList({
+  relays,
+  className,
+}: {
+  relays: string[];
+  className?: string;
+}) {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col gap-2">
+    <div className={cn("flex flex-col gap-2", className)}>
       <div className="flex flex-row gap-1 items-center flex-wrap">
         <Server className="size-4 text-muted-foreground" />
         <h4 className="text-sm uppercase font-light text-muted-foreground">
@@ -418,10 +490,16 @@ function RelayList({ relays }: { relays: string[] }) {
   );
 }
 
-function MintList({ mints }: { mints: string[] }) {
+function MintList({
+  mints,
+  className,
+}: {
+  mints: string[];
+  className?: string;
+}) {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col gap-2">
+    <div className={cn("flex flex-col gap-2", className)}>
       <div className="flex flex-row gap-1 items-center flex-wrap">
         <Landmark className="size-4 text-muted-foreground" />
         <h4 className="text-sm uppercase font-light text-muted-foreground">
@@ -443,7 +521,6 @@ function MintList({ mints }: { mints: string[] }) {
 
 export function Wallet() {
   const { t } = useTranslation();
-  const [mintList] = useAtom(mintListAtom);
   const cashuWallet = useCashuWallet();
   const [ndkWallets] = useNDKWallets();
   return (
@@ -458,16 +535,15 @@ export function Wallet() {
           </div>
           <p className="text-xs">{t("settings.wallet.payments.description")}</p>
         </div>
-        {!cashuWallet ? <CreateWallet /> : null}
-        {mintList ? (
-          <div className="flex flex-col gap-2 px-3">
-            {mintList.pubkey ? <Pubkey pubkey={mintList.pubkey} /> : null}
-            <div className="flex flex-row gap-4 items-start">
-              <MintList mints={mintList.mints} />
-              <RelayList relays={mintList.relays} />
-            </div>
-          </div>
-        ) : null}
+        {cashuWallet ? (
+          <WalletSummary
+            key={walletId(cashuWallet)}
+            wallet={cashuWallet}
+            showControls
+          />
+        ) : (
+          <CreateWallet />
+        )}
       </div>
       <div className="flex flex-col gap-3">
         <div className="flex flex-row gap-1.5 items-center">
@@ -476,9 +552,11 @@ export function Wallet() {
             {t("settings.wallet.wallets.title")}
           </h3>
         </div>
-        {ndkWallets.map((w) => (
-          <WalletSummary key={walletId(w)} wallet={w} showControls />
-        ))}
+        {ndkWallets
+          .filter((w) => w.type !== "nip-60")
+          .map((w) => (
+            <WalletSummary key={walletId(w)} wallet={w} showControls />
+          ))}
       </div>
       <div className="flex flex-col gap-2">
         <ConnectWallet />

@@ -13,7 +13,12 @@ import NDK, {
 } from "@nostr-dev-kit/ndk";
 import { relaysAtom } from "@/app/store";
 import { useNDK } from "@/lib/ndk";
-import { isRelayURL, discoveryRelays, profileRelays, fallbackRelays } from "@/lib/relay";
+import {
+  isRelayURL,
+  discoveryRelays,
+  profileRelays,
+  fallbackRelays,
+} from "@/lib/relay";
 import { EVENT, ADDRESS, PROFILE, RELAY_LIST } from "@/lib/query";
 
 interface NostrREQResult<A> {
@@ -26,9 +31,9 @@ export function useRelaySet(relays: string[]): NDKRelaySet | undefined {
   const ndk = useNDK();
   const relayUrls = relays.filter(isRelayURL);
   const relaySet = useMemo(() => {
-  return relayUrls.length > 0 && ndk
-    ? NDKRelaySet.fromRelayUrls(relayUrls, ndk)
-    : undefined;
+    return relayUrls.length > 0 && ndk
+      ? NDKRelaySet.fromRelayUrls(relayUrls, ndk)
+      : undefined;
   }, [relayUrls]);
   return relaySet;
 }
@@ -322,9 +327,7 @@ export function fetchProfile(ndk: NDK, pubkey: string, relays: string[]) {
       },
       { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
       NDKRelaySet.fromRelayUrls(
-        relays.length > 0
-          ? relays
-          : profileRelays, 
+        relays.length > 0 ? relays : profileRelays,
         ndk,
       ),
     )
@@ -346,8 +349,7 @@ export function useProfiles(pubkeys: string[]) {
     queries: pubkeys.map((pubkey) => {
       return {
         queryKey: [PROFILE, pubkey],
-        queryFn: () =>
-          fetchProfile(ndk, pubkey, profileRelays),
+        queryFn: () => fetchProfile(ndk, pubkey, profileRelays),
         staleTime: Infinity,
       };
     }),
@@ -377,10 +379,7 @@ async function fetchRelayList(ndk: NDK, pubkey: string) {
         authors: [pubkey],
       },
       { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.PARALLEL },
-      NDKRelaySet.fromRelayUrls(
-        discoveryRelays,
-        ndk,
-      ),
+      NDKRelaySet.fromRelayUrls(discoveryRelays, ndk),
     )
     .then((ev) => {
       if (ev) {

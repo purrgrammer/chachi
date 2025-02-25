@@ -595,6 +595,10 @@
       "title": "Wallets",
       "settings": "Settings",
       "mints": "Mints",
+      "enable": "Enable",
+      "enabled": "Enabled",
+      "enable-success": "Wallet enabled",
+      "enable-error": "Failed to enable wallet",
       "relays": "Relays",
       "default-wallet": {
         "title": "Active wallet",
