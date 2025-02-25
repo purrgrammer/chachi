@@ -844,16 +844,7 @@ export function FeedEmbed({
           open={showEmojiPicker}
           onOpenChange={setShowEmojiPicker}
           onEmojiSelect={onEmojiSelect}
-        >
-          <Embed
-            canOpenDetails={false}
-            showReactions={false}
-            event={event}
-            group={group}
-            relays={relays}
-            className="overflow-y-auto overflow-x-hidden max-h-32 rounded-b-none border-none pretty-scrollbar"
-          />
-        </EmojiPicker>
+        />
       ) : null}
       {showReplyDialog && canSign ? (
         <ReplyDialog

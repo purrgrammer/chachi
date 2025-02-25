@@ -372,9 +372,7 @@ export function ChatMessage({
                 if (info.offset.x > 20) {
                   setReplyingTo?.(event);
                 } else if (info.offset.x < -20) {
-                  if (canReact) {
-                    setShowingEmojiPicker(true);
-                  }
+                  setShowingEmojiPicker(true);
                 }
               }}
               className={`z-0 relative ${isChain ? "rounded-lg" : isMine ? "rounded-tl-lg rounded-tr-lg rounded-bl-lg" : "rounded-tl-lg rounded-tr-lg rounded-br-lg"} p-1 px-2 w-fit max-w-[18rem] sm:max-w-sm md:max-w-md ${isChain && !isMine ? "ml-9" : ""} ${shouldHaveTransparentBackground ? "bg-transparent p-0" : isMine ? "bg-primary/10 text-foreground dark:bg-primary dark:text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}
@@ -466,26 +464,9 @@ export function ChatMessage({
                   open={showingEmojiPicker}
                   onOpenChange={(open) => setShowingEmojiPicker(open)}
                   onEmojiSelect={react}
-                >
-                  <div className="pointer-events-none">
-                    <ChatMessage
-                      group={group}
-                      event={event}
-                      admins={admins}
-                      canReact={false}
-                      isFirstInChain={true}
-                      richTextOptions={{
-                        images: false,
-                        video: false,
-                        audio: false,
-                        events: false,
-                      }}
-                      richTextClassnames={{ paragraphs: "break-all" }}
-                    />
-                  </div>
-                </EmojiPicker>
+                />
               ) : null}
-              {showMessageActions ? (
+              {showMessageActions && canReact ? (
                 <div className="flex absolute bottom-0 -right-7 flex-col gap-1">
                   <Button
                     variant="outline"

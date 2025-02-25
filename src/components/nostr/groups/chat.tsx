@@ -5,6 +5,8 @@ import React, {
   forwardRef,
   ForwardedRef,
 } from "react";
+import { motion } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
 import { useInView } from "framer-motion";
 import {
@@ -108,6 +110,8 @@ function ChatNutzap({
   const { t } = useTranslation();
   const [, copy] = useCopy();
   const [settings] = useSettings();
+  const isMobile = useIsMobile();
+  const canSign = useCanSign();
 
   useEffect(() => {
     if (scroll && ref.current) {
@@ -193,7 +197,19 @@ function ChatNutzap({
     <>
       <ContextMenu>
         <ContextMenuTrigger asChild>
-          <div
+          <motion.div
+            // Drag controls
+            drag={isMobile && !isMine && canSign ? "x" : false}
+            dragSnapToOrigin={true}
+            dragConstraints={{ left: 20, right: 20 }}
+            dragElastic={{ left: 0.2, right: 0.2 }}
+            onDragEnd={(_, info) => {
+              if (info.offset.x > 20) {
+                setReplyingTo?.(event);
+              } else if (info.offset.x < -20) {
+                setShowingEmojiPicker(true);
+              }
+            }}
             ref={ref}
             className={`z-0 border-none my-1 max-w-[18rem] sm:max-w-sm md:max-w-md ${isMine ? "ml-auto" : ""}`}
           >
@@ -224,7 +240,7 @@ function ChatNutzap({
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuItem
@@ -353,11 +369,7 @@ function ChatNutzap({
           open={showingEmojiPicker}
           onOpenChange={(open) => setShowingEmojiPicker(open)}
           onEmojiSelect={react}
-        >
-          <div className="pointer-events-none">
-            <Nutzap event={event} group={group} showAuthor={false} />
-          </div>
-        </EmojiPicker>
+        />
       ) : null}
       {showingZapDialog ? (
         <NewZapDialog

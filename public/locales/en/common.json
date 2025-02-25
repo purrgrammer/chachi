@@ -236,7 +236,6 @@
       "react": {
         "action": "React",
         "with": "Reacted with ",
-        "success": "Reacted with {{emoji}}",
         "error": "Can't react"
       },
       "reply": {
@@ -399,7 +398,6 @@
     }
   },
   "emoji": {
-    "pick": "Pick an emoji",
     "set": {
       "bookmark": {
         "error": "Failed to bookmark emoji set"
