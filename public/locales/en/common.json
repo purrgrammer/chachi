@@ -654,7 +654,11 @@
     "contact": "Contact",
     "version": "Version",
     "features": "Features",
-    "nuts": "Nuts"
+    "nuts": "Nuts",
+    "sat": "Bitcoin",
+    "eur": "Euro",
+    "usd": "US Dollar",
+    "currencies": "Currencies"
   },
   "ln": {
     "send": {

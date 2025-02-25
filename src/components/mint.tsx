@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { RichText } from "@/components/rich-text";
 import { User } from "@/components/nostr/user";
 import { useTranslation } from "react-i18next";
-import { useMintInfo } from "@/lib/cashu";
+import { useMintInfo, useMintKeys } from "@/lib/cashu";
 import { useHost } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import {
@@ -36,6 +36,9 @@ import {
   EyeOff,
   LucideIcon,
   Rocket,
+  Bitcoin,
+  DollarSign,
+  Euro,
 } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { InputCopy } from "@/components/ui/input-copy";
@@ -163,6 +166,9 @@ export function MintPreview({ url }: { url: string }) {
 
 export function Mint({ url }: { url: string }) {
   const { data: info } = useMintInfo(url);
+  const { data: keys } = useMintKeys(url);
+  console.log("MINT", url, keys);
+  const units = Array.from(new Set(keys?.map((k) => k.unit)));
   const { t } = useTranslation();
   const email = info?.contact.find((c) => c.method === "email")?.info;
   const twitter = info?.contact.find((c) => c.method === "twitter")?.info;
@@ -172,9 +178,10 @@ export function Mint({ url }: { url: string }) {
     <div className="p-4 flex flex-col gap-3">
       <MintLink url={url} classNames={{ icon: "size-8", name: "text-4xl" }} />
       <InputCopy value={url} />
-      {info?.description ? <p>{info.description}</p> : null}
       {info?.description_long ? (
         <RichText tags={[]}>{info.description_long}</RichText>
+      ) : info?.description ? (
+        <p>{info.description}</p>
       ) : null}
       {info?.motd ? (
         <span className="bg-accent px-2 py-1 w-fit rounded-tl-lg rounded-tr-lg rounded-br-lg">
@@ -201,6 +208,34 @@ export function Mint({ url }: { url: string }) {
           >
             {twitter}
           </Link>
+        </div>
+      ) : null}
+
+      {units.length > 0 ? (
+        <div className="flex flex-col gap-1">
+          <h2 className="text-sm uppercase font-light text-muted-foreground">
+            {t("mint.currencies")}
+          </h2>
+          <ul className="flex flex-col mx-2">
+            {units.map((unit) =>
+              unit === "sat" ? (
+                <div className="flex flex-row items-center gap-1">
+                  <Bitcoin className="size-4 text-muted-foreground" />
+                  <span className="">{t("mint.sat")}</span>
+                </div>
+              ) : unit === "eur" ? (
+                <div className="flex flex-row items-center gap-1">
+                  <Euro className="size-4 text-muted-foreground" />
+                  <span className="">{t("mint.eur")}</span>
+                </div>
+              ) : unit === "usd" ? (
+                <div className="flex flex-row items-center gap-1">
+                  <DollarSign className="size-4 text-muted-foreground" />
+                  <span className="">{t("mint.usd")}</span>
+                </div>
+              ) : null,
+            )}
+          </ul>
         </div>
       ) : null}
 

@@ -5,7 +5,8 @@ import { useParams } from "react-router-dom";
 
 export default function MintPage() {
   const { url } = useParams();
-  const mint = decodeURIComponent(url || "");
+  const decoded = decodeURIComponent(url || "");
+  const mint = decoded.startsWith("https") ? decoded : `https://${decoded}`;
   return (
     <div>
       <Header>
