@@ -157,7 +157,12 @@ export default function App() {
             <SidebarProvider>
               <ThemeProvider defaultTheme="dark" storageKey="chachi-theme">
                 <RouterProvider router={router} />
-                <Toaster position="top-right" />
+                <Toaster
+                  toastOptions={{
+                    duration: 1500,
+                  }}
+                  position="top-right"
+                />
               </ThemeProvider>
             </SidebarProvider>
           </QueryClientProvider>
