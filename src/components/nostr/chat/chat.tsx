@@ -458,6 +458,8 @@ export function ChatMessage({
                   pubkey={event.pubkey}
                   group={group}
                   onClose={() => setShowingZapDialog(false)}
+                  onZap={() => setShowingZapDialog(false)}
+                  zapType={mintList?.pubkey ? "nip-61" : "nip-57"}
                 />
               ) : null}
               {showingEmojiPicker ? (
@@ -499,17 +501,15 @@ export function ChatMessage({
                 <SmilePlus className="w-4 h-4" />
               </ContextMenuShortcut>
             </ContextMenuItem>
-            {mintList?.pubkey ? (
-              <ContextMenuItem
-                className="cursor-pointer"
-                onClick={() => setShowingZapDialog(true)}
-              >
-                {t("chat.message.tip.action")}
-                <ContextMenuShortcut>
-                  <Bitcoin className="w-4 h-4" />
-                </ContextMenuShortcut>
-              </ContextMenuItem>
-            ) : null}
+            <ContextMenuItem
+              className="cursor-pointer"
+              onClick={() => setShowingZapDialog(true)}
+            >
+              {t("chat.message.tip.action")}
+              <ContextMenuShortcut>
+                <Bitcoin className="w-4 h-4" />
+              </ContextMenuShortcut>
+            </ContextMenuItem>
             <ContextMenuSeparator />
             <ContextMenuItem
               className="cursor-pointer"

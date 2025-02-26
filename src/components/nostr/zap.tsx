@@ -49,7 +49,7 @@ export function NewZapDialog({
 }: {
   open?: boolean;
   onClose?: () => void;
-  onZap?: (e: NostrEvent) => void;
+  onZap?: (e?: NostrEvent) => void;
   event?: NostrEvent;
   pubkey: string;
   group?: Group;
@@ -108,6 +108,7 @@ export function NewZapDialog({
             e.name && e.image ? [["emoji", e.name, e.image]] : [],
           ),
         ]);
+        onZap?.();
         toast.success(
           t("zap.dialog.success", {
             amount: formatShortNumber(Number(amount)),
@@ -252,7 +253,7 @@ export function NewZap({
 }: {
   event: NostrEvent;
   group?: Group;
-  onZap: (e: NostrEvent) => void;
+  onZap: (e?: NostrEvent) => void;
 }) {
   return (
     <NewZapDialog

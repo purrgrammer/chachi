@@ -520,6 +520,12 @@ export const GroupChat = forwardRef(
       newMessage(ev);
     }
 
+    function onZap(z?: NostrEvent) {
+      if (z) {
+        onNewMessage(z);
+      }
+    }
+
     function canDelete(event: NostrEvent) {
       return isAdmin || event.pubkey === me;
     }
@@ -620,7 +626,7 @@ export const GroupChat = forwardRef(
             }
           >
             {replyingTo ? (
-              <NewZap event={replyingTo} group={group} onZap={onNewMessage} />
+              <NewZap event={replyingTo} group={group} onZap={onZap} />
             ) : (
               <New group={group} />
             )}
