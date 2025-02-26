@@ -16,7 +16,6 @@ export async function fetchCustomEmojis(
   const sets = await ndk.fetchEvents(
     filters,
     {
-      groupable: false,
       closeOnEose: true,
     },
     relaySet,
