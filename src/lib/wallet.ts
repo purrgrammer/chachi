@@ -418,7 +418,7 @@ export function useNWCBalance(wallet: NDKNWCWallet) {
       try {
         const res = await wallet.req("get_balance", {});
         if (res?.result) {
-          return res.result.balance ? res.result.balance / 1000 : 0;
+          return res.result.balance ? Math.floor(res.result.balance / 1000) : 0;
         }
         return 0;
       } catch (err) {
@@ -511,8 +511,8 @@ async function fetchNWCTransactions(
       return {
         id: nwcTx.preimage || nwcTx.invoice,
         created_at: nwcTx.created_at,
-        amount: nwcTx.amount / 1000,
-        fee: nwcTx.fees_paid ? nwcTx.fees_paid / 1000 : 0,
+        amount: Math.floor(nwcTx.amount / 1000),
+        fee: nwcTx.fees_paid ? Math.floor(nwcTx.fees_paid / 1000) : 0,
         unit: "sat" as Unit,
         invoice: nwcTx.invoice,
         direction: nwcTx.type === "incoming" ? "in" : ("out" as Direction),
