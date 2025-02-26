@@ -13,10 +13,11 @@ import {
 import { useMintList } from "@/lib/cashu";
 import { useNDK } from "@/lib/ndk";
 import { defaultMints } from "@/lib/wallet";
-import { useRelaySet, useRelays } from "@/lib/nostr";
+import { useRelaySet, useStream, useRelays } from "@/lib/nostr";
 import { NostrEvent } from "nostr-tools";
 import { LNURL } from "@/lib/query";
 import { Zap, validateZap } from "@/lib/nip-57";
+import { usePubkey } from "@/lib/account";
 
 export const HUGE_AMOUNT = 21_000;
 
@@ -242,6 +243,28 @@ export function useWallets(): Wallet[] {
         ]
       : []),
   ];
+}
+
+export function useSentZaps() {
+  const pubkey = usePubkey();
+  const relays = useRelays();
+  const filter = {
+    kinds: [NDKKind.Zap],
+    "#P": [pubkey!],
+    limit: 50,
+  };
+  return useStream(filter, relays, true, true);
+}
+
+export function useReceivedZaps() {
+  const pubkey = usePubkey();
+  const relays = useRelays();
+  const filter = {
+    kinds: [NDKKind.Zap],
+    "#p": [pubkey!],
+    limit: 50,
+  };
+  return useStream(filter, relays, true, true);
 }
 
 export function useZaps(event: NostrEvent, relays: string[], live = true) {

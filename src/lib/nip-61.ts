@@ -1,6 +1,6 @@
 import { NostrEvent } from "nostr-tools";
 
-export interface Nutzap {
+export type Nutzap = {
   id: string;
   created_at: number;
   amount: number;
@@ -13,7 +13,7 @@ export interface Nutzap {
   a?: string;
   p?: string;
   tags: string[][];
-}
+};
 
 export function sumProofs(proof: string): number {
   const tokens = JSON.parse(proof);
