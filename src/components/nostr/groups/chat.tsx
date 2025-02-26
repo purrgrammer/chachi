@@ -131,6 +131,7 @@ function ChatZap({
       const ev = new NDKEvent(ndk, {
         kind: NDKKind.Reaction,
         content: e.native ? e.native : e.shortcodes,
+        tags: [["h", group.id, group.relay]],
       } as NostrEvent);
       ev.tag(new NDKEvent(ndk, event));
       if (e.src) {
@@ -151,7 +152,7 @@ function ChatZap({
         kind: NDKKind.GroupAdminRemoveUser,
         content: "",
         tags: [
-          ...(group ? [["h", group.id, group.relay]] : []),
+          ["h", group.id, group.relay],
           ["p", e.pubkey],
         ],
       } as NostrEvent);

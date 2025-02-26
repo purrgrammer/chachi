@@ -42,6 +42,7 @@ import {
 import { Name } from "@/components/nostr/name";
 import { Reactions } from "@/components/nostr/reactions";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { validateZap } from "@/lib/nip-57";
 import { useCopy } from "@/lib/hooks";
 import { useNDK } from "@/lib/ndk";
 import { Avatar } from "@/components/nostr/avatar";
@@ -75,6 +76,10 @@ function Reply({
     relays: group ? [group.relay] : [],
   });
   const isAdmin = event?.pubkey ? admins.includes(event?.pubkey) : false;
+  const author =
+    event && event.kind === NDKKind.Zap
+      ? validateZap(event)?.pubkey || event?.pubkey
+      : event?.pubkey;
   return (
     <div
       className={cn(
@@ -84,11 +89,11 @@ function Reply({
       )}
       onClick={event ? () => setScrollTo?.(event) : undefined}
     >
-      {event ? (
+      {event && author ? (
         <>
           <div className="flex flex-row gap-1 items-center">
             <h4 className="text-sm font-semibold">
-              <Name pubkey={event.pubkey} />
+              <Name pubkey={author} />
             </h4>
             {isAdmin ? <Crown className="w-3 h-3" /> : null}
           </div>

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, useMemo, KeyboardEvent } from "react";
 import { Crown, Reply as ReplyIcon, X } from "lucide-react";
+import { NDKKind } from "@nostr-dev-kit/ndk";
+import { validateZap } from "@/lib/nip-57";
 import { NostrEvent } from "nostr-tools";
 import { motion, AnimatePresence } from "framer-motion";
 import { npubEncode } from "nostr-tools/nip19";
@@ -35,6 +37,10 @@ function ReplyPreview({
   reply: NostrEvent;
   setReplyingTo?: (event: NostrEvent | undefined) => void;
 }) {
+  const author =
+    reply.kind === NDKKind.Zap
+      ? validateZap(reply)?.pubkey || reply.pubkey
+      : reply.pubkey;
   return (
     <motion.div
       initial={{
@@ -59,7 +65,7 @@ function ReplyPreview({
         <ReplyIcon className="w-4 h-4 text-muted-foreground" />
       </div>
       <h4 className="font-semibold text-sm">
-        <Name pubkey={reply.pubkey} />
+        <Name pubkey={author} />
       </h4>
       <p className="line-clamp-1">{reply.content}</p>
       <div className="w-7">
