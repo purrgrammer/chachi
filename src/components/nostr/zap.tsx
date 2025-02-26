@@ -6,12 +6,18 @@ import { NostrEvent } from "nostr-tools";
 import { Bitcoin } from "lucide-react";
 import { Invoice } from "@/components/ln";
 import { Button } from "@/components/ui/button";
-import { RichText } from "@/components/rich-text";
+import { A, E } from "@/components/nostr/event";
+import {
+  useRichText,
+  RichText,
+  BlockFragment,
+  EmojiFragment,
+} from "@/components/rich-text";
+import { Emoji } from "@/components/emoji";
 import { Embed } from "@/components/nostr/detail";
 import { Input } from "@/components/ui/input";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
 import { User } from "@/components/nostr/user";
-import { Event, Address } from "@/components/nostr/event";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { validateZap, Zap as ZapType } from "@/lib/nip-57";
 import { formatShortNumber } from "@/lib/number";
@@ -34,7 +40,10 @@ import {
 } from "@/components/ui/dialog";
 import { useGroup } from "@/lib/nostr/groups";
 import { WalletSelector } from "@/components/wallet";
-import type { Group, Emoji } from "@/lib/types";
+import type { Group, Emoji as EmojiType } from "@/lib/types";
+import { useRelays } from "@/lib/nostr";
+import { usePubkey } from "@/lib/account";
+import { cn } from "@/lib/utils";
 
 export function NewZapDialog({
   open,
@@ -61,7 +70,7 @@ export function NewZapDialog({
   const amounts = useZapAmounts();
   const { data: metadata } = useGroup(group);
   const increaseZapAmount = useIncreaseZapAmount();
-  const [customEmojis, setCustomEmojis] = useState<Emoji[]>([]);
+  const [customEmojis, setCustomEmojis] = useState<EmojiType[]>([]);
   const [isOpen, setIsOpen] = useState(open);
   const [isZapping, setIsZapping] = useState(false);
   const [invoice, setInvoice] = useState<string | null>(null);
@@ -69,18 +78,22 @@ export function NewZapDialog({
   const [message, setMessage] = useState(reply || "");
   const { data: profile } = useProfile(pubkey);
   const name = profile?.name || pubkey.slice(0, 6);
+  const myRelays = useRelays();
   const { data: relayList } = useRelayList(pubkey);
   const { data: mintList } = useMintList(pubkey);
-  const relays =
-    mintList && group
-      ? [group.relay, ...mintList.relays]
-      : relayList && group
-        ? [group.relay, ...relayList]
-        : relayList
-          ? relayList
-          : group
-            ? [group.relay]
-            : [];
+  const relays = Array.from(
+    new Set<string>(
+      zapType === "nip-61" && mintList && group
+        ? [group.relay, ...mintList.relays, ...myRelays]
+        : relayList && group
+          ? [group.relay, ...relayList, ...myRelays]
+          : relayList
+            ? [...relayList, ...myRelays]
+            : group
+              ? [group.relay, ...myRelays]
+              : myRelays,
+    ),
+  );
   const sendNutzap = useNutzap(pubkey, relays, event);
   const sendZap = useZap(pubkey, relays, event);
 
@@ -100,14 +113,15 @@ export function NewZapDialog({
       setIsZapping(true);
       if (zapType === "nip-57") {
         await sendZap(message.trim(), Number(amount), [
-          ...(group ? [["h", group.id, group.relay]] : []),
-          ...(group && metadata?.pubkey
+          ...(event ? [["e", event.id]] : []),
+          ...(group?.id && metadata && metadata.pubkey
             ? [["a", `${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`]]
             : []),
           ...customEmojis.flatMap((e) =>
             e.name && e.image ? [["emoji", e.name, e.image]] : [],
           ),
         ]);
+        setIsZapping(false);
         onZap?.();
         toast.success(
           t("zap.dialog.success", {
@@ -271,40 +285,6 @@ export function NewZap({
   );
 }
 
-function E({
-  id,
-  group,
-  pubkey,
-}: {
-  id: string;
-  pubkey?: string;
-  group?: Group;
-}) {
-  return (
-    <Event
-      id={id}
-      group={group}
-      pubkey={pubkey}
-      relays={[]}
-      showReactions={false}
-    />
-  );
-}
-
-function A({ address, group }: { address: string; group?: Group }) {
-  const [k, pubkey, d] = address.split(":");
-  return (
-    <Address
-      kind={Number(k)}
-      pubkey={pubkey}
-      identifier={d}
-      group={group}
-      relays={[]}
-      showReactions={false}
-    />
-  );
-}
-
 export function ZapDetail({
   event,
   group,
@@ -339,41 +319,105 @@ export function Zap({
   zap,
   group,
   animateGradient,
-  embedMention = true,
+  showAuthor = true,
+  onReplyClick,
+  classNames,
 }: {
   zap: ZapType;
   group?: Group;
   animateGradient?: boolean;
-  embedMention?: boolean;
+  showAuthor?: boolean;
+  onReplyClick?: (ev: NostrEvent) => void;
+  classNames?: {
+    singleCustomEmoji?: string;
+    onlyEmojis?: string;
+  };
 }) {
+  const pubkey = usePubkey();
+  const fragments = useRichText(
+    zap.content.trim(),
+    {
+      emojis: true,
+    },
+    zap.tags,
+  );
+  const isSingleCustomEmoji =
+    fragments.length === 1 &&
+    fragments[0].type === "block" &&
+    fragments[0].nodes.length === 1 &&
+    fragments[0].nodes[0].type === "emoji";
+  const singleCustomEmoji = isSingleCustomEmoji
+    ? ((fragments[0] as BlockFragment).nodes[0] as EmojiFragment)
+    : null;
+  const isOnlyEmojis =
+    /^\p{Emoji_Presentation}{1}\s*\p{Emoji_Presentation}{0,4}$/u.test(
+      zap.content.trim(),
+    );
+  const content =
+    isSingleCustomEmoji && singleCustomEmoji ? (
+      <div
+        className={zap.pubkey === pubkey ? "flex items-end justify-end" : ""}
+      >
+        <Emoji
+          key={singleCustomEmoji.name}
+          name={singleCustomEmoji.name}
+          image={singleCustomEmoji.image}
+          className={cn(
+            `w-32 h-32 aspect-auto rounded-md`,
+            classNames?.singleCustomEmoji,
+          )}
+        />
+      </div>
+    ) : isOnlyEmojis ? (
+      <span className={cn("text-7xl", classNames?.onlyEmojis)}>
+        {zap.content.trim()}
+      </span>
+    ) : (
+      <RichText tags={zap.tags}>{zap.content.trim()}</RichText>
+    );
+  // todo: emoji, single custom emoji
   return (
     <div
-      className={`flex flex-col gap-2 ${animateGradient ? "rounded-md border-gradient" : ""} ${animateGradient && zap.amount >= HUGE_AMOUNT ? "border-animated-gradient" : ""}`}
+      className={`flex flex-col gap-1 ${animateGradient ? "rounded-md border-gradient" : ""} ${animateGradient && zap.amount >= HUGE_AMOUNT ? "border-animated-gradient" : ""}`}
     >
       <div className="flex flex-row gap-3 justify-between">
-        <User pubkey={zap.pubkey} classNames={{ avatar: "size-4" }} />
+        {showAuthor ? (
+          <User pubkey={zap.pubkey} classNames={{ avatar: "size-4" }} />
+        ) : null}
         <div className="flex items-center">
+          <Bitcoin className="size-5 text-muted-foreground" />
           <span className="font-mono text-lg">
             {formatShortNumber(zap.amount)}
           </span>
-          <span className="text-muted-foreground">
-            <Bitcoin className="size-4" />
-          </span>
         </div>
         {zap.p ? (
-          <User pubkey={zap.p} classNames={{ avatar: "size-4" }} />
+          <User
+            pubkey={zap.p}
+            classNames={{ avatar: "size-4", name: "font-normal" }}
+          />
         ) : null}
       </div>
-      {zap.e && embedMention ? (
-        <E id={zap.e} group={group} pubkey={zap.p} />
-      ) : zap.a && embedMention ? (
-        <A address={zap.a} group={group} />
+      {zap.e ? (
+        <E
+          id={zap.e}
+          group={group}
+          pubkey={zap.p}
+          relays={group ? [group.relay] : []}
+          showReactions={false}
+          asReply
+          onClick={onReplyClick}
+        />
+      ) : zap.a && !zap.a.startsWith("39000") ? (
+        <A
+          address={zap.a}
+          group={group}
+          showReactions={false}
+          asReply
+          relays={group ? [group.relay] : []}
+          onClick={onReplyClick}
+        />
       ) : null}
-      {zap.content.trim().length > 0 ? (
-        <RichText tags={zap.tags} group={group}>
-          {zap.content}
-        </RichText>
-      ) : null}
+      {zap.content.trim().length > 0 ? content : null}
     </div>
   );
 }

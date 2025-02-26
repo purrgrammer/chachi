@@ -62,21 +62,34 @@ export function useGroupchat(group: Group) {
   const isSubbed = groupIds.includes(groupId(group));
 
   useEffect(() => {
-    if (isSubbed) return;
+    //if (isSubbed) return;
 
     let sub: NDKSubscription | undefined;
     getLastGroupMessage(group).then((last) => {
-      const filter = {
-        kinds: [
-          NDKKind.GroupChat,
-          NDKKind.GroupAdminAddUser,
-          NDKKind.GroupAdminRemoveUser,
-          DELETE_GROUP,
-          NDKKind.Nutzap,
-        ],
-        "#h": [group.id],
-        ...(last ? { since: last.created_at } : {}),
-      };
+      const filter = [
+        {
+          kinds: [
+            NDKKind.GroupChat,
+            NDKKind.GroupAdminAddUser,
+            NDKKind.GroupAdminRemoveUser,
+            DELETE_GROUP,
+            NDKKind.Nutzap,
+          ],
+          "#h": [group.id],
+          ...(last ? { since: last.created_at } : {}),
+        },
+        ...(metadata?.pubkey
+          ? [
+              {
+                kinds: [NDKKind.Zap],
+                "#a": [
+                  `${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`,
+                ],
+                //...(last ? { since: last.created_at } : {}),
+              },
+            ]
+          : []),
+      ];
       sub = ndk.subscribe(
         filter,
         {

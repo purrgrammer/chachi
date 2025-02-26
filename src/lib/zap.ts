@@ -173,8 +173,6 @@ export function useNutzap(
 
 export function useZap(pubkey: string, relays: string[], event?: NostrEvent) {
   const ndk = useNDK();
-  const myRelays = useRelays();
-  const allRelays = Array.from(new Set(relays.concat(myRelays)));
   return useCallback(
     async (content: string, amount: number, tags: string[][]) => {
       return new Promise(async (resolve, reject) => {
@@ -188,7 +186,7 @@ export function useZap(pubkey: string, relays: string[], event?: NostrEvent) {
               ndk,
               tags,
             },
-            { relays: allRelays },
+            { relays },
           );
           zapper.on("complete", (res) => {
             resolve(res);
