@@ -2063,6 +2063,11 @@ function Deposit({
                     className="w-full"
                     placeholder="cashu..."
                   />
+                  {ecash && !wallet.mints.includes(ecash.mint) ? (
+                    <span className="text-xs text-red-300">
+                      {t("wallet.deposit.mint-error")}
+                    </span>
+                  ) : null}
                 </div>
                 <Button
                   variant="outline"
