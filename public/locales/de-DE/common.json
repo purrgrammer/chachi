@@ -254,17 +254,17 @@
     },
     "new-messages": "Neue Nachrichten",
     "user": {
-      "not-member": "You are not a member of this group yet",
+      "not-member": "Du bist noch kein Mitglied dieser Gruppe",
       "kick": {
-        "action": "Kick",
-        "success": "Kicked user",
-        "error": "Couldn't kick user"
+        "action": "Rauswerfen",
+        "success": "Rausgeworfener Benutzer",
+        "error": "Benutzer konnte nicht rausgeworfen werden"
       }
     },
     "join": {
-      "action": "Join",
+      "action": "Beitreten",
       "request": {
-        "sent": "Request sent",
+        "sent": "Anfrage gesendet",
         "success": "Join request sent",
         "error": "Failed to send join request"
       }
@@ -547,15 +547,15 @@
     }
   },
   "zap": {
-    "trigger": "Trinkgeld",
-    "action": "Trinkgeld",
+    "trigger": "Tip",
+    "action": "Tip",
     "dialog": {
       "title": "Zap {{ name }}",
-      "description": "Send a tip to {{ name }}",
-      "amount": "Amount",
+      "description": "Einen Tip an {{ name }} senden",
+      "amount": "Betrag",
       "invoice": "Invoice",
-      "message": "Message",
-      "message-placeholder": "Add a message",
+      "message": "Nachricht",
+      "message-placeholder": "Eine Nachricht hinzufügen",
       "tip": "Zap {{ amount }}",
       "copy": "Copy invoice",
       "wallet": "Open in wallet",
@@ -631,38 +631,38 @@
     "no-message": "No message",
     "title": "Zaps",
     "redeemed": "Redeemed",
-    "failed": "Failed",
-    "log-in": "Log in to see your zaps",
-    "invalid": "Invalid zap",
-    "redeem": "Redeem",
-    "redeem-success": "Redeemed {{ amount }} zap",
-    "redeem-error": "Failed to redeem zap",
-    "received": "Received",
-    "sent": "Sent",
-    "no-received": "Nothing to see here... yet",
-    "no-sent": "Nothing to see here... yet",
-    "open": "Open"
+    "failed": "Fehlgeschlagen",
+    "log-in": "Melde dich an, um deine Zaps zu sehen",
+    "invalid": "Invalider Zap",
+    "redeem": "Einlösen",
+    "redeem-success": "{{ amount }} Zap eingelöst",
+    "redeem-error": "Fehler beim Einlösen des Zap",
+    "received": "Empfangen",
+    "sent": "Gesendet",
+    "no-received": "Nichts zu sehen... noch nicht",
+    "no-sent": "Nichts zu sehen... noch nicht",
+    "open": "Öffnen"
   },
   "mint": {
-    "contact": "Contact",
+    "contact": "Kontaktieren",
     "version": "Version",
-    "features": "Features",
+    "features": "Funktionen",
     "nuts": "Nuts",
     "sat": "Bitcoin",
     "eur": "Euro",
     "usd": "US Dollar",
-    "currencies": "Currencies"
+    "currencies": "Währungen"
   },
   "ln": {
     "send": {
-      "title": "Send {{ amount }}",
-      "show-qr": "Show QR",
-      "hide-qr": "Hide QR"
+      "title": "{{ amount }} senden",
+      "show-qr": "QR anzeigen",
+      "hide-qr": "QR verbergen"
     }
   },
   "qr": {
-    "scan": "Scan QR Code",
-    "scan-error": "Error scanning QR Code",
-    "unknown": "Unknown QR Code"
+    "scan": "QR-Code scannen",
+    "scan-error": "Fehler beim QR-Code scannen",
+    "unknown": "Unbekannter QR-Code"
   }
 }
