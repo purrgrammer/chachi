@@ -530,25 +530,25 @@
     "dialog": {
       "title": "Wallet verbinden",
       "description": "Verbinden dein Wallet, um deine Lieblingskünstler mit kleinen Spenden zu unterstützen",
-      "connect-webln": "Connect web wallet",
-      "webln-connected": "Connected to web wallet",
-      "webln-unavailable": "WebLN wallet not available",
-      "webln-error": "Failed to connect to WebLN wallet",
-      "connect-nip60": "Connect remote wallet",
-      "nwc-empty": "NWC address is empty",
-      "nwc-error": "Failed to connect to remote wallet",
-      "nwc-connected": "Connected to remote wallet"
+      "connect-webln": "Web-Wallet verbinden",
+      "webln-connected": "Mit Web-Wallet verbunden",
+      "webln-unavailable": "WebLN-Wallet nicht verfügbar",
+      "webln-error": "Verbindung zu WebLN-Wallet fehlgeschlagen",
+      "connect-nip60": "Remote-Wallet verbinden",
+      "nwc-empty": "NWC-Adresse ist leer",
+      "nwc-error": "Verbindung mit Remote-Wallet fehlgeschlagen",
+      "nwc-connected": "Mit Remote-Wallet verbunden"
     },
-    "coins": "Cash",
+    "coins": "Geld",
     "transactions": {
-      "title": "Transactions",
-      "loading": "Loading transactions",
-      "loading-error": "Error loading transactions"
+      "title": "Transaktionen",
+      "loading": "Transaktionen werden geladen",
+      "loading-error": "Fehler beim Laden der Transaktionen"
     }
   },
   "zap": {
-    "trigger": "Tip",
-    "action": "Tip",
+    "trigger": "Trinkgeld",
+    "action": "Trinkgeld",
     "dialog": {
       "title": "Zap {{ name }}",
       "description": "Send a tip to {{ name }}",
