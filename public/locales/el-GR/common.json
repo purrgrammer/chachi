@@ -1,110 +1,110 @@
 {
   "locale": {
-    "today": "今天"
+    "today": "Today"
   },
-  "home": "主頁",
+  "home": "Home",
   "nav": {
-    "no-groups": "尚無群聊"
+    "no-groups": "No groups"
   },
   "user": {
     "login": {
-      "start": "開始",
-      "title": "開始",
-      "description": "請選擇以下登錄方式。",
+      "start": "Get started",
+      "title": "Get started",
+      "description": "Select the login method below.",
       "extension": {
-        "label": "擴充套件",
-        "error": "無法使用擴充套件登錄"
+        "label": "Browser extension",
+        "error": "Failed to log in with extension"
       },
       "remote": {
-        "label": "遠程簽名器",
-        "error": "无法使用遠程簽名器登录"
+        "label": "Remote signer",
+        "error": "Failed to log in with remote signer"
       },
-      "or": "或者",
-      "connect": "連接"
+      "or": "OR",
+      "connect": "Connect"
     },
-    "logout": "登出",
+    "logout": "Log out",
     "zaps": "Zaps",
-    "language": "語言",
+    "language": "Language",
     "theme": {
-      "trigger": "主題",
-      "light": "淡色",
-      "dark": "深色",
-      "system": "系統"
+      "trigger": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
     },
     "settings": "Settings"
   },
   "dashboard": {
     "activity": {
-      "heading": "動態",
-      "unread": "未读",
-      "mentions": "提及",
-      "none": "還沒有新動態…"
+      "heading": "Activity",
+      "unread": "unread",
+      "mentions": "mentions",
+      "none": "Nothing new for you... yet"
     },
     "featured": {
-      "heading": "精選"
+      "heading": "Featured"
     },
     "popular": {
-      "heading": "熱門"
+      "heading": "Popular in your network"
     },
     "search": {
-      "prompt": "找不到你要找的東西嗎？",
-      "trigger": "搜索群聊",
-      "title": "查找群聊",
+      "prompt": "Can't find what you're looking for?",
+      "trigger": "Search groups",
+      "title": "Find a group",
       "input": {
-        "placeholder": "搜索群聊",
-        "no-results-for-x": "沒有找到\"{{search}}\"的結果",
-        "n-results-for-x": "\"{{search}}\"的{{n}}個結果",
-        "start-typing-to-filter-groups": "開始輸入以篩選群聊"
+        "placeholder": "Search groups",
+        "no-results-for-x": "No results for \"{{search}}\"",
+        "n-results-for-x": "{{n}} results for \"{{search}}\"",
+        "start-typing-to-filter-groups": "Start typing to filter groups"
       },
       "result": {
-        "visit": "訪問",
-        "no-description-available": "無可用描述",
-        "no-groups-found-for-x-want-to": "未找到\"{{search}}\"相關的結果，想",
-        "start-one": "創建一個",
-        "?": "嗎？"
+        "visit": "Visit",
+        "no-description-available": "No description available",
+        "no-groups-found-for-x-want-to": "No groups found for \"{{search}}\", want to ",
+        "start-one": "start one",
+        "?": "?"
       }
     }
   },
   "group": {
     "hosted": {
       "by": "Hosted by ",
-      "and": "和"
+      "and": " and "
     },
     "create": {
-      "new": "新群聊",
-      "title": "創建群聊",
-      "description": "創建一個新群聊與好友聊天。",
+      "new": "New group",
+      "title": "Create group",
+      "description": "Create a new group to chat with your friends",
       "form": {
         "name": {
-          "label": "名稱",
-          "placeholder": "這是群聊的名稱。",
-          "required": "請添加一個名稱"
+          "label": "Name",
+          "placeholder": "This is the group's name.",
+          "required": "Please add a name"
         },
         "about": {
-          "label": "關於",
-          "placeholder": "這是群聊的描述。"
+          "label": "About",
+          "placeholder": "This is the group's description."
         },
         "relay": {
-          "label": "中繼",
-          "placeholder": "選擇一個中繼。",
-          "description": "這是存儲帖子內容的服務器。",
-          "required": "選擇一個中繼"
+          "label": "Relay",
+          "placeholder": "Choose a relay.",
+          "description": "This is the server where the posts will be stored.",
+          "required": "Please select a relay"
         },
         "visibility": {
-          "label": "可見度",
-          "anyone": "任何人",
-          "members-only": "僅限成員",
-          "description": "消息未加密，可能會被中繼讀取。為了最大限度的保護隱私，請自行託管中繼。"
+          "label": "Visibility",
+          "anyone": "Anyone",
+          "members-only": "Members only",
+          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
         },
         "access": {
-          "label": "訪問權",
-          "anyone": "任何人",
-          "invite-only": "僅限受邀"
+          "label": "Access",
+          "anyone": "Anyone",
+          "invite-only": "Invite only"
         },
         "submit": {
-          "trigger": "創建",
-          "success": "群聊已創建",
-          "error": "無法創建群聊"
+          "trigger": "Create",
+          "success": "Group created",
+          "error": "Couldn't create group"
         }
       }
     },
@@ -112,118 +112,118 @@
       "title": "Group settings",
       "form": {
         "name": {
-          "label": "名稱",
-          "placeholder": "我的群聊",
-          "description": "這是群聊的名稱。"
+          "label": "Name",
+          "placeholder": "My Group",
+          "description": "This is the group's name"
         },
         "about": {
-          "label": "關於",
-          "placeholder": "給我的好友們聊天的群聊。",
-          "description": "這是群聊的描述。"
+          "label": "About",
+          "placeholder": "A group for my frens",
+          "description": "This is the group's description"
         },
         "visibility": {
-          "label": "可見度",
-          "anyone": "任何人",
-          "members-only": "僅限成員",
-          "description": "消息未加密，可能會被中繼讀取。為了最大限度地保護隱私，請自行託管中繼。"
+          "label": "Visibility",
+          "anyone": "Anyone",
+          "members-only": "Members only",
+          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
         },
         "access": {
-          "label": "訪問權",
-          "anyone": "任何人",
-          "invite-only": "僅限受邀",
-          "description": "任何人都可以加入開放群聊。封閉群聊需要批准。"
+          "label": "Access",
+          "anyone": "Anyone",
+          "invite-only": "Invite only",
+          "description": "Anyone can join an open group. Closed groups require approval"
         },
         "submit": {
-          "trigger": "保存",
-          "success": "群聊已更新",
-          "error": "無法更新群聊"
+          "trigger": "Save",
+          "success": "Group updated",
+          "error": "Couldn't update group"
         }
       }
     },
     "delete": {
-      "trigger": "刪除",
+      "trigger": "Delete",
       "confirmation": {
-        "title": "你確定要刪除該群聊嗎？",
-        "description": "此操作無法撤銷。該群聊及其所有歷史紀錄將被刪除。",
-        "confirm": "刪除",
-        "cancel": "取消"
+        "title": "Are you sure you want to delete the group?",
+        "description": "This action cannot be undone. This group and all its history will be deleted.",
+        "confirm": "Delete",
+        "cancel": "Cancel"
       },
-      "success": "群聊已刪除",
-      "error": "無法刪除群聊"
+      "success": "Group deleted",
+      "error": "Couldn't delete group"
     },
-    "deleted": "該群聊已被刪除",
+    "deleted": "This group has been deleted",
     "bookmark": {
-      "trigger": "收藏",
-      "error": "收藏群聊時出錯了"
+      "trigger": "Bookmark",
+      "error": "Error bookmarking group"
     },
     "unbookmark": {
-      "trigger": "取消收藏",
-      "error": "取消收藏時出錯了"
+      "trigger": "Unbookmark",
+      "error": "Error unbookmarking group"
     },
-    "join": "加入",
+    "join": "Join",
     "leave": {
-      "trigger": "退出",
+      "trigger": "Leave",
       "confirmation": {
-        "title": "你確定要退出嗎？",
-        "description": "此操作無法撤銷。你將從成員列表中移除。",
-        "confirm": "退出",
-        "cancel": "取消"
+        "title": "Are you sure you want to leave?",
+        "description": "This action cannot be undone. You will be removed from the group members list.",
+        "confirm": "Leave",
+        "cancel": "Cancel"
       },
-      "success": "已退出群聊",
-      "error": "退出群聊時出錯了"
+      "success": "Left group",
+      "error": "Error leaving group"
     },
     "chat": {
       "user": {
-        "joined": "已加入",
-        "left": "已退出"
+        "joined": "joined",
+        "left": "left"
       },
       "event": {
         "delete": {
-          "success": "消息已刪除",
-          "error": "無法刪除消息"
+          "success": "Message deleted",
+          "error": "Couldn't delete message"
         }
       }
     },
     "metadata": {
       "visibility": {
         "private": {
-          "trigger": "僅限成員",
-          "content": "只有成員可以閱讀內容"
+          "trigger": "Members only",
+          "content": "Only members can read content"
         },
         "public": {
-          "trigger": "公開",
-          "content": "任何人都可以閱讀"
+          "trigger": "Public",
+          "content": "Can be read by anyone"
         }
       },
       "access": {
         "closed": {
-          "trigger": "封閉",
-          "content": "需要批准或邀請才能加入"
+          "trigger": "Closed",
+          "content": "Requires approval or an invitation to join"
         },
         "open": {
-          "trigger": "開放",
-          "content": "任何人都可以加入"
+          "trigger": "Open",
+          "content": "Anyone can join"
         }
       },
-      "join-the-conversation": "加入對話"
+      "join-the-conversation": "Join the conversation"
     },
     "info": {
-      "admin": "管理員",
-      "admins": "管理員（{{adminsLength}}）",
-      "members": "成員（{{membersLength}}）",
-      "no-members": "沒有成員"
+      "admin": "Admin",
+      "admins": "Admins ({{adminsLength}})",
+      "members": "Members ({{membersLength}})",
+      "no-members": "No members"
     }
   },
   "chat": {
     "message": {
-      "loading": "正在加載消息…",
+      "loading": "Loading message...",
       "tip": {
         "action": "Zap"
       },
       "copy": {
-        "action": "複製",
-        "success": "已複製到剪貼板",
-        "error": "無法複製到剪貼板"
+        "action": "Copy",
+        "success": "Copied to clipboard",
+        "error": "Can't copy to clipboard"
       },
       "redeem": {
         "action": "Redeem",
@@ -234,73 +234,73 @@
         "action": "Zap"
       },
       "react": {
-        "action": "回應",
-        "with": "回應了",
-        "error": "無法回應"
+        "action": "React",
+        "with": "Reacted with ",
+        "error": "Can't react"
       },
       "reply": {
-        "action": "回覆",
-        "error": "無法回覆"
+        "action": "Reply",
+        "error": "Couldn't reply"
       },
       "forward": {
         "action": "Forward",
         "forwarded": "forwarded from"
       },
       "delete": {
-        "action": "刪除"
+        "action": "Delete"
       },
-      "deleted": "消息已刪除",
-      "save-as-last-seen": "保存為上次查看"
+      "deleted": "Message deleted",
+      "save-as-last-seen": "Save as last seen"
     },
-    "new-messages": "新消息",
+    "new-messages": "New messages",
     "user": {
-      "not-member": "你還不是該群聊的成員",
+      "not-member": "You are not a member of this group yet",
       "kick": {
-        "action": "踢",
-        "success": "已踢用戶",
-        "error": "無法踢用戶"
+        "action": "Kick",
+        "success": "Kicked user",
+        "error": "Couldn't kick user"
       }
     },
     "join": {
-      "action": "加入",
+      "action": "Join",
       "request": {
-        "sent": "請求已發送",
-        "success": "加入請求已發送",
-        "error": "發送加入請求失敗"
+        "sent": "Request sent",
+        "success": "Join request sent",
+        "error": "Failed to send join request"
       }
     },
-    "debug": "除錯"
+    "debug": "Debug"
   },
   "join": {
     "request": {
       "send": {
-        "success": "加入請求已發送",
-        "error": "發送加入請求失敗"
+        "success": "Join request sent",
+        "error": "Failed to send join request"
       },
       "accept": {
-        "action": "接受",
-        "success": "用戶已添加到群聊",
-        "error": "無法將用戶添加到群聊"
+        "action": "Accept",
+        "success": "User added to group",
+        "error": "Couldn't add user to group"
       },
       "reject": {
-        "action": "拒絕",
-        "success": "用戶加入請求被拒絕了",
-        "error": "無法拒絕用戶"
+        "action": "Reject",
+        "success": "User join request rejected",
+        "error": "Couldn't reject user from group"
       }
     },
     "requests": {
-      "n": "加入請求（{{requestsLength}}）",
-      "none": "還沒有加入請求…"
+      "n": "Join requests ({{requestsLength}})",
+      "none": "No join requests... yet"
     }
   },
   "gif": {
-    "search": "搜索 GIF",
-    "tenor": "搜索 Tenor",
-    "error": "搜索 GIFs 的時候出錯了"
+    "search": "Search GIF",
+    "tenor": "Search Tenor",
+    "error": "Error searching GIFs"
   },
   "file": {
     "upload": {
-      "error": "無法上傳文件"
+      "error": "Couldn't upload file"
     }
   },
   "image": {
@@ -320,121 +320,121 @@
     }
   },
   "copy": {
-    "success": "已複製",
-    "error": "無法複製"
+    "success": "Copied",
+    "error": "Couldn't copy"
   },
   "content": {
-    "prompt": "你想創建什麼？",
-    "create": "創建",
+    "prompt": "What do you want to create?",
+    "create": "Create",
     "type": {
-      "chat": "聊天",
-      "post": "帖子",
-      "posts": "帖子",
-      "poll": "投票",
-      "polls": "投票",
-      "video": "視頻",
-      "videos": "視頻",
-      "image": "圖片",
-      "images": "圖片"
+      "chat": "Chat",
+      "post": "Post",
+      "posts": "Posts",
+      "poll": "Poll",
+      "polls": "Polls",
+      "video": "Video",
+      "videos": "Videos",
+      "image": "Image",
+      "images": "Images"
     }
   },
   "post": {
-    "new": "新帖子",
-    "action": "發佈",
-    "placeholder": "你想說些什麼？",
-    "success": "已發佈",
-    "error": "無法發佈",
+    "new": "New",
+    "action": "Post",
+    "placeholder": "What's on your mind?",
+    "success": "Posted",
+    "error": "Couldn't post",
     "delete": {
-      "success": "帖子已刪除",
-      "error": "無法刪除帖子"
+      "success": "Post deleted",
+      "error": "Couldn't delete post"
     },
-    "start": "開始對話"
+    "start": "Start a conversation"
   },
   "poll": {
-    "start": "發起投票",
+    "start": "Start a poll",
     "create": {
-      "action": "創建投票",
-      "success": "投票已創建",
-      "error": "無法創建投票"
+      "action": "Create poll",
+      "success": "Poll created",
+      "error": "Couldn't create poll"
     },
-    "new": "新投票",
-    "question": "問題",
+    "new": "New poll",
+    "question": "Question",
     "expiration": {
-      "label": "到期",
-      "date": "到期日期",
-      "check": "到期日期必須在未來"
+      "label": "Expiration",
+      "date": "Expiry date",
+      "check": "Expiry date must be in the future"
     },
-    "options": "選項",
-    "multiple-choices": "多選項",
-    "closed": "投票已關閉",
-    "ends": "結束於"
+    "options": "Options",
+    "multiple-choices": "Multiple choices",
+    "closed": "Poll closed",
+    "ends": "Ends "
   },
   "vote": {
-    "action": "投票",
-    "success": "已投票",
-    "error": "無法投票"
+    "action": "Vote",
+    "success": "Vote cast",
+    "error": "Couldn't cast vote"
   },
   "video": {
-    "post": "發佈視頻",
-    "upload": "上傳",
-    "record": "錄製",
+    "post": "Post a video",
+    "upload": "Upload",
+    "record": "Record",
     "publish": {
-      "success": "視頻已發佈",
-      "error": "無法發佈視頻"
+      "success": "Video posted",
+      "error": "Failed to post video"
     },
-    "new": "新視頻",
+    "new": "New video",
     "title": {
-      "label": "標題",
-      "placeholder": "添加標題"
+      "label": "Title",
+      "placeholder": "Add a title"
     },
     "description": {
-      "label": "描述",
-      "placeholder": "添加描述"
+      "label": "Description",
+      "placeholder": "Add a description"
     }
   },
   "emoji": {
     "set": {
       "bookmark": {
-        "error": "無法收藏表情符號集"
+        "error": "Failed to bookmark emoji set"
       }
     }
   },
-  "peer": "個好友",
-  "peers": "個好友",
-  "message": "消息",
-  "write-a-message": "寫條消息…",
+  "peer": " peer",
+  "peers": " peers",
+  "message": "Message",
+  "write-a-message": "Write a message...",
   "send": {
-    "login-required": "登錄以發送消息",
-    "error": "發送消息失敗"
+    "login-required": "Log in to send message",
+    "error": "Failed to send message"
   },
   "event": {
-    "content": "內容",
-    "replies": "回覆",
-    "details": "詳情",
-    "loading": "正在加載事件",
-    "not-found": "未找到事件",
-    "fetch-error": "獲取事件時出錯了"
+    "content": "Content",
+    "replies": "Replies",
+    "details": "Details",
+    "loading": "Loading event",
+    "not-found": "Event not found",
+    "fetch-error": "Error fetching event"
   },
   "events": {
-    "loading": "正在加載事件",
-    "none": "這裏還沒有什麼可看的…"
+    "loading": "Loading events",
+    "none": "Nothing to see here... yet"
   },
   "share": {
-    "success": "已分享",
-    "error": "無法分享帖子",
-    "publication": "分享帖子",
+    "success": "Shared",
+    "error": "Couldn't share post",
+    "publication": "Share publication",
     "this": {
-      "publication": "分享這個帖子",
-      "in": "將這個帖子分享至 {{groupName}}。"
+      "publication": "Share this publication",
+      "in": "Share this publication in {{groupName}}"
     },
     "in": {
       "group": "Share in",
-      "x": "分享至 {{groupName}} 聊天",
-      "chat": "分享至聊天"
+      "x": "Share in {{groupName}} chat",
+      "chat": "Share in chat"
     }
   },
-  "share-in": "分享至",
-  "action-open": "打開",
+  "share-in": "Share in ",
+  "action-open": "Open",
   "action-zap": "Zap",
   "media": {
     "reveal": "Reveal"
