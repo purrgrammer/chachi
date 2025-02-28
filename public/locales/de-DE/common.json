@@ -265,8 +265,8 @@
       "action": "Beitreten",
       "request": {
         "sent": "Anfrage gesendet",
-        "success": "Join request sent",
-        "error": "Failed to send join request"
+        "success": "Beitrittsanfrage gesendet",
+        "error": "Fehler beim Senden der Beitrittsanfrage"
       }
     },
     "debug": "Debug"
@@ -274,44 +274,44 @@
   "join": {
     "request": {
       "send": {
-        "success": "Join request sent",
-        "error": "Failed to send join request"
+        "success": "Beitrittsanfrage gesendet",
+        "error": "Fehler beim Senden der Beitrittsanfrage"
       },
       "accept": {
-        "action": "Accept",
-        "success": "User added to group",
-        "error": "Couldn't add user to group"
+        "action": "Annehmen",
+        "success": "Benutzer zur Gruppe hinzugefügt",
+        "error": "Konnte Benutzer nicht zur Gruppe hinzufügen"
       },
       "reject": {
-        "action": "Reject",
-        "success": "User join request rejected",
-        "error": "Couldn't reject user from group"
+        "action": "Ablehnen",
+        "success": "Anfrage zum Beitritt abgelehnt",
+        "error": "Konnte Benutzer nicht aus Gruppe ablehnen"
       }
     },
     "requests": {
-      "n": "Join requests ({{requestsLength}})",
-      "none": "No join requests... yet"
+      "n": "Beitrittsanfragen ({{requestsLength}})",
+      "none": "Noch keine Beitrittsanfragen..."
     }
   },
   "gif": {
-    "search": "Search GIF",
-    "tenor": "Search Tenor",
-    "error": "Error searching GIFs"
+    "search": "Suche GIF",
+    "tenor": "Suche Tenor",
+    "error": "Fehler bei der Suche nach GIFs"
   },
   "file": {
     "upload": {
-      "error": "Couldn't upload file"
+      "error": "Datei konnte nicht hochgeladen werden"
     }
   },
   "image": {
-    "new": "New image",
-    "post": "Post an image",
+    "new": "Neues Bild",
+    "post": "Ein Bild veröffentlichen",
     "title": {
-      "label": "Title",
-      "placeholder": "Add a title"
+      "label": "Titel",
+      "placeholder": "Titel hinzufügen"
     },
     "publish": {
-      "success": "Image posted",
+      "success": "Bild veröffentlicht",
       "error": "Failed to post image"
     },
     "description": {
