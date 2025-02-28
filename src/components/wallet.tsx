@@ -798,7 +798,7 @@ function Tx({ tx }: { tx: Transaction }) {
   return e || a ? (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>{component}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="bg-transparent border-none outline-none flex items-center justify-center h-[calc(100vh-2rem)]">
         {e ? (
           <Event
             id={e}
