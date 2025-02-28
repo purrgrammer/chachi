@@ -154,23 +154,23 @@
     "deleted": "Diese Gruppe wurde gelöscht",
     "bookmark": {
       "trigger": "Lesezeichen",
-      "error": "Error bookmarking group"
+      "error": "Fehler beim Lesezeichen setzen"
     },
     "unbookmark": {
-      "trigger": "Unbookmark",
-      "error": "Error unbookmarking group"
+      "trigger": "Lesezeichen entfernen",
+      "error": "Fehler beim Lesezeichen setzen"
     },
-    "join": "Join",
+    "join": "Beitreten",
     "leave": {
-      "trigger": "Leave",
+      "trigger": "Verlassen",
       "confirmation": {
-        "title": "Are you sure you want to leave?",
-        "description": "This action cannot be undone. You will be removed from the group members list.",
-        "confirm": "Leave",
-        "cancel": "Cancel"
+        "title": "Bist du sicher, dass du gehen willst?",
+        "description": "Diese Aktion kann nicht rückgängig gemacht werden. Du wirst von der Liste der Gruppenmitglieder entfernt.",
+        "confirm": "Verlassen",
+        "cancel": "Abbrechen"
       },
-      "success": "Left group",
-      "error": "Error leaving group"
+      "success": "Gruppe verlassen",
+      "error": "Fehler beim Verlassen der Gruppe"
     },
     "chat": {
       "user": {
@@ -346,85 +346,85 @@
     "error": "Couldn't post",
     "delete": {
       "success": "Post deleted",
-      "error": "Couldn't delete post"
+      "error": "Beitrag konnte nicht gelöscht werden"
     },
-    "start": "Start a conversation"
+    "start": "Unterhaltung starten"
   },
   "poll": {
-    "start": "Start a poll",
+    "start": "Umfrage starten",
     "create": {
-      "action": "Create poll",
-      "success": "Poll created",
-      "error": "Couldn't create poll"
+      "action": "Umfrage erstellen",
+      "success": "Umfrage erstellt",
+      "error": "Umfrage konnte nicht erstellt werden"
     },
-    "new": "New poll",
-    "question": "Question",
+    "new": "Neue Umfrage",
+    "question": "Frage",
     "expiration": {
-      "label": "Expiration",
-      "date": "Expiry date",
-      "check": "Expiry date must be in the future"
+      "label": "Ablaufzeit",
+      "date": "Ablaufdatum",
+      "check": "Ablaufdatum muss in der Zukunft liegen"
     },
-    "options": "Options",
-    "multiple-choices": "Multiple choices",
-    "closed": "Poll closed",
-    "ends": "Ends "
+    "options": "Optionen",
+    "multiple-choices": "Mehrfache Auswahl",
+    "closed": "Umfrage beendet",
+    "ends": "Endet "
   },
   "vote": {
-    "action": "Vote",
-    "success": "Vote cast",
-    "error": "Couldn't cast vote"
+    "action": "Abstimmen",
+    "success": "Abgegebene Stimmen",
+    "error": "Abstimmung fehlgeschlagen"
   },
   "video": {
-    "post": "Post a video",
-    "upload": "Upload",
-    "record": "Record",
+    "post": "Video posten",
+    "upload": "Hochladen",
+    "record": "Aufnahmen",
     "publish": {
-      "success": "Video posted",
-      "error": "Failed to post video"
+      "success": "Video veröffentlicht",
+      "error": "Video konnte nicht veröffentlicht werden"
     },
-    "new": "New video",
+    "new": "Neues Video",
     "title": {
-      "label": "Title",
-      "placeholder": "Add a title"
+      "label": "Titel",
+      "placeholder": "Titel hinzufügen"
     },
     "description": {
-      "label": "Description",
-      "placeholder": "Add a description"
+      "label": "Beschreibung",
+      "placeholder": "Beschreibung hinzufügen"
     }
   },
   "emoji": {
     "set": {
       "bookmark": {
-        "error": "Failed to bookmark emoji set"
+        "error": "Fehler beim Setzen des Lesezeichens für das Emoji-Set"
       }
     }
   },
   "peer": " peer",
   "peers": " peers",
-  "message": "Message",
-  "write-a-message": "Write a message...",
+  "message": "Nachricht",
+  "write-a-message": "Nachricht schreiben...",
   "send": {
-    "login-required": "Log in to send message",
-    "error": "Failed to send message"
+    "login-required": "Anmelden, um Nachricht zu senden",
+    "error": "Fehler beim Senden der Nachricht"
   },
   "event": {
     "content": "Content",
-    "replies": "Replies",
+    "replies": "Antworten",
     "details": "Details",
-    "loading": "Loading event",
-    "not-found": "Event not found",
-    "fetch-error": "Error fetching event"
+    "loading": "Lade Event",
+    "not-found": "Event nicht gefunden",
+    "fetch-error": "Fehler beim Abrufen des Events"
   },
   "events": {
-    "loading": "Loading events",
-    "none": "Nothing to see here... yet"
+    "loading": "Lade Events",
+    "none": "Nichts zu sehen... noch nicht"
   },
   "share": {
-    "success": "Shared",
-    "error": "Couldn't share post",
-    "publication": "Share publication",
+    "success": "Geteilt",
+    "error": "Beitrag konnte nicht geteilt werden",
+    "publication": "Veröffentlichung teilen",
     "this": {
-      "publication": "Share this publication",
+      "publication": "Diese Veröffentlichung teilen",
       "in": "Share this publication in {{groupName}}"
     },
     "in": {
