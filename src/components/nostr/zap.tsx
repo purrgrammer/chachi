@@ -14,7 +14,6 @@ import {
   EmojiFragment,
 } from "@/components/rich-text";
 import { Emoji } from "@/components/emoji";
-import { Embed } from "@/components/nostr/detail";
 import { Input } from "@/components/ui/input";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
 import { User } from "@/components/nostr/user";
@@ -198,14 +197,6 @@ export function NewZapDialog({
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                {event ? (
-                  <Embed
-                    event={event}
-                    group={group}
-                    relays={[]}
-                    showReactions={false}
-                  />
-                ) : null}
                 <div className="flex flex-row gap-4 items-center mx-2">
                   <Input
                     type="number"

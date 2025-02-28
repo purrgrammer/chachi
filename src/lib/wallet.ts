@@ -316,7 +316,7 @@ export function useTransactions(pubkey: string, wallet: NDKCashuWallet) {
             a,
             token,
             p,
-            tags: event.tags,
+            tags,
             zap: null,
           };
         } else {
