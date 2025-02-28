@@ -23,13 +23,15 @@
       "connect": "连接"
     },
     "logout": "登出",
+    "zaps": "Zaps",
     "language": "语言",
     "theme": {
       "trigger": "主题",
       "light": "淡色",
       "dark": "深色",
       "system": "系統"
-    }
+    },
+    "settings": "Settings"
   },
   "dashboard": {
     "activity": {
@@ -107,7 +109,7 @@
       }
     },
     "edit": {
-      "title": "",
+      "title": "Group settings",
       "form": {
         "name": {
           "label": "名稱",
@@ -215,20 +217,34 @@
   "chat": {
     "message": {
       "loading": "正在加载消息...",
+      "tip": {
+        "action": "Zap"
+      },
       "copy": {
         "action": "复制",
         "success": "已复制到剪贴板",
         "error": "无法复制到剪贴板"
       },
+      "redeem": {
+        "action": "Redeem",
+        "failed": "Failed",
+        "redeemed": "Redeemed"
+      },
+      "zap": {
+        "action": "Zap"
+      },
       "react": {
         "action": "回应",
         "with": "回应了",
-        "success": "已用{{emoji}}回应",
         "error": "无法回应"
       },
       "reply": {
         "action": "回复",
         "error": "无法回复"
+      },
+      "forward": {
+        "action": "Forward",
+        "forwarded": "forwarded from"
       },
       "delete": {
         "action": "删除"
@@ -288,8 +304,19 @@
     }
   },
   "image": {
-    "upload": {
-      "error": "无法上传图像"
+    "new": "New image",
+    "post": "Post an image",
+    "title": {
+      "label": "Title",
+      "placeholder": "Add a title"
+    },
+    "publish": {
+      "success": "Image posted",
+      "error": "Failed to post image"
+    },
+    "description": {
+      "label": "Description",
+      "placeholder": "Add a description"
     }
   },
   "copy": {
@@ -366,7 +393,6 @@
     }
   },
   "emoji": {
-    "pick": "选择一个表情符号",
     "set": {
       "bookmark": {
         "error": "无法收藏表情符号集"
@@ -402,10 +428,241 @@
       "in": "将这个帖子分享至 {{groupName}}。"
     },
     "in": {
+      "group": "Share in",
       "x": "分享至 {{groupName}} 聊天",
       "chat": "分享到聊天"
     }
   },
   "share-in": "分享至",
-  "action-open": "打开"
+  "action-open": "打开",
+  "action-zap": "Zap",
+  "media": {
+    "reveal": "Reveal"
+  },
+  "header": {
+    "public": "Public",
+    "unknown": "Unknown"
+  },
+  "book": {
+    "by": "by {{ author }}",
+    "current-chapter": "{{ chapter }} / {{ total }}"
+  },
+  "goal": {
+    "expires-in": "Expires in",
+    "expired": "Goal expired",
+    "leaderboard": "Leaderboard"
+  },
+  "wallet": {
+    "title": "Incoming payment",
+    "keys": "Keys",
+    "sync": "Sync",
+    "sync-success": "Ecash synced",
+    "sync-error": "Error syncing wallet",
+    "keys-description": "Your wallet keys, it's important to keep them safe and backed up",
+    "debit": "Payment",
+    "credit": "Payment",
+    "connect": "Connect",
+    "not-found": "Wallet not found",
+    "no-transactions": "No transactions found",
+    "no-coins": "No coins found",
+    "make-default": "Make default",
+    "choose-wallet": "Choose wallet",
+    "choose-wallet-placeholder": "Choose a wallet to pay with",
+    "make-default-error": "Failed to set wallet as default",
+    "make-default-success": "Wallet set as default",
+    "create": "Create wallet",
+    "settings": {
+      "title": "Wallet settings",
+      "description": "Manage your wallet settings",
+      "create": {
+        "title": "Create wallet",
+        "description": "Create a wallet to start sending and receiving zaps"
+      }
+    },
+    "save": "Save changes",
+    "saved": "Changes saved",
+    "save-error": "Failed to save changes",
+    "mints": "Mints",
+    "add-mint": "Add mint",
+    "relays": "Relays",
+    "add-relay": "Add relay",
+    "deposit": {
+      "title": "Receive",
+      "cashu-description": "Deposit funds into a mint or redeem ecash tokens",
+      "description": "Deposit funds into your wallet",
+      "mint": "Mint",
+      "amount": "Amount",
+      "confirm": "Confirm",
+      "success": "Deposit successful",
+      "error": "Failed to deposit",
+      "receive-cash": "Ecash",
+      "redeem": "Redeem",
+      "redeem-error": "Failed to redeem ecash",
+      "redeem-success": "Ecash redeemed",
+      "from-wallet": "Choose a wallet to pay this invoice",
+      "confirm-wallet": "Pay"
+    },
+    "withdraw": {
+      "title": "Send",
+      "description": "Pay a lightning invoice, send money to a profile or a lightning address",
+      "placeholder": "Lightning invoice, profile or address",
+      "to": "To",
+      "confirm": "Pay",
+      "error": "Failed to send",
+      "unrecognized-invoice": "Unrecognized invoice",
+      "to-wallet": "Choose a wallet to send to",
+      "choose-wallet": "Send to wallet",
+      "confirm-cash": "Send ecash",
+      "no-wallet": "No wallet selected",
+      "success": "Send successful",
+      "p2pk-success": "Sent {{ amount }} to {{ name }}",
+      "lud16-success": "Sent {{ amount }} to {{ lud16 }}",
+      "amount-success": "Sent {{ amount }}",
+      "message": "Message",
+      "message-placeholder": "Write an optional message",
+      "confirm-wallet": "Send"
+    },
+    "mints-description": "Mints are the custodians of the funds. Withdraw your funds to your wallet regularly.",
+    "relays-description": "Relays where the wallet data is stored.",
+    "name": "Name",
+    "name-description": "A name for your wallet",
+    "ready": "Wallet `{{ name }}` ready",
+    "dialog": {
+      "title": "Connect wallet",
+      "description": "Connect your wallet to send tips and support your favorite creators",
+      "connect-webln": "Connect web wallet",
+      "webln-connected": "Connected to web wallet",
+      "webln-unavailable": "WebLN wallet not available",
+      "webln-error": "Failed to connect to WebLN wallet",
+      "connect-nip60": "Connect remote wallet",
+      "nwc-empty": "NWC address is empty",
+      "nwc-error": "Failed to connect to remote wallet",
+      "nwc-connected": "Connected to remote wallet"
+    },
+    "coins": "Cash",
+    "transactions": {
+      "title": "Transactions",
+      "loading": "Loading transactions",
+      "loading-error": "Error loading transactions"
+    }
+  },
+  "zap": {
+    "trigger": "Tip",
+    "action": "Tip",
+    "dialog": {
+      "title": "Zap {{ name }}",
+      "description": "Send a tip to {{ name }}",
+      "amount": "Amount",
+      "invoice": "Invoice",
+      "message": "Message",
+      "message-placeholder": "Add a message",
+      "tip": "Zap {{ amount }}",
+      "copy": "Copy invoice",
+      "wallet": "Open in wallet",
+      "wallet-error": "Couldn't open wallet",
+      "error": "Failed to zap",
+      "success": "Zapped {{ amount }} to {{ name }}"
+    }
+  },
+  "ecash": {
+    "redeem": "Redeem",
+    "fee": "fee:"
+  },
+  "settings": {
+    "title": "Settings",
+    "ui": {
+      "title": "Appearance",
+      "language": {
+        "title": "Language",
+        "description": "Choose your preferred language"
+      },
+      "theme": {
+        "title": "Theme",
+        "description": "Choose your preferred theme",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      }
+    },
+    "wallet": {
+      "title": "Wallets",
+      "settings": "Settings",
+      "mints": "Mints",
+      "enable": "Enable",
+      "enabled": "Enabled",
+      "enable-success": "Wallet enabled",
+      "enable-error": "Failed to enable wallet",
+      "relays": "Relays",
+      "default-wallet": {
+        "title": "Active wallet",
+        "none": "No wallet selected"
+      },
+      "payments": {
+        "title": "Payments",
+        "description": "Manage the mints and relays you'll use to receive payments"
+      },
+      "wallets": {
+        "title": "Wallets",
+        "none": "No wallets",
+        "remove": "Remove",
+        "description": "Manage your wallets",
+        "create": "Create wallet",
+        "default": "Default",
+        "make-default": "Make default",
+        "delete": "Delete",
+        "delete-error": "Failed to delete wallet",
+        "delete-success": "Wallet deleted",
+        "create-error": "Failed to create wallet",
+        "create-success": "Wallet created",
+        "sync": "Sync",
+        "synced": "Synced",
+        "sync-error": "Error syncing wallet",
+        "open": "Open"
+      }
+    },
+    "media": {
+      "title": "Media"
+    },
+    "relays": {
+      "title": "Relays"
+    }
+  },
+  "nutzaps": {
+    "no-message": "No message",
+    "title": "Zaps",
+    "redeemed": "Redeemed",
+    "failed": "Failed",
+    "log-in": "Log in to see your zaps",
+    "invalid": "Invalid zap",
+    "redeem": "Redeem",
+    "redeem-success": "Redeemed {{ amount }} zap",
+    "redeem-error": "Failed to redeem zap",
+    "received": "Received",
+    "sent": "Sent",
+    "no-received": "Nothing to see here... yet",
+    "no-sent": "Nothing to see here... yet",
+    "open": "Open"
+  },
+  "mint": {
+    "contact": "Contact",
+    "version": "Version",
+    "features": "Features",
+    "nuts": "Nuts",
+    "sat": "Bitcoin",
+    "eur": "Euro",
+    "usd": "US Dollar",
+    "currencies": "Currencies"
+  },
+  "ln": {
+    "send": {
+      "title": "Send {{ amount }}",
+      "show-qr": "Show QR",
+      "hide-qr": "Hide QR"
+    }
+  },
+  "qr": {
+    "scan": "Scan QR Code",
+    "scan-error": "Error scanning QR Code",
+    "unknown": "Unknown QR Code"
+  }
 }
