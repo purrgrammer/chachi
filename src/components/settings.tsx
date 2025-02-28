@@ -88,19 +88,11 @@ const uiSchema = z.object({
 });
 
 function UILanguage({ lang }: { lang: Language }) {
-  return (
-    <span>
-      {lang === "en"
-        ? "English"
-        : lang === "es"
-          ? "Español"
-          : lang === "zh-CN"
-            ? "简体中文"
-            : lang === "zh-TW"
-              ? "繁體中文"
-              : lang}
-    </span>
-  );
+  const { i18n } = useTranslation();
+  const displayName = new Intl.DisplayNames([i18n.language], {
+    type: "language",
+  });
+  return <span className="capitalize">{displayName.of(lang)}</span>;
 }
 
 function UITheme({ theme }: { theme: "light" | "dark" | "system" }) {

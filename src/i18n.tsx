@@ -4,10 +4,19 @@ import enTranslations from "../public/locales/en/common.json";
 import esTranslations from "../public/locales/es-ES/common.json";
 import zhCNTranslations from "../public/locales/zh-CN/common.json";
 import zhTWTranslations from "../public/locales/zh-TW/common.json";
+import svTranslations from "../public/locales/sv-SE/common.json";
+import deTranslations from "../public/locales/de-DE/common.json";
 
-export type Language = "en" | "es" | "zh-CN" | "zh-TW";
+export type Language = "en" | "es" | "zh-CN" | "zh-TW" | "sv-SE" | "de-DE";
 
-export const languages = ["en", "es", "zh-CN", "zh-TW"] as const;
+export const languages = [
+  "en",
+  "es",
+  "zh-CN",
+  "zh-TW",
+  "sv-SE",
+  "de-DE",
+] as const;
 
 export function getLanguage(): Language {
   const lang = localStorage.getItem("language");
@@ -40,6 +49,12 @@ i18n.use(initReactI18next).init({
     },
     "zh-TW": {
       translations: zhTWTranslations,
+    },
+    "sv-SE": {
+      translations: svTranslations,
+    },
+    "de-DE": {
+      translations: deTranslations,
     },
   },
   ns: ["translations"],

@@ -1,31 +1,15 @@
 import { useNavigate } from "@/lib/navigation";
-import {
-  ChevronsUpDown,
-  LogOut,
-  Moon,
-  Sun,
-  SunMoon,
-  Check,
-  Languages,
-  Palette,
-  Settings,
-  Zap,
-} from "lucide-react";
+import { ChevronsUpDown, LogOut, Settings, Zap } from "lucide-react";
 import { Login } from "@/components/nostr/login";
 import { Avatar } from "@/components/nostr/avatar";
 import { Name } from "@/components/nostr/name";
 import { Nip05 } from "@/components/nostr/nip05";
-import { useTheme } from "@/components/theme-provider";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuPortal,
-  DropdownMenuSubContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -44,7 +28,6 @@ import {
   NDKWebLNWallet,
 } from "@nostr-dev-kit/ndk-wallet";
 import { useNDKWallets } from "@/lib/wallet";
-import { changeLanguage } from "@/i18n";
 
 function UserInfo({ pubkey }: { pubkey: string }) {
   return (
@@ -64,14 +47,13 @@ function UserInfo({ pubkey }: { pubkey: string }) {
 
 export function NavUser() {
   const { isMobile, open, openMobile, state } = useSidebar();
-  const { theme, setTheme } = useTheme();
   const [wallets] = useNDKWallets();
   const logout = useLogout();
   const account = useAccount();
   const navigate = useNavigate();
   const pubkey = account?.pubkey;
   const isExpanded = state === "expanded" || open || openMobile;
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   function openWallet(wallet: NDKWallet) {
     if (wallet instanceof NDKNWCWallet && wallet.pairingCode) {
@@ -123,72 +105,6 @@ export function NavUser() {
                 <Settings className="text-muted-foreground size-4" />
                 {t("user.settings")}
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  <div className="flex flex-row items-center gap-2">
-                    <Languages className="text-muted-foreground size-4" />
-                    <span>{t("user.language")}</span>
-                  </div>
-                </DropdownMenuSubTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuSubContent>
-                    <DropdownMenuItem onClick={() => changeLanguage("en")}>
-                      <span>English</span>
-                      {i18n.language === "en" ? (
-                        <Check className="ml-auto" />
-                      ) : null}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => changeLanguage("es")}>
-                      <span>Español</span>
-                      {i18n.language === "es" ? (
-                        <Check className="ml-auto" />
-                      ) : null}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => changeLanguage("zh-CN")}>
-                      <span>简体中文</span>
-                      {i18n.language === "zh-CN" ? (
-                        <Check className="ml-auto" />
-                      ) : null}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => changeLanguage("zh-TW")}>
-                      <span>繁體中文</span>
-                      {i18n.language === "zh-TW" ? (
-                        <Check className="ml-auto" />
-                      ) : null}
-                    </DropdownMenuItem>
-                  </DropdownMenuSubContent>
-                </DropdownMenuPortal>
-              </DropdownMenuSub>
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  <div className="flex flex-row items-center gap-2">
-                    <Palette className="size-4 text-muted-foreground" />
-                    <span>{t("user.theme.trigger")}</span>
-                  </div>
-                </DropdownMenuSubTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuSubContent>
-                    <DropdownMenuItem onClick={() => setTheme("light")}>
-                      <Sun className="text-muted-foreground" />
-                      <span>{t("user.theme.light")}</span>
-                      {theme === "light" ? <Check className="ml-auto" /> : null}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setTheme("dark")}>
-                      <Moon className="text-muted-foreground" />
-                      <span>{t("user.theme.dark")}</span>
-                      {theme === "dark" ? <Check className="ml-auto" /> : null}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setTheme("system")}>
-                      <SunMoon className="text-muted-foreground" />
-                      <span>{t("user.theme.system")}</span>
-                      {theme === "system" ? (
-                        <Check className="ml-auto" />
-                      ) : null}
-                    </DropdownMenuItem>
-                  </DropdownMenuSubContent>
-                </DropdownMenuPortal>
-              </DropdownMenuSub>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={logout}>
                 <LogOut className="text-destructive dark:text-red-300" />
