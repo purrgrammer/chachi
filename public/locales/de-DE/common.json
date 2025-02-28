@@ -312,40 +312,40 @@
     },
     "publish": {
       "success": "Bild veröffentlicht",
-      "error": "Failed to post image"
+      "error": "Bild konnte nicht veröffentlicht werden"
     },
     "description": {
-      "label": "Description",
-      "placeholder": "Add a description"
+      "label": "Beschreibung",
+      "placeholder": "Beschreibung hinzufügen"
     }
   },
   "copy": {
-    "success": "Copied",
-    "error": "Couldn't copy"
+    "success": "Kopiert",
+    "error": "Kopieren fehlgeschlagen"
   },
   "content": {
-    "prompt": "What do you want to create?",
-    "create": "Create",
+    "prompt": "Was möchtest du erstellen?",
+    "create": "Erstellen",
     "type": {
       "chat": "Chat",
-      "post": "Post",
-      "posts": "Posts",
-      "poll": "Poll",
-      "polls": "Polls",
+      "post": "Beitrag",
+      "posts": "Beiträge",
+      "poll": "Umfrage",
+      "polls": "Umfragen",
       "video": "Video",
       "videos": "Videos",
-      "image": "Image",
-      "images": "Images"
+      "image": "Bild",
+      "images": "Bilder"
     }
   },
   "post": {
-    "new": "New",
-    "action": "Post",
-    "placeholder": "What's on your mind?",
-    "success": "Posted",
-    "error": "Couldn't post",
+    "new": "Neu",
+    "action": "Veröffentlichen",
+    "placeholder": "Woran denkst du gerade?",
+    "success": "Veröffentlicht",
+    "error": "Veröffentlichen fehlgeschlagen",
     "delete": {
-      "success": "Post deleted",
+      "success": "Beitrag gelöscht",
       "error": "Beitrag konnte nicht gelöscht werden"
     },
     "start": "Unterhaltung starten"
@@ -430,71 +430,71 @@
     "in": {
       "group": "Teilen in",
       "x": "Im {{groupName}} Chat teilen",
-      "chat": "Share in chat"
+      "chat": "Im Chat teilen"
     }
   },
-  "share-in": "Share in ",
-  "action-open": "Open",
+  "share-in": "Teilen in ",
+  "action-open": "Öffnen",
   "action-zap": "Zap",
   "media": {
-    "reveal": "Reveal"
+    "reveal": "Anzeigen"
   },
   "header": {
-    "public": "Public",
-    "unknown": "Unknown"
+    "public": "Öffentlich",
+    "unknown": "Unbekannt"
   },
   "book": {
-    "by": "by {{ author }}",
+    "by": "von {{ author }}",
     "current-chapter": "{{ chapter }} / {{ total }}"
   },
   "goal": {
-    "expires-in": "Expires in",
-    "expired": "Goal expired",
-    "leaderboard": "Leaderboard"
+    "expires-in": "Läuft ab in",
+    "expired": "Ziel abgelaufen",
+    "leaderboard": "Rangliste"
   },
   "wallet": {
-    "title": "Incoming payment",
+    "title": "Eingehende Zahlung",
     "keys": "Keys",
     "sync": "Sync",
-    "sync-success": "Ecash synced",
-    "sync-error": "Error syncing wallet",
-    "keys-description": "Your wallet keys, it's important to keep them safe and backed up",
-    "debit": "Payment",
-    "credit": "Payment",
-    "connect": "Connect",
-    "not-found": "Wallet not found",
-    "no-transactions": "No transactions found",
-    "no-coins": "No coins found",
-    "make-default": "Make default",
-    "choose-wallet": "Choose wallet",
-    "choose-wallet-placeholder": "Choose a wallet to pay with",
-    "make-default-error": "Failed to set wallet as default",
-    "make-default-success": "Wallet set as default",
-    "create": "Create wallet",
+    "sync-success": "Ecash synchronisiert",
+    "sync-error": "Fehler beim Synchronisieren des Wallets",
+    "keys-description": "Deine Wallet-Keys, es ist wichtig, dass du sie sicher verwahrst",
+    "debit": "Zahlung",
+    "credit": "Zahlung",
+    "connect": "Verbinden",
+    "not-found": "Wallet nicht gefunden",
+    "no-transactions": "Keine Transaktionen gefunden",
+    "no-coins": "Keine Coins gefunden",
+    "make-default": "Standard festlegen",
+    "choose-wallet": "Wallet auswählen",
+    "choose-wallet-placeholder": "Wählen ein Wallet zum Bezahlen aus",
+    "make-default-error": "Wallet konnte nicht als Standard festgelegt werden",
+    "make-default-success": "Wallet als Standard festgelegt",
+    "create": "Wallet erstellen",
     "settings": {
-      "title": "Wallet settings",
-      "description": "Manage your wallet settings",
+      "title": "Wallet-Einstellungen",
+      "description": "Wallet-Einstellungen verwalten",
       "create": {
-        "title": "Create wallet",
-        "description": "Create a wallet to start sending and receiving zaps"
+        "title": "Wallet erstellen",
+        "description": "Erstelle ein Wallet zum Senden und Empfangen von Zaps"
       }
     },
-    "save": "Save changes",
-    "saved": "Changes saved",
-    "save-error": "Failed to save changes",
+    "save": "Änderungen speichern",
+    "saved": "Änderungen gespeichert",
+    "save-error": "Fehler beim Speichern der Änderungen",
     "mints": "Mints",
-    "add-mint": "Add mint",
+    "add-mint": "Mint hinzufügen",
     "relays": "Relays",
-    "add-relay": "Add relay",
+    "add-relay": "Relay hinzufügen",
     "deposit": {
-      "title": "Receive",
-      "cashu-description": "Deposit funds into a mint or redeem ecash tokens",
-      "description": "Deposit funds into your wallet",
+      "title": "Empfangen",
+      "cashu-description": "Guthaben in eine Mint einzahlen oder Ecash einlösen",
+      "description": "Guthaben auf dein Wallet einzahlen",
       "mint": "Mint",
-      "amount": "Amount",
-      "confirm": "Confirm",
-      "success": "Deposit successful",
-      "error": "Failed to deposit",
+      "amount": "Betrag",
+      "confirm": "Bestätigen",
+      "success": "Einzahlung erfolgreich",
+      "error": "Einzahlung fehlgeschlagen",
       "receive-cash": "Ecash",
       "redeem": "Einlösen",
       "redeem-error": "Fehler beim Einlösen von Ecash",
@@ -557,80 +557,80 @@
       "message": "Nachricht",
       "message-placeholder": "Eine Nachricht hinzufügen",
       "tip": "Zap {{ amount }}",
-      "copy": "Copy invoice",
-      "wallet": "Open in wallet",
-      "wallet-error": "Couldn't open wallet",
-      "error": "Failed to zap",
-      "success": "Zapped {{ amount }} to {{ name }}"
+      "copy": "Invoice kopieren",
+      "wallet": "In Wallet öffnen",
+      "wallet-error": "Wallet konnte nicht geöffnet werden",
+      "error": "Zap fehlgeschlagen",
+      "success": "{{ amount }} an {{ name }} gesendet"
     }
   },
   "ecash": {
-    "redeem": "Redeem",
-    "fee": "fee:"
+    "redeem": "Einlösen",
+    "fee": "Gebühr:"
   },
   "settings": {
-    "title": "Settings",
+    "title": "Einstellungen",
     "ui": {
-      "title": "Appearance",
+      "title": "Erscheinung",
       "language": {
-        "title": "Language",
-        "description": "Choose your preferred language"
+        "title": "Sprache",
+        "description": "Wähle deine bevorzugte Sprache"
       },
       "theme": {
-        "title": "Theme",
-        "description": "Choose your preferred theme",
-        "light": "Light",
-        "dark": "Dark",
+        "title": "Thema",
+        "description": "Wähle dein bevorzugtes Thema",
+        "light": "Hell",
+        "dark": "Dunkel",
         "system": "System"
       }
     },
     "wallet": {
       "title": "Wallets",
-      "settings": "Settings",
+      "settings": "Einstellungen",
       "mints": "Mints",
-      "enable": "Enable",
-      "enabled": "Enabled",
-      "enable-success": "Wallet enabled",
-      "enable-error": "Failed to enable wallet",
+      "enable": "Aktivieren",
+      "enabled": "Aktiviert",
+      "enable-success": "Wallet aktiviert",
+      "enable-error": "Wallet konnte nicht aktiviert werden",
       "relays": "Relays",
       "default-wallet": {
-        "title": "Active wallet",
-        "none": "No wallet selected"
+        "title": "Aktives Wallet",
+        "none": "Kein Wallet ausgewählt"
       },
       "payments": {
-        "title": "Payments",
-        "description": "Manage the mints and relays you'll use to receive payments"
+        "title": "Zahlungen",
+        "description": "Verwalte die Mints und Relays, mit denen du Zahlungen erhältst"
       },
       "wallets": {
         "title": "Wallets",
-        "none": "No wallets",
-        "remove": "Remove",
-        "description": "Manage your wallets",
-        "create": "Create wallet",
-        "default": "Default",
-        "make-default": "Make default",
-        "delete": "Delete",
-        "delete-error": "Failed to delete wallet",
-        "delete-success": "Wallet deleted",
-        "create-error": "Failed to create wallet",
-        "create-success": "Wallet created",
+        "none": "Keine Wallets",
+        "remove": "Entfernen",
+        "description": "Wallets verwalten",
+        "create": "Wallet erstellen",
+        "default": "Standard",
+        "make-default": "Standard festlegen",
+        "delete": "Löschen",
+        "delete-error": "Wallet konnte nicht gelöscht werden",
+        "delete-success": "Wallet gelöscht",
+        "create-error": "Wallet konnte nicht erstellt werden",
+        "create-success": "Wallet erstellt",
         "sync": "Sync",
-        "synced": "Synced",
-        "sync-error": "Error syncing wallet",
-        "open": "Open"
+        "synced": "Synchronisiert",
+        "sync-error": "Fehler beim Synchronisieren des Wallets",
+        "open": "Öffnen"
       }
     },
     "media": {
-      "title": "Media"
+      "title": "Medien"
     },
     "relays": {
       "title": "Relays"
     }
   },
   "nutzaps": {
-    "no-message": "No message",
+    "no-message": "Keine Nachricht",
     "title": "Zaps",
-    "redeemed": "Redeemed",
+    "redeemed": "Eingelöst",
     "failed": "Fehlgeschlagen",
     "log-in": "Melde dich an, um deine Zaps zu sehen",
     "invalid": "Invalider Zap",
