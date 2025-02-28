@@ -1,7 +1,7 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import enTranslations from "../public/locales/en/common.json";
-import esTranslations from "../public/locales/es/common.json";
+import esTranslations from "../public/locales/es-ES/common.json";
 import zhCNTranslations from "../public/locales/zh-CN/common.json";
 import zhTWTranslations from "../public/locales/zh-TW/common.json";
 
@@ -30,6 +30,9 @@ i18n.use(initReactI18next).init({
       translations: enTranslations,
     },
     es: {
+      translations: esTranslations,
+    },
+    "es-ES": {
       translations: esTranslations,
     },
     "zh-CN": {
