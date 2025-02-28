@@ -1,159 +1,159 @@
 {
   "locale": {
-    "today": "Today"
+    "today": "Heute"
   },
-  "home": "Home",
+  "home": "Startseite",
   "nav": {
-    "no-groups": "No groups"
+    "no-groups": "Keine Gruppen"
   },
   "user": {
     "login": {
-      "start": "Get started",
-      "title": "Get started",
-      "description": "Select the login method below.",
+      "start": "Erste Schritte",
+      "title": "Erste Schritte",
+      "description": "Wähle unten die Login-Methode.",
       "extension": {
-        "label": "Browser extension",
-        "error": "Failed to log in with extension"
+        "label": "Browser-Erweiterung",
+        "error": "Fehler beim Anmelden mit Erweiterung"
       },
       "remote": {
-        "label": "Remote signer",
-        "error": "Failed to log in with remote signer"
+        "label": "Remote-Signierer",
+        "error": "Fehler beim Anmelden mit Remote-Signer"
       },
-      "or": "OR",
-      "connect": "Connect"
+      "or": "ODER",
+      "connect": "Verbinden"
     },
-    "logout": "Log out",
+    "logout": "Abmelden",
     "zaps": "Zaps",
-    "language": "Language",
+    "language": "Sprache",
     "theme": {
-      "trigger": "Theme",
-      "light": "Light",
-      "dark": "Dark",
+      "trigger": "Thema",
+      "light": "Hell",
+      "dark": "Dunkel",
       "system": "System"
     },
-    "settings": "Settings"
+    "settings": "Einstellungen"
   },
   "dashboard": {
     "activity": {
-      "heading": "Activity",
-      "unread": "unread",
-      "mentions": "mentions",
-      "none": "Nothing new for you... yet"
+      "heading": "Aktivität",
+      "unread": "ungelesen",
+      "mentions": "Erwähnungen",
+      "none": "Noch nichts Neues für dich..."
     },
     "featured": {
-      "heading": "Featured"
+      "heading": "Empfohlen"
     },
     "popular": {
-      "heading": "Popular in your network"
+      "heading": "Beliebt in deinem Netzwerk"
     },
     "search": {
-      "prompt": "Can't find what you're looking for?",
-      "trigger": "Search groups",
-      "title": "Find a group",
+      "prompt": "Du findest nicht, wonach du suchst?",
+      "trigger": "Gruppen durchsuchen",
+      "title": "Finde eine Gruppe",
       "input": {
-        "placeholder": "Search groups",
-        "no-results-for-x": "No results for \"{{search}}\"",
-        "n-results-for-x": "{{n}} results for \"{{search}}\"",
-        "start-typing-to-filter-groups": "Start typing to filter groups"
+        "placeholder": "Gruppen durchsuchen",
+        "no-results-for-x": "Keine Ergebnisse für \"{{search}}\"",
+        "n-results-for-x": "{{n}} Ergebnisse für \"{{search}}\"",
+        "start-typing-to-filter-groups": "Tippen, um Gruppen zu filtern"
       },
       "result": {
-        "visit": "Visit",
-        "no-description-available": "No description available",
-        "no-groups-found-for-x-want-to": "No groups found for \"{{search}}\", want to ",
-        "start-one": "start one",
+        "visit": "Besuchen",
+        "no-description-available": "Keine Beschreibung vorhanden",
+        "no-groups-found-for-x-want-to": "Keine Gruppen für \"{{search}}\" gefunden ",
+        "start-one": "Gruppe starten",
         "?": "?"
       }
     }
   },
   "group": {
     "hosted": {
-      "by": "Hosted by ",
-      "and": " and "
+      "by": "Gehostet von ",
+      "and": " und "
     },
     "create": {
-      "new": "New group",
-      "title": "Create group",
-      "description": "Create a new group to chat with your friends",
+      "new": "Neue Gruppe",
+      "title": "Gruppe erstellen",
+      "description": "Erstelle eine neue Gruppe um mit deinen Freunden zu chatten",
       "form": {
         "name": {
           "label": "Name",
-          "placeholder": "This is the group's name.",
-          "required": "Please add a name"
+          "placeholder": "Das ist der Gruppenname.",
+          "required": "Bitte einen Namen eingeben"
         },
         "about": {
-          "label": "About",
-          "placeholder": "This is the group's description."
+          "label": "Über",
+          "placeholder": "Das ist die Gruppenbeschreibung."
         },
         "relay": {
           "label": "Relay",
-          "placeholder": "Choose a relay.",
-          "description": "This is the server where the posts will be stored.",
-          "required": "Please select a relay"
+          "placeholder": "Wähle ein Relay.",
+          "description": "Das ist der Server, auf dem die Beiträge gespeichert werden.",
+          "required": "Bitte ein Relay auswählen"
         },
         "visibility": {
-          "label": "Visibility",
-          "anyone": "Anyone",
-          "members-only": "Members only",
-          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+          "label": "Sichtbarkeit",
+          "anyone": "Alle",
+          "members-only": "Nur Mitglieder",
+          "description": "Nachrichten sind nicht verschlüsselt und können von Relays gelesen werden. Hoste ein eigenes Relay für maximale Privatsphäre."
         },
         "access": {
-          "label": "Access",
-          "anyone": "Anyone",
-          "invite-only": "Invite only"
+          "label": "Zugang",
+          "anyone": "Alle",
+          "invite-only": "Nur Einladungen"
         },
         "submit": {
-          "trigger": "Create",
-          "success": "Group created",
-          "error": "Couldn't create group"
+          "trigger": "Erstellen",
+          "success": "Gruppe erstellt",
+          "error": "Gruppe konnte nicht erstellt werden"
         }
       }
     },
     "edit": {
-      "title": "Group settings",
+      "title": "Gruppen-Einstellungen",
       "form": {
         "name": {
           "label": "Name",
-          "placeholder": "My Group",
-          "description": "This is the group's name"
+          "placeholder": "Meine Gruppe",
+          "description": "Das ist der Gruppenname"
         },
         "about": {
-          "label": "About",
-          "placeholder": "A group for my frens",
-          "description": "This is the group's description"
+          "label": "Über",
+          "placeholder": "Eine Gruppe für meine frens",
+          "description": "Das ist die Gruppenbeschreibung"
         },
         "visibility": {
-          "label": "Visibility",
-          "anyone": "Anyone",
-          "members-only": "Members only",
-          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+          "label": "Sichtbarkeit",
+          "anyone": "Alle",
+          "members-only": "Nur Mitglieder",
+          "description": "Nachrichten sind nicht verschlüsselt und können von Relays gelesen werden. Hoste ein eigenes Relay für maximale Privatsphäre."
         },
         "access": {
-          "label": "Access",
-          "anyone": "Anyone",
-          "invite-only": "Invite only",
-          "description": "Anyone can join an open group. Closed groups require approval"
+          "label": "Zugang",
+          "anyone": "Alle",
+          "invite-only": "Nur Einladungen",
+          "description": "Alle können einer offenen Gruppe beitreten. Geschlossene Gruppen müssen genehmigt werden"
         },
         "submit": {
-          "trigger": "Save",
-          "success": "Group updated",
-          "error": "Couldn't update group"
+          "trigger": "Speichern",
+          "success": "Gruppe aktualisiert",
+          "error": "Gruppe konnte nicht aktualisiert werden"
         }
       }
     },
     "delete": {
-      "trigger": "Delete",
+      "trigger": "Löschen",
       "confirmation": {
-        "title": "Are you sure you want to delete the group?",
-        "description": "This action cannot be undone. This group and all its history will be deleted.",
-        "confirm": "Delete",
-        "cancel": "Cancel"
+        "title": "Möchtest du die Gruppe wirklich löschen?",
+        "description": "Diese Aktion kann nicht rückgängig gemacht werden. Diese Gruppe und ihr gesamter Verlauf werden gelöscht.",
+        "confirm": "Löschen",
+        "cancel": "Abbrechen"
       },
-      "success": "Group deleted",
-      "error": "Couldn't delete group"
+      "success": "Gruppe gelöscht",
+      "error": "Gruppe konnte nicht gelöscht werden"
     },
-    "deleted": "This group has been deleted",
+    "deleted": "Diese Gruppe wurde gelöscht",
     "bookmark": {
-      "trigger": "Bookmark",
+      "trigger": "Lesezeichen",
       "error": "Error bookmarking group"
     },
     "unbookmark": {
@@ -174,85 +174,85 @@
     },
     "chat": {
       "user": {
-        "joined": "joined",
-        "left": "left"
+        "joined": "beigetreten",
+        "left": "verlassen"
       },
       "event": {
         "delete": {
-          "success": "Message deleted",
-          "error": "Couldn't delete message"
+          "success": "Nachricht gelöscht",
+          "error": "Nachricht konnte nicht gelöscht werden"
         }
       }
     },
     "metadata": {
       "visibility": {
         "private": {
-          "trigger": "Members only",
-          "content": "Only members can read content"
+          "trigger": "Nur Mitglieder",
+          "content": "Nur Mitglieder können Inhalte lesen"
         },
         "public": {
-          "trigger": "Public",
-          "content": "Can be read by anyone"
+          "trigger": "Öffentlich",
+          "content": "Kann von allen gelesen werden"
         }
       },
       "access": {
         "closed": {
-          "trigger": "Closed",
-          "content": "Requires approval or an invitation to join"
+          "trigger": "Geschlossen",
+          "content": "Genehmigung oder Einladung zum Beitritt erforderlich"
         },
         "open": {
-          "trigger": "Open",
-          "content": "Anyone can join"
+          "trigger": "Öffnen",
+          "content": "Alle können beitreten"
         }
       },
-      "join-the-conversation": "Join the conversation"
+      "join-the-conversation": "An der Unterhaltung teilnehmen"
     },
     "info": {
       "admin": "Admin",
       "admins": "Admins ({{adminsLength}})",
-      "members": "Members ({{membersLength}})",
-      "no-members": "No members"
+      "members": "Mitglieder ({{membersLength}})",
+      "no-members": "Keine Mitglieder"
     }
   },
   "chat": {
     "message": {
-      "loading": "Loading message...",
+      "loading": "Lade Nachricht...",
       "tip": {
         "action": "Zap"
       },
       "copy": {
-        "action": "Copy",
-        "success": "Copied to clipboard",
-        "error": "Can't copy to clipboard"
+        "action": "Kopieren",
+        "success": "In die Zwischenablage kopiert",
+        "error": "Kann nicht in die Zwischenablage kopieren"
       },
       "redeem": {
-        "action": "Redeem",
-        "failed": "Failed",
-        "redeemed": "Redeemed"
+        "action": "Einlösen",
+        "failed": "Fehlgeschlagen",
+        "redeemed": "Eingelöst"
       },
       "zap": {
         "action": "Zap"
       },
       "react": {
-        "action": "React",
-        "with": "Reacted with ",
-        "error": "Can't react"
+        "action": "Reagieren",
+        "with": "Reagiert mit ",
+        "error": "Kann nicht reagieren"
       },
       "reply": {
-        "action": "Reply",
-        "error": "Couldn't reply"
+        "action": "Antworten",
+        "error": "Antworten nicht möglich"
       },
       "forward": {
-        "action": "Forward",
-        "forwarded": "forwarded from"
+        "action": "Weiterleiten",
+        "forwarded": "weitergeleitet von"
       },
       "delete": {
-        "action": "Delete"
+        "action": "Löschen"
       },
-      "deleted": "Message deleted",
-      "save-as-last-seen": "Save as last seen"
+      "deleted": "Nachricht gelöscht",
+      "save-as-last-seen": "Speichern als zuletzt gesehen"
     },
-    "new-messages": "New messages",
+    "new-messages": "Neue Nachrichten",
     "user": {
       "not-member": "You are not a member of this group yet",
       "kick": {
