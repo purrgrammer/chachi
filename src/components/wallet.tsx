@@ -1919,15 +1919,9 @@ function Deposit({
 
   async function onRedeem() {
     try {
-      if (!ecash || !token) return;
+      if (!ecash || !token || !(wallet instanceof NDKCashuWallet)) return;
       setIsDepositing(true);
-      if (wallet instanceof NDKCashuWallet) {
-        await wallet.receiveToken(token);
-      } else if (wallet instanceof NDKWebLNWallet) {
-        console.log("TODO");
-      } else if (wallet instanceof NDKNWCWallet) {
-        console.log("TODO");
-      }
+      await wallet.receiveToken(token);
       toast.success(t("wallet.deposit.redeem-success"));
       refreshWallet(wallet);
       onOpenChange?.(false);
@@ -2055,9 +2049,7 @@ function Deposit({
                 {t("wallet.deposit.confirm")}
               </Button>
             </div>
-            {ecash &&
-            wallet instanceof NDKCashuWallet &&
-            wallet.mints.includes(ecash.mint) ? (
+            {wallet instanceof NDKCashuWallet ? (
               <>
                 <p className="mx-auto text-xs text-muted-foreground">
                   {t("user.login.or")}
@@ -2074,7 +2066,9 @@ function Deposit({
                 </div>
                 <Button
                   variant="outline"
-                  disabled={isDepositing || !ecash}
+                  disabled={
+                    isDepositing || !ecash || !wallet.mints.includes(ecash.mint)
+                  }
                   onClick={onRedeem}
                 >
                   <HandCoins />
