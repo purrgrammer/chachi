@@ -86,88 +86,6 @@ export function useChachiWallet() {
     });
   }, []);
 
-  //  useEffect(() => {
-  //    //if (pubkey && defaultWallet && defaultWallet.type === "nip60") {
-  //    //  ndk
-  //    //    .fetchEvent(
-  //    //      {
-  //    //        kinds: [NDKKind.CashuWallet],
-  //    //        authors: [pubkey],
-  //    //      },
-  //    //      {
-  //    //        closeOnEose: true,
-  //    //      },
-  //    //      relaySet,
-  //    //    )
-  //    //    .then((ev) => {
-  //    //      if (!ev) {
-  //    //        console.error("Wallet not found");
-  //    //        return;
-  //    //      }
-  //    //      const event = new NDKEvent(ndk, ev);
-  //    //      event
-  //    //        .decrypt(new NDKUser({ pubkey }), ndk.signer, "nip44")
-  //    //        .then(() => {
-  //    //          NDKCashuWallet.from(event)
-  //    //            .then((w) => {
-  //    //              if (!w) return;
-  //    //              ndk.wallet = w;
-  //    //              setWallet(w);
-  //    //    	  setNDKWallets((wallets) => [...wallets, w]);
-  //    //              //fixme: this is trying to /mint/bolt11 already minted tokens?
-  //    //              w.start();
-  //    //              const name = w.walletId || event.dTag;
-  //    //              w.on("ready", () =>
-  //    //                toast.success(t("wallet.ready", { name })),
-  //    //              );
-  //    //            })
-  //    //            .catch((err) => {
-  //    //              console.error(err);
-  //    //              toast.error(t("wallet.sync-error"));
-  //    //            });
-  //    //        });
-  //    //    });
-  //    //  return () => {
-  //    //    if (wallet instanceof NDKCashuWallet) {
-  //    //      wallet?.stop();
-  //    //    }
-  //    //  };
-  //    //} else
-  //   if (defaultWallet?.type === "nwc") {
-  //	    const existing = ndkWallets.find(w => w instanceof NDKNWCWallet && w.pairingCode === defaultWallet.connection)
-  //	    if (existing) {
-  //		    ndk.wallet = existing;
-  //		    setWallet(existing);
-  //		    return;
-  //	    }
-  //      const u = new URL(defaultWallet.connection);
-  //      const relayUrls = u.searchParams.getAll("relay");
-  //      for (const relay of relayUrls) {
-  //        nwcNdk.addExplicitRelay(relay);
-  //      }
-  //      const nwc = new NDKNWCWallet(nwcNdk, {
-  //        timeout: 20_000,
-  //        pairingCode: defaultWallet.connection,
-  //      });
-  //      nwc.on("ready", () => {
-  //        setWallet(nwc);
-  //        ndk.wallet = nwc;
-  //		  setNDKWallets((wallets) => [...wallets, nwc]);
-  //      });
-  //    } else if (defaultWallet?.type === "webln") {
-  //	    const existing = ndkWallets.find((w: NDKWallet) => w instanceof NDKWebLNWallet)
-  //	    if (existing) {
-  //		    ndk.wallet = existing;
-  //		    setWallet(existing);
-  //		    return;
-  //	    }
-  //      const w = new NDKWebLNWallet();
-  //      setWallet(w);
-  //      ndk.wallet = w;
-  //setNDKWallets((wallets) => [...wallets, w]);
-  //    }
-  //  }, [defaultWallet]);
-
   useEffect(() => {
     if (cashu && pubkey && !cashuWallet) {
       createCashuWallet(cashu, ndk, mintList ? mintList.relays : relays)
@@ -248,6 +166,7 @@ function useStreamMap(
       {
         cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
         closeOnEose: false,
+        groupable: false,
       },
       relaySet,
     );
@@ -448,8 +367,7 @@ export function useWebLNBalance(wallet: NDKWebLNWallet) {
 }
 
 export function useCashuBalance(wallet: NDKCashuWallet) {
-  const proofs = wallet.state.getProofEntries({ onlyAvailable: true });
-  return proofs.reduce((acc, b) => acc + b.proof.amount, 0);
+  return wallet.state.getBalance();
 }
 
 export function useNWCInfo(wallet: NDKNWCWallet) {
@@ -541,6 +459,7 @@ export function useNWCTransactions(wallet: NDKNWCWallet) {
   });
 }
 
+//todo
 //export function useWebLNTransactions(wallet: NDKWebLNWallet) {
 //  return useQuery({
 //    enabled: Boolean(wallet.provider),
@@ -606,6 +525,7 @@ export async function createCashuWallet(
     resolve(w);
     w.on("ready", () => {
       resolve(w);
+      w.checkProofs();
     });
   });
 }
