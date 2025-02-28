@@ -5,26 +5,25 @@ import { useQuery } from "@tanstack/react-query";
 import {
   NDKEvent,
   NDKKind,
+  NDKNutzap,
+  NDKUser,
+  NDKZapper,
   NDKSubscriptionCacheUsage,
 } from "@nostr-dev-kit/ndk";
+import { useMintList } from "@/lib/cashu";
 import { useNDK } from "@/lib/ndk";
-import { useRelaySet } from "@/lib/nostr";
+import { defaultMints } from "@/lib/wallet";
+import { useRelaySet, useStream, useRelays } from "@/lib/nostr";
 import { NostrEvent } from "nostr-tools";
 import { LNURL } from "@/lib/query";
-import { useGroup } from "@/lib/nostr/groups";
-import type { Group } from "@/lib/types";
 import { Zap, validateZap } from "@/lib/nip-57";
+import { usePubkey } from "@/lib/account";
 
 export const HUGE_AMOUNT = 21_000;
 
 // Record how many times we have used each amount to suggest it to the user
 type ZapAmounts = Record<number, number>;
 // todo: local-storage synced, store frequency, sort amounts by frequency
-
-interface ZapAmount {
-  amount: number;
-  frequency: number;
-}
 
 export const zapAmountsAtom = atomWithStorage<ZapAmounts>(
   "zap-amounts",
@@ -48,12 +47,15 @@ export function useIncreaseZapAmount() {
   );
 }
 
-export function useZapAmounts(): ZapAmount[] {
+export function useZapAmounts(): number[] {
   const amounts = useAtomValue(zapAmountsAtom);
-  return Object.entries(amounts).map(([amount, frequency]) => ({
-    amount: parseInt(amount),
-    frequency,
-  }));
+  return Object.entries(amounts)
+    .map(([amount, frequency]) => ({
+      amount: parseInt(amount),
+      frequency,
+    }))
+    .sort((a, b) => b.frequency - a.frequency)
+    .map(({ amount }) => amount);
 }
 
 interface LNURLParams {
@@ -70,7 +72,6 @@ interface LNURLParams {
 type LNURLResponse = { status: "ERROR"; reason?: string } | LNURLParams;
 
 async function fetchLNURLParams(lud16: string) {
-  console.log("FETCHLNURL", lud16);
   const [name, domain] = lud16.split("@");
   const lnurlParams = (await fetch(
     `https://${domain}/.well-known/lnurlp/${name}`,
@@ -106,38 +107,98 @@ export function fetchInvoice(
   ).then((r) => r.json());
 }
 
-export function useZap(group: Group, pubkey: string, event?: NostrEvent) {
-  const { data: metadata } = useGroup(group);
+function shuffle<T>(array: T[]): T[] {
+  return array.sort(() => Math.random() - 0.5);
+}
+
+export function useNutzap(
+  pubkey: string,
+  relays: string[],
+  event?: NostrEvent,
+) {
   const ndk = useNDK();
-  const zap = useCallback(
-    (content: string, amount: number, tags: string[][]) => {
-      const zapped = event ? new NDKEvent(ndk, event) : null;
-      // todo: a-tag zaps
-      const [t, v] = zapped ? zapped.tagReference() : [];
-      const ev = new NDKEvent(ndk, {
-        kind: NDKKind.ZapRequest,
-        content,
-        tags: [
-          ["relays", group.relay],
-          ["p", pubkey],
-          ["amount", String(amount * 1000)],
-          ...tags,
-          ...(t && v ? [[t, v]] : []),
-        ],
-      } as NostrEvent);
-      // a-tag the group so in case `h` is not set in the receipt we can still find the zap
-      if (metadata) {
-        ev.tags.push([
-          "a",
-          `${NDKKind.GroupMetadata}:${metadata.pubkey}:${metadata.id}`,
-          group.relay,
-        ]);
-      }
-      return ev;
+  const myRelays = useRelays();
+  const { data: mintList } = useMintList(pubkey);
+  const relaySet = useRelaySet(Array.from(new Set(relays.concat(myRelays))));
+  return useCallback(
+    async (
+      content: string,
+      amount: number,
+      tags: string[][],
+      onZap: (z: NDKNutzap) => void,
+    ) => {
+      // todo: filter mint list for mints that can mitn tokens
+      return new Promise(async (resolve, reject) => {
+        try {
+          const zapped = event ? new NDKEvent(ndk, event) : null;
+          const zapper = new Zapper(
+            zapped ? zapped : new NDKUser({ pubkey }),
+            Number(amount) * 1000,
+            {
+              comment: content,
+              ndk,
+              tags,
+            },
+            { relays },
+          );
+          zapper.on("complete", (res) => {
+            resolve(res);
+          });
+          const nutzap = await zapper.zapNip61(
+            {
+              amount: Number(amount) * 1000,
+              pubkey,
+            },
+            {
+              // @ts-expect-error: needed to override default comment
+              paymentDescription: content,
+              relays: mintList?.relays || relays,
+              mints: mintList ? shuffle(mintList.mints) : defaultMints,
+              p2pk: mintList?.pubkey || pubkey,
+              allowIntramintFallback: true,
+            },
+          );
+          if (nutzap instanceof NDKNutzap) {
+            onZap(nutzap);
+            nutzap.publish(relaySet);
+          }
+        } catch (err) {
+          reject(err);
+        }
+      });
     },
-    [pubkey, event],
+    [pubkey, relays, event],
   );
-  return zap;
+}
+
+export function useZap(pubkey: string, relays: string[], event?: NostrEvent) {
+  const ndk = useNDK();
+  return useCallback(
+    async (content: string, amount: number, tags: string[][]) => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const zapped = event ? new NDKEvent(ndk, event) : null;
+          const zapper = new Zapper(
+            zapped ? zapped : new NDKUser({ pubkey }),
+            Number(amount) * 1000,
+            {
+              comment: content,
+              ndk,
+              tags,
+            },
+            { relays },
+          );
+          zapper.on("complete", (res) => {
+            resolve(res);
+          });
+          zapper.zap().then(resolve);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    },
+    [pubkey, relays, event],
+  );
 }
 
 interface WebLNWallet {
@@ -182,6 +243,28 @@ export function useWallets(): Wallet[] {
   ];
 }
 
+export function useSentZaps() {
+  const pubkey = usePubkey();
+  const relays = useRelays();
+  const filter = {
+    kinds: [NDKKind.Zap],
+    "#P": [pubkey!],
+    limit: 50,
+  };
+  return useStream(filter, relays, true, true);
+}
+
+export function useReceivedZaps() {
+  const pubkey = usePubkey();
+  const relays = useRelays();
+  const filter = {
+    kinds: [NDKKind.Zap],
+    "#p": [pubkey!],
+    limit: 50,
+  };
+  return useStream(filter, relays, true, true);
+}
+
 export function useZaps(event: NostrEvent, relays: string[], live = true) {
   const ndk = useNDK();
   const relaySet = useRelaySet(relays);
@@ -215,4 +298,26 @@ export function useZaps(event: NostrEvent, relays: string[], live = true) {
   }, []);
 
   return zaps;
+}
+
+interface ZapperConfig {
+  relays: string[];
+}
+
+export class Zapper extends NDKZapper {
+  public config: ZapperConfig;
+
+  constructor(
+    target: NDKEvent | NDKUser,
+    amount: number,
+    options = {},
+    config: ZapperConfig = { relays: [] },
+  ) {
+    super(target, amount, "msat", options);
+    this.config = config;
+  }
+
+  public async relays(): Promise<string[]> {
+    return this.config.relays;
+  }
 }

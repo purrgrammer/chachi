@@ -26,9 +26,6 @@ export const GroupImages = forwardRef(
         ref={ref}
         className={className}
         group={group}
-        live={true}
-        onlyRelays={group.id === "_"}
-        outboxRelays={[group.relay]}
         newPost={
           <NewImage group={group}>
             <Button size="sm" variant="outline">

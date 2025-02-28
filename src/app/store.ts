@@ -1,5 +1,6 @@
 import { atom, useAtom } from "jotai";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
+import { NostrEvent } from "nostr-tools";
 import type { LoginMethod, Account, Group, Relay, EmojiSet } from "@/lib/types";
 
 // todo: navigation history
@@ -26,20 +27,26 @@ interface GroupList {
   created_at: number;
   content: string;
   groups: Group[];
+  couldDecrypt?: boolean;
+  privateGroups?: Group[];
 }
 
 export const groupListAtom = atomWithStorage<GroupList>(
-  "group-list",
+  "groups",
   {
     created_at: 0,
     content: "",
     groups: [],
+    couldDecrypt: false,
+    privateGroups: [],
   },
   createJSONStorage<GroupList>(() => localStorage),
   { getOnInit: true },
 );
 export const groupsAtom = atom<Group[]>((get) => {
-  return get(groupListAtom).groups;
+  const { groups, privateGroups } = get(groupListAtom);
+  // todo: deduplicate, show private
+  return groups.concat(privateGroups || []);
 });
 export const groupsContentAtom = atom<string>((get) => {
   return get(groupListAtom).content;
@@ -63,6 +70,32 @@ export const relayListAtom = atomWithStorage<RelayList>(
 );
 export const relaysAtom = atom<Relay[]>((get) => {
   return get(relayListAtom).relays;
+});
+
+// Cashu mints
+interface MintList {
+  created_at: number;
+  mints: string[];
+  relays: string[];
+  pubkey?: string;
+}
+
+export const mintListAtom = atomWithStorage<MintList>(
+  "mints-list",
+  {
+    created_at: 0,
+    mints: [],
+    relays: [],
+    pubkey: undefined,
+  },
+  createJSONStorage<MintList>(() => localStorage),
+  { getOnInit: true },
+);
+export const mintsAtom = atom<string[]>((get) => {
+  return get(mintListAtom).mints;
+});
+export const mintRelaysAtom = atom<string[]>((get) => {
+  return get(mintListAtom).relays;
 });
 
 // Frens
@@ -104,6 +137,13 @@ export const mediaServersAtom = atom<string[]>((get) => {
   return get(mediaServerListAtom).servers;
 });
 
+export const cashuAtom = atomWithStorage<NostrEvent | null>(
+  "cashu",
+  null,
+  createJSONStorage<NostrEvent | null>(() => localStorage),
+  { getOnInit: true },
+);
+
 // Emojis
 interface EmojiList {
   created_at: number;
@@ -129,10 +169,14 @@ export function useResetState() {
   const [, setContactList] = useAtom(contactListAtom);
   const [, setMediaServersList] = useAtom(mediaServerListAtom);
   const [, setEmojiList] = useAtom(emojiListAtom);
+  const [, setCashu] = useAtom(cashuAtom);
+  const [, setMintList] = useAtom(mintListAtom);
 
   return () => {
     setAccount(null);
     setLoginMethod(null);
+    setCashu(null);
+    setMintList({ created_at: 0, mints: [], relays: [] });
     setGroupList({ created_at: 0, content: "", groups: [] });
     setRelayList({ created_at: 0, relays: [] });
     setContactList({ created_at: 0, pubkeys: [] });

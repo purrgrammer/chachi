@@ -14,6 +14,7 @@ import {
   accountAtom,
   accountsAtom,
   followsAtom,
+  mintListAtom,
 } from "@/app/store";
 
 export function useAccount(): Account | null {
@@ -74,7 +75,7 @@ async function getNostrConnectSettings(ndk: NDK, nostrConnect: string) {
     } else {
       const user = await NDKUser.fromNip05(nostrConnect, ndk);
       if (user) {
-        const pubkey = user.hexpubkey;
+        const pubkey = user.pubkey;
         const relays =
           user.nip46Urls?.length > 0
             ? user.nip46Urls
@@ -132,4 +133,8 @@ export function useNip46Login() {
       toast.error("Error logging in with NIP-46");
     }
   };
+}
+
+export function useMintList() {
+  return useAtomValue(mintListAtom);
 }

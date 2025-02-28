@@ -5,14 +5,18 @@ import { NostrEvent } from "nostr-tools";
 import { groupURL } from "@/lib/groups";
 import { ChatMessage } from "@/components/nostr/chat/chat";
 import { useGroup } from "@/lib/nostr/groups";
+import { cn } from "@/lib/utils";
 import type { Group } from "@/lib/types";
 
-function GroupName({ group }: { group: Group }) {
+function GroupName({ group, className }: { group: Group; className?: string }) {
   const { data: metadata } = useGroup(group);
   return metadata ? (
     <Link
       to={groupURL(group)}
-      className="text-sm hover:cursor-pointer hover:underline hover:decoration-dotted"
+      className={cn(
+        "text-sm hover:cursor-pointer hover:underline hover:decoration-dotted",
+        className,
+      )}
     >
       <div className="flex flex-row items-center gap-1">
         {metadata.picture ? (
@@ -26,23 +30,28 @@ function GroupName({ group }: { group: Group }) {
 
 interface ChatBubbleProps {
   event: NostrEvent;
+  group?: Group;
 }
 
-export function ChatBubble({ event }: ChatBubbleProps) {
+export function ChatBubble({ event, group }: ChatBubbleProps) {
   const { t } = useTranslation();
   const groupTag = event.tags.find((t) => t[0] === "h");
   const [, id, relay] = groupTag ? groupTag : [];
-  const group = { id, relay };
+  const chatGroup = { id, relay };
+  const isForwarded =
+    chatGroup.id &&
+    chatGroup.relay &&
+    (group?.id !== chatGroup.id || group?.relay !== chatGroup.relay);
   return (
-    <div className="flex flex-col gap-0">
-      {group.id && group.relay ? (
-        <div className="flex flex-row gap-1 items-center text-muted-foreground ml-10">
+    <div className="flex flex-col gap-0.5">
+      {isForwarded ? (
+        <div className="flex flex-row gap-1 items-center text-muted-foreground ml-9">
           <Forward className="size-4" />
-          <span className="text-sm">{t("chat.message.forward.forwarded")}</span>
-          <GroupName group={group} />
+          <span className="text-xs">{t("chat.message.forward.forwarded")}</span>
+          <GroupName group={chatGroup} className="text-xs" />
         </div>
       ) : null}
-      <ChatMessage event={event} group={group} admins={[]} />
+      <ChatMessage event={event} group={group} admins={[]} className="" />
     </div>
   );
 }

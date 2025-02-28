@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Maximize,
+  Bitcoin,
   Reply,
   SmilePlus,
   Trash,
@@ -10,9 +11,11 @@ import {
   MessageSquareShare,
   Ban,
 } from "lucide-react";
+import { NewZapDialog } from "@/components/nostr/zap";
 import { NDKRelaySet } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { Empty } from "@/components/empty";
+import { Name } from "@/components/nostr/name";
 import { Loading } from "@/components/loading";
 import { useNavigate } from "react-router-dom";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
@@ -51,7 +54,6 @@ import { Stream } from "@/components/nostr/stream";
 import People from "@/components/nostr/people";
 import { EmojiSet } from "@/components/nostr/emoji-set";
 import { GIFSet } from "@/components/nostr/gif-set";
-import { Emoji } from "@/components/emoji";
 import Reaction from "@/components/nostr/reaction";
 import {
   ContextMenu,
@@ -64,12 +66,14 @@ import { Emoji as PickerEmoji, EmojiPicker } from "@/components/emoji-picker";
 import { Poll, PollResults } from "@/components/nostr/poll";
 import { CalendarEvent } from "@/components/nostr/calendar";
 import { ReplyDialog } from "@/components/nostr/reply";
+import { useMintList } from "@/lib/cashu";
 import { getRelayHost } from "@/lib/relay";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet, useRelays } from "@/lib/nostr";
 import { useReplies } from "@/lib/nostr/comments";
-import { useGroupAdminsList, useGroupName } from "@/lib/nostr/groups";
+import { useGroupAdminsList } from "@/lib/nostr/groups";
 import { useMyGroups, useOpenGroup, groupId } from "@/lib/groups";
+import { MintEventPreview, MintEventDetail } from "@/components/mint";
 import {
   POLL,
   REPO,
@@ -80,6 +84,8 @@ import {
   GIF_SET,
   //GOAL,
   BOOK,
+  //BOOK_CONTENT,
+  CASHU_MINT,
 } from "@/lib/kinds";
 import {
   Dialog,
@@ -101,6 +107,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { WikiPreview, WikiDetail } from "@/components/nostr/wiki";
 import { saveGroupEvent } from "@/lib/messages";
 import { usePubkey, useCanSign } from "@/lib/account";
 import type { Group, Emoji as EmojiType } from "@/lib/types";
@@ -108,11 +115,11 @@ import { useTranslation } from "react-i18next";
 
 type EventComponent = (props: {
   event: NostrEvent;
-  group: Group;
   relays: string[];
+  group?: Group;
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
-}) => JSX.Element;
+}) => JSX.Element | null;
 
 // todo: events with no header or alternative author (group metadata, zap?, stream)
 const eventDetails: Record<
@@ -141,7 +148,7 @@ const eventDetails: Record<
   [NDKKind.GroupChat]: {
     noHeader: true,
     className: "border-none",
-    innerClassname: "pb-0",
+    innerClassname: "pt-2 pb-0 px-2",
     preview: ChatBubble,
     detail: ChatBubbleDetail,
   },
@@ -200,7 +207,8 @@ const eventDetails: Record<
   },
   [NDKKind.Zap]: {
     noHeader: true,
-    className: "relative rounded-md bg-background/80 border-none my-0.5",
+    className:
+      "relative rounded-md bg-background/80 border-none my-0.5 border-gradient",
     preview: ZapPreview,
     detail: ZapDetail,
   },
@@ -236,6 +244,15 @@ const eventDetails: Record<
     preview: Reaction,
     detail: Reaction,
   },
+  [NDKKind.Wiki]: {
+    preview: WikiPreview,
+    detail: WikiDetail,
+  },
+  [CASHU_MINT]: {
+    noHeader: true,
+    preview: MintEventPreview,
+    detail: MintEventDetail,
+  },
 };
 
 function ShareDialog({
@@ -254,7 +271,6 @@ function ShareDialog({
   const ndk = useNDK();
   const [message, setMessage] = useState("");
   const [customEmoji, setCustomEmoji] = useState<EmojiType[]>([]);
-  const groupName = useGroupName(group);
   const openGroup = useOpenGroup(group);
   const { t } = useTranslation();
 
@@ -288,7 +304,6 @@ function ShareDialog({
     } catch (err) {
       console.error(err);
       toast.error(t("share.error"));
-    } finally {
     }
   }
 
@@ -297,9 +312,13 @@ function ShareDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{t("share.publication")}</DialogTitle>
-          {groupName ? (
+          {group ? (
             <DialogDescription>
-              {t("share.this.in", { groupName })}
+              {t("share.in.group")}{" "}
+              <div className="flex flex-row items-center gap-1">
+                <GroupPicture group={group} className="size-5" />
+                <GroupName group={group} />
+              </div>
             </DialogDescription>
           ) : (
             <DialogDescription>{t("share.this.publication")}</DialogDescription>
@@ -319,9 +338,12 @@ function ShareDialog({
         />
         <DialogFooter>
           <Button className="overflow-x-hidden w-full" onClick={shareEvent}>
-            <MessageSquareShare />
-            {t("share-in")}
-            <GroupPicture group={group} className="size-4" /> {groupName}
+            <div className="flex flex-row items-center gap-1">
+              <MessageSquareShare />
+              {t("share-in")}
+              <GroupPicture group={group} className="size-4" />{" "}
+              <GroupName group={group} />
+            </div>
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -336,30 +358,29 @@ function EventMenu({
   canOpen,
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   relays: string[];
   canOpen?: boolean;
 }) {
   const [showShareDialog, setShowShareDialog] = useState(false);
-  const [shareGroup, setShareGroup] = useState<Group>(group);
+  const [shareGroup, setShareGroup] = useState<Group | undefined>(group);
   const ndk = useNDK();
   const navigate = useNavigate();
   const groups = useMyGroups();
-  const groupName = useGroupName(group);
   const isGroupEvent =
-    group.id !== "_" && event.tags.find((t) => t[0] === "h")?.[1] === group.id;
+    group &&
+    group.id !== "_" &&
+    event.tags.find((t) => t[0] === "h")?.[1] === group.id;
   const { t } = useTranslation();
+  const [showZapDialog, setShowZapDialog] = useState(false);
+  const { data: mintList } = useMintList(event.pubkey);
 
   function showDetail() {
     const ev = new NDKEvent(ndk, event);
     // @ts-expect-error for some reason it thinks this function takes a number
     const nlink = ev.encode(relays);
-    let url = "";
-    if (group.id === "_") {
-      url = `/${getRelayHost(group.relay)}/e/${nlink}`;
-    } else {
-      url = `/${getRelayHost(group.relay)}/${group.id}/e/${nlink}`;
-    }
+    const prefix = group ? `/${getRelayHost(group.relay)}` : "";
+    const url = `${prefix}/e/${nlink}`;
     navigate(url);
   }
 
@@ -370,13 +391,26 @@ function EventMenu({
 
   return (
     <>
-      <ShareDialog
-        open={showShareDialog}
-        onOpenChange={setShowShareDialog}
-        event={event}
-        group={shareGroup}
-        relays={relays}
-      />
+      {showZapDialog ? (
+        <NewZapDialog
+          open={showZapDialog}
+          onClose={() => setShowZapDialog(false)}
+          event={event}
+          pubkey={event.pubkey}
+          group={group}
+          onZap={() => setShowZapDialog(false)}
+          zapType={mintList?.pubkey ? "nip-61" : "nip-57"}
+        />
+      ) : null}
+      {shareGroup ? (
+        <ShareDialog
+          open={showShareDialog}
+          onOpenChange={setShowShareDialog}
+          event={event}
+          group={shareGroup}
+          relays={relays}
+        />
+      ) : null}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon">
@@ -391,14 +425,21 @@ function EventMenu({
                 <span>{t("action-open")}</span>
               </DropdownMenuItem>
             ) : null}
-            {isGroupEvent ? (
+            <DropdownMenuItem onClick={() => setShowZapDialog(true)}>
+              <Bitcoin />
+              <span>{t("action-zap")}</span>
+            </DropdownMenuItem>
+            {isGroupEvent && group ? (
               <DropdownMenuItem onClick={() => shareIn(group)}>
                 <MessageSquareShare />
-                {groupName ? (
-                  <span className="line-clamp-1">
-                    {" "}
-                    {t("share.in.x", { groupName })}
-                  </span>
+                {group ? (
+                  <div className="flex flex-row items-center gap-1.5 line-clamp-1">
+                    {t("share-in")}
+                    <div className="flex flex-row items-center gap-1">
+                      <GroupPicture group={group} className="size-4" />{" "}
+                      <GroupName group={group} />
+                    </div>
+                  </div>
                 ) : (
                   <span className="line-clamp-1">{t("share.in.chat")}</span>
                 )}
@@ -431,6 +472,99 @@ function EventMenu({
   );
 }
 
+// todo: delete item when not group
+function DeleteGroupEventItem({
+  event,
+  group,
+  onDelete,
+}: {
+  event: NostrEvent;
+  group: Group;
+  onDelete: () => void;
+}) {
+  const ndk = useNDK();
+  const me = usePubkey();
+  const { data: admins } = useGroupAdminsList(group);
+  const { t } = useTranslation();
+  const relaySet = useRelaySet([group.relay]);
+  const canDelete = me && (me === event.pubkey || admins?.includes(me));
+
+  async function handleDelete() {
+    try {
+      const ev = new NDKEvent(ndk, {
+        kind:
+          event.pubkey === me || group.id === "_"
+            ? NDKKind.EventDeletion
+            : (9005 as NDKKind),
+        content: "",
+      } as NostrEvent);
+      ev.tag(new NDKEvent(ndk, event));
+      await ev.publish(relaySet);
+      toast.success(t("post.delete.success"));
+      onDelete();
+    } catch (err) {
+      console.error(err);
+      toast.error(t("post.delete.error"));
+    }
+  }
+
+  return canDelete ? (
+    <ContextMenuItem className="cursor-pointer" onClick={handleDelete}>
+      {t("chat.message.delete.action")}
+      <ContextMenuShortcut>
+        <Trash className="w-4 h-4 text-destructive" />
+      </ContextMenuShortcut>
+    </ContextMenuItem>
+  ) : null;
+}
+
+function AsReply({
+  event,
+  group,
+  className,
+  onClick,
+}: {
+  event: NostrEvent;
+  group?: Group;
+  className?: string;
+  onClick?: (ev: NostrEvent) => void;
+}) {
+  return (
+    <div
+      className={cn(
+        "h-12 p-1 pl-2 border-l-4 rounded-md mb-1 bg-background/80 border-background dark:bg-background/40 dark:border-background/60",
+        onClick ? "cursor-pointer" : "",
+        className,
+      )}
+      onClick={onClick ? () => onClick(event) : undefined}
+    >
+      <h4 className="text-sm font-semibold">
+        <Name pubkey={event.pubkey} />
+      </h4>
+      <RichText
+        group={group}
+        tags={event.tags}
+        options={{
+          inline: true,
+          mentions: true,
+          urls: true,
+          emojis: true,
+          images: false,
+          video: false,
+          audio: false,
+          youtube: false,
+          events: false,
+          hashtags: true,
+          ecash: false,
+        }}
+        className="break-all line-clamp-1"
+      >
+        {event.content}
+      </RichText>
+    </div>
+  );
+}
+
 export function FeedEmbed({
   event,
   group,
@@ -442,7 +576,7 @@ export function FeedEmbed({
   relays = [],
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   className?: string;
   canOpenDetails?: boolean;
   showReactions?: boolean;
@@ -452,18 +586,19 @@ export function FeedEmbed({
 }) {
   const ndk = useNDK();
   const userRelays = useRelays();
-  const me = usePubkey();
   const canSign = useCanSign();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showReplyDialog, setShowReplyDialog] = useState(false);
-  const relaySet = useRelaySet([group.relay]);
+  const [zapType, setZapType] = useState<"nip-57" | "nip-61">("nip-61");
+  const [showZapDialog, setShowZapDialog] = useState(false);
   const components = eventDetails[event.kind];
-  const { data: admins } = useGroupAdminsList(group);
-  const canDelete = me && (me === event.pubkey || admins?.includes(me));
   const [isDeleted, setIsDeleted] = useState(false);
+  const relaySet = useRelaySet(group ? [group.relay] : userRelays);
   // NIP-31
   const alt = event.tags.find((t) => t[0] === "alt")?.[1];
   const { t } = useTranslation();
+  const isRelayGroup = group?.id === "_";
+  const { data: mintList } = useMintList(event.pubkey);
 
   function openEmojiPicker() {
     setShowEmojiPicker(true);
@@ -471,6 +606,11 @@ export function FeedEmbed({
 
   function openReplyDialog() {
     setShowReplyDialog(true);
+  }
+
+  function openZapDialog(type: "nip-61" | "nip-57") {
+    setZapType(type);
+    setShowZapDialog(true);
   }
 
   async function onReply(content: string, tags: string[][]) {
@@ -485,14 +625,14 @@ export function FeedEmbed({
       const rootKind =
         event.tags.find((t) => t[0] === "K")?.[1] ?? String(event.kind);
       const rootRef = root ? root[1] : ref;
-      const rootRelay = root ? root[2] : group.relay;
+      const rootRelay = root ? root[2] : (group?.relay ?? "");
       const rootPubkey = root ? root[3] : event.pubkey;
       const ev = new NDKEvent(ndk, {
         kind: COMMENT,
         content,
         tags: [
-          ["h", group.id, group.relay],
-          ...(group.id === "_" ? [["-"]] : []),
+          ...(group ? [["h", group.id, group.relay]] : []),
+          ...(group && group.id === "_" ? [["-"]] : []),
           // root marker
           rootTag === "E"
             ? [rootTag, rootRef, rootRelay, rootPubkey]
@@ -500,8 +640,8 @@ export function FeedEmbed({
           ["K", rootKind],
           // parent item
           t === "e"
-            ? [t, ref, group.relay, event.pubkey]
-            : [t, ref, group.relay],
+            ? [t, ref, group ? group.relay : "", event.pubkey]
+            : [t, ref, group ? group.relay : ""],
           ["k", String(event.kind)],
           ...tags,
         ],
@@ -527,47 +667,11 @@ export function FeedEmbed({
         ev.tags.push(["emoji", e.name, e.src]);
       }
       await ev.publish(relaySet);
-      if (e.native) {
-        // TODO add translation
-        // toast.success(`Reacted with ${e.native}`);
-        toast.success(t("chat.message.react.success", { emoji: e.native }));
-      } else if (e.src) {
-        // nit: info icon
-        toast(
-          <div className="flex flex-row gap-2 items-center">
-            {t("chat.message.react.with")}
-            <Emoji
-              name={e.name}
-              image={e.src}
-              className="inline-block w-5 h-5"
-            />
-          </div>,
-        );
-      }
     } catch (err) {
       console.error(err);
       toast.error(t("chat.message.react.error"));
     } finally {
       setShowEmojiPicker(false);
-    }
-  }
-
-  async function onDelete() {
-    try {
-      const ev = new NDKEvent(ndk, {
-        kind:
-          event.pubkey === me || group.id === "_"
-            ? NDKKind.EventDeletion
-            : (9005 as NDKKind),
-        content: "",
-      } as NostrEvent);
-      ev.tag(new NDKEvent(ndk, event));
-      await ev.publish(relaySet);
-      toast.success(t("post.delete.success"));
-      setIsDeleted(true);
-    } catch (err) {
-      console.error(err);
-      toast.error(t("post.delete.error"));
     }
   }
 
@@ -584,7 +688,7 @@ export function FeedEmbed({
   );
 
   const body = (
-    <div className="py-1 px-4 pb-2 space-y-3">
+    <div className={cn("py-1 px-4 pb-2 space-y-3", components?.className)}>
       {components?.preview ? (
         components.preview({
           event,
@@ -608,8 +712,8 @@ export function FeedEmbed({
       {showReactions ? (
         <Reactions
           event={event}
-          relays={[group.relay, ...relays, ...userRelays]}
-          kinds={[NDKKind.Zap, NDKKind.Reaction]}
+          relays={group ? [group.relay] : [...relays, ...userRelays]}
+          kinds={[NDKKind.Zap, NDKKind.Nutzap, NDKKind.Reaction]}
         />
       ) : null}
     </div>
@@ -674,13 +778,33 @@ export function FeedEmbed({
                   <SmilePlus className="w-4 h-4" />
                 </ContextMenuShortcut>
               </ContextMenuItem>
-              {canDelete ? (
-                <ContextMenuItem className="cursor-pointer" onClick={onDelete}>
-                  {t("chat.message.delete.action")}
+              {isRelayGroup ? (
+                <ContextMenuItem
+                  className="cursor-pointer"
+                  onClick={() => openZapDialog("nip-57")}
+                >
+                  {t("chat.message.zap.action")}
                   <ContextMenuShortcut>
-                    <Trash className="w-4 h-4 text-destructive" />
+                    <Bitcoin className="w-4 h-4" />
                   </ContextMenuShortcut>
                 </ContextMenuItem>
+              ) : mintList?.pubkey ? (
+                <ContextMenuItem
+                  className="cursor-pointer"
+                  onClick={() => openZapDialog("nip-61")}
+                >
+                  {t("chat.message.zap.action")}
+                  <ContextMenuShortcut>
+                    <Bitcoin className="w-4 h-4" />
+                  </ContextMenuShortcut>
+                </ContextMenuItem>
+              ) : null}
+              {group ? (
+                <DeleteGroupEventItem
+                  event={event}
+                  group={group}
+                  onDelete={() => setIsDeleted(true)}
+                />
               ) : null}
             </ContextMenuContent>
           </ContextMenu>
@@ -708,21 +832,23 @@ export function FeedEmbed({
           <SmilePlus className="absolute right-2 top-3 z-0 size-6" />
         </>
       )}
+      {showZapDialog ? (
+        <NewZapDialog
+          open={showZapDialog}
+          onZap={() => setShowZapDialog(false)}
+          onClose={() => setShowZapDialog(false)}
+          event={event}
+          pubkey={event.pubkey}
+          group={group}
+          zapType={zapType}
+        />
+      ) : null}
       {showEmojiPicker && canSign ? (
         <EmojiPicker
           open={showEmojiPicker}
           onOpenChange={setShowEmojiPicker}
           onEmojiSelect={onEmojiSelect}
-        >
-          <Embed
-            canOpenDetails={false}
-            showReactions={false}
-            event={event}
-            group={group}
-            relays={relays}
-            className="overflow-y-auto overflow-x-hidden max-h-32 rounded-b-none border-none pretty-scrollbar"
-          />
-        </EmojiPicker>
+        />
       ) : null}
       {showReplyDialog && canSign ? (
         <ReplyDialog
@@ -755,9 +881,11 @@ export function Embed({
   showReactions = true,
   options = {},
   relays = [],
+  asReply = false,
+  onClick,
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   className?: string;
   canOpenDetails?: boolean;
   isDetail?: boolean;
@@ -765,11 +893,23 @@ export function Embed({
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
   relays: string[];
+  asReply?: boolean;
+  onClick?: (ev: NostrEvent) => void;
 }) {
   const userRelays = useRelays();
   const components = eventDetails[event.kind];
   // NIP-31
   const alt = event.tags.find((t) => t[0] === "alt")?.[1];
+  if (asReply) {
+    return (
+      <AsReply
+        event={event}
+        group={group}
+        className={className}
+        onClick={onClick}
+      />
+    );
+  }
   return (
     <div
       className={cn(
@@ -814,8 +954,8 @@ export function Embed({
         {showReactions ? (
           <Reactions
             event={event}
-            relays={[group.relay, ...relays, ...userRelays]}
-            kinds={[NDKKind.Zap, NDKKind.Reaction]}
+            relays={group ? [group.relay] : [...relays, ...userRelays]}
+            kinds={[NDKKind.Zap, NDKKind.Nutzap, NDKKind.Reaction]}
           />
         ) : null}
       </div>
@@ -829,7 +969,7 @@ export function EventDetail({
   relays,
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   relays: string[];
 }) {
   const { eose, events: comments } = useReplies(event, group);

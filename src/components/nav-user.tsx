@@ -1,3 +1,4 @@
+import { useNavigate } from "@/lib/navigation";
 import {
   ChevronsUpDown,
   LogOut,
@@ -7,6 +8,8 @@ import {
   Check,
   Languages,
   Palette,
+  Settings,
+  Zap,
 } from "lucide-react";
 import { Login } from "@/components/nostr/login";
 import { Avatar } from "@/components/nostr/avatar";
@@ -31,8 +34,16 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { WalletBalance } from "@/components/wallet";
 import { useAccount, useLogout } from "@/lib/account";
 import { useTranslation } from "react-i18next";
+import {
+  NDKWallet,
+  NDKCashuWallet,
+  NDKNWCWallet,
+  NDKWebLNWallet,
+} from "@nostr-dev-kit/ndk-wallet";
+import { useNDKWallets } from "@/lib/wallet";
 import { changeLanguage } from "@/i18n";
 
 function UserInfo({ pubkey }: { pubkey: string }) {
@@ -54,11 +65,24 @@ function UserInfo({ pubkey }: { pubkey: string }) {
 export function NavUser() {
   const { isMobile, open, openMobile, state } = useSidebar();
   const { theme, setTheme } = useTheme();
+  const [wallets] = useNDKWallets();
   const logout = useLogout();
   const account = useAccount();
+  const navigate = useNavigate();
   const pubkey = account?.pubkey;
   const isExpanded = state === "expanded" || open || openMobile;
   const { t, i18n } = useTranslation();
+
+  function openWallet(wallet: NDKWallet) {
+    if (wallet instanceof NDKNWCWallet && wallet.pairingCode) {
+      navigate(`/wallet/nwc/${encodeURIComponent(wallet.pairingCode)}`);
+    } else if (wallet instanceof NDKCashuWallet) {
+      navigate(`/wallet`);
+    } else if (wallet instanceof NDKWebLNWallet) {
+      navigate(`/wallet/webln`);
+    }
+  }
+
   return (
     <SidebarMenu>
       {pubkey ? (
@@ -84,6 +108,21 @@ export function NavUser() {
                   <UserInfo pubkey={pubkey} />
                 </div>
               </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate("/zaps")}>
+                <Zap className="text-muted-foreground size-4" />
+                {t("user.zaps")}
+              </DropdownMenuItem>
+              {wallets.map((wallet) => (
+                <DropdownMenuItem onClick={() => openWallet(wallet)}>
+                  <WalletBalance wallet={wallet} />
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate("/settings")}>
+                <Settings className="text-muted-foreground size-4" />
+                {t("user.settings")}
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>

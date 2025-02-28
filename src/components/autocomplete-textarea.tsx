@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, useMemo, KeyboardEvent } from "react";
 import { Crown, Reply as ReplyIcon, X } from "lucide-react";
+import { NDKKind } from "@nostr-dev-kit/ndk";
+import { validateZap } from "@/lib/nip-57";
 import { NostrEvent } from "nostr-tools";
 import { motion, AnimatePresence } from "framer-motion";
 import { npubEncode } from "nostr-tools/nip19";
@@ -14,7 +16,7 @@ import { useGroupAdminsList } from "@/lib/nostr/groups";
 import { useMembers } from "@/lib/messages";
 import { cn, dedupeBy } from "@/lib/utils";
 import { Highlight } from "@/components/highlight";
-import { usePubkey } from "@/lib/account";
+import { usePubkey, useFollows } from "@/lib/account";
 import { emojis } from "@/lib/emoji";
 import type { Group, Emoji, Profile } from "@/lib/types";
 
@@ -35,6 +37,10 @@ function ReplyPreview({
   reply: NostrEvent;
   setReplyingTo?: (event: NostrEvent | undefined) => void;
 }) {
+  const author =
+    reply.kind === NDKKind.Zap
+      ? validateZap(reply)?.pubkey || reply.pubkey
+      : reply.pubkey;
   return (
     <motion.div
       initial={{
@@ -59,7 +65,7 @@ function ReplyPreview({
         <ReplyIcon className="w-4 h-4 text-muted-foreground" />
       </div>
       <h4 className="font-semibold text-sm">
-        <Name pubkey={reply.pubkey} />
+        <Name pubkey={author} />
       </h4>
       <p className="line-clamp-1">{reply.content}</p>
       <div className="w-7">
@@ -77,7 +83,7 @@ function ReplyPreview({
 }
 
 interface AutocompleteTextareaProps extends TextareaProps {
-  group: Group;
+  group?: Group;
   className?: string;
   topOffset?: number;
   message: string;
@@ -88,6 +94,7 @@ interface AutocompleteTextareaProps extends TextareaProps {
   setReplyingTo?: (event: NostrEvent | undefined) => void;
   submitOnEnter?: boolean;
   focusAfterSubmit?: boolean;
+  disableEmojiAutocomplete?: boolean;
 }
 
 export function AutocompleteTextarea({
@@ -102,12 +109,14 @@ export function AutocompleteTextarea({
   setReplyingTo,
   submitOnEnter,
   focusAfterSubmit,
+  disableEmojiAutocomplete,
   ...props
 }: AutocompleteTextareaProps) {
   const ref = useRef<HTMLTextAreaElement | null>(null);
+  const follows = useFollows();
   const { data: adminList } = useGroupAdminsList(group);
-  const admins = adminList || [];
   const members = useMembers(group);
+  const admins = adminList || [];
   const me = usePubkey();
 
   // Emojis
@@ -125,7 +134,9 @@ export function AutocompleteTextarea({
   const [autocompleteTerm, setAutocompleteTerm] = useState("");
   const [autocompleteEmojiTerm, setAutocompleteEmojiTerm] = useState("");
 
-  const profiles = useProfiles(members ?? []);
+  const profiles = useProfiles(
+    group && members ? members : follows ? follows : [],
+  );
   const profileList = profiles.map((p) => p.data).filter(Boolean);
   const autocompleteProfiles =
     autocompleteTerm && isAutocompleting
@@ -240,7 +251,10 @@ export function AutocompleteTextarea({
       setIsAutocompleting(true);
       setAutocompleteEmojiTerm("");
       setIsAutocompletingEmoji(false);
-    } else if (emojiAutocompleteRegex.test(value)) {
+    } else if (
+      !disableEmojiAutocomplete &&
+      emojiAutocompleteRegex.test(value)
+    ) {
       setAutocompleteTerm("");
       setIsAutocompleting(false);
       const term = value.slice(value.lastIndexOf(":") + 1);
@@ -290,7 +304,7 @@ export function AutocompleteTextarea({
             setReplyingTo={setReplyingTo}
           />
         ) : null}
-        {isAutocompletingEmoji && (
+        {!disableEmojiAutocomplete && isAutocompletingEmoji && (
           <Autocomplete
             topOffset={topOffset}
             width={ref.current?.clientWidth ?? 0}

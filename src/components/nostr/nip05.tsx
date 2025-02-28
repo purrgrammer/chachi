@@ -8,5 +8,5 @@ export function Nip05({
   relays?: string[];
 }) {
   const { data: profile } = useProfile(pubkey, relays);
-  return profile?.nip05 || null;
+  return profile?.nip05?.replace(/^_@/, "") || null;
 }

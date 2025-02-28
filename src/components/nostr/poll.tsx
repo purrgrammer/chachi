@@ -37,7 +37,7 @@ function Option({
   id: string;
   iVoted: boolean;
   isMultipleChoice: boolean;
-  group: Group;
+  group?: Group;
   event: NostrEvent;
   text: string;
   votes: NostrEvent[];
@@ -104,7 +104,7 @@ export function Poll({
   className,
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   className?: string;
 }) {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -210,7 +210,7 @@ function ResultOption({
   votes,
 }: {
   id: string;
-  group: Group;
+  group?: Group;
   event: NostrEvent;
   text: string;
   votes: NostrEvent[];
@@ -246,7 +246,7 @@ export function PollResults({
   className,
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   className?: string;
 }) {
   const votes = useVotes(event);

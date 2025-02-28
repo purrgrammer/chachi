@@ -1,4 +1,5 @@
 import { useEvent, useAddress } from "@/lib/nostr";
+import { NostrEvent } from "nostr-tools";
 import { SearchSlash, Network, Ban } from "lucide-react";
 import { Embed } from "@/components/nostr/detail";
 import type { Group } from "@/lib/types";
@@ -41,13 +42,17 @@ export function Event({
   pubkey,
   className,
   showReactions = true,
+  asReply,
+  onClick,
 }: {
   id: string;
   relays: string[];
   pubkey?: string;
-  group: Group;
+  group?: Group;
   className?: string;
   showReactions?: boolean;
+  asReply?: boolean;
+  onClick?: (ev: NostrEvent) => void;
 }) {
   const { data: event, status } = useEvent({ id, pubkey, relays });
 
@@ -70,6 +75,8 @@ export function Event({
       className={className}
       relays={relays}
       showReactions={showReactions}
+      asReply={asReply}
+      onClick={onClick}
     />
   ) : (
     <EventNotFound />
@@ -84,14 +91,18 @@ export function Address({
   relays,
   className,
   showReactions = true,
+  asReply,
+  onClick,
 }: {
-  group: Group;
+  group?: Group;
   pubkey: string;
   kind: number;
   identifier: string;
   relays: string[];
   className?: string;
   showReactions?: boolean;
+  asReply?: boolean;
+  onClick?: (ev: NostrEvent) => void;
 }) {
   const { data: event, status } = useAddress({
     pubkey,
@@ -119,8 +130,70 @@ export function Address({
       className={className}
       relays={relays}
       showReactions={showReactions}
+      asReply={asReply}
+      onClick={onClick}
     />
   ) : (
     <EventNotFound />
+  );
+}
+
+export function E({
+  id,
+  group,
+  pubkey,
+  relays,
+  showReactions,
+  asReply,
+  onClick,
+}: {
+  id: string;
+  pubkey?: string;
+  group?: Group;
+  relays?: string[];
+  showReactions?: boolean;
+  asReply?: boolean;
+  onClick?: (ev: NostrEvent) => void;
+}) {
+  return (
+    <Event
+      id={id}
+      group={group}
+      pubkey={pubkey}
+      relays={relays ? relays : group ? [group.relay] : []}
+      showReactions={showReactions}
+      asReply={asReply}
+      onClick={onClick}
+    />
+  );
+}
+
+export function A({
+  address,
+  group,
+  relays,
+  showReactions,
+  asReply,
+  onClick,
+}: {
+  address: string;
+  group?: Group;
+  relays?: string[];
+  showReactions?: boolean;
+  asReply?: boolean;
+  onClick?: (ev: NostrEvent) => void;
+}) {
+  const [k, pubkey, d] = address.split(":");
+  return (
+    <Address
+      kind={Number(k)}
+      pubkey={pubkey}
+      identifier={d}
+      group={group}
+      relays={relays ? relays : group ? [group.relay] : []}
+      showReactions={showReactions}
+      asReply={asReply}
+      onClick={onClick}
+    />
   );
 }

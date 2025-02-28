@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useAtomValue } from "jotai";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { nip19 } from "nostr-tools";
@@ -13,11 +13,16 @@ import NDK, {
 } from "@nostr-dev-kit/ndk";
 import { relaysAtom } from "@/app/store";
 import { useNDK } from "@/lib/ndk";
-import { isRelayURL } from "@/lib/relay";
+import {
+  isRelayURL,
+  discoveryRelays,
+  profileRelays,
+  fallbackRelays,
+} from "@/lib/relay";
 import { EVENT, ADDRESS, PROFILE, RELAY_LIST } from "@/lib/query";
 
-interface NostrREQResult {
-  events: NostrEvent[];
+interface NostrREQResult<A> {
+  events: A[];
   eose: boolean;
 }
 
@@ -25,9 +30,12 @@ interface NostrREQResult {
 export function useRelaySet(relays: string[]): NDKRelaySet | undefined {
   const ndk = useNDK();
   const relayUrls = relays.filter(isRelayURL);
-  return relayUrls.length > 0 && ndk
-    ? NDKRelaySet.fromRelayUrls(relayUrls, ndk)
-    : undefined;
+  const relaySet = useMemo(() => {
+    return relayUrls.length > 0 && ndk
+      ? NDKRelaySet.fromRelayUrls(relayUrls, ndk)
+      : undefined;
+  }, [relayUrls]);
+  return relaySet;
 }
 
 // todo: rename useEventId
@@ -36,22 +44,26 @@ export function useEvent({
   pubkey,
   relays,
 }: {
-  id: string;
+  id?: string;
   pubkey?: string;
   relays: string[];
 }) {
   const ndk = useNDK();
 
   return useQuery({
+    enabled: Boolean(id),
     queryKey: [EVENT, id ? id : "empty"],
     queryFn: async () => {
+      if (!id) throw new Error("No id");
       const relayList =
         pubkey && relays.length === 0
           ? await fetchRelayList(ndk, pubkey)
           : relays.length > 0
             ? relays
-            : ["wss://relay.nostr.band"];
-      const relaySet = NDKRelaySet.fromRelayUrls(relayList, ndk);
+            : null;
+      const relaySet = relayList
+        ? NDKRelaySet.fromRelayUrls(relayList, ndk)
+        : undefined;
       return ndk
         .fetchEvent(
           { ids: [id] },
@@ -94,7 +106,7 @@ export function useAddress({
           ? await fetchRelayList(ndk, pubkey)
           : relays.length > 0
             ? relays
-            : ["wss://relay.nostr.band"];
+            : fallbackRelays;
       const relaySet = NDKRelaySet.fromRelayUrls(relayList, ndk);
       return ndk
         .fetchEvent(
@@ -228,8 +240,8 @@ export function useStream(
   filter: NDKFilter | NDKFilter[],
   relays: string[],
   live = true,
-  onlyRelays = false,
-): NostrREQResult {
+  onlyRelays = true,
+): NostrREQResult<NostrEvent> {
   const ndk = useNDK();
   const relaySet = useRelaySet(relays);
   const [eose, setEose] = useState(false);
@@ -244,8 +256,8 @@ export function useStream(
           : live
             ? NDKSubscriptionCacheUsage.PARALLEL
             : NDKSubscriptionCacheUsage.ONLY_CACHE,
-        closeOnEose: !live,
         skipOptimisticPublishEvent: true,
+        closeOnEose: !live,
       },
       relaySet,
     );
@@ -253,10 +265,8 @@ export function useStream(
     sub.on("event", (event) => {
       setEvents((events) => {
         const newEvents = [...events];
-        insertEventIntoDescendingList(
-          newEvents,
-          event.rawEvent() as NostrEvent,
-        );
+        const rawEvent = event.rawEvent() as NostrEvent;
+        insertEventIntoDescendingList(newEvents, rawEvent);
         return newEvents;
       });
     });
@@ -274,7 +284,7 @@ export function useStream(
 export function useRequest(
   filter: NDKFilter | NDKFilter[],
   relays: string[],
-): NostrREQResult {
+): NostrREQResult<NostrEvent> {
   const ndk = useNDK();
   const relaySet = useRelaySet(relays);
   const [eose, setEose] = useState(false);
@@ -286,6 +296,7 @@ export function useRequest(
       {
         closeOnEose: true,
         skipOptimisticPublishEvent: true,
+        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
       },
       relaySet,
     );
@@ -308,7 +319,7 @@ export function useRequest(
 
 // Users
 
-function fetchProfile(ndk: NDK, pubkey: string, relays: string[]) {
+export function fetchProfile(ndk: NDK, pubkey: string, relays: string[]) {
   // todo: use NDK helpers to fech profile
   return ndk
     .fetchEvent(
@@ -318,9 +329,7 @@ function fetchProfile(ndk: NDK, pubkey: string, relays: string[]) {
       },
       { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
       NDKRelaySet.fromRelayUrls(
-        relays.length > 0
-          ? relays
-          : ["wss://purplepag.es", "wss://relay.nostr.band"],
+        relays.length > 0 ? relays : profileRelays,
         ndk,
       ),
     )
@@ -342,25 +351,22 @@ export function useProfiles(pubkeys: string[]) {
     queries: pubkeys.map((pubkey) => {
       return {
         queryKey: [PROFILE, pubkey],
-        queryFn: () =>
-          fetchProfile(ndk, pubkey, [
-            "wss://purplepag.es",
-            "wss://relay.nostr.band",
-          ]),
+        queryFn: () => fetchProfile(ndk, pubkey, profileRelays),
         staleTime: Infinity,
       };
     }),
   });
 }
 
-export function useProfile(pubkey: string, relays: string[] = []) {
+export function useProfile(pubkey?: string, relays: string[] = []) {
   const ndk = useNDK();
 
   // todo: use user#fetchProfile?
   return useQuery({
-    queryKey: [PROFILE, pubkey],
+    enabled: Boolean(pubkey),
+    queryKey: [PROFILE, pubkey ? pubkey : "-"],
     queryFn: () => {
-      return fetchProfile(ndk, pubkey, relays);
+      return pubkey ? fetchProfile(ndk, pubkey, relays) : null;
     },
     staleTime: Infinity,
     gcTime: 1 * 60 * 1000,
@@ -375,10 +381,7 @@ async function fetchRelayList(ndk: NDK, pubkey: string) {
         authors: [pubkey],
       },
       { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.PARALLEL },
-      NDKRelaySet.fromRelayUrls(
-        ["wss://purplepag.es", "wss://relay.nostr.band"],
-        ndk,
-      ),
+      NDKRelaySet.fromRelayUrls(discoveryRelays, ndk),
     )
     .then((ev) => {
       if (ev) {
@@ -407,14 +410,11 @@ export function useReactions(
   live = true,
 ) {
   const ndk = useNDK();
-  return useStream(
-    {
-      kinds,
-      ...new NDKEvent(ndk, event).filter(),
-    },
-    relays,
-    live,
-  );
+  const filter = {
+    kinds,
+    ...new NDKEvent(ndk, event).filter(),
+  };
+  return useStream(filter, relays, live);
 }
 
 // Relays

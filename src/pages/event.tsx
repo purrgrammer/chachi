@@ -8,7 +8,7 @@ function WrongLink() {
   return <span>Link not recognized</span>;
 }
 
-function EventDetailPage({ group, nlink }: { group: Group; nlink: string }) {
+function EventDetailPage({ group, nlink }: { group?: Group; nlink: string }) {
   // todo: loading state
   const { event, relays, error } = useNostrLink(nlink);
   return event ? (
@@ -20,10 +20,13 @@ function EventDetailPage({ group, nlink }: { group: Group; nlink: string }) {
 
 export default function EventPage() {
   const { host, id, nlink } = useParams();
-  const group = {
-    id: id || "_",
-    relay: `wss://${host}`,
-  };
+  const group =
+    host && id
+      ? {
+          id: id || "_",
+          relay: `wss://${host}`,
+        }
+      : undefined;
   // todo: error handling
   return nlink ? (
     <EventDetailPage group={group} nlink={nlink} />

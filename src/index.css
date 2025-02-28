@@ -12,6 +12,8 @@
     --popover-foreground: 224 71.4% 4.1%;
     --primary: 262.1 83.3% 57.8%;
     --primary-foreground: 210 20% 98%;
+    --bitcoin-background: 24.6 95% 53.1%;
+    --bitcoin-foreground: 60 9.1% 97.8%;
     --secondary: 220 14.3% 95.9%;
     --secondary-foreground: 220.9 39.3% 11%;
     --muted: 220 14.3% 95.9%;
@@ -33,6 +35,7 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
     --arrow: 220.9 39.3% 11%;
+    --bg-gradient-opacity: 0.2;
   }
 
   .dark {
@@ -44,6 +47,8 @@
     --popover-foreground: 210 20% 98%;
     --primary: 263.4 70% 50.4%;
     --primary-foreground: 210 20% 98%;
+    --bitcoin-background: 20.5 90.2% 48.2%;
+    --bitcoin-foreground: 60 9.1% 97.8%;
     --secondary: 215 27.9% 16.9%;
     --secondary-foreground: 210 20% 98%;
     --muted: 215 27.9% 16.9%;
@@ -63,6 +68,7 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --bg-gradient-opacity: 0.5;
   }
 
   .monochrome {
@@ -141,6 +147,13 @@
     background: linear-gradient(to bottom right, #ff902b, #f83838);
     border-radius: inherit;
   }
+  .bg-gradient {
+    background: linear-gradient(
+      to bottom right,
+      rgba(255, 144, 43, var(--bg-gradient-opacity)),
+      rgba(248, 56, 56, var(--bg-gradient-opacity))
+    );
+  }
   .border-animated-gradient:before {
     content: "";
     position: absolute;
@@ -162,6 +175,19 @@
     animation: animatedgradient 6s ease-in-out alternate infinite;
     background-size: 300% 300%;
     border-radius: inherit;
+  }
+  .bg-animated-gradient {
+    background: linear-gradient(
+      60deg,
+      rgba(43, 217, 255, var(--bg-gradient-opacity)),
+      rgba(140, 141, 237, var(--bg-gradient-opacity)),
+      rgba(248, 56, 217, var(--bg-gradient-opacity)),
+      rgba(248, 56, 56, var(--bg-gradient-opacity)),
+      rgba(255, 144, 43, var(--bg-gradient-opacity)),
+      rgba(221, 248, 56, var(--bg-gradient-opacity))
+    );
+    animation: animatedgradient 6s ease-in-out alternate infinite;
+    background-size: 300% 300%;
   }
 
   @keyframes animatedgradient {
@@ -247,6 +273,22 @@
     }
     .footnote {
       @apply first:mt-0 my-1 mx-2;
+    }
+  }
+
+  .svg-qr-code {
+    image {
+      clip-path: circle(50%);
+    }
+  }
+
+  .qr-scanner {
+    svg {
+      path {
+        stroke: hsl(var(--background));
+        stroke-width: 2;
+        opacity: 0.4;
+      }
     }
   }
 }

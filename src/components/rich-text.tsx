@@ -136,7 +136,7 @@ function toNode(
   fragment: Fragment,
   idx: number,
   classNames: RichTextClassnames,
-  group: Group,
+  group?: Group,
   options?: RichTextOptions,
 ) {
   if (fragment.type === "mention") {
@@ -194,7 +194,13 @@ function toNode(
 
   if (fragment.type === "image") {
     return (
-      <Image url={fragment.url} className={cn("my-1", classNames.image)} />
+      <Image
+        url={fragment.url}
+        className={cn(
+          "my-1 max-h-[36rem] bg-background/90 object-contain",
+          classNames.image,
+        )}
+      />
     );
   }
 
@@ -208,7 +214,7 @@ function toNode(
         href={fragment.url}
         target="_blank"
         rel="noopener noreferrer"
-        className={cn("underline decoration-dotted", classNames.urls)}
+        className={cn("break-all underline decoration-dotted", classNames.urls)}
       >
         {fragment.url}
       </a>
@@ -573,7 +579,7 @@ export function Fragments({
   options,
 }: {
   fragments: Fragment[];
-  group: Group;
+  group?: Group;
   className?: string;
   classNames?: RichTextClassnames;
   options?: RichTextOptions;
@@ -612,7 +618,7 @@ export function RichText({
   tags?: string[][];
   className?: string;
   classNames?: RichTextClassnames;
-  group: Group;
+  group?: Group;
 }) {
   const opts = { ...defaultOptions, ...options };
   const fragments = useMemo(() => {

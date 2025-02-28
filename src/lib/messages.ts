@@ -23,6 +23,7 @@ import {
   getGroupChatParticipants,
 } from "@/lib/messages/queries";
 import db from "@/lib/db";
+import { useGroup } from "@/lib/nostr/groups";
 import { Group } from "@/lib/types";
 import { DELETE_GROUP } from "@/lib/kinds";
 import { LastSeen } from "@/lib/db";
@@ -55,25 +56,40 @@ export function saveLastSeen(ev: NostrEvent, group: Group) {
 export function useGroupchat(group: Group) {
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
+  const { data: metadata } = useGroup(group);
   const groups = useAtomValue(groupsAtom);
   const groupIds = groups.map(groupId);
   const isSubbed = groupIds.includes(groupId(group));
 
   useEffect(() => {
-    if (isSubbed) return;
+    //if (isSubbed) return;
 
     let sub: NDKSubscription | undefined;
     getLastGroupMessage(group).then((last) => {
-      const filter = {
-        kinds: [
-          NDKKind.GroupChat,
-          NDKKind.GroupAdminAddUser,
-          NDKKind.GroupAdminRemoveUser,
-          DELETE_GROUP,
-        ],
-        "#h": [group.id],
-        ...(last ? { since: last.created_at } : {}),
-      };
+      const filter = [
+        {
+          kinds: [
+            NDKKind.GroupChat,
+            NDKKind.GroupAdminAddUser,
+            NDKKind.GroupAdminRemoveUser,
+            DELETE_GROUP,
+            NDKKind.Nutzap,
+          ],
+          "#h": [group.id],
+          ...(last ? { since: last.created_at } : {}),
+        },
+        ...(metadata?.pubkey
+          ? [
+              {
+                kinds: [NDKKind.Zap],
+                "#a": [
+                  `${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`,
+                ],
+                //...(last ? { since: last.created_at } : {}),
+              },
+            ]
+          : []),
+      ];
       sub = ndk.subscribe(
         filter,
         {
@@ -85,6 +101,8 @@ export function useGroupchat(group: Group) {
       );
 
       sub.on("event", (event) => {
+        // todo: check that event.h is the same as group.id
+        // todo: check that event.h relay is the group relay
         saveGroupEvent(event.rawEvent() as NostrEvent, group);
       });
     });
@@ -93,6 +111,27 @@ export function useGroupchat(group: Group) {
       if (!isSubbed) sub?.stop();
     };
   }, [isSubbed, group.id, group.relay]);
+
+  useEffect(() => {
+    if (!metadata) return;
+    const filter = {
+      kinds: [NDKKind.Zap],
+      "#a": [`${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`],
+    };
+    const sub = ndk.subscribe(
+      filter,
+      {
+        cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
+        groupable: false,
+        closeOnEose: false,
+      },
+      relaySet,
+    );
+
+    sub.on("event", (event) => {
+      saveGroupEvent(event.rawEvent() as NostrEvent, group);
+    });
+  }, [metadata, group.id, group.relay]);
 
   return useLiveQuery(() => getGroupChat(group), [group.id, group.relay], []);
 }
@@ -104,22 +143,15 @@ export function useLastMessage(group: Group) {
   );
 }
 
-export function useLastSeen(group: Group, kind = NDKKind.GroupChat) {
-  return useLiveQuery(
-    () => getLastSeen(group, kind),
-    [group.id, group.relay, kind],
-  );
-}
-
-export function useMemoizedLastSeen(group: Group, kind = NDKKind.GroupChat) {
+export function useLastSeen(group: Group) {
   const [memoized, setMemoized] = useState<LastSeen | null>(null);
   useEffect(() => {
-    getLastSeen(group, kind).then((lastSeen) => {
+    getLastSeen(group).then((lastSeen) => {
       if (lastSeen) {
         setMemoized(lastSeen);
       }
     });
-  }, [group.id, group.relay, kind]);
+  }, [group.id, group.relay]);
   return memoized;
 }
 
@@ -179,10 +211,15 @@ export function useSaveLastSeen(group: Group) {
   };
 }
 
-export function useMembers(group: Group) {
+export function useMembers(group?: Group) {
   return useLiveQuery(
-    () => getGroupChatParticipants(group),
-    [group.id, group.relay],
+    () => {
+      if (group) {
+        return getGroupChatParticipants(group);
+      }
+      return [];
+    },
+    [group?.id, group?.relay],
     [],
   );
 }

@@ -42,7 +42,7 @@ export function Article({
   className,
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   className?: string;
 }) {
   // todo: communities list

@@ -361,7 +361,11 @@ function GroupSearch() {
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          leftIcon={<Search className="size-4" />}
+          leftIcon={
+            <div className="flex items-center justify-center w-full h-full mr-4">
+              <Search className="size-5" />
+            </div>
+          }
           rightIcon={<X />}
           onRightIconClick={() => setSearch("")}
           placeholder={t("dashboard.search.input.placeholder")}

@@ -2,13 +2,7 @@ import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import { useTheme } from "@/components/theme-provider";
 import { useCustomEmojis } from "@/lib/nostr/emojis";
-import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-  DialogContent,
-} from "@/components/ui/dialog";
-import { useTranslation } from "react-i18next";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export interface Emoji {
   id: string;
@@ -22,14 +16,11 @@ export function EmojiPicker({
   open,
   onOpenChange,
   onEmojiSelect,
-  children,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEmojiSelect: (e: Emoji) => void;
-  children?: React.ReactNode;
 }) {
-  const { t } = useTranslation();
   const { theme } = useTheme();
   const { data: custom } = useCustomEmojis();
   const customEmoji =
@@ -49,13 +40,9 @@ export function EmojiPicker({
   // todo: scroll?
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{t("emoji.pick")}</DialogTitle>
-        </DialogHeader>
-        <div className="flex justify-center items-center border-none bg-background">
+      <DialogContent className="outline-none border-none">
+        <div className="flex justify-center items-center">
           <div className="emoji-picker w-[352px]">
-            {children}
             <Picker
               dynamicWidth={false}
               data={data}

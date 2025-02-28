@@ -17,6 +17,8 @@ const buttonVariants = cva(
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
+        amount:
+          "rounded-full border border-accent bg-secondary text-secondary-foreground hover:bg-secondary/80",
         link: "text-primary underline-offset-4 hover:underline",
         reaction:
           "bg-background/90 dark:bg-background/30 text-muted-foreground hover:bg-background/90 disabled:opacity-100 rounded-xl",
@@ -25,13 +27,17 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-10 px-4 py-2",
+        tiny: "h-6 px-2 py-1 text-xs [&_svg]:size-3",
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
+        bigIcon: "h-10 w-10 [&_svg]:size-6",
+        wideIcon: "h-10 w-16 [&_svg]:size-5",
         smallIcon: "h-6 w-6",
         play: "w-12 h-12 [&_svg]:size-8",
         fit: "w-fit p-1",
-        huge: "h-32 w-32",
+        big: "h-16 w-16 [&_svg]:size-6",
+        huge: "h-32 w-32 [&_svg]:size-9",
         wide: "w-32 h-18",
       },
     },

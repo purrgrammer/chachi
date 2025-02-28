@@ -1,0 +1,8 @@
+{
+  "names": {
+    "_": "46fc871c1aedb295a8325abcf7663467d297b0a852733ceb06b0957d1c14bff4"
+  },
+  "relays": {
+    "46fc871c1aedb295a8325abcf7663467d297b0a852733ceb06b0957d1c14bff4": ["wss://frens.nostr1.com", "wss://nos.lol", "wss://relay.damus.io"]
+  }
+}

@@ -9,6 +9,7 @@ import {
 import { useNDK } from "@/lib/ndk";
 import { saveGroupEvent } from "@/lib/messages";
 import { getLastGroupMessage } from "@/lib/messages/queries";
+import { fetchGroupMetadata } from "@/lib/nostr/groups";
 import { useStream } from "@/lib/nostr";
 import type { Group } from "@/lib/types";
 import { DELETE_GROUP } from "@/lib/kinds";
@@ -38,6 +39,7 @@ export function useGroupMessages(groups: Group[]) {
             NDKKind.GroupAdminAddUser,
             NDKKind.GroupAdminRemoveUser,
             DELETE_GROUP,
+            NDKKind.Nutzap,
           ],
           "#h": [id],
           ...(lastMessage ? { since: lastMessage.created_at } : {}),
@@ -53,10 +55,42 @@ export function useGroupMessages(groups: Group[]) {
         );
 
         sub.on("event", (event) => {
-          saveGroupEvent(event.rawEvent() as NostrEvent, group);
+          // todo: check that event.h is the same as group.id
+          // todo: check that event.h relay is the group relay
+          if (event.tags.find((tag) => tag[0] === "h" && tag[1] === group.id)) {
+            saveGroupEvent(event.rawEvent() as NostrEvent, group);
+          }
         });
 
         setSubs((subs) => [...subs, sub as NDKSubscription]);
+
+        fetchGroupMetadata(ndk, group).then((metadata) => {
+          const filter = {
+            kinds: [NDKKind.Zap],
+            "#a": [`${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`],
+          };
+          const s = ndk.subscribe(
+            filter,
+            {
+              cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+              groupable: false,
+              closeOnEose: false,
+            },
+            relaySet,
+          );
+
+          s.on("event", (event) => {
+            // todo: check that event.h is the same as group.id
+            // todo: check that event.h relay is the group relay
+            if (
+              event.tags.find((tag) => tag[0] === "h" && tag[1] === group.id)
+            ) {
+              saveGroupEvent(event.rawEvent() as NostrEvent, group);
+            }
+          });
+
+          setSubs((subs) => [...subs, s as NDKSubscription]);
+        });
       });
     }
 

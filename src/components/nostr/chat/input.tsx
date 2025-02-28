@@ -202,11 +202,11 @@ export function ChatInput({
             tabIndex={1}
             aria-label="Send"
             disabled={!canPoast}
-            size="icon"
+            size="wideIcon"
             className="sm:hidden"
             onClick={() => sendMessage(message)}
           >
-            <Send className="size-6" />
+            <Send />
           </Button>
         </div>
       )}

@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { atom, useAtom } from "jotai";
 import { toast } from "sonner";
 import {
   Crown,
@@ -10,17 +9,21 @@ import {
   Trash,
   Ban,
   ShieldBan,
+  Bitcoin,
 } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { Button } from "@/components/ui/button";
+import { useMintList } from "@/lib/cashu";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { cn } from "@/lib/utils";
 import { ProfileDrawer } from "@/components/nostr/profile";
 import { Separator } from "@/components/ui/separator";
 import { Emoji } from "@/components/emoji";
+import { NewZapDialog } from "@/components/nostr/zap";
 import { Badge } from "@/components/ui/badge";
 import {
   useRichText,
+  EventFragment,
   BlockFragment,
   EmojiFragment,
   RichText,
@@ -37,60 +40,60 @@ import {
   ContextMenuShortcut,
 } from "@/components/ui/context-menu";
 import { Name } from "@/components/nostr/name";
-import { Zaps, Reactions } from "@/components/nostr/reactions";
+import { Reactions } from "@/components/nostr/reactions";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { validateZap } from "@/lib/nip-57";
+import { useCopy } from "@/lib/hooks";
 import { useNDK } from "@/lib/ndk";
 import { Avatar } from "@/components/nostr/avatar";
 import { useEvent, useRelaySet } from "@/lib/nostr";
-import { useDeletions } from "@/lib/nostr/chat";
 import { usePubkey, useCanSign } from "@/lib/account";
 import { Emoji as EmojiType, EmojiPicker } from "@/components/emoji-picker";
-import {
-  useMemoizedLastSeen,
-  saveLastSeen,
-  saveGroupEvent,
-} from "@/lib/messages";
+import { saveLastSeen, saveGroupEvent } from "@/lib/messages";
 import { useSettings } from "@/lib/settings";
 import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import i18n from "i18next";
 import { getLanguage } from "@/i18n";
 
-const scrollToAtom = atom<string | null>(null);
-
 function Reply({
   group,
   admins,
   id,
   className,
+  setScrollTo,
 }: {
-  group: Group;
+  group?: Group;
   admins: string[];
   id: string;
   className?: string;
+  setScrollTo?: (ev?: NostrEvent) => void;
 }) {
   const { t } = useTranslation();
   // todo: replying to picture, video, mention, custom emoji
   const { data: event } = useEvent({
     id,
-    relays: [group.relay],
+    relays: group ? [group.relay] : [],
   });
-  const [, setScrollTo] = useAtom(scrollToAtom);
   const isAdmin = event?.pubkey ? admins.includes(event?.pubkey) : false;
+  const author =
+    event && event.kind === NDKKind.Zap
+      ? validateZap(event)?.pubkey || event?.pubkey
+      : event?.pubkey;
   return (
     <div
       className={cn(
-        "h-12 p-1 pl-2 border-l-4 rounded-md mb-1 bg-background/80 border-background dark:bg-background/40 dark:border-background/60 cursor-pointer",
-        event ? "" : "animate-pulse place-content-center",
+        "h-12 p-1 pl-2 border-l-4 rounded-md mb-1 bg-background/80 border-background dark:bg-background/40 dark:border-background/60",
+        event ? "cursor-pointer" : "animate-pulse place-content-center",
         className,
       )}
-      onClick={() => setScrollTo(id)}
+      onClick={event ? () => setScrollTo?.(event) : undefined}
     >
-      {event ? (
+      {event && author ? (
         <>
           <div className="flex flex-row gap-1 items-center">
             <h4 className="text-sm font-semibold">
-              <Name pubkey={event.pubkey} />
+              <Name pubkey={author} />
             </h4>
             {isAdmin ? <Crown className="w-3 h-3" /> : null}
           </div>
@@ -140,8 +143,10 @@ export function ChatMessage({
   richTextOptions,
   richTextClassnames = {},
   className,
+  scrollTo,
+  setScrollTo,
 }: {
-  group: Group;
+  group?: Group;
   event: NostrEvent;
   admins: string[];
   isChain?: boolean;
@@ -159,15 +164,18 @@ export function ChatMessage({
   richTextOptions?: RichTextOptions;
   richTextClassnames?: RichTextClassnames;
   className?: string;
+  scrollTo?: NostrEvent;
+  setScrollTo?: (ev?: NostrEvent) => void;
 }) {
   const { t } = useTranslation();
   const [settings] = useSettings();
-  const relay = group.relay;
+  const { data: mintList } = useMintList(event.pubkey);
+  const relay = group?.relay;
   const ndk = useNDK();
-  const relaySet = useRelaySet([group.relay]);
-  const [scrollTo] = useAtom(scrollToAtom);
+  const relaySet = useRelaySet(group ? [group.relay] : []);
   const [showMessageActions, setShowMessageActions] = useState(false);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
+  const [showingZapDialog, setShowingZapDialog] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
   const lastSeenRef = useRef<HTMLDivElement | null>(null);
   const isInView = useInView(ref);
@@ -179,7 +187,7 @@ export function ChatMessage({
   const replyTo = legacyReply || quotedReply;
   const replyRoot = event.tags.find((t) => t[3] === "root")?.[1];
   const isReplyingTo = replyTo || replyRoot;
-  const isFocused = scrollTo === event.id;
+  const isFocused = scrollTo?.id === event.id;
   const isAdmin = author ? admins.includes(author) : false;
   const me = usePubkey();
   const canSign = useCanSign();
@@ -200,6 +208,20 @@ export function ChatMessage({
     },
     event.tags,
   );
+  const eventFragmentIds = useMemo(() => {
+    return fragments.flatMap((f) => {
+      if (f.type === "block") {
+        return f.nodes
+          .filter((n) => n.type === "event")
+          .map((n) => (n as EventFragment).id);
+      } else if (f.type === "event") {
+        return [(f as EventFragment).id];
+      } else {
+        return [];
+      }
+    });
+  }, [fragments]);
+  const showReply = replyTo && !eventFragmentIds.includes(replyTo);
   const isSingleCustomEmoji =
     fragments.length === 1 &&
     fragments[0].type === "block" &&
@@ -239,8 +261,9 @@ export function ChatMessage({
       isOnlyVideo ||
       isOnlyAudio ||
       isSingleEmbed) &&
-    !isReplyingTo &&
+    (!isReplyingTo || !showReply) &&
     !isDeleted;
+  const [, copy] = useCopy();
 
   useEffect(() => {
     if (isFocused && ref.current) {
@@ -262,23 +285,12 @@ export function ChatMessage({
 
   useEffect(() => {
     if (isNew && ref.current) {
-      setTimeout(() => {
-        ref.current?.scrollIntoView({
-          behavior: "smooth",
-        });
-      }, 0);
+      ref.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
   }, [isNew]);
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(content);
-      toast.success(t("chat.message.copy.success"));
-    } catch (err) {
-      console.error(err);
-      toast.error(t("chat.message.copy.error"));
-    }
-  }
 
   function enableMessageActions() {
     setShowMessageActions(true);
@@ -295,22 +307,6 @@ export function ChatMessage({
         ev.tags.push(["emoji", e.name, e.src]);
       }
       await ev.publish(relaySet);
-      if (e.native) {
-        // TODO add translation
-        toast.success(`Reacted with ${e.native}`);
-      } else if (e.src) {
-        // nit: info icon
-        toast(
-          <div className="flex flex-row gap-2 items-center">
-            {t("chat.message.react.with")}
-            <Emoji
-              name={e.name}
-              image={e.src}
-              className="inline-block w-5 h-5"
-            />
-          </div>,
-        );
-      }
     } catch (err) {
       console.error(err);
       toast.error(t("chat.message.react.error"));
@@ -326,13 +322,15 @@ export function ChatMessage({
         kind: NDKKind.GroupAdminRemoveUser,
         content: "",
         tags: [
-          ["h", group.id, group.relay],
+          ...(group ? [["h", group.id, group.relay]] : []),
           ["p", e.pubkey],
         ],
       } as NostrEvent);
       await ev.publish(relaySet);
       toast.success(t("chat.user.kick.success"));
-      saveGroupEvent(ev.rawEvent() as NostrEvent, group);
+      if (group) {
+        saveGroupEvent(ev.rawEvent() as NostrEvent, group);
+      }
     } catch (err) {
       console.error(err);
       toast.error(t("chat.user.kick.error"));
@@ -379,12 +377,10 @@ export function ChatMessage({
                 if (info.offset.x > 20) {
                   setReplyingTo?.(event);
                 } else if (info.offset.x < -20) {
-                  if (canReact) {
-                    setShowingEmojiPicker(true);
-                  }
+                  setShowingEmojiPicker(true);
                 }
               }}
-              className={`z-0 relative ${isChain ? "rounded-lg" : isMine ? "rounded-tl-lg rounded-tr-lg rounded-bl-lg" : "rounded-tl-lg rounded-tr-lg rounded-br-lg"} p-1 px-2 w-fit max-w-[18rem] sm:max-w-sm md:max-w-md ${isMine ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"} ${isChain && !isMine ? "ml-9" : ""} ${shouldHaveTransparentBackground ? "bg-transparent p-0" : ""}`}
+              className={`z-0 relative ${isChain ? "rounded-lg" : isMine ? "rounded-tl-lg rounded-tr-lg rounded-bl-lg" : "rounded-tl-lg rounded-tr-lg rounded-br-lg"} p-1 px-2 w-fit max-w-[18rem] sm:max-w-sm md:max-w-md ${isChain && !isMine ? "ml-9" : ""} ${shouldHaveTransparentBackground ? "bg-transparent p-0" : isMine ? "bg-primary/10 text-foreground dark:bg-primary dark:text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}
             >
               {isFirstInChain ? (
                 <div className="flex flex-row gap-1 items-center">
@@ -400,8 +396,11 @@ export function ChatMessage({
                   {isAdmin ? <Crown className="w-3 h-3" /> : null}
                 </div>
               ) : null}
-              {(replyTo || (replyRoot && showRootReply)) && isReplyingTo ? (
+              {(replyTo || (replyRoot && showRootReply)) &&
+              isReplyingTo &&
+              showReply ? (
                 <Reply
+                  setScrollTo={setScrollTo}
                   group={group}
                   admins={admins}
                   id={isReplyingTo}
@@ -450,44 +449,32 @@ export function ChatMessage({
                   {content}
                 </RichText>
               )}
-              <div className="space-y-1">
-                <Zaps
+              <Reactions
+                className="pt-1"
+                event={event}
+                relays={[...(relay ? [relay] : [])]}
+                kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
+                live={isInView}
+              />
+              {showingZapDialog ? (
+                <NewZapDialog
+                  open
                   event={event}
-                  relays={[...(relay ? [relay] : [])]}
-                  live={true}
-                  className="pt-1"
+                  pubkey={event.pubkey}
+                  group={group}
+                  onClose={() => setShowingZapDialog(false)}
+                  onZap={() => setShowingZapDialog(false)}
+                  zapType={mintList?.pubkey ? "nip-61" : "nip-57"}
                 />
-                <Reactions
-                  event={event}
-                  relays={[...(relay ? [relay] : [])]}
-                  live={isInView}
-                />
-              </div>
+              ) : null}
               {showingEmojiPicker ? (
                 <EmojiPicker
                   open={showingEmojiPicker}
                   onOpenChange={(open) => setShowingEmojiPicker(open)}
                   onEmojiSelect={react}
-                >
-                  <div className="pointer-events-none">
-                    <ChatMessage
-                      group={group}
-                      event={event}
-                      admins={admins}
-                      canReact={false}
-                      isFirstInChain={true}
-                      richTextOptions={{
-                        images: false,
-                        video: false,
-                        audio: false,
-                        events: false,
-                      }}
-                      richTextClassnames={{ paragraphs: "break-all" }}
-                    />
-                  </div>
-                </EmojiPicker>
+                />
               ) : null}
-              {showMessageActions ? (
+              {showMessageActions && canReact ? (
                 <div className="flex absolute bottom-0 -right-7 flex-col gap-1">
                   <Button
                     variant="outline"
@@ -519,7 +506,20 @@ export function ChatMessage({
                 <SmilePlus className="w-4 h-4" />
               </ContextMenuShortcut>
             </ContextMenuItem>
-            <ContextMenuItem className="cursor-pointer" onClick={() => copy()}>
+            <ContextMenuItem
+              className="cursor-pointer"
+              onClick={() => setShowingZapDialog(true)}
+            >
+              {t("chat.message.tip.action")}
+              <ContextMenuShortcut>
+                <Bitcoin className="w-4 h-4" />
+              </ContextMenuShortcut>
+            </ContextMenuItem>
+            <ContextMenuSeparator />
+            <ContextMenuItem
+              className="cursor-pointer"
+              onClick={() => copy(content)}
+            >
               {t("chat.message.copy.action")}
               <ContextMenuShortcut>
                 <Copy className="w-4 h-4" />
@@ -573,12 +573,14 @@ export function ChatMessage({
                 >
                   Log
                 </ContextMenuItem>
-                <ContextMenuItem
-                  className="cursor-pointer"
-                  onClick={() => saveLastSeen(event, group)}
-                >
-                  {t("chat.message.save-as-last-seen")}
-                </ContextMenuItem>
+                {group ? (
+                  <ContextMenuItem
+                    className="cursor-pointer"
+                    onClick={() => saveLastSeen(event, group)}
+                  >
+                    {t("chat.message.save-as-last-seen")}
+                  </ContextMenuItem>
+                ) : null}
               </>
             ) : null}
           </ContextMenuContent>
@@ -648,18 +650,33 @@ function formatDay(date: string) {
 type MotionProps = React.ComponentProps<typeof motion.div>;
 
 interface ChatProps extends MotionProps {
-  group: Group;
+  group?: Group;
   events: NostrEvent[];
   admins: string[];
   messageKinds: NDKKind[];
   canDelete?: (event: NostrEvent) => boolean;
   deleteEvent?: (event: NostrEvent) => void;
-  components?: Record<number, React.ComponentType<{ event: NostrEvent }>>;
+  components?: Record<
+    number,
+    React.ComponentType<{
+      event: NostrEvent;
+      admins: string[];
+      scrollTo?: NostrEvent;
+      setScrollTo?: (ev?: NostrEvent) => void;
+      setReplyingTo?: (event: NostrEvent) => void;
+      deleteEvent?: (event: NostrEvent) => void;
+      canDelete?: (event: NostrEvent) => boolean;
+    }>
+  >;
   setReplyingTo?: (event: NostrEvent | undefined) => void;
   className?: string;
   style?: React.CSSProperties;
+  scrollTo?: NostrEvent;
+  setScrollTo?: (ev?: NostrEvent) => void;
   newMessage?: NostrEvent;
   showRootReply?: boolean;
+  lastSeen?: { ref: string };
+  deleteEvents: NostrEvent[];
 }
 
 export function Chat({
@@ -675,13 +692,14 @@ export function Chat({
   newMessage,
   showRootReply = true,
   className,
+  lastSeen,
+  deleteEvents,
+  scrollTo,
+  setScrollTo,
 }: ChatProps) {
   // todo: check admin events against relay pubkey
   const groupedMessages = groupByDay(events);
-  const lastSeen = useMemoizedLastSeen(group);
   const lastMessage = events.filter((e) => e.kind === NDKKind.GroupChat).at(0);
-  const [, setScrollTo] = useAtom(scrollToAtom);
-  const { events: deleteEvents } = useDeletions(group);
   const deletedIds = new Set(
     deleteEvents
       .map((e) => e.tags.find((t) => t[0] === "e")?.[1])
@@ -690,8 +708,8 @@ export function Chat({
   const me = usePubkey();
 
   useEffect(() => {
-    return () => setScrollTo(null);
-  }, [group.id, group.relay]);
+    return () => setScrollTo?.(undefined);
+  }, [group?.id, group?.relay]);
 
   return (
     <div
@@ -734,9 +752,18 @@ export function Chat({
                 setReplyingTo={setReplyingTo}
                 isNew={newMessage?.id === event.id}
                 showRootReply={showRootReply}
+                scrollTo={scrollTo}
+                setScrollTo={setScrollTo}
               />
             ) : Component ? (
-              <Component key={event.id} event={event} />
+              <Component
+                key={event.id}
+                event={event}
+                admins={admins}
+                setReplyingTo={setReplyingTo}
+                scrollTo={scrollTo}
+                setScrollTo={setScrollTo}
+              />
             ) : null;
           })}
         </div>

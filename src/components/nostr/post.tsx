@@ -1,4 +1,5 @@
 import type { NostrEvent } from "nostr-tools";
+import { NDKKind } from "@nostr-dev-kit/ndk";
 import {
   RichText,
   RichTextOptions,
@@ -16,7 +17,7 @@ export function Post({
   options = {},
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   className?: string;
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
@@ -46,7 +47,7 @@ export function PostWithReplies({
   options = {},
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   className?: string;
   classNames?: RichTextClassnames;
   options?: RichTextOptions;
@@ -68,7 +69,12 @@ export function PostWithReplies({
       {replies?.length > 0 ? (
         <div>
           <span className="text-xs text-muted-foreground">
-            <NameList pubkeys={replies.map((r) => r.pubkey)} suffix="replied" />
+            <NameList
+              pubkeys={replies
+                .filter((r) => r.kind !== NDKKind.Zap)
+                .map((r) => r.pubkey)}
+              suffix="replied"
+            />
           </span>
         </div>
       ) : null}

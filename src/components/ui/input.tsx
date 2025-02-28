@@ -37,34 +37,32 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {...props}
       />
     ) : (
-      <div className={cn("flex flex-row relative", className)}>
+      <div className={cn("flex flex-row gap-2 w-full", className)}>
         {leftIcon ? (
-          <div className="text-muted-foreground absolute left-2 top-3">
+          <div className="flex items-center justify-center text-muted-foreground">
             {leftIcon}
           </div>
         ) : null}
         <input
           type={type}
           className={cn(
-            "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-            leftIcon ? "pl-8" : "",
-            rightIcon ? "pr-10" : "",
+            "flex flex-1 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
             className,
           )}
           ref={ref}
           {...props}
         />
         {rightIcon && onRightIconClick ? (
-          <Button
-            variant="ghost"
-            className={cn(
-              "size-6 text-muted-foreground absolute right-2 top-2",
-              rightIconClassName,
-            )}
-            onClick={onRightIconClick}
-          >
-            {rightIcon}
-          </Button>
+          <div className="flex items-center justify-center">
+            <Button
+              variant="ghost"
+              size="smallIcon"
+              className={cn("text-muted-foreground", rightIconClassName)}
+              onClick={onRightIconClick}
+            >
+              {rightIcon}
+            </Button>
+          </div>
         ) : null}
       </div>
     );

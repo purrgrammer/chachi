@@ -13,7 +13,7 @@ export default function People({
   className,
 }: {
   event: NostrEvent;
-  group: Group;
+  group?: Group;
   className?: string;
 }) {
   const title =
