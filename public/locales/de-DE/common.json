@@ -1,272 +1,272 @@
 {
   "locale": {
-    "today": "Today"
+    "today": "Heute"
   },
-  "home": "Home",
+  "home": "Startseite",
   "nav": {
-    "no-groups": "No groups"
+    "no-groups": "Keine Gruppen"
   },
   "user": {
     "login": {
-      "start": "Get started",
-      "title": "Get started",
-      "description": "Select the login method below.",
+      "start": "Erste Schritte",
+      "title": "Erste Schritte",
+      "description": "Wähle unten die Login-Methode.",
       "extension": {
-        "label": "Browser extension",
-        "error": "Failed to log in with extension"
+        "label": "Browser-Erweiterung",
+        "error": "Fehler beim Anmelden mit Erweiterung"
       },
       "remote": {
-        "label": "Remote signer",
-        "error": "Failed to log in with remote signer"
+        "label": "Remote-Signierer",
+        "error": "Fehler beim Anmelden mit Remote-Signer"
       },
-      "or": "OR",
-      "connect": "Connect"
+      "or": "ODER",
+      "connect": "Verbinden"
     },
-    "logout": "Log out",
+    "logout": "Abmelden",
     "zaps": "Zaps",
-    "language": "Language",
+    "language": "Sprache",
     "theme": {
-      "trigger": "Theme",
-      "light": "Light",
-      "dark": "Dark",
+      "trigger": "Thema",
+      "light": "Hell",
+      "dark": "Dunkel",
       "system": "System"
     },
-    "settings": "Settings"
+    "settings": "Einstellungen"
   },
   "dashboard": {
     "activity": {
-      "heading": "Activity",
-      "unread": "unread",
-      "mentions": "mentions",
-      "none": "Nothing new for you... yet"
+      "heading": "Aktivität",
+      "unread": "ungelesen",
+      "mentions": "Erwähnungen",
+      "none": "Noch nichts Neues für dich..."
     },
     "featured": {
-      "heading": "Featured"
+      "heading": "Empfohlen"
     },
     "popular": {
-      "heading": "Popular in your network"
+      "heading": "Beliebt in deinem Netzwerk"
     },
     "search": {
-      "prompt": "Can't find what you're looking for?",
-      "trigger": "Search groups",
-      "title": "Find a group",
+      "prompt": "Du findest nicht, wonach du suchst?",
+      "trigger": "Gruppen durchsuchen",
+      "title": "Finde eine Gruppe",
       "input": {
-        "placeholder": "Search groups",
-        "no-results-for-x": "No results for \"{{search}}\"",
-        "n-results-for-x": "{{n}} results for \"{{search}}\"",
-        "start-typing-to-filter-groups": "Start typing to filter groups"
+        "placeholder": "Gruppen durchsuchen",
+        "no-results-for-x": "Keine Ergebnisse für \"{{search}}\"",
+        "n-results-for-x": "{{n}} Ergebnisse für \"{{search}}\"",
+        "start-typing-to-filter-groups": "Tippen, um Gruppen zu filtern"
       },
       "result": {
-        "visit": "Visit",
-        "no-description-available": "No description available",
-        "no-groups-found-for-x-want-to": "No groups found for \"{{search}}\", want to ",
-        "start-one": "start one",
+        "visit": "Besuchen",
+        "no-description-available": "Keine Beschreibung vorhanden",
+        "no-groups-found-for-x-want-to": "Keine Gruppen für \"{{search}}\" gefunden ",
+        "start-one": "Gruppe starten",
         "?": "?"
       }
     }
   },
   "group": {
     "hosted": {
-      "by": "Hosted by ",
-      "and": " and "
+      "by": "Gehostet von ",
+      "and": " und "
     },
     "create": {
-      "new": "New group",
-      "title": "Create group",
-      "description": "Create a new group to chat with your friends",
+      "new": "Neue Gruppe",
+      "title": "Gruppe erstellen",
+      "description": "Erstelle eine neue Gruppe um mit deinen Freunden zu chatten",
       "form": {
         "name": {
           "label": "Name",
-          "placeholder": "This is the group's name.",
-          "required": "Please add a name"
+          "placeholder": "Das ist der Gruppenname.",
+          "required": "Bitte einen Namen eingeben"
         },
         "about": {
-          "label": "About",
-          "placeholder": "This is the group's description."
+          "label": "Über",
+          "placeholder": "Das ist die Gruppenbeschreibung."
         },
         "relay": {
           "label": "Relay",
-          "placeholder": "Choose a relay.",
-          "description": "This is the server where the posts will be stored.",
-          "required": "Please select a relay"
+          "placeholder": "Wähle ein Relay.",
+          "description": "Das ist der Server, auf dem die Beiträge gespeichert werden.",
+          "required": "Bitte ein Relay auswählen"
         },
         "visibility": {
-          "label": "Visibility",
-          "anyone": "Anyone",
-          "members-only": "Members only",
-          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+          "label": "Sichtbarkeit",
+          "anyone": "Alle",
+          "members-only": "Nur Mitglieder",
+          "description": "Nachrichten sind nicht verschlüsselt und können von Relays gelesen werden. Hoste ein eigenes Relay für maximale Privatsphäre."
         },
         "access": {
-          "label": "Access",
-          "anyone": "Anyone",
-          "invite-only": "Invite only"
+          "label": "Zugang",
+          "anyone": "Alle",
+          "invite-only": "Nur Einladungen"
         },
         "submit": {
-          "trigger": "Create",
-          "success": "Group created",
-          "error": "Couldn't create group"
+          "trigger": "Erstellen",
+          "success": "Gruppe erstellt",
+          "error": "Gruppe konnte nicht erstellt werden"
         }
       }
     },
     "edit": {
-      "title": "Group settings",
+      "title": "Gruppen-Einstellungen",
       "form": {
         "name": {
           "label": "Name",
-          "placeholder": "My Group",
-          "description": "This is the group's name"
+          "placeholder": "Meine Gruppe",
+          "description": "Das ist der Gruppenname"
         },
         "about": {
-          "label": "About",
-          "placeholder": "A group for my frens",
-          "description": "This is the group's description"
+          "label": "Über",
+          "placeholder": "Eine Gruppe für meine frens",
+          "description": "Das ist die Gruppenbeschreibung"
         },
         "visibility": {
-          "label": "Visibility",
-          "anyone": "Anyone",
-          "members-only": "Members only",
-          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+          "label": "Sichtbarkeit",
+          "anyone": "Alle",
+          "members-only": "Nur Mitglieder",
+          "description": "Nachrichten sind nicht verschlüsselt und können von Relays gelesen werden. Hoste ein eigenes Relay für maximale Privatsphäre."
         },
         "access": {
-          "label": "Access",
-          "anyone": "Anyone",
-          "invite-only": "Invite only",
-          "description": "Anyone can join an open group. Closed groups require approval"
+          "label": "Zugang",
+          "anyone": "Alle",
+          "invite-only": "Nur Einladungen",
+          "description": "Alle können einer offenen Gruppe beitreten. Geschlossene Gruppen müssen genehmigt werden"
         },
         "submit": {
-          "trigger": "Save",
-          "success": "Group updated",
-          "error": "Couldn't update group"
+          "trigger": "Speichern",
+          "success": "Gruppe aktualisiert",
+          "error": "Gruppe konnte nicht aktualisiert werden"
         }
       }
     },
     "delete": {
-      "trigger": "Delete",
+      "trigger": "Löschen",
       "confirmation": {
-        "title": "Are you sure you want to delete the group?",
-        "description": "This action cannot be undone. This group and all its history will be deleted.",
-        "confirm": "Delete",
-        "cancel": "Cancel"
+        "title": "Möchtest du die Gruppe wirklich löschen?",
+        "description": "Diese Aktion kann nicht rückgängig gemacht werden. Diese Gruppe und ihr gesamter Verlauf werden gelöscht.",
+        "confirm": "Löschen",
+        "cancel": "Abbrechen"
       },
-      "success": "Group deleted",
-      "error": "Couldn't delete group"
+      "success": "Gruppe gelöscht",
+      "error": "Gruppe konnte nicht gelöscht werden"
     },
-    "deleted": "This group has been deleted",
+    "deleted": "Diese Gruppe wurde gelöscht",
     "bookmark": {
-      "trigger": "Bookmark",
-      "error": "Error bookmarking group"
+      "trigger": "Lesezeichen",
+      "error": "Fehler beim Lesezeichen setzen"
     },
     "unbookmark": {
-      "trigger": "Unbookmark",
-      "error": "Error unbookmarking group"
+      "trigger": "Lesezeichen entfernen",
+      "error": "Fehler beim Lesezeichen setzen"
     },
-    "join": "Join",
+    "join": "Beitreten",
     "leave": {
-      "trigger": "Leave",
+      "trigger": "Verlassen",
       "confirmation": {
-        "title": "Are you sure you want to leave?",
-        "description": "This action cannot be undone. You will be removed from the group members list.",
-        "confirm": "Leave",
-        "cancel": "Cancel"
+        "title": "Bist du sicher, dass du gehen willst?",
+        "description": "Diese Aktion kann nicht rückgängig gemacht werden. Du wirst von der Liste der Gruppenmitglieder entfernt.",
+        "confirm": "Verlassen",
+        "cancel": "Abbrechen"
       },
-      "success": "Left group",
-      "error": "Error leaving group"
+      "success": "Gruppe verlassen",
+      "error": "Fehler beim Verlassen der Gruppe"
     },
     "chat": {
       "user": {
-        "joined": "joined",
-        "left": "left"
+        "joined": "beigetreten",
+        "left": "verlassen"
       },
       "event": {
         "delete": {
-          "success": "Message deleted",
-          "error": "Couldn't delete message"
+          "success": "Nachricht gelöscht",
+          "error": "Nachricht konnte nicht gelöscht werden"
         }
       }
     },
     "metadata": {
       "visibility": {
         "private": {
-          "trigger": "Members only",
-          "content": "Only members can read content"
+          "trigger": "Nur Mitglieder",
+          "content": "Nur Mitglieder können Inhalte lesen"
         },
         "public": {
-          "trigger": "Public",
-          "content": "Can be read by anyone"
+          "trigger": "Öffentlich",
+          "content": "Kann von allen gelesen werden"
         }
       },
       "access": {
         "closed": {
-          "trigger": "Closed",
-          "content": "Requires approval or an invitation to join"
+          "trigger": "Geschlossen",
+          "content": "Genehmigung oder Einladung zum Beitritt erforderlich"
         },
         "open": {
-          "trigger": "Open",
-          "content": "Anyone can join"
+          "trigger": "Öffnen",
+          "content": "Alle können beitreten"
         }
       },
-      "join-the-conversation": "Join the conversation"
+      "join-the-conversation": "An der Unterhaltung teilnehmen"
     },
     "info": {
       "admin": "Admin",
       "admins": "Admins ({{adminsLength}})",
-      "members": "Members ({{membersLength}})",
-      "no-members": "No members"
+      "members": "Mitglieder ({{membersLength}})",
+      "no-members": "Keine Mitglieder"
     }
   },
   "chat": {
     "message": {
-      "loading": "Loading message...",
+      "loading": "Lade Nachricht...",
       "tip": {
         "action": "Zap"
       },
       "copy": {
-        "action": "Copy",
-        "success": "Copied to clipboard",
-        "error": "Can't copy to clipboard"
+        "action": "Kopieren",
+        "success": "In die Zwischenablage kopiert",
+        "error": "Kann nicht in die Zwischenablage kopieren"
       },
       "redeem": {
-        "action": "Redeem",
-        "failed": "Failed",
-        "redeemed": "Redeemed"
+        "action": "Einlösen",
+        "failed": "Fehlgeschlagen",
+        "redeemed": "Eingelöst"
       },
       "zap": {
         "action": "Zap"
       },
       "react": {
-        "action": "React",
-        "with": "Reacted with ",
-        "error": "Can't react"
+        "action": "Reagieren",
+        "with": "Reagiert mit ",
+        "error": "Kann nicht reagieren"
       },
       "reply": {
-        "action": "Reply",
-        "error": "Couldn't reply"
+        "action": "Antworten",
+        "error": "Antworten nicht möglich"
       },
       "forward": {
-        "action": "Forward",
-        "forwarded": "forwarded from"
+        "action": "Weiterleiten",
+        "forwarded": "weitergeleitet von"
       },
       "delete": {
-        "action": "Delete"
+        "action": "Löschen"
       },
-      "deleted": "Message deleted",
-      "save-as-last-seen": "Save as last seen"
+      "deleted": "Nachricht gelöscht",
+      "save-as-last-seen": "Speichern als zuletzt gesehen"
     },
-    "new-messages": "New messages",
+    "new-messages": "Neue Nachrichten",
     "user": {
-      "not-member": "You are not a member of this group yet",
+      "not-member": "Du bist noch kein Mitglied dieser Gruppe",
       "kick": {
-        "action": "Kick",
-        "success": "Kicked user",
-        "error": "Couldn't kick user"
+        "action": "Rauswerfen",
+        "success": "Rausgeworfener Benutzer",
+        "error": "Benutzer konnte nicht rausgeworfen werden"
       }
     },
     "join": {
-      "action": "Join",
+      "action": "Beitreten",
       "request": {
-        "sent": "Request sent",
-        "success": "Join request sent",
-        "error": "Failed to send join request"
+        "sent": "Anfrage gesendet",
+        "success": "Beitrittsanfrage gesendet",
+        "error": "Fehler beim Senden der Beitrittsanfrage"
       }
     },
     "debug": "Debug"
@@ -274,276 +274,276 @@
   "join": {
     "request": {
       "send": {
-        "success": "Join request sent",
-        "error": "Failed to send join request"
+        "success": "Beitrittsanfrage gesendet",
+        "error": "Fehler beim Senden der Beitrittsanfrage"
       },
       "accept": {
-        "action": "Accept",
-        "success": "User added to group",
-        "error": "Couldn't add user to group"
+        "action": "Annehmen",
+        "success": "Benutzer zur Gruppe hinzugefügt",
+        "error": "Konnte Benutzer nicht zur Gruppe hinzufügen"
       },
       "reject": {
-        "action": "Reject",
-        "success": "User join request rejected",
-        "error": "Couldn't reject user from group"
+        "action": "Ablehnen",
+        "success": "Anfrage zum Beitritt abgelehnt",
+        "error": "Konnte Benutzer nicht aus Gruppe ablehnen"
       }
     },
     "requests": {
-      "n": "Join requests ({{requestsLength}})",
-      "none": "No join requests... yet"
+      "n": "Beitrittsanfragen ({{requestsLength}})",
+      "none": "Noch keine Beitrittsanfragen..."
     }
   },
   "gif": {
-    "search": "Search GIF",
-    "tenor": "Search Tenor",
-    "error": "Error searching GIFs"
+    "search": "Suche GIF",
+    "tenor": "Suche Tenor",
+    "error": "Fehler bei der Suche nach GIFs"
   },
   "file": {
     "upload": {
-      "error": "Couldn't upload file"
+      "error": "Datei konnte nicht hochgeladen werden"
     }
   },
   "image": {
-    "new": "New image",
-    "post": "Post an image",
+    "new": "Neues Bild",
+    "post": "Ein Bild veröffentlichen",
     "title": {
-      "label": "Title",
-      "placeholder": "Add a title"
+      "label": "Titel",
+      "placeholder": "Titel hinzufügen"
     },
     "publish": {
-      "success": "Image posted",
-      "error": "Failed to post image"
+      "success": "Bild veröffentlicht",
+      "error": "Bild konnte nicht veröffentlicht werden"
     },
     "description": {
-      "label": "Description",
-      "placeholder": "Add a description"
+      "label": "Beschreibung",
+      "placeholder": "Beschreibung hinzufügen"
     }
   },
   "copy": {
-    "success": "Copied",
-    "error": "Couldn't copy"
+    "success": "Kopiert",
+    "error": "Kopieren fehlgeschlagen"
   },
   "content": {
-    "prompt": "What do you want to create?",
-    "create": "Create",
+    "prompt": "Was möchtest du erstellen?",
+    "create": "Erstellen",
     "type": {
       "chat": "Chat",
-      "post": "Post",
-      "posts": "Posts",
-      "poll": "Poll",
-      "polls": "Polls",
+      "post": "Beitrag",
+      "posts": "Beiträge",
+      "poll": "Umfrage",
+      "polls": "Umfragen",
       "video": "Video",
       "videos": "Videos",
-      "image": "Image",
-      "images": "Images"
+      "image": "Bild",
+      "images": "Bilder"
     }
   },
   "post": {
-    "new": "New",
-    "action": "Post",
-    "placeholder": "What's on your mind?",
-    "success": "Posted",
-    "error": "Couldn't post",
+    "new": "Neu",
+    "action": "Veröffentlichen",
+    "placeholder": "Woran denkst du gerade?",
+    "success": "Veröffentlicht",
+    "error": "Veröffentlichen fehlgeschlagen",
     "delete": {
-      "success": "Post deleted",
-      "error": "Couldn't delete post"
+      "success": "Beitrag gelöscht",
+      "error": "Beitrag konnte nicht gelöscht werden"
     },
-    "start": "Start a conversation"
+    "start": "Unterhaltung starten"
   },
   "poll": {
-    "start": "Start a poll",
+    "start": "Umfrage starten",
     "create": {
-      "action": "Create poll",
-      "success": "Poll created",
-      "error": "Couldn't create poll"
+      "action": "Umfrage erstellen",
+      "success": "Umfrage erstellt",
+      "error": "Umfrage konnte nicht erstellt werden"
     },
-    "new": "New poll",
-    "question": "Question",
+    "new": "Neue Umfrage",
+    "question": "Frage",
     "expiration": {
-      "label": "Expiration",
-      "date": "Expiry date",
-      "check": "Expiry date must be in the future"
+      "label": "Ablaufzeit",
+      "date": "Ablaufdatum",
+      "check": "Ablaufdatum muss in der Zukunft liegen"
     },
-    "options": "Options",
-    "multiple-choices": "Multiple choices",
-    "closed": "Poll closed",
-    "ends": "Ends "
+    "options": "Optionen",
+    "multiple-choices": "Mehrfache Auswahl",
+    "closed": "Umfrage beendet",
+    "ends": "Endet "
   },
   "vote": {
-    "action": "Vote",
-    "success": "Vote cast",
-    "error": "Couldn't cast vote"
+    "action": "Abstimmen",
+    "success": "Abgegebene Stimmen",
+    "error": "Abstimmung fehlgeschlagen"
   },
   "video": {
-    "post": "Post a video",
-    "upload": "Upload",
-    "record": "Record",
+    "post": "Video posten",
+    "upload": "Hochladen",
+    "record": "Aufnahmen",
     "publish": {
-      "success": "Video posted",
-      "error": "Failed to post video"
+      "success": "Video veröffentlicht",
+      "error": "Video konnte nicht veröffentlicht werden"
     },
-    "new": "New video",
+    "new": "Neues Video",
     "title": {
-      "label": "Title",
-      "placeholder": "Add a title"
+      "label": "Titel",
+      "placeholder": "Titel hinzufügen"
     },
     "description": {
-      "label": "Description",
-      "placeholder": "Add a description"
+      "label": "Beschreibung",
+      "placeholder": "Beschreibung hinzufügen"
     }
   },
   "emoji": {
     "set": {
       "bookmark": {
-        "error": "Failed to bookmark emoji set"
+        "error": "Fehler beim Setzen des Lesezeichens für das Emoji-Set"
       }
     }
   },
   "peer": " peer",
   "peers": " peers",
-  "message": "Message",
-  "write-a-message": "Write a message...",
+  "message": "Nachricht",
+  "write-a-message": "Nachricht schreiben...",
   "send": {
-    "login-required": "Log in to send message",
-    "error": "Failed to send message"
+    "login-required": "Anmelden, um Nachricht zu senden",
+    "error": "Fehler beim Senden der Nachricht"
   },
   "event": {
     "content": "Content",
-    "replies": "Replies",
+    "replies": "Antworten",
     "details": "Details",
-    "loading": "Loading event",
-    "not-found": "Event not found",
-    "fetch-error": "Error fetching event"
+    "loading": "Lade Event",
+    "not-found": "Event nicht gefunden",
+    "fetch-error": "Fehler beim Abrufen des Events"
   },
   "events": {
-    "loading": "Loading events",
-    "none": "Nothing to see here... yet"
+    "loading": "Lade Events",
+    "none": "Nichts zu sehen... noch nicht"
   },
   "share": {
-    "success": "Shared",
-    "error": "Couldn't share post",
-    "publication": "Share publication",
+    "success": "Geteilt",
+    "error": "Beitrag konnte nicht geteilt werden",
+    "publication": "Veröffentlichung teilen",
     "this": {
-      "publication": "Share this publication",
-      "in": "Share this publication in {{groupName}}"
+      "publication": "Diese Veröffentlichung teilen",
+      "in": "Diese Veröffentlichung in {{groupName}} teilen"
     },
     "in": {
-      "group": "Share in",
-      "x": "Share in {{groupName}} chat",
-      "chat": "Share in chat"
+      "group": "Teilen in",
+      "x": "Im {{groupName}} Chat teilen",
+      "chat": "Im Chat teilen"
     }
   },
-  "share-in": "Share in ",
-  "action-open": "Open",
+  "share-in": "Teilen in ",
+  "action-open": "Öffnen",
   "action-zap": "Zap",
   "media": {
-    "reveal": "Reveal"
+    "reveal": "Anzeigen"
   },
   "header": {
-    "public": "Public",
-    "unknown": "Unknown"
+    "public": "Öffentlich",
+    "unknown": "Unbekannt"
   },
   "book": {
-    "by": "by {{ author }}",
+    "by": "von {{ author }}",
     "current-chapter": "{{ chapter }} / {{ total }}"
   },
   "goal": {
-    "expires-in": "Expires in",
-    "expired": "Goal expired",
-    "leaderboard": "Leaderboard"
+    "expires-in": "Läuft ab in",
+    "expired": "Ziel abgelaufen",
+    "leaderboard": "Rangliste"
   },
   "wallet": {
-    "title": "Incoming payment",
+    "title": "Eingehende Zahlung",
     "keys": "Keys",
     "sync": "Sync",
-    "sync-success": "Ecash synced",
-    "sync-error": "Error syncing wallet",
-    "keys-description": "Your wallet keys, it's important to keep them safe and backed up",
-    "debit": "Payment",
-    "credit": "Payment",
-    "connect": "Connect",
-    "not-found": "Wallet not found",
-    "no-transactions": "No transactions found",
-    "no-coins": "No coins found",
-    "make-default": "Make default",
-    "choose-wallet": "Choose wallet",
-    "choose-wallet-placeholder": "Choose a wallet to pay with",
-    "make-default-error": "Failed to set wallet as default",
-    "make-default-success": "Wallet set as default",
-    "create": "Create wallet",
+    "sync-success": "Ecash synchronisiert",
+    "sync-error": "Fehler beim Synchronisieren des Wallets",
+    "keys-description": "Deine Wallet-Keys, es ist wichtig, dass du sie sicher verwahrst",
+    "debit": "Zahlung",
+    "credit": "Zahlung",
+    "connect": "Verbinden",
+    "not-found": "Wallet nicht gefunden",
+    "no-transactions": "Keine Transaktionen gefunden",
+    "no-coins": "Keine Coins gefunden",
+    "make-default": "Standard festlegen",
+    "choose-wallet": "Wallet auswählen",
+    "choose-wallet-placeholder": "Wählen ein Wallet zum Bezahlen aus",
+    "make-default-error": "Wallet konnte nicht als Standard festgelegt werden",
+    "make-default-success": "Wallet als Standard festgelegt",
+    "create": "Wallet erstellen",
     "settings": {
-      "title": "Wallet settings",
-      "description": "Manage your wallet settings",
+      "title": "Wallet-Einstellungen",
+      "description": "Wallet-Einstellungen verwalten",
       "create": {
-        "title": "Create wallet",
-        "description": "Create a wallet to start sending and receiving zaps"
+        "title": "Wallet erstellen",
+        "description": "Erstelle ein Wallet zum Senden und Empfangen von Zaps"
       }
     },
-    "save": "Save changes",
-    "saved": "Changes saved",
-    "save-error": "Failed to save changes",
+    "save": "Änderungen speichern",
+    "saved": "Änderungen gespeichert",
+    "save-error": "Fehler beim Speichern der Änderungen",
     "mints": "Mints",
-    "add-mint": "Add mint",
+    "add-mint": "Mint hinzufügen",
     "relays": "Relays",
-    "add-relay": "Add relay",
+    "add-relay": "Relay hinzufügen",
     "deposit": {
-      "title": "Receive",
-      "cashu-description": "Deposit funds into a mint or redeem ecash tokens",
-      "description": "Deposit funds into your wallet",
+      "title": "Empfangen",
+      "cashu-description": "Guthaben in eine Mint einzahlen oder Ecash einlösen",
+      "description": "Guthaben auf dein Wallet einzahlen",
       "mint": "Mint",
-      "amount": "Amount",
-      "confirm": "Confirm",
-      "success": "Deposit successful",
-      "error": "Failed to deposit",
+      "amount": "Betrag",
+      "confirm": "Bestätigen",
+      "success": "Einzahlung erfolgreich",
+      "error": "Einzahlung fehlgeschlagen",
       "receive-cash": "Ecash",
-      "redeem": "Redeem",
-      "redeem-error": "Failed to redeem ecash",
-      "redeem-success": "Ecash redeemed",
-      "from-wallet": "Choose a wallet to pay this invoice",
-      "confirm-wallet": "Pay"
+      "redeem": "Einlösen",
+      "redeem-error": "Fehler beim Einlösen von Ecash",
+      "redeem-success": "Ecash eingelöst",
+      "from-wallet": "Wallet zum Bezahlen auswählen",
+      "confirm-wallet": "Bezahlen"
     },
     "withdraw": {
-      "title": "Send",
-      "description": "Pay a lightning invoice, send money to a profile or a lightning address",
-      "placeholder": "Lightning invoice, profile or address",
-      "to": "To",
-      "confirm": "Pay",
-      "error": "Failed to send",
-      "unrecognized-invoice": "Unrecognized invoice",
-      "to-wallet": "Choose a wallet to send to",
-      "choose-wallet": "Send to wallet",
-      "confirm-cash": "Send ecash",
-      "no-wallet": "No wallet selected",
-      "success": "Send successful",
-      "p2pk-success": "Sent {{ amount }} to {{ name }}",
-      "lud16-success": "Sent {{ amount }} to {{ lud16 }}",
-      "amount-success": "Sent {{ amount }}",
-      "message": "Message",
-      "message-placeholder": "Write an optional message",
-      "confirm-wallet": "Send"
+      "title": "Senden",
+      "description": "Bezahle eine Lightning-Invoice, sende Geld an ein Profil oder eine Lightning-Adresse",
+      "placeholder": "Lightning-Invoice, Profil oder Adresse",
+      "to": "An",
+      "confirm": "Bezahlen",
+      "error": "Fehler beim Senden",
+      "unrecognized-invoice": "Unbekannte Invoice",
+      "to-wallet": "Wähle ein Wallet, an das gesendet werden soll",
+      "choose-wallet": "An Wallet senden",
+      "confirm-cash": "Ecash senden",
+      "no-wallet": "Kein Wallet ausgewählt",
+      "success": "Senden erfolgreich",
+      "p2pk-success": "{{ amount }} an {{ name }} gesendet",
+      "lud16-success": "{{ amount }} an {{ lud16 }} gesendet",
+      "amount-success": "{{ amount }} gesendet",
+      "message": "Nachricht",
+      "message-placeholder": "Optionale Nachricht schreiben",
+      "confirm-wallet": "Senden"
     },
-    "mints-description": "Mints are the custodians of the funds. Withdraw your funds to your wallet regularly.",
-    "relays-description": "Relays where the wallet data is stored.",
+    "mints-description": "Mints sind die Halter des Ecash. Ziehe dein Guthaben regelmäßig auf dein eigenes Wallet ab.",
+    "relays-description": "Relays, auf dem die Wallet-Daten gespeichert werden.",
     "name": "Name",
-    "name-description": "A name for your wallet",
-    "ready": "Wallet `{{ name }}` ready",
+    "name-description": "Ein Name für deine Wallet",
+    "ready": "Wallet `{{ name }}` bereit",
     "dialog": {
-      "title": "Connect wallet",
-      "description": "Connect your wallet to send tips and support your favorite creators",
-      "connect-webln": "Connect web wallet",
-      "webln-connected": "Connected to web wallet",
-      "webln-unavailable": "WebLN wallet not available",
-      "webln-error": "Failed to connect to WebLN wallet",
-      "connect-nip60": "Connect remote wallet",
-      "nwc-empty": "NWC address is empty",
-      "nwc-error": "Failed to connect to remote wallet",
-      "nwc-connected": "Connected to remote wallet"
+      "title": "Wallet verbinden",
+      "description": "Verbinden dein Wallet, um deine Lieblingskünstler mit kleinen Spenden zu unterstützen",
+      "connect-webln": "Web-Wallet verbinden",
+      "webln-connected": "Mit Web-Wallet verbunden",
+      "webln-unavailable": "WebLN-Wallet nicht verfügbar",
+      "webln-error": "Verbindung zu WebLN-Wallet fehlgeschlagen",
+      "connect-nip60": "Remote-Wallet verbinden",
+      "nwc-empty": "NWC-Adresse ist leer",
+      "nwc-error": "Verbindung mit Remote-Wallet fehlgeschlagen",
+      "nwc-connected": "Mit Remote-Wallet verbunden"
     },
-    "coins": "Cash",
+    "coins": "Geld",
     "transactions": {
-      "title": "Transactions",
-      "loading": "Loading transactions",
-      "loading-error": "Error loading transactions"
+      "title": "Transaktionen",
+      "loading": "Transaktionen werden geladen",
+      "loading-error": "Fehler beim Laden der Transaktionen"
     }
   },
   "zap": {
@@ -551,118 +551,118 @@
     "action": "Tip",
     "dialog": {
       "title": "Zap {{ name }}",
-      "description": "Send a tip to {{ name }}",
-      "amount": "Amount",
+      "description": "Einen Tip an {{ name }} senden",
+      "amount": "Betrag",
       "invoice": "Invoice",
-      "message": "Message",
-      "message-placeholder": "Add a message",
+      "message": "Nachricht",
+      "message-placeholder": "Eine Nachricht hinzufügen",
       "tip": "Zap {{ amount }}",
-      "copy": "Copy invoice",
-      "wallet": "Open in wallet",
-      "wallet-error": "Couldn't open wallet",
-      "error": "Failed to zap",
-      "success": "Zapped {{ amount }} to {{ name }}"
+      "copy": "Invoice kopieren",
+      "wallet": "In Wallet öffnen",
+      "wallet-error": "Wallet konnte nicht geöffnet werden",
+      "error": "Zap fehlgeschlagen",
+      "success": "{{ amount }} an {{ name }} gesendet"
     }
   },
   "ecash": {
-    "redeem": "Redeem",
-    "fee": "fee:"
+    "redeem": "Einlösen",
+    "fee": "Gebühr:"
   },
   "settings": {
-    "title": "Settings",
+    "title": "Einstellungen",
     "ui": {
-      "title": "Appearance",
+      "title": "Erscheinung",
       "language": {
-        "title": "Language",
-        "description": "Choose your preferred language"
+        "title": "Sprache",
+        "description": "Wähle deine bevorzugte Sprache"
       },
       "theme": {
-        "title": "Theme",
-        "description": "Choose your preferred theme",
-        "light": "Light",
-        "dark": "Dark",
+        "title": "Thema",
+        "description": "Wähle dein bevorzugtes Thema",
+        "light": "Hell",
+        "dark": "Dunkel",
         "system": "System"
       }
     },
     "wallet": {
       "title": "Wallets",
-      "settings": "Settings",
+      "settings": "Einstellungen",
       "mints": "Mints",
-      "enable": "Enable",
-      "enabled": "Enabled",
-      "enable-success": "Wallet enabled",
-      "enable-error": "Failed to enable wallet",
+      "enable": "Aktivieren",
+      "enabled": "Aktiviert",
+      "enable-success": "Wallet aktiviert",
+      "enable-error": "Wallet konnte nicht aktiviert werden",
       "relays": "Relays",
       "default-wallet": {
-        "title": "Active wallet",
-        "none": "No wallet selected"
+        "title": "Aktives Wallet",
+        "none": "Kein Wallet ausgewählt"
       },
       "payments": {
-        "title": "Payments",
-        "description": "Manage the mints and relays you'll use to receive payments"
+        "title": "Zahlungen",
+        "description": "Verwalte die Mints und Relays, mit denen du Zahlungen erhältst"
       },
       "wallets": {
         "title": "Wallets",
-        "none": "No wallets",
-        "remove": "Remove",
-        "description": "Manage your wallets",
-        "create": "Create wallet",
-        "default": "Default",
-        "make-default": "Make default",
-        "delete": "Delete",
-        "delete-error": "Failed to delete wallet",
-        "delete-success": "Wallet deleted",
-        "create-error": "Failed to create wallet",
-        "create-success": "Wallet created",
+        "none": "Keine Wallets",
+        "remove": "Entfernen",
+        "description": "Wallets verwalten",
+        "create": "Wallet erstellen",
+        "default": "Standard",
+        "make-default": "Standard festlegen",
+        "delete": "Löschen",
+        "delete-error": "Wallet konnte nicht gelöscht werden",
+        "delete-success": "Wallet gelöscht",
+        "create-error": "Wallet konnte nicht erstellt werden",
+        "create-success": "Wallet erstellt",
         "sync": "Sync",
-        "synced": "Synced",
-        "sync-error": "Error syncing wallet",
-        "open": "Open"
+        "synced": "Synchronisiert",
+        "sync-error": "Fehler beim Synchronisieren des Wallets",
+        "open": "Öffnen"
       }
     },
     "media": {
-      "title": "Media"
+      "title": "Medien"
     },
     "relays": {
       "title": "Relays"
     }
   },
   "nutzaps": {
-    "no-message": "No message",
+    "no-message": "Keine Nachricht",
     "title": "Zaps",
-    "redeemed": "Redeemed",
-    "failed": "Failed",
-    "log-in": "Log in to see your zaps",
-    "invalid": "Invalid zap",
-    "redeem": "Redeem",
-    "redeem-success": "Redeemed {{ amount }} zap",
-    "redeem-error": "Failed to redeem zap",
-    "received": "Received",
-    "sent": "Sent",
-    "no-received": "Nothing to see here... yet",
-    "no-sent": "Nothing to see here... yet",
-    "open": "Open"
+    "redeemed": "Eingelöst",
+    "failed": "Fehlgeschlagen",
+    "log-in": "Melde dich an, um deine Zaps zu sehen",
+    "invalid": "Invalider Zap",
+    "redeem": "Einlösen",
+    "redeem-success": "{{ amount }} Zap eingelöst",
+    "redeem-error": "Fehler beim Einlösen des Zap",
+    "received": "Empfangen",
+    "sent": "Gesendet",
+    "no-received": "Nichts zu sehen... noch nicht",
+    "no-sent": "Nichts zu sehen... noch nicht",
+    "open": "Öffnen"
   },
   "mint": {
-    "contact": "Contact",
+    "contact": "Kontaktieren",
     "version": "Version",
-    "features": "Features",
+    "features": "Funktionen",
     "nuts": "Nuts",
     "sat": "Bitcoin",
     "eur": "Euro",
     "usd": "US Dollar",
-    "currencies": "Currencies"
+    "currencies": "Währungen"
   },
   "ln": {
     "send": {
-      "title": "Send {{ amount }}",
-      "show-qr": "Show QR",
-      "hide-qr": "Hide QR"
+      "title": "{{ amount }} senden",
+      "show-qr": "QR anzeigen",
+      "hide-qr": "QR verbergen"
     }
   },
   "qr": {
-    "scan": "Scan QR Code",
-    "scan-error": "Error scanning QR Code",
-    "unknown": "Unknown QR Code"
+    "scan": "QR-Code scannen",
+    "scan-error": "Fehler beim QR-Code scannen",
+    "unknown": "Unbekannter QR-Code"
   }
 }

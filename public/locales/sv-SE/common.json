@@ -1,668 +1,668 @@
 {
   "locale": {
-    "today": "Today"
+    "today": "Idag"
   },
-  "home": "Home",
+  "home": "Hem",
   "nav": {
-    "no-groups": "No groups"
+    "no-groups": "Inga grupper"
   },
   "user": {
     "login": {
-      "start": "Get started",
-      "title": "Get started",
-      "description": "Select the login method below.",
+      "start": "Kom igång",
+      "title": "Kom igång",
+      "description": "Välj en inloggningsmetod nedan.",
       "extension": {
-        "label": "Browser extension",
-        "error": "Failed to log in with extension"
+        "label": "Webbläsartillägg",
+        "error": "Misslyckades med att logga in med tillägg"
       },
       "remote": {
-        "label": "Remote signer",
-        "error": "Failed to log in with remote signer"
+        "label": "Fjärrsignerare",
+        "error": "Misslyckades med att logga in med fjärrsignerare"
       },
-      "or": "OR",
-      "connect": "Connect"
+      "or": "ELLER",
+      "connect": "Anslut"
     },
-    "logout": "Log out",
+    "logout": "Logga ut",
     "zaps": "Zaps",
-    "language": "Language",
+    "language": "Språk",
     "theme": {
-      "trigger": "Theme",
-      "light": "Light",
-      "dark": "Dark",
+      "trigger": "Tema",
+      "light": "Ljust",
+      "dark": "Mörkt",
       "system": "System"
     },
-    "settings": "Settings"
+    "settings": "Inställningar"
   },
   "dashboard": {
     "activity": {
-      "heading": "Activity",
-      "unread": "unread",
-      "mentions": "mentions",
-      "none": "Nothing new for you... yet"
+      "heading": "Aktivitet",
+      "unread": "oläst",
+      "mentions": "omnämnanden",
+      "none": "Inget nytt för dig... än"
     },
     "featured": {
-      "heading": "Featured"
+      "heading": "Utvalda"
     },
     "popular": {
-      "heading": "Popular in your network"
+      "heading": "Populärt i ditt nätverk"
     },
     "search": {
-      "prompt": "Can't find what you're looking for?",
-      "trigger": "Search groups",
-      "title": "Find a group",
+      "prompt": "Kan du inte hitta det du söker?",
+      "trigger": "Sök grupper",
+      "title": "Hitta en grupp",
       "input": {
-        "placeholder": "Search groups",
-        "no-results-for-x": "No results for \"{{search}}\"",
-        "n-results-for-x": "{{n}} results for \"{{search}}\"",
-        "start-typing-to-filter-groups": "Start typing to filter groups"
+        "placeholder": "Sök grupper",
+        "no-results-for-x": "Inga resultat för \"{{search}}\"",
+        "n-results-for-x": "{{n}} resultat för \"{{search}}\"",
+        "start-typing-to-filter-groups": "Börja skriva för att filtrera grupper"
       },
       "result": {
-        "visit": "Visit",
-        "no-description-available": "No description available",
-        "no-groups-found-for-x-want-to": "No groups found for \"{{search}}\", want to ",
-        "start-one": "start one",
+        "visit": "Besök",
+        "no-description-available": "Ingen beskrivning tillgänglig",
+        "no-groups-found-for-x-want-to": "Inga grupper hittades för \"{{search}}\", vill du ",
+        "start-one": "starta en",
         "?": "?"
       }
     }
   },
   "group": {
     "hosted": {
-      "by": "Hosted by ",
-      "and": " and "
+      "by": "Värden heter ",
+      "and": " och "
     },
     "create": {
-      "new": "New group",
-      "title": "Create group",
-      "description": "Create a new group to chat with your friends",
+      "new": "Ny grupp",
+      "title": "Skapa grupp",
+      "description": "Skapa en ny grupp för att chatta med dina vänner",
       "form": {
         "name": {
-          "label": "Name",
-          "placeholder": "This is the group's name.",
-          "required": "Please add a name"
+          "label": "Namn",
+          "placeholder": "Detta är gruppens namn.",
+          "required": "Vänligen lägg till ett namn"
         },
         "about": {
-          "label": "About",
-          "placeholder": "This is the group's description."
+          "label": "Om",
+          "placeholder": "Detta är gruppens beskrivning."
         },
         "relay": {
-          "label": "Relay",
-          "placeholder": "Choose a relay.",
-          "description": "This is the server where the posts will be stored.",
-          "required": "Please select a relay"
+          "label": "Relä",
+          "placeholder": "Välj ett relä.",
+          "description": "Detta är servern där inläggen kommer att lagras.",
+          "required": "Vänligen välj ett relä"
         },
         "visibility": {
-          "label": "Visibility",
-          "anyone": "Anyone",
-          "members-only": "Members only",
-          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+          "label": "Synlighet",
+          "anyone": "Alla",
+          "members-only": "Endast medlemmar",
+          "description": "Meddelanden är inte krypterade och kan läsas av reläer. För maximal integritet, hosta ditt eget relä."
         },
         "access": {
-          "label": "Access",
-          "anyone": "Anyone",
-          "invite-only": "Invite only"
+          "label": "Åtkomst",
+          "anyone": "Alla",
+          "invite-only": "Endast inbjudna"
         },
         "submit": {
-          "trigger": "Create",
-          "success": "Group created",
-          "error": "Couldn't create group"
+          "trigger": "Skapa",
+          "success": "Grupp skapad",
+          "error": "Kunde inte skapa grupp"
         }
       }
     },
     "edit": {
-      "title": "Group settings",
+      "title": "Gruppinställningar",
       "form": {
         "name": {
-          "label": "Name",
-          "placeholder": "My Group",
-          "description": "This is the group's name"
+          "label": "Namn",
+          "placeholder": "Min grupp",
+          "description": "Detta är gruppens namn"
         },
         "about": {
-          "label": "About",
-          "placeholder": "A group for my frens",
-          "description": "This is the group's description"
+          "label": "Om",
+          "placeholder": "En grupp för mina vänner",
+          "description": "Detta är gruppens beskrivning"
         },
         "visibility": {
-          "label": "Visibility",
-          "anyone": "Anyone",
-          "members-only": "Members only",
-          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+          "label": "Synlighet",
+          "anyone": "Alla",
+          "members-only": "Endast medlemmar",
+          "description": "Meddelanden är inte krypterade och kan läsas av reläer. För maximal integritet, hosta ditt eget relä."
         },
         "access": {
-          "label": "Access",
-          "anyone": "Anyone",
-          "invite-only": "Invite only",
-          "description": "Anyone can join an open group. Closed groups require approval"
+          "label": "Åtkomst",
+          "anyone": "Alla",
+          "invite-only": "Endast inbjudna",
+          "description": "Alla kan gå med i en öppen grupp. Stängda grupper kräver godkännande"
         },
         "submit": {
-          "trigger": "Save",
-          "success": "Group updated",
-          "error": "Couldn't update group"
+          "trigger": "Spara",
+          "success": "Grupp uppdaterad",
+          "error": "Kunde inte uppdatera grupp"
         }
       }
     },
     "delete": {
-      "trigger": "Delete",
+      "trigger": "Radera",
       "confirmation": {
-        "title": "Are you sure you want to delete the group?",
-        "description": "This action cannot be undone. This group and all its history will be deleted.",
-        "confirm": "Delete",
-        "cancel": "Cancel"
+        "title": "Är du säker på att du vill radera gruppen?",
+        "description": "Denna åtgärd kan inte ångras. Gruppen och all dess historik kommer att raderas.",
+        "confirm": "Radera",
+        "cancel": "Avbryt"
       },
-      "success": "Group deleted",
-      "error": "Couldn't delete group"
+      "success": "Grupp raderad",
+      "error": "Kunde inte radera grupp"
     },
-    "deleted": "This group has been deleted",
+    "deleted": "Denna grupp har raderats",
     "bookmark": {
-      "trigger": "Bookmark",
-      "error": "Error bookmarking group"
+      "trigger": "Bokmärk",
+      "error": "Fel vid bokmärkning av grupp"
     },
     "unbookmark": {
-      "trigger": "Unbookmark",
-      "error": "Error unbookmarking group"
+      "trigger": "Ta bort bokmärke",
+      "error": "Fel vid borttagning av bokmärke"
     },
-    "join": "Join",
+    "join": "Gå med",
     "leave": {
-      "trigger": "Leave",
+      "trigger": "Lämna",
       "confirmation": {
-        "title": "Are you sure you want to leave?",
-        "description": "This action cannot be undone. You will be removed from the group members list.",
-        "confirm": "Leave",
-        "cancel": "Cancel"
+        "title": "Är du säker på att du vill lämna?",
+        "description": "Denna åtgärd kan inte ångras. Du kommer att tas bort från gruppens medlemslista.",
+        "confirm": "Lämna",
+        "cancel": "Avbryt"
       },
-      "success": "Left group",
-      "error": "Error leaving group"
+      "success": "Lämnade grupp",
+      "error": "Fel vid utträde ur grupp"
     },
     "chat": {
       "user": {
-        "joined": "joined",
-        "left": "left"
+        "joined": "gick med",
+        "left": "lämnade"
       },
       "event": {
         "delete": {
-          "success": "Message deleted",
-          "error": "Couldn't delete message"
+          "success": "Meddelande raderat",
+          "error": "Kunde inte radera meddelande"
         }
       }
     },
     "metadata": {
       "visibility": {
         "private": {
-          "trigger": "Members only",
-          "content": "Only members can read content"
+          "trigger": "Endast medlemmar",
+          "content": "Endast medlemmar kan läsa innehåll"
         },
         "public": {
-          "trigger": "Public",
-          "content": "Can be read by anyone"
+          "trigger": "Offentlig",
+          "content": "Kan läsas av alla"
         }
       },
       "access": {
         "closed": {
-          "trigger": "Closed",
-          "content": "Requires approval or an invitation to join"
+          "trigger": "Stängd",
+          "content": "Kräver godkännande eller en inbjudan för att gå med"
         },
         "open": {
-          "trigger": "Open",
-          "content": "Anyone can join"
+          "trigger": "Öppen",
+          "content": "Vem som helst kan gå med"
         }
       },
-      "join-the-conversation": "Join the conversation"
+      "join-the-conversation": "Gå med i konversationen"
     },
     "info": {
       "admin": "Admin",
-      "admins": "Admins ({{adminsLength}})",
-      "members": "Members ({{membersLength}})",
-      "no-members": "No members"
+      "admins": "Administratörer ({{adminsLength}})",
+      "members": "Medlemmar ({{membersLength}})",
+      "no-members": "Inga medlemmar"
     }
   },
   "chat": {
     "message": {
-      "loading": "Loading message...",
+      "loading": "Laddar meddelande...",
       "tip": {
         "action": "Zap"
       },
       "copy": {
-        "action": "Copy",
-        "success": "Copied to clipboard",
-        "error": "Can't copy to clipboard"
+        "action": "Kopiera",
+        "success": "Kopierat till urklipp",
+        "error": "Kan inte kopiera till urklipp"
       },
       "redeem": {
-        "action": "Redeem",
-        "failed": "Failed",
-        "redeemed": "Redeemed"
+        "action": "Lös in",
+        "failed": "Misslyckades",
+        "redeemed": "Inlöst"
       },
       "zap": {
         "action": "Zap"
       },
       "react": {
-        "action": "React",
-        "with": "Reacted with ",
-        "error": "Can't react"
+        "action": "Reagera",
+        "with": "Reagerade med ",
+        "error": "Kan inte reagera"
       },
       "reply": {
-        "action": "Reply",
-        "error": "Couldn't reply"
+        "action": "Svara",
+        "error": "Kunde inte svara"
       },
       "forward": {
-        "action": "Forward",
-        "forwarded": "forwarded from"
+        "action": "Vidarebefordra",
+        "forwarded": "vidarebefordrat från"
       },
       "delete": {
-        "action": "Delete"
+        "action": "Radera"
       },
-      "deleted": "Message deleted",
-      "save-as-last-seen": "Save as last seen"
+      "deleted": "Meddelande raderat",
+      "save-as-last-seen": "Spara som senast läst"
     },
-    "new-messages": "New messages",
+    "new-messages": "Nya meddelanden",
     "user": {
-      "not-member": "You are not a member of this group yet",
+      "not-member": "Du är ännu inte medlem i denna grupp",
       "kick": {
-        "action": "Kick",
-        "success": "Kicked user",
-        "error": "Couldn't kick user"
+        "action": "Sparka ut",
+        "success": "Användaren har blivit utkastad",
+        "error": "Kunde inte sparka ut användaren"
       }
     },
     "join": {
-      "action": "Join",
+      "action": "Gå med",
       "request": {
-        "sent": "Request sent",
-        "success": "Join request sent",
-        "error": "Failed to send join request"
+        "sent": "Förfrågan skickad",
+        "success": "Begäran om att gå med skickad",
+        "error": "Misslyckades med att skicka begäran om att gå med"
       }
     },
-    "debug": "Debug"
+    "debug": "Felsök"
   },
   "join": {
     "request": {
       "send": {
-        "success": "Join request sent",
-        "error": "Failed to send join request"
+        "success": "Begäran om att gå med skickad",
+        "error": "Misslyckades med att skicka begäran om att gå med"
       },
       "accept": {
-        "action": "Accept",
-        "success": "User added to group",
-        "error": "Couldn't add user to group"
+        "action": "Acceptera",
+        "success": "Användaren har lagts till i gruppen",
+        "error": "Kunde inte lägga till användaren i gruppen"
       },
       "reject": {
-        "action": "Reject",
-        "success": "User join request rejected",
-        "error": "Couldn't reject user from group"
+        "action": "Avvisa",
+        "success": "Användarens begäran om att gå med avvisades",
+        "error": "Kunde inte avvisa användaren från gruppen"
       }
     },
     "requests": {
-      "n": "Join requests ({{requestsLength}})",
-      "none": "No join requests... yet"
+      "n": "Begäran om att gå med ({{requestsLength}})",
+      "none": "Inga begäran om att gå med... än"
     }
   },
   "gif": {
-    "search": "Search GIF",
-    "tenor": "Search Tenor",
-    "error": "Error searching GIFs"
+    "search": "Sök GIF",
+    "tenor": "Sök Tenor",
+    "error": "Fel vid sökning av GIFs"
   },
   "file": {
     "upload": {
-      "error": "Couldn't upload file"
+      "error": "Kunde inte ladda upp fil"
     }
   },
   "image": {
-    "new": "New image",
-    "post": "Post an image",
+    "new": "Ny bild",
+    "post": "Lägg upp en bild",
     "title": {
-      "label": "Title",
-      "placeholder": "Add a title"
+      "label": "Titel",
+      "placeholder": "Lägg till en titel"
     },
     "publish": {
-      "success": "Image posted",
-      "error": "Failed to post image"
+      "success": "Bild uppladdad",
+      "error": "Misslyckades med att lägga upp bild"
     },
     "description": {
-      "label": "Description",
-      "placeholder": "Add a description"
+      "label": "Beskrivning",
+      "placeholder": "Lägg till en beskrivning"
     }
   },
   "copy": {
-    "success": "Copied",
-    "error": "Couldn't copy"
+    "success": "Kopierad",
+    "error": "Kunde inte kopiera"
   },
   "content": {
-    "prompt": "What do you want to create?",
-    "create": "Create",
+    "prompt": "Vad vill du skapa?",
+    "create": "Skapa",
     "type": {
-      "chat": "Chat",
-      "post": "Post",
-      "posts": "Posts",
-      "poll": "Poll",
-      "polls": "Polls",
+      "chat": "Chatt",
+      "post": "Inlägg",
+      "posts": "Inlägg",
+      "poll": "Enkät",
+      "polls": "Enkäter",
       "video": "Video",
-      "videos": "Videos",
-      "image": "Image",
-      "images": "Images"
+      "videos": "Videor",
+      "image": "Bild",
+      "images": "Bilder"
     }
   },
   "post": {
-    "new": "New",
-    "action": "Post",
-    "placeholder": "What's on your mind?",
-    "success": "Posted",
-    "error": "Couldn't post",
+    "new": "Ny",
+    "action": "Lägg upp",
+    "placeholder": "Vad tänker du på?",
+    "success": "Uppladdat",
+    "error": "Kunde inte lägga upp",
     "delete": {
-      "success": "Post deleted",
-      "error": "Couldn't delete post"
+      "success": "Inlägg raderat",
+      "error": "Kunde inte radera inlägg"
     },
-    "start": "Start a conversation"
+    "start": "Starta en konversation"
   },
   "poll": {
-    "start": "Start a poll",
+    "start": "Starta en enkät",
     "create": {
-      "action": "Create poll",
-      "success": "Poll created",
-      "error": "Couldn't create poll"
+      "action": "Skapa enkät",
+      "success": "Enkät skapad",
+      "error": "Kunde inte skapa enkät"
     },
-    "new": "New poll",
-    "question": "Question",
+    "new": "Ny enkät",
+    "question": "Fråga",
     "expiration": {
-      "label": "Expiration",
-      "date": "Expiry date",
-      "check": "Expiry date must be in the future"
+      "label": "Utgångsdatum",
+      "date": "Utgångsdatum",
+      "check": "Utgångsdatum måste vara i framtiden"
     },
-    "options": "Options",
-    "multiple-choices": "Multiple choices",
-    "closed": "Poll closed",
-    "ends": "Ends "
+    "options": "Alternativ",
+    "multiple-choices": "Flera val",
+    "closed": "Enkäten stängd",
+    "ends": "Slutar "
   },
   "vote": {
-    "action": "Vote",
-    "success": "Vote cast",
-    "error": "Couldn't cast vote"
+    "action": "Rösta",
+    "success": "Röst avlagd",
+    "error": "Kunde inte avlägga röst"
   },
   "video": {
-    "post": "Post a video",
-    "upload": "Upload",
-    "record": "Record",
+    "post": "Lägg upp en video",
+    "upload": "Ladda upp",
+    "record": "Spela in",
     "publish": {
-      "success": "Video posted",
-      "error": "Failed to post video"
+      "success": "Video uppladdad",
+      "error": "Misslyckades med att lägga upp video"
     },
-    "new": "New video",
+    "new": "Ny video",
     "title": {
-      "label": "Title",
-      "placeholder": "Add a title"
+      "label": "Titel",
+      "placeholder": "Lägg till en titel"
     },
     "description": {
-      "label": "Description",
-      "placeholder": "Add a description"
+      "label": "Beskrivning",
+      "placeholder": "Lägg till en beskrivning"
     }
   },
   "emoji": {
     "set": {
       "bookmark": {
-        "error": "Failed to bookmark emoji set"
+        "error": "Misslyckades med att bokmärka emoji-set"
       }
     }
   },
   "peer": " peer",
   "peers": " peers",
-  "message": "Message",
-  "write-a-message": "Write a message...",
+  "message": "Meddelande",
+  "write-a-message": "Skriv ett meddelande...",
   "send": {
-    "login-required": "Log in to send message",
-    "error": "Failed to send message"
+    "login-required": "Logga in för att skicka meddelande",
+    "error": "Misslyckades med att skicka meddelande"
   },
   "event": {
-    "content": "Content",
-    "replies": "Replies",
-    "details": "Details",
-    "loading": "Loading event",
-    "not-found": "Event not found",
-    "fetch-error": "Error fetching event"
+    "content": "Innehåll",
+    "replies": "Svar",
+    "details": "Detaljer",
+    "loading": "Laddar event",
+    "not-found": "Event inte hittat",
+    "fetch-error": "Fel vid hämtning av event"
   },
   "events": {
-    "loading": "Loading events",
-    "none": "Nothing to see here... yet"
+    "loading": "Laddar event",
+    "none": "Inget att se här... än"
   },
   "share": {
-    "success": "Shared",
-    "error": "Couldn't share post",
-    "publication": "Share publication",
+    "success": "Delat",
+    "error": "Kunde inte dela inlägg",
+    "publication": "Dela publikation",
     "this": {
-      "publication": "Share this publication",
-      "in": "Share this publication in {{groupName}}"
+      "publication": "Dela denna publikation",
+      "in": "Dela denna publikation i {{groupName}}"
     },
     "in": {
-      "group": "Share in",
-      "x": "Share in {{groupName}} chat",
-      "chat": "Share in chat"
+      "group": "Dela i",
+      "x": "Dela i {{groupName}} chatt",
+      "chat": "Dela i chatt"
     }
   },
-  "share-in": "Share in ",
-  "action-open": "Open",
+  "share-in": "Dela i ",
+  "action-open": "Öppna",
   "action-zap": "Zap",
   "media": {
-    "reveal": "Reveal"
+    "reveal": "Avslöja"
   },
   "header": {
-    "public": "Public",
-    "unknown": "Unknown"
+    "public": "Offentlig",
+    "unknown": "Okänd"
   },
   "book": {
-    "by": "by {{ author }}",
-    "current-chapter": "{{ chapter }} / {{ total }}"
+    "by": "av {{author}}",
+    "current-chapter": "{{chapter}} / {{total}}"
   },
   "goal": {
-    "expires-in": "Expires in",
-    "expired": "Goal expired",
-    "leaderboard": "Leaderboard"
+    "expires-in": "Går ut om",
+    "expired": "Mål utgånget",
+    "leaderboard": "Topplista"
   },
   "wallet": {
-    "title": "Incoming payment",
-    "keys": "Keys",
-    "sync": "Sync",
-    "sync-success": "Ecash synced",
-    "sync-error": "Error syncing wallet",
-    "keys-description": "Your wallet keys, it's important to keep them safe and backed up",
-    "debit": "Payment",
-    "credit": "Payment",
-    "connect": "Connect",
-    "not-found": "Wallet not found",
-    "no-transactions": "No transactions found",
-    "no-coins": "No coins found",
-    "make-default": "Make default",
-    "choose-wallet": "Choose wallet",
-    "choose-wallet-placeholder": "Choose a wallet to pay with",
-    "make-default-error": "Failed to set wallet as default",
-    "make-default-success": "Wallet set as default",
-    "create": "Create wallet",
+    "title": "Inkommande betalning",
+    "keys": "Nycklar",
+    "sync": "Synkronisera",
+    "sync-success": "Ecash synkroniserat",
+    "sync-error": "Fel vid synkronisering av plånbok",
+    "keys-description": "Dina plånboksnycklar, det är viktigt att hålla dem säkra och säkerhetskopiera dem",
+    "debit": "Betalning",
+    "credit": "Betalning",
+    "connect": "Anslut",
+    "not-found": "Plånbok inte hittad",
+    "no-transactions": "Inga transaktioner hittades",
+    "no-coins": "Inga coins hittades",
+    "make-default": "Gör till standard",
+    "choose-wallet": "Välj plånbok",
+    "choose-wallet-placeholder": "Välj en plånbok att betala med",
+    "make-default-error": "Kunde inte ställa in plånbok som standard",
+    "make-default-success": "Plånbok inställd som standard",
+    "create": "Skapa plånbok",
     "settings": {
-      "title": "Wallet settings",
-      "description": "Manage your wallet settings",
+      "title": "Plånboksinställningar",
+      "description": "Hantera dina plånboksinställningar",
       "create": {
-        "title": "Create wallet",
-        "description": "Create a wallet to start sending and receiving zaps"
+        "title": "Skapa plånbok",
+        "description": "Skapa en plånbok för att börja skicka och ta emot zaps"
       }
     },
-    "save": "Save changes",
-    "saved": "Changes saved",
-    "save-error": "Failed to save changes",
+    "save": "Spara ändringar",
+    "saved": "Ändringar sparade",
+    "save-error": "Misslyckades med att spara ändringar",
     "mints": "Mints",
-    "add-mint": "Add mint",
-    "relays": "Relays",
-    "add-relay": "Add relay",
+    "add-mint": "Lägg till mint",
+    "relays": "Reläer",
+    "add-relay": "Lägg till relä",
     "deposit": {
-      "title": "Receive",
-      "cashu-description": "Deposit funds into a mint or redeem ecash tokens",
-      "description": "Deposit funds into your wallet",
+      "title": "Ta emot",
+      "cashu-description": "Sätt in pengar i en mint eller lös in ecash-tokens",
+      "description": "Sätt in pengar i din plånbok",
       "mint": "Mint",
-      "amount": "Amount",
-      "confirm": "Confirm",
-      "success": "Deposit successful",
-      "error": "Failed to deposit",
+      "amount": "Belopp",
+      "confirm": "Bekräfta",
+      "success": "Insättning lyckades",
+      "error": "Misslyckades med insättning",
       "receive-cash": "Ecash",
-      "redeem": "Redeem",
-      "redeem-error": "Failed to redeem ecash",
-      "redeem-success": "Ecash redeemed",
-      "from-wallet": "Choose a wallet to pay this invoice",
-      "confirm-wallet": "Pay"
+      "redeem": "Lös in",
+      "redeem-error": "Misslyckades med att lösa in ecash",
+      "redeem-success": "Ecash inlöst",
+      "from-wallet": "Välj en plånbok för att betala denna faktura",
+      "confirm-wallet": "Betala"
     },
     "withdraw": {
-      "title": "Send",
-      "description": "Pay a lightning invoice, send money to a profile or a lightning address",
-      "placeholder": "Lightning invoice, profile or address",
-      "to": "To",
-      "confirm": "Pay",
-      "error": "Failed to send",
-      "unrecognized-invoice": "Unrecognized invoice",
-      "to-wallet": "Choose a wallet to send to",
-      "choose-wallet": "Send to wallet",
-      "confirm-cash": "Send ecash",
-      "no-wallet": "No wallet selected",
-      "success": "Send successful",
-      "p2pk-success": "Sent {{ amount }} to {{ name }}",
-      "lud16-success": "Sent {{ amount }} to {{ lud16 }}",
-      "amount-success": "Sent {{ amount }}",
-      "message": "Message",
-      "message-placeholder": "Write an optional message",
-      "confirm-wallet": "Send"
+      "title": "Skicka",
+      "description": "Betala en lightning-faktura, skicka pengar till en profil eller en lightning-adress",
+      "placeholder": "Lightning-faktura, profil eller adress",
+      "to": "Till",
+      "confirm": "Betala",
+      "error": "Misslyckades med att skicka",
+      "unrecognized-invoice": "Oigenkänd faktura",
+      "to-wallet": "Välj en plånbok att skicka till",
+      "choose-wallet": "Skicka till plånbok",
+      "confirm-cash": "Skicka ecash",
+      "no-wallet": "Ingen plånbok vald",
+      "success": "Skickat framgångsrikt",
+      "p2pk-success": "Skickade {{ amount }} till {{ name }}",
+      "lud16-success": "Skickade {{ amount }} till {{ lud16 }}",
+      "amount-success": "Skickade {{ amount }}",
+      "message": "Meddelande",
+      "message-placeholder": "Skriv ett valfritt meddelande",
+      "confirm-wallet": "Skicka"
     },
-    "mints-description": "Mints are the custodians of the funds. Withdraw your funds to your wallet regularly.",
-    "relays-description": "Relays where the wallet data is stored.",
-    "name": "Name",
-    "name-description": "A name for your wallet",
-    "ready": "Wallet `{{ name }}` ready",
+    "mints-description": "Mints är förvarare av medlen. Ta ut dina medel regelbundet till din plånbok.",
+    "relays-description": "Reläer där plånboksdata lagras.",
+    "name": "Namn",
+    "name-description": "Ett namn för din plånbok",
+    "ready": "Plånbok `{{ name }}` klar",
     "dialog": {
-      "title": "Connect wallet",
-      "description": "Connect your wallet to send tips and support your favorite creators",
-      "connect-webln": "Connect web wallet",
-      "webln-connected": "Connected to web wallet",
-      "webln-unavailable": "WebLN wallet not available",
-      "webln-error": "Failed to connect to WebLN wallet",
-      "connect-nip60": "Connect remote wallet",
-      "nwc-empty": "NWC address is empty",
-      "nwc-error": "Failed to connect to remote wallet",
-      "nwc-connected": "Connected to remote wallet"
+      "title": "Anslut plånbok",
+      "description": "Anslut din plånbok för att skicka dricks och stödja dina favoritkreatörer",
+      "connect-webln": "Anslut web-plånbok",
+      "webln-connected": "Ansluten till web-plånbok",
+      "webln-unavailable": "WebLN-plånbok inte tillgänglig",
+      "webln-error": "Misslyckades med att ansluta till WebLN-plånbok",
+      "connect-nip60": "Anslut fjärrplånbok",
+      "nwc-empty": "NWC-adress är tom",
+      "nwc-error": "Misslyckades med att ansluta till fjärrplånbok",
+      "nwc-connected": "Ansluten till fjärrplånbok"
     },
     "coins": "Cash",
     "transactions": {
-      "title": "Transactions",
-      "loading": "Loading transactions",
-      "loading-error": "Error loading transactions"
+      "title": "Transaktioner",
+      "loading": "Laddar transaktioner",
+      "loading-error": "Fel vid laddning av transaktioner"
     }
   },
   "zap": {
-    "trigger": "Tip",
-    "action": "Tip",
+    "trigger": "Dricks",
+    "action": "Dricks",
     "dialog": {
       "title": "Zap {{ name }}",
-      "description": "Send a tip to {{ name }}",
-      "amount": "Amount",
-      "invoice": "Invoice",
-      "message": "Message",
-      "message-placeholder": "Add a message",
+      "description": "Skicka en dricks till {{ name }}",
+      "amount": "Belopp",
+      "invoice": "Faktura",
+      "message": "Meddelande",
+      "message-placeholder": "Lägg till ett meddelande",
       "tip": "Zap {{ amount }}",
-      "copy": "Copy invoice",
-      "wallet": "Open in wallet",
-      "wallet-error": "Couldn't open wallet",
-      "error": "Failed to zap",
-      "success": "Zapped {{ amount }} to {{ name }}"
+      "copy": "Kopiera faktura",
+      "wallet": "Öppna i plånbok",
+      "wallet-error": "Kunde inte öppna plånbok",
+      "error": "Misslyckades med att zap",
+      "success": "Zappade {{ amount }} till {{ name }}"
     }
   },
   "ecash": {
-    "redeem": "Redeem",
-    "fee": "fee:"
+    "redeem": "Lös in",
+    "fee": "avgift:"
   },
   "settings": {
-    "title": "Settings",
+    "title": "Inställningar",
     "ui": {
-      "title": "Appearance",
+      "title": "Utseende",
       "language": {
-        "title": "Language",
-        "description": "Choose your preferred language"
+        "title": "Språk",
+        "description": "Välj ditt föredragna språk"
       },
       "theme": {
-        "title": "Theme",
-        "description": "Choose your preferred theme",
-        "light": "Light",
-        "dark": "Dark",
+        "title": "Tema",
+        "description": "Välj ditt föredragna tema",
+        "light": "Ljus",
+        "dark": "Mörk",
         "system": "System"
       }
     },
     "wallet": {
-      "title": "Wallets",
-      "settings": "Settings",
+      "title": "Plånböcker",
+      "settings": "Inställningar",
       "mints": "Mints",
-      "enable": "Enable",
-      "enabled": "Enabled",
-      "enable-success": "Wallet enabled",
-      "enable-error": "Failed to enable wallet",
-      "relays": "Relays",
+      "enable": "Aktivera",
+      "enabled": "Aktiverad",
+      "enable-success": "Plånbok aktiverad",
+      "enable-error": "Kunde inte aktivera plånbok",
+      "relays": "Reläer",
       "default-wallet": {
-        "title": "Active wallet",
-        "none": "No wallet selected"
+        "title": "Aktiv plånbok",
+        "none": "Ingen plånbok vald"
       },
       "payments": {
-        "title": "Payments",
-        "description": "Manage the mints and relays you'll use to receive payments"
+        "title": "Betalningar",
+        "description": "Hantera de mints och reläer du använder för att ta emot betalningar"
       },
       "wallets": {
-        "title": "Wallets",
-        "none": "No wallets",
-        "remove": "Remove",
-        "description": "Manage your wallets",
-        "create": "Create wallet",
-        "default": "Default",
-        "make-default": "Make default",
-        "delete": "Delete",
-        "delete-error": "Failed to delete wallet",
-        "delete-success": "Wallet deleted",
-        "create-error": "Failed to create wallet",
-        "create-success": "Wallet created",
-        "sync": "Sync",
-        "synced": "Synced",
-        "sync-error": "Error syncing wallet",
-        "open": "Open"
+        "title": "Plånböcker",
+        "none": "Inga plånböcker",
+        "remove": "Ta bort",
+        "description": "Hantera dina plånböcker",
+        "create": "Skapa plånbok",
+        "default": "Standard",
+        "make-default": "Gör till standard",
+        "delete": "Radera",
+        "delete-error": "Misslyckades med att radera plånbok",
+        "delete-success": "Plånbok raderad",
+        "create-error": "Misslyckades med att skapa plånbok",
+        "create-success": "Plånbok skapad",
+        "sync": "Synkronisera",
+        "synced": "Synkroniserad",
+        "sync-error": "Fel vid synkronisering av plånbok",
+        "open": "Öppna"
       }
     },
     "media": {
       "title": "Media"
     },
     "relays": {
-      "title": "Relays"
+      "title": "Reläer"
     }
   },
   "nutzaps": {
-    "no-message": "No message",
+    "no-message": "Inget meddelande",
     "title": "Zaps",
-    "redeemed": "Redeemed",
-    "failed": "Failed",
-    "log-in": "Log in to see your zaps",
-    "invalid": "Invalid zap",
-    "redeem": "Redeem",
-    "redeem-success": "Redeemed {{ amount }} zap",
-    "redeem-error": "Failed to redeem zap",
-    "received": "Received",
-    "sent": "Sent",
-    "no-received": "Nothing to see here... yet",
-    "no-sent": "Nothing to see here... yet",
-    "open": "Open"
+    "redeemed": "Inlöst",
+    "failed": "Misslyckades",
+    "log-in": "Logga in för att se dina zaps",
+    "invalid": "Ogiltig zap",
+    "redeem": "Lös in",
+    "redeem-success": "Löst in {{ amount }} zap",
+    "redeem-error": "Misslyckades med att lösa in zap",
+    "received": "Mottaget",
+    "sent": "Skickat",
+    "no-received": "Inget att se här... än",
+    "no-sent": "Inget att se här... än",
+    "open": "Öppna"
   },
   "mint": {
-    "contact": "Contact",
+    "contact": "Kontakt",
     "version": "Version",
-    "features": "Features",
+    "features": "Funktioner",
     "nuts": "Nuts",
     "sat": "Bitcoin",
     "eur": "Euro",
     "usd": "US Dollar",
-    "currencies": "Currencies"
+    "currencies": "Valutor"
   },
   "ln": {
     "send": {
-      "title": "Send {{ amount }}",
-      "show-qr": "Show QR",
-      "hide-qr": "Hide QR"
+      "title": "Skicka {{ amount }}",
+      "show-qr": "Visa QR",
+      "hide-qr": "Dölj QR"
     }
   },
   "qr": {
-    "scan": "Scan QR Code",
-    "scan-error": "Error scanning QR Code",
-    "unknown": "Unknown QR Code"
+    "scan": "Skanna QR-kod",
+    "scan-error": "Fel vid skanning av QR-kod",
+    "unknown": "Okänd QR-kod"
   }
 }
