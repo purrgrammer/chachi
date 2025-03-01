@@ -496,6 +496,7 @@
       "success": "Einzahlung erfolgreich",
       "error": "Einzahlung fehlgeschlagen",
       "receive-cash": "Ecash",
+      "mint-error": "You are not accepting ecash from this mint",
       "redeem": "Einlösen",
       "redeem-error": "Fehler beim Einlösen von Ecash",
       "redeem-success": "Ecash eingelöst",
