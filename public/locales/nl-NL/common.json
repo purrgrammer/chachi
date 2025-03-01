@@ -1,10 +1,10 @@
 {
   "locale": {
-    "today": "Today"
+    "today": "Vandaag"
   },
   "home": "Home",
   "nav": {
-    "no-groups": "No groups"
+    "no-groups": "Geen groepen"
   },
   "user": {
     "login": {
@@ -19,24 +19,24 @@
         "label": "Remote signer",
         "error": "Failed to log in with remote signer"
       },
-      "or": "OR",
+      "or": "OF",
       "connect": "Connect"
     },
     "logout": "Log out",
     "zaps": "Zaps",
-    "language": "Language",
+    "language": "Taal",
     "theme": {
-      "trigger": "Theme",
+      "trigger": "Thema",
       "light": "Light",
       "dark": "Dark",
-      "system": "System"
+      "system": "Systeem"
     },
-    "settings": "Settings"
+    "settings": "Instellingen"
   },
   "dashboard": {
     "activity": {
       "heading": "Activity",
-      "unread": "unread",
+      "unread": "ongelezen",
       "mentions": "mentions",
       "none": "Nothing new for you... yet"
     },
@@ -49,16 +49,16 @@
     "search": {
       "prompt": "Can't find what you're looking for?",
       "trigger": "Search groups",
-      "title": "Find a group",
+      "title": "Vind een groep",
       "input": {
         "placeholder": "Search groups",
-        "no-results-for-x": "No results for \"{{search}}\"",
-        "n-results-for-x": "{{n}} results for \"{{search}}\"",
-        "start-typing-to-filter-groups": "Start typing to filter groups"
+        "no-results-for-x": "Geen resultaten voor \"{{search}}\"",
+        "n-results-for-x": "{{n}} resultaten voor \"{{search}}\"",
+        "start-typing-to-filter-groups": "Begin met typen om groepen te filteren"
       },
       "result": {
         "visit": "Visit",
-        "no-description-available": "No description available",
+        "no-description-available": "Geen omschrijving beschikbaar",
         "no-groups-found-for-x-want-to": "No groups found for \"{{search}}\", want to ",
         "start-one": "start one",
         "?": "?"
@@ -67,28 +67,28 @@
   },
   "group": {
     "hosted": {
-      "by": "Hosted by ",
-      "and": " and "
+      "by": "Gehost door ",
+      "and": " en "
     },
     "create": {
-      "new": "New group",
+      "new": "Nieuwe groep",
       "title": "Create group",
       "description": "Create a new group to chat with your friends",
       "form": {
         "name": {
-          "label": "Name",
-          "placeholder": "This is the group's name.",
-          "required": "Please add a name"
+          "label": "Naam",
+          "placeholder": "Dit is de naam van de groep.",
+          "required": "Voeg een naam toe"
         },
         "about": {
           "label": "About",
-          "placeholder": "This is the group's description."
+          "placeholder": "Dit is de omschrijving van de groep."
         },
         "relay": {
           "label": "Relay",
-          "placeholder": "Choose a relay.",
+          "placeholder": "Kies een relay.",
           "description": "This is the server where the posts will be stored.",
-          "required": "Please select a relay"
+          "required": "Selecteer een relay"
         },
         "visibility": {
           "label": "Visibility",
@@ -109,32 +109,32 @@
       }
     },
     "edit": {
-      "title": "Group settings",
+      "title": "Groep instellingen",
       "form": {
         "name": {
-          "label": "Name",
-          "placeholder": "My Group",
-          "description": "This is the group's name"
+          "label": "Naam",
+          "placeholder": "Mijn groep",
+          "description": "Dit is de naam van de groep"
         },
         "about": {
           "label": "About",
           "placeholder": "A group for my frens",
-          "description": "This is the group's description"
+          "description": "Dit is de omschrijving van de groep"
         },
         "visibility": {
-          "label": "Visibility",
-          "anyone": "Anyone",
-          "members-only": "Members only",
+          "label": "Zichtbaarheid",
+          "anyone": "Iedereen",
+          "members-only": "Alleen leden",
           "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
         },
         "access": {
-          "label": "Access",
-          "anyone": "Anyone",
+          "label": "Toegang",
+          "anyone": "Iedereen",
           "invite-only": "Invite only",
           "description": "Anyone can join an open group. Closed groups require approval"
         },
         "submit": {
-          "trigger": "Save",
+          "trigger": "Opslaan",
           "success": "Group updated",
           "error": "Couldn't update group"
         }
@@ -153,11 +153,11 @@
     },
     "deleted": "This group has been deleted",
     "bookmark": {
-      "trigger": "Bookmark",
+      "trigger": "Toevoegen aan bladwijzers",
       "error": "Error bookmarking group"
     },
     "unbookmark": {
-      "trigger": "Unbookmark",
+      "trigger": "Verwijderen uit bladwijzers",
       "error": "Error unbookmarking group"
     },
     "join": "Join",
@@ -210,7 +210,7 @@
     "info": {
       "admin": "Admin",
       "admins": "Admins ({{adminsLength}})",
-      "members": "Members ({{membersLength}})",
+      "members": "Leden ({{membersLength}})",
       "no-members": "No members"
     }
   },
@@ -252,7 +252,7 @@
       "deleted": "Message deleted",
       "save-as-last-seen": "Save as last seen"
     },
-    "new-messages": "New messages",
+    "new-messages": "Nieuwe berichten",
     "user": {
       "not-member": "You are not a member of this group yet",
       "kick": {
@@ -294,8 +294,8 @@
     }
   },
   "gif": {
-    "search": "Search GIF",
-    "tenor": "Search Tenor",
+    "search": "Zoek GIF",
+    "tenor": "Zoek Tenor",
     "error": "Error searching GIFs"
   },
   "file": {
@@ -304,19 +304,19 @@
     }
   },
   "image": {
-    "new": "New image",
+    "new": "Nieuwe afbeelding",
     "post": "Post an image",
     "title": {
-      "label": "Title",
-      "placeholder": "Add a title"
+      "label": "Titel",
+      "placeholder": "Voeg een titel toe"
     },
     "publish": {
       "success": "Image posted",
       "error": "Failed to post image"
     },
     "description": {
-      "label": "Description",
-      "placeholder": "Add a description"
+      "label": "Omschrijving",
+      "placeholder": "Voeg een omschrijving toe"
     }
   },
   "copy": {
@@ -333,9 +333,9 @@
       "poll": "Poll",
       "polls": "Polls",
       "video": "Video",
-      "videos": "Videos",
-      "image": "Image",
-      "images": "Images"
+      "videos": "Video's",
+      "image": "Afbeelding",
+      "images": "Afbeeldingen"
     }
   },
   "post": {
@@ -358,7 +358,7 @@
       "error": "Couldn't create poll"
     },
     "new": "New poll",
-    "question": "Question",
+    "question": "Vraag",
     "expiration": {
       "label": "Expiration",
       "date": "Expiry date",
@@ -382,14 +382,14 @@
       "success": "Video posted",
       "error": "Failed to post video"
     },
-    "new": "New video",
+    "new": "Nieuwe video",
     "title": {
-      "label": "Title",
-      "placeholder": "Add a title"
+      "label": "Titel",
+      "placeholder": "Voeg een titel toe"
     },
     "description": {
-      "label": "Description",
-      "placeholder": "Add a description"
+      "label": "Omschrijving",
+      "placeholder": "Voeg een omschrijving toe"
     }
   },
   "emoji": {
@@ -401,16 +401,16 @@
   },
   "peer": " peer",
   "peers": " peers",
-  "message": "Message",
-  "write-a-message": "Write a message...",
+  "message": "Bericht",
+  "write-a-message": "Schrijf een bericht...",
   "send": {
     "login-required": "Log in to send message",
     "error": "Failed to send message"
   },
   "event": {
-    "content": "Content",
+    "content": "Inhoud",
     "replies": "Replies",
-    "details": "Details",
+    "details": "Gegevens",
     "loading": "Loading event",
     "not-found": "Event not found",
     "fetch-error": "Error fetching event"
@@ -420,7 +420,7 @@
     "none": "Nothing to see here... yet"
   },
   "share": {
-    "success": "Shared",
+    "success": "Gedeeld",
     "error": "Couldn't share post",
     "publication": "Share publication",
     "this": {
@@ -479,13 +479,13 @@
         "description": "Create a wallet to start sending and receiving zaps"
       }
     },
-    "save": "Save changes",
-    "saved": "Changes saved",
+    "save": "Wijzigingen opslaan",
+    "saved": "Wijzigingen opgeslagen",
     "save-error": "Failed to save changes",
     "mints": "Mints",
     "add-mint": "Add mint",
     "relays": "Relays",
-    "add-relay": "Add relay",
+    "add-relay": "Voeg relay toe",
     "deposit": {
       "title": "Receive",
       "cashu-description": "Deposit funds into a mint or redeem ecash tokens",
@@ -496,6 +496,7 @@
       "success": "Deposit successful",
       "error": "Failed to deposit",
       "receive-cash": "Ecash",
+      "mint-error": "You are not accepting ecash from this mint",
       "redeem": "Redeem",
       "redeem-error": "Failed to redeem ecash",
       "redeem-success": "Ecash redeemed",
@@ -503,7 +504,7 @@
       "confirm-wallet": "Pay"
     },
     "withdraw": {
-      "title": "Send",
+      "title": "Verzenden",
       "description": "Pay a lightning invoice, send money to a profile or a lightning address",
       "placeholder": "Lightning invoice, profile or address",
       "to": "To",
@@ -524,7 +525,7 @@
     },
     "mints-description": "Mints are the custodians of the funds. Withdraw your funds to your wallet regularly.",
     "relays-description": "Relays where the wallet data is stored.",
-    "name": "Name",
+    "name": "Naam",
     "name-description": "A name for your wallet",
     "ready": "Wallet `{{ name }}` ready",
     "dialog": {
@@ -541,7 +542,7 @@
     },
     "coins": "Cash",
     "transactions": {
-      "title": "Transactions",
+      "title": "Transacties",
       "loading": "Loading transactions",
       "loading-error": "Error loading transactions"
     }
@@ -552,10 +553,10 @@
     "dialog": {
       "title": "Zap {{ name }}",
       "description": "Send a tip to {{ name }}",
-      "amount": "Amount",
+      "amount": "Bedrag",
       "invoice": "Invoice",
-      "message": "Message",
-      "message-placeholder": "Add a message",
+      "message": "Bericht",
+      "message-placeholder": "Voeg een bericht toe",
       "tip": "Zap {{ amount }}",
       "copy": "Copy invoice",
       "wallet": "Open in wallet",
@@ -569,15 +570,15 @@
     "fee": "fee:"
   },
   "settings": {
-    "title": "Settings",
+    "title": "Instellingen",
     "ui": {
       "title": "Appearance",
       "language": {
-        "title": "Language",
+        "title": "Taal",
         "description": "Choose your preferred language"
       },
       "theme": {
-        "title": "Theme",
+        "title": "Thema",
         "description": "Choose your preferred theme",
         "light": "Light",
         "dark": "Dark",
@@ -598,7 +599,7 @@
         "none": "No wallet selected"
       },
       "payments": {
-        "title": "Payments",
+        "title": "Betalingen",
         "description": "Manage the mints and relays you'll use to receive payments"
       },
       "wallets": {
@@ -628,7 +629,7 @@
     }
   },
   "nutzaps": {
-    "no-message": "No message",
+    "no-message": "Geen bericht",
     "title": "Zaps",
     "redeemed": "Redeemed",
     "failed": "Failed",
@@ -644,8 +645,8 @@
     "open": "Open"
   },
   "mint": {
-    "contact": "Contact",
-    "version": "Version",
+    "contact": "Contactpersoon",
+    "version": "Versie",
     "features": "Features",
     "nuts": "Nuts",
     "sat": "Bitcoin",
@@ -656,7 +657,7 @@
   "ln": {
     "send": {
       "title": "Send {{ amount }}",
-      "show-qr": "Show QR",
+      "show-qr": "Toon QR",
       "hide-qr": "Hide QR"
     }
   },

@@ -23,7 +23,7 @@
       "connect": "连接"
     },
     "logout": "登出",
-    "zaps": "Zaps",
+    "zaps": "打闪",
     "language": "语言",
     "theme": {
       "trigger": "主题",
@@ -31,7 +31,7 @@
       "dark": "深色",
       "system": "系統"
     },
-    "settings": "Settings"
+    "settings": "设置"
   },
   "dashboard": {
     "activity": {
@@ -67,7 +67,7 @@
   },
   "group": {
     "hosted": {
-      "by": "Hosted by ",
+      "by": "主管：",
       "and": "和"
     },
     "create": {
@@ -109,7 +109,7 @@
       }
     },
     "edit": {
-      "title": "Group settings",
+      "title": "群聊设置",
       "form": {
         "name": {
           "label": "名稱",
@@ -218,7 +218,7 @@
     "message": {
       "loading": "正在加载消息...",
       "tip": {
-        "action": "Zap"
+        "action": "打闪"
       },
       "copy": {
         "action": "复制",
@@ -226,12 +226,12 @@
         "error": "无法复制到剪贴板"
       },
       "redeem": {
-        "action": "Redeem",
-        "failed": "Failed",
-        "redeemed": "Redeemed"
+        "action": "兑换",
+        "failed": "失败",
+        "redeemed": "已兑换"
       },
       "zap": {
-        "action": "Zap"
+        "action": "打闪"
       },
       "react": {
         "action": "回应",
@@ -243,8 +243,8 @@
         "error": "无法回复"
       },
       "forward": {
-        "action": "Forward",
-        "forwarded": "forwarded from"
+        "action": "转发",
+        "forwarded": "转发自"
       },
       "delete": {
         "action": "删除"
@@ -304,19 +304,19 @@
     }
   },
   "image": {
-    "new": "New image",
-    "post": "Post an image",
+    "new": "新图片",
+    "post": "发布图片",
     "title": {
-      "label": "Title",
-      "placeholder": "Add a title"
+      "label": "标题",
+      "placeholder": "添加标题"
     },
     "publish": {
-      "success": "Image posted",
-      "error": "Failed to post image"
+      "success": "图片已发布",
+      "error": "无法发布图片"
     },
     "description": {
-      "label": "Description",
-      "placeholder": "Add a description"
+      "label": "描述",
+      "placeholder": "添加描述"
     }
   },
   "copy": {
@@ -428,241 +428,242 @@
       "in": "将这个帖子分享至 {{groupName}}。"
     },
     "in": {
-      "group": "Share in",
+      "group": "分享至",
       "x": "分享至 {{groupName}} 聊天",
       "chat": "分享到聊天"
     }
   },
   "share-in": "分享至",
   "action-open": "打开",
-  "action-zap": "Zap",
+  "action-zap": "打闪",
   "media": {
-    "reveal": "Reveal"
+    "reveal": "显示"
   },
   "header": {
-    "public": "Public",
-    "unknown": "Unknown"
+    "public": "公开",
+    "unknown": "未知"
   },
   "book": {
-    "by": "by {{ author }}",
+    "by": "{{ author }} 著",
     "current-chapter": "{{ chapter }} / {{ total }}"
   },
   "goal": {
-    "expires-in": "Expires in",
-    "expired": "Goal expired",
-    "leaderboard": "Leaderboard"
+    "expires-in": "过期时间：",
+    "expired": "目标已过期",
+    "leaderboard": "排行榜"
   },
   "wallet": {
-    "title": "Incoming payment",
-    "keys": "Keys",
-    "sync": "Sync",
-    "sync-success": "Ecash synced",
-    "sync-error": "Error syncing wallet",
-    "keys-description": "Your wallet keys, it's important to keep them safe and backed up",
-    "debit": "Payment",
-    "credit": "Payment",
-    "connect": "Connect",
-    "not-found": "Wallet not found",
-    "no-transactions": "No transactions found",
-    "no-coins": "No coins found",
-    "make-default": "Make default",
-    "choose-wallet": "Choose wallet",
-    "choose-wallet-placeholder": "Choose a wallet to pay with",
-    "make-default-error": "Failed to set wallet as default",
-    "make-default-success": "Wallet set as default",
-    "create": "Create wallet",
+    "title": "收款",
+    "keys": "密钥",
+    "sync": "同步",
+    "sync-success": "Ecash 已同步",
+    "sync-error": "同步钱包时出错了",
+    "keys-description": "你的钱包密钥至关重要，请务必安全保存并进行备份",
+    "debit": "付款",
+    "credit": "付款",
+    "connect": "连接",
+    "not-found": "未找到钱包",
+    "no-transactions": "找不到任何交易",
+    "no-coins": "找不到任何资金",
+    "make-default": "设为默认",
+    "choose-wallet": "选择钱包",
+    "choose-wallet-placeholder": "请选择用于付款的钱包",
+    "make-default-error": "无法设定钱包为默认",
+    "make-default-success": "钱包已设为默认",
+    "create": "创建钱包",
     "settings": {
-      "title": "Wallet settings",
-      "description": "Manage your wallet settings",
+      "title": "钱包设置",
+      "description": "管理你的钱包设置",
       "create": {
-        "title": "Create wallet",
-        "description": "Create a wallet to start sending and receiving zaps"
+        "title": "创建钱包",
+        "description": "创建钱包，即可开始发送和接收打闪"
       }
     },
-    "save": "Save changes",
-    "saved": "Changes saved",
-    "save-error": "Failed to save changes",
-    "mints": "Mints",
-    "add-mint": "Add mint",
-    "relays": "Relays",
-    "add-relay": "Add relay",
+    "save": "保存更改",
+    "saved": "更改已保存",
+    "save-error": "保存更改失败",
+    "mints": "铸币厂",
+    "add-mint": "添加铸币厂",
+    "relays": "中继",
+    "add-relay": "添加中继",
     "deposit": {
-      "title": "Receive",
-      "cashu-description": "Deposit funds into a mint or redeem ecash tokens",
-      "description": "Deposit funds into your wallet",
-      "mint": "Mint",
-      "amount": "Amount",
-      "confirm": "Confirm",
-      "success": "Deposit successful",
-      "error": "Failed to deposit",
+      "title": "接收",
+      "cashu-description": "将资金存入铸币厂或兑换代币",
+      "description": "充值钱包",
+      "mint": "铸币厂",
+      "amount": "金额",
+      "confirm": "确认",
+      "success": "充值成功",
+      "error": "充值失败",
       "receive-cash": "Ecash",
-      "redeem": "Redeem",
-      "redeem-error": "Failed to redeem ecash",
-      "redeem-success": "Ecash redeemed",
-      "from-wallet": "Choose a wallet to pay this invoice",
-      "confirm-wallet": "Pay"
+      "mint-error": "你不接受来自此铸币厂的 ecash",
+      "redeem": "兑换",
+      "redeem-error": "兑换 ecash 失败",
+      "redeem-success": "已兑换 ecash",
+      "from-wallet": "请选择用于支付此发票的钱包",
+      "confirm-wallet": "支付"
     },
     "withdraw": {
-      "title": "Send",
-      "description": "Pay a lightning invoice, send money to a profile or a lightning address",
-      "placeholder": "Lightning invoice, profile or address",
-      "to": "To",
-      "confirm": "Pay",
-      "error": "Failed to send",
-      "unrecognized-invoice": "Unrecognized invoice",
-      "to-wallet": "Choose a wallet to send to",
-      "choose-wallet": "Send to wallet",
-      "confirm-cash": "Send ecash",
-      "no-wallet": "No wallet selected",
-      "success": "Send successful",
-      "p2pk-success": "Sent {{ amount }} to {{ name }}",
-      "lud16-success": "Sent {{ amount }} to {{ lud16 }}",
-      "amount-success": "Sent {{ amount }}",
-      "message": "Message",
-      "message-placeholder": "Write an optional message",
-      "confirm-wallet": "Send"
+      "title": "发送",
+      "description": "支付闪电发票或向个人档案或闪电地址发送资金",
+      "placeholder": "闪电发票、个人档案或闪电地址",
+      "to": "至",
+      "confirm": "支付",
+      "error": "发送失败",
+      "unrecognized-invoice": "无法识别发票",
+      "to-wallet": "请选择用于收款的钱包",
+      "choose-wallet": "发送到钱包",
+      "confirm-cash": "发送 ecash",
+      "no-wallet": "未选择钱包",
+      "success": "发送成功",
+      "p2pk-success": "已发送 {{ amount }} 至 {{ name }}",
+      "lud16-success": "已发送 {{ amount }} 至 {{ lud16 }}",
+      "amount-success": "已发送 {{ amount }}",
+      "message": "消息",
+      "message-placeholder": "写一条消息（可选）",
+      "confirm-wallet": "发送"
     },
-    "mints-description": "Mints are the custodians of the funds. Withdraw your funds to your wallet regularly.",
-    "relays-description": "Relays where the wallet data is stored.",
-    "name": "Name",
-    "name-description": "A name for your wallet",
-    "ready": "Wallet `{{ name }}` ready",
+    "mints-description": "铸币厂是资金的保管人。请定期将你的资金提取到你自己的钱包。",
+    "relays-description": "储存钱包资料的中继。",
+    "name": "名称",
+    "name-description": "为你的钱包取个名字",
+    "ready": "钱包 `{{ name }}` 已准备就绪",
     "dialog": {
-      "title": "Connect wallet",
-      "description": "Connect your wallet to send tips and support your favorite creators",
-      "connect-webln": "Connect web wallet",
-      "webln-connected": "Connected to web wallet",
-      "webln-unavailable": "WebLN wallet not available",
-      "webln-error": "Failed to connect to WebLN wallet",
-      "connect-nip60": "Connect remote wallet",
-      "nwc-empty": "NWC address is empty",
-      "nwc-error": "Failed to connect to remote wallet",
-      "nwc-connected": "Connected to remote wallet"
+      "title": "连接钱包",
+      "description": "连接你的钱包以打赏并支持你最喜欢的创造者",
+      "connect-webln": "连接网络钱包",
+      "webln-connected": "已连接网络钱包",
+      "webln-unavailable": "WebLN 钱包不可用",
+      "webln-error": "无法连接 WebLN 钱包",
+      "connect-nip60": "连接远程钱包",
+      "nwc-empty": "NWC 地址为空",
+      "nwc-error": "无法连接远程钱包",
+      "nwc-connected": "已连接远程钱包"
     },
-    "coins": "Cash",
+    "coins": "资金",
     "transactions": {
-      "title": "Transactions",
-      "loading": "Loading transactions",
-      "loading-error": "Error loading transactions"
+      "title": "交易",
+      "loading": "正在加载交易",
+      "loading-error": "加载交易时出错了"
     }
   },
   "zap": {
-    "trigger": "Tip",
-    "action": "Tip",
+    "trigger": "打闪",
+    "action": "打闪",
     "dialog": {
-      "title": "Zap {{ name }}",
-      "description": "Send a tip to {{ name }}",
-      "amount": "Amount",
-      "invoice": "Invoice",
-      "message": "Message",
-      "message-placeholder": "Add a message",
-      "tip": "Zap {{ amount }}",
-      "copy": "Copy invoice",
-      "wallet": "Open in wallet",
-      "wallet-error": "Couldn't open wallet",
-      "error": "Failed to zap",
-      "success": "Zapped {{ amount }} to {{ name }}"
+      "title": "打闪 {{ name }}",
+      "description": "打闪 {{ name }}",
+      "amount": "金额",
+      "invoice": "发票",
+      "message": "消息",
+      "message-placeholder": "添加一条消息",
+      "tip": "打闪 {{ amount }}",
+      "copy": "复制发票",
+      "wallet": "在钱包中打开",
+      "wallet-error": "无法打开钱包",
+      "error": "打闪失败",
+      "success": "已打闪 {{ amount }} 至 {{ name }}"
     }
   },
   "ecash": {
-    "redeem": "Redeem",
-    "fee": "fee:"
+    "redeem": "兑换",
+    "fee": "费用："
   },
   "settings": {
-    "title": "Settings",
+    "title": "设置",
     "ui": {
-      "title": "Appearance",
+      "title": "外观",
       "language": {
-        "title": "Language",
-        "description": "Choose your preferred language"
+        "title": "语言",
+        "description": "选择你的语言"
       },
       "theme": {
-        "title": "Theme",
-        "description": "Choose your preferred theme",
-        "light": "Light",
-        "dark": "Dark",
-        "system": "System"
+        "title": "主题",
+        "description": "选择你的主题",
+        "light": "淡色",
+        "dark": "深色",
+        "system": "系统"
       }
     },
     "wallet": {
-      "title": "Wallets",
-      "settings": "Settings",
-      "mints": "Mints",
-      "enable": "Enable",
-      "enabled": "Enabled",
-      "enable-success": "Wallet enabled",
-      "enable-error": "Failed to enable wallet",
-      "relays": "Relays",
+      "title": "钱包",
+      "settings": "设置",
+      "mints": "铸币厂",
+      "enable": "启用",
+      "enabled": "已启用",
+      "enable-success": "已启用钱包",
+      "enable-error": "启用钱包失败",
+      "relays": "中继",
       "default-wallet": {
-        "title": "Active wallet",
-        "none": "No wallet selected"
+        "title": "活跃钱包",
+        "none": "未选择钱包"
       },
       "payments": {
-        "title": "Payments",
-        "description": "Manage the mints and relays you'll use to receive payments"
+        "title": "付款",
+        "description": "管理你将用来接收付款的铸币厂和中继"
       },
       "wallets": {
-        "title": "Wallets",
-        "none": "No wallets",
-        "remove": "Remove",
-        "description": "Manage your wallets",
-        "create": "Create wallet",
-        "default": "Default",
-        "make-default": "Make default",
-        "delete": "Delete",
-        "delete-error": "Failed to delete wallet",
-        "delete-success": "Wallet deleted",
-        "create-error": "Failed to create wallet",
-        "create-success": "Wallet created",
-        "sync": "Sync",
-        "synced": "Synced",
-        "sync-error": "Error syncing wallet",
-        "open": "Open"
+        "title": "钱包",
+        "none": "尚无钱包",
+        "remove": "移除",
+        "description": "管理你的钱包",
+        "create": "创建钱包",
+        "default": "默认",
+        "make-default": "设为默认",
+        "delete": "删除",
+        "delete-error": "删除钱包失败",
+        "delete-success": "钱包已删除",
+        "create-error": "创建钱包失败",
+        "create-success": "钱包已创建",
+        "sync": "同步",
+        "synced": "已同步",
+        "sync-error": "同步钱包时出错",
+        "open": "打开"
       }
     },
     "media": {
-      "title": "Media"
+      "title": "多媒体"
     },
     "relays": {
-      "title": "Relays"
+      "title": "中继"
     }
   },
   "nutzaps": {
-    "no-message": "No message",
-    "title": "Zaps",
-    "redeemed": "Redeemed",
-    "failed": "Failed",
-    "log-in": "Log in to see your zaps",
-    "invalid": "Invalid zap",
-    "redeem": "Redeem",
-    "redeem-success": "Redeemed {{ amount }} zap",
-    "redeem-error": "Failed to redeem zap",
-    "received": "Received",
-    "sent": "Sent",
-    "no-received": "Nothing to see here... yet",
-    "no-sent": "Nothing to see here... yet",
-    "open": "Open"
+    "no-message": "无消息",
+    "title": "打闪",
+    "redeemed": "已兑换",
+    "failed": "失败",
+    "log-in": "登录以查看你的打闪",
+    "invalid": "无效打闪",
+    "redeem": "兑换",
+    "redeem-success": "已兑换 {{ amount }} 打闪",
+    "redeem-error": "兑换打闪失败",
+    "received": "已接收",
+    "sent": "已发送",
+    "no-received": "这里还没有什么可看的…",
+    "no-sent": "这里还没有什么可看的…",
+    "open": "打开"
   },
   "mint": {
-    "contact": "Contact",
-    "version": "Version",
-    "features": "Features",
+    "contact": "联系人",
+    "version": "版本",
+    "features": "功能",
     "nuts": "Nuts",
-    "sat": "Bitcoin",
-    "eur": "Euro",
-    "usd": "US Dollar",
-    "currencies": "Currencies"
+    "sat": "比特币",
+    "eur": "欧元",
+    "usd": "美元",
+    "currencies": "货币"
   },
   "ln": {
     "send": {
-      "title": "Send {{ amount }}",
-      "show-qr": "Show QR",
-      "hide-qr": "Hide QR"
+      "title": "发送 {{ amount }}",
+      "show-qr": "显示二维码",
+      "hide-qr": "隐藏二维码"
     }
   },
   "qr": {
-    "scan": "Scan QR Code",
-    "scan-error": "Error scanning QR Code",
-    "unknown": "Unknown QR Code"
+    "scan": "扫码",
+    "scan-error": "扫码时出错了",
+    "unknown": "未知二维码"
   }
 }
