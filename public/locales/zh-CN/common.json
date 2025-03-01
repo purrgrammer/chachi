@@ -31,7 +31,7 @@
       "dark": "深色",
       "system": "系統"
     },
-    "settings": "Settings"
+    "settings": "设置"
   },
   "dashboard": {
     "activity": {
@@ -67,7 +67,7 @@
   },
   "group": {
     "hosted": {
-      "by": "Hosted by ",
+      "by": "主管：",
       "and": "和"
     },
     "create": {
@@ -109,7 +109,7 @@
       }
     },
     "edit": {
-      "title": "Group settings",
+      "title": "群聊设置",
       "form": {
         "name": {
           "label": "名稱",
@@ -243,8 +243,8 @@
         "error": "无法回复"
       },
       "forward": {
-        "action": "Forward",
-        "forwarded": "forwarded from"
+        "action": "转发",
+        "forwarded": "转发自"
       },
       "delete": {
         "action": "删除"
@@ -304,19 +304,19 @@
     }
   },
   "image": {
-    "new": "New image",
-    "post": "Post an image",
+    "new": "新图片",
+    "post": "发布图片",
     "title": {
-      "label": "Title",
-      "placeholder": "Add a title"
+      "label": "标题",
+      "placeholder": "添加标题"
     },
     "publish": {
-      "success": "Image posted",
-      "error": "Failed to post image"
+      "success": "图片已发布",
+      "error": "无法发布图片"
     },
     "description": {
-      "label": "Description",
-      "placeholder": "Add a description"
+      "label": "描述",
+      "placeholder": "添加描述"
     }
   },
   "copy": {
@@ -428,7 +428,7 @@
       "in": "将这个帖子分享至 {{groupName}}。"
     },
     "in": {
-      "group": "Share in",
+      "group": "分享至",
       "x": "分享至 {{groupName}} 聊天",
       "chat": "分享到聊天"
     }
@@ -437,114 +437,114 @@
   "action-open": "打开",
   "action-zap": "打闪",
   "media": {
-    "reveal": "Reveal"
+    "reveal": "显示"
   },
   "header": {
-    "public": "Public",
-    "unknown": "Unknown"
+    "public": "公开",
+    "unknown": "未知"
   },
   "book": {
-    "by": "by {{ author }}",
+    "by": "{{ author }} 著",
     "current-chapter": "{{ chapter }} / {{ total }}"
   },
   "goal": {
-    "expires-in": "Expires in",
-    "expired": "Goal expired",
-    "leaderboard": "Leaderboard"
+    "expires-in": "过期时间：",
+    "expired": "目标已过期",
+    "leaderboard": "排行榜"
   },
   "wallet": {
-    "title": "Incoming payment",
-    "keys": "Keys",
-    "sync": "Sync",
-    "sync-success": "Ecash synced",
-    "sync-error": "Error syncing wallet",
-    "keys-description": "Your wallet keys, it's important to keep them safe and backed up",
-    "debit": "Payment",
-    "credit": "Payment",
-    "connect": "Connect",
-    "not-found": "Wallet not found",
-    "no-transactions": "No transactions found",
-    "no-coins": "No coins found",
-    "make-default": "Make default",
-    "choose-wallet": "Choose wallet",
-    "choose-wallet-placeholder": "Choose a wallet to pay with",
-    "make-default-error": "Failed to set wallet as default",
-    "make-default-success": "Wallet set as default",
-    "create": "Create wallet",
+    "title": "收款",
+    "keys": "密钥",
+    "sync": "同步",
+    "sync-success": "Ecash 已同步",
+    "sync-error": "同步钱包时出错了",
+    "keys-description": "你的钱包密钥至关重要，请务必安全保存并进行备份",
+    "debit": "付款",
+    "credit": "付款",
+    "connect": "连接",
+    "not-found": "未找到钱包",
+    "no-transactions": "找不到任何交易",
+    "no-coins": "找不到任何资金",
+    "make-default": "设为默认",
+    "choose-wallet": "选择钱包",
+    "choose-wallet-placeholder": "请选择用于付款的钱包",
+    "make-default-error": "无法设定钱包为默认",
+    "make-default-success": "钱包已设为默认",
+    "create": "创建钱包",
     "settings": {
-      "title": "Wallet settings",
-      "description": "Manage your wallet settings",
+      "title": "钱包设置",
+      "description": "管理你的钱包设置",
       "create": {
-        "title": "Create wallet",
-        "description": "Create a wallet to start sending and receiving zaps"
+        "title": "创建钱包",
+        "description": "创建钱包，即可开始发送和接收打闪"
       }
     },
-    "save": "Save changes",
-    "saved": "Changes saved",
-    "save-error": "Failed to save changes",
-    "mints": "Mints",
-    "add-mint": "Add mint",
-    "relays": "Relays",
-    "add-relay": "Add relay",
+    "save": "保存更改",
+    "saved": "更改已保存",
+    "save-error": "保存更改失败",
+    "mints": "铸币厂",
+    "add-mint": "添加铸币厂",
+    "relays": "中继",
+    "add-relay": "添加中继",
     "deposit": {
-      "title": "Receive",
+      "title": "接收",
       "cashu-description": "将资金存入铸币厂或兑换代币",
-      "description": "Deposit funds into your wallet",
-      "mint": "Mint",
-      "amount": "Amount",
-      "confirm": "Confirm",
-      "success": "Deposit successful",
-      "error": "Failed to deposit",
+      "description": "充值钱包",
+      "mint": "铸币厂",
+      "amount": "金额",
+      "confirm": "确认",
+      "success": "充值成功",
+      "error": "充值失败",
       "receive-cash": "Ecash",
-      "mint-error": "You are not accepting ecash from this mint",
+      "mint-error": "你不接受来自此铸币厂的 ecash",
       "redeem": "兑换",
       "redeem-error": "兑换 ecash 失败",
       "redeem-success": "已兑换 ecash",
-      "from-wallet": "Choose a wallet to pay this invoice",
-      "confirm-wallet": "Pay"
+      "from-wallet": "请选择用于支付此发票的钱包",
+      "confirm-wallet": "支付"
     },
     "withdraw": {
-      "title": "Send",
-      "description": "Pay a lightning invoice, send money to a profile or a lightning address",
-      "placeholder": "Lightning invoice, profile or address",
-      "to": "To",
-      "confirm": "Pay",
-      "error": "Failed to send",
-      "unrecognized-invoice": "Unrecognized invoice",
-      "to-wallet": "Choose a wallet to send to",
-      "choose-wallet": "Send to wallet",
-      "confirm-cash": "Send ecash",
-      "no-wallet": "No wallet selected",
-      "success": "Send successful",
-      "p2pk-success": "Sent {{ amount }} to {{ name }}",
-      "lud16-success": "Sent {{ amount }} to {{ lud16 }}",
-      "amount-success": "Sent {{ amount }}",
-      "message": "Message",
-      "message-placeholder": "Write an optional message",
-      "confirm-wallet": "Send"
+      "title": "发送",
+      "description": "支付闪电发票或向个人档案或闪电地址发送资金",
+      "placeholder": "闪电发票、个人档案或闪电地址",
+      "to": "至",
+      "confirm": "支付",
+      "error": "发送失败",
+      "unrecognized-invoice": "无法识别发票",
+      "to-wallet": "请选择用于收款的钱包",
+      "choose-wallet": "发送到钱包",
+      "confirm-cash": "发送 ecash",
+      "no-wallet": "未选择钱包",
+      "success": "发送成功",
+      "p2pk-success": "已发送 {{ amount }} 至 {{ name }}",
+      "lud16-success": "已发送 {{ amount }} 至 {{ lud16 }}",
+      "amount-success": "已发送 {{ amount }}",
+      "message": "消息",
+      "message-placeholder": "写一条消息（可选）",
+      "confirm-wallet": "发送"
     },
-    "mints-description": "Mints are the custodians of the funds. Withdraw your funds to your wallet regularly.",
-    "relays-description": "Relays where the wallet data is stored.",
-    "name": "Name",
-    "name-description": "A name for your wallet",
-    "ready": "Wallet `{{ name }}` ready",
+    "mints-description": "铸币厂是资金的保管人。请定期将你的资金提取到你自己的钱包。",
+    "relays-description": "储存钱包资料的中继。",
+    "name": "名称",
+    "name-description": "为你的钱包取个名字",
+    "ready": "钱包 `{{ name }}` 已准备就绪",
     "dialog": {
-      "title": "Connect wallet",
-      "description": "Connect your wallet to send tips and support your favorite creators",
-      "connect-webln": "Connect web wallet",
-      "webln-connected": "Connected to web wallet",
-      "webln-unavailable": "WebLN wallet not available",
-      "webln-error": "Failed to connect to WebLN wallet",
-      "connect-nip60": "Connect remote wallet",
-      "nwc-empty": "NWC address is empty",
-      "nwc-error": "Failed to connect to remote wallet",
-      "nwc-connected": "Connected to remote wallet"
+      "title": "连接钱包",
+      "description": "连接你的钱包以打赏并支持你最喜欢的创造者",
+      "connect-webln": "连接网络钱包",
+      "webln-connected": "已连接网络钱包",
+      "webln-unavailable": "WebLN 钱包不可用",
+      "webln-error": "无法连接 WebLN 钱包",
+      "connect-nip60": "连接远程钱包",
+      "nwc-empty": "NWC 地址为空",
+      "nwc-error": "无法连接远程钱包",
+      "nwc-connected": "已连接远程钱包"
     },
-    "coins": "Cash",
+    "coins": "资金",
     "transactions": {
-      "title": "Transactions",
-      "loading": "Loading transactions",
-      "loading-error": "Error loading transactions"
+      "title": "交易",
+      "loading": "正在加载交易",
+      "loading-error": "加载交易时出错了"
     }
   },
   "zap": {
@@ -567,7 +567,7 @@
   },
   "ecash": {
     "redeem": "兑换",
-    "fee": "fee:"
+    "fee": "费用："
   },
   "settings": {
     "title": "设置",
@@ -600,7 +600,7 @@
       },
       "payments": {
         "title": "付款",
-        "description": "Manage the mints and relays you'll use to receive payments"
+        "description": "管理你将用来接收付款的铸币厂和中继"
       },
       "wallets": {
         "title": "钱包",
@@ -651,12 +651,12 @@
     "nuts": "Nuts",
     "sat": "比特币",
     "eur": "欧元",
-    "usd": "US Dollar",
-    "currencies": "Currencies"
+    "usd": "美元",
+    "currencies": "货币"
   },
   "ln": {
     "send": {
-      "title": "Send {{ amount }}",
+      "title": "发送 {{ amount }}",
       "show-qr": "显示二维码",
       "hide-qr": "隐藏二维码"
     }
