@@ -1,9 +1,12 @@
+import { useState } from "react";
+import { toast } from "sonner";
 import { useNavigate } from "@/lib/navigation";
-import { ChevronsUpDown, LogOut, Settings, Zap } from "lucide-react";
+import { ChevronsUpDown, LogOut, Settings, Zap, HandHeart } from "lucide-react";
 import { Login } from "@/components/nostr/login";
 import { Avatar } from "@/components/nostr/avatar";
 import { Name } from "@/components/nostr/name";
 import { Nip05 } from "@/components/nostr/nip05";
+import { NewZapDialog } from "@/components/nostr/zap";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +32,10 @@ import {
 } from "@nostr-dev-kit/ndk-wallet";
 import { useNDKWallets } from "@/lib/wallet";
 
+const CHACHI_PUBKEY =
+  "46fc871c1aedb295a8325abcf7663467d297b0a852733ceb06b0957d1c14bff4";
+const CHACHI_GROUP = { id: "chachi", relay: "wss://groups.0xchat.com/" };
+
 function UserInfo({ pubkey }: { pubkey: string }) {
   return (
     <>
@@ -48,6 +55,7 @@ function UserInfo({ pubkey }: { pubkey: string }) {
 export function NavUser() {
   const { isMobile, open, openMobile, state } = useSidebar();
   const [wallets] = useNDKWallets();
+  const [showDonateDialog, setShowDonateDialog] = useState(false);
   const logout = useLogout();
   const account = useAccount();
   const navigate = useNavigate();
@@ -65,57 +73,81 @@ export function NavUser() {
     }
   }
 
+  function onZap() {
+    setShowDonateDialog(false);
+    toast.success(t("user.thank-you"));
+  }
+
   return (
-    <SidebarMenu>
-      {pubkey ? (
-        <SidebarMenuItem>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <SidebarMenuButton
-                size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-              >
-                <UserInfo pubkey={pubkey} />
-                <ChevronsUpDown className="ml-auto size-4" />
-              </SidebarMenuButton>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className="rounded-lg w-[--radix-dropdown-menu-trigger-width] min-w-56"
-              side={isMobile ? "bottom" : "right"}
-              align="end"
-              sideOffset={4}
-            >
-              <DropdownMenuLabel className="p-0 font-normal">
-                <div className="flex gap-2 items-center py-1.5 px-1 text-sm text-left">
+    <>
+      <SidebarMenu>
+        {pubkey ? (
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
                   <UserInfo pubkey={pubkey} />
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate("/zaps")}>
-                <Zap className="text-muted-foreground size-4" />
-                {t("user.zaps")}
-              </DropdownMenuItem>
-              {wallets.map((wallet) => (
-                <DropdownMenuItem onClick={() => openWallet(wallet)}>
-                  <WalletBalance wallet={wallet} />
+                  <ChevronsUpDown className="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="rounded-lg w-[--radix-dropdown-menu-trigger-width] min-w-56"
+                side={isMobile ? "bottom" : "right"}
+                align="end"
+                sideOffset={4}
+              >
+                <DropdownMenuLabel className="p-0 font-normal">
+                  <div className="flex gap-2 items-center py-1.5 px-1 text-sm text-left">
+                    <UserInfo pubkey={pubkey} />
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/zaps")}>
+                  <Zap className="text-muted-foreground size-4" />
+                  {t("user.zaps")}
                 </DropdownMenuItem>
-              ))}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate("/settings")}>
-                <Settings className="text-muted-foreground size-4" />
-                {t("user.settings")}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout}>
-                <LogOut className="text-destructive dark:text-red-300" />
-                {t("user.logout")}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </SidebarMenuItem>
-      ) : (
-        <Login isCompact={!isExpanded} />
-      )}
-    </SidebarMenu>
+                <DropdownMenuItem onClick={() => setShowDonateDialog(true)}>
+                  <HandHeart className="text-muted-foreground size-4" />
+                  {t("user.donate")}
+                </DropdownMenuItem>
+                {wallets.map((wallet) => (
+                  <DropdownMenuItem onClick={() => openWallet(wallet)}>
+                    <WalletBalance wallet={wallet} />
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/settings")}>
+                  <Settings className="text-muted-foreground size-4" />
+                  {t("user.settings")}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout}>
+                  <LogOut className="text-destructive dark:text-red-300" />
+                  {t("user.logout")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        ) : (
+          <Login isCompact={!isExpanded} />
+        )}
+      </SidebarMenu>
+      {showDonateDialog ? (
+        <NewZapDialog
+          open
+          title={t("user.support-chachi")}
+          description={t("user.support-chachi-description")}
+          defaultAmount={420}
+          onClose={() => setShowDonateDialog(false)}
+          onZap={onZap}
+          pubkey={CHACHI_PUBKEY}
+          group={CHACHI_GROUP}
+          zapType="nip-57"
+        />
+      ) : null}
+    </>
   );
 }

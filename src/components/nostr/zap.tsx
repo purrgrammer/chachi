@@ -54,6 +54,9 @@ export function NewZapDialog({
   trigger,
   reply,
   zapType = "nip-61",
+  title,
+  description,
+  defaultAmount = 21,
 }: {
   open?: boolean;
   onClose?: () => void;
@@ -64,6 +67,9 @@ export function NewZapDialog({
   trigger?: React.ReactNode;
   reply?: string;
   zapType?: "nip-57" | "nip-61";
+  title?: string;
+  description?: string;
+  defaultAmount?: number;
 }) {
   const { t } = useTranslation();
   const amounts = useZapAmounts();
@@ -73,7 +79,7 @@ export function NewZapDialog({
   const [isOpen, setIsOpen] = useState(open);
   const [isZapping, setIsZapping] = useState(false);
   const [invoice, setInvoice] = useState<string | null>(null);
-  const [amount, setAmount] = useState("21");
+  const [amount, setAmount] = useState(String(defaultAmount));
   const [message, setMessage] = useState(reply || "");
   const { data: profile } = useProfile(pubkey);
   const name = profile?.name || pubkey.slice(0, 6);
@@ -173,9 +179,11 @@ export function NewZapDialog({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("zap.dialog.title", { name })}</DialogTitle>
+          <DialogTitle>
+            {title ? title : t("zap.dialog.title", { name })}
+          </DialogTitle>
           <DialogDescription>
-            {t("zap.dialog.description", { name })}
+            {description ? description : t("zap.dialog.description", { name })}
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col items-center justify-center gap-4">
@@ -233,7 +241,7 @@ export function NewZapDialog({
             {invoice ? null : (
               <motion.div className="w-full">
                 <Button
-                  disabled={!amount || isZapping}
+                  disabled={!amount || isZapping || Number(amount) <= 0}
                   onClick={zap}
                   className="w-full mt-3"
                 >
