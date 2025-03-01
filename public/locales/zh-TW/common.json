@@ -31,7 +31,7 @@
       "dark": "深色",
       "system": "系統"
     },
-    "settings": "Settings"
+    "settings": "設置"
   },
   "dashboard": {
     "activity": {
@@ -67,7 +67,7 @@
   },
   "group": {
     "hosted": {
-      "by": "Hosted by ",
+      "by": "主管：",
       "and": "和"
     },
     "create": {
@@ -109,7 +109,7 @@
       }
     },
     "edit": {
-      "title": "Group settings",
+      "title": "群聊設置",
       "form": {
         "name": {
           "label": "名稱",
@@ -226,9 +226,9 @@
         "error": "無法複製到剪貼板"
       },
       "redeem": {
-        "action": "Redeem",
-        "failed": "Failed",
-        "redeemed": "Redeemed"
+        "action": "兌換",
+        "failed": "失敗",
+        "redeemed": "已兌換"
       },
       "zap": {
         "action": "打閃"
@@ -243,8 +243,8 @@
         "error": "無法回覆"
       },
       "forward": {
-        "action": "Forward",
-        "forwarded": "forwarded from"
+        "action": "轉發",
+        "forwarded": "轉發自"
       },
       "delete": {
         "action": "刪除"
@@ -304,19 +304,19 @@
     }
   },
   "image": {
-    "new": "New image",
-    "post": "Post an image",
+    "new": "新圖像",
+    "post": "發佈圖片",
     "title": {
-      "label": "Title",
-      "placeholder": "Add a title"
+      "label": "標題",
+      "placeholder": "添加標題"
     },
     "publish": {
-      "success": "Image posted",
-      "error": "Failed to post image"
+      "success": "已發佈圖片",
+      "error": "無法發佈圖片"
     },
     "description": {
-      "label": "Description",
-      "placeholder": "Add a description"
+      "label": "描述",
+      "placeholder": "添加描述"
     }
   },
   "copy": {
@@ -428,7 +428,7 @@
       "in": "將這個帖子分享至 {{groupName}}。"
     },
     "in": {
-      "group": "Share in",
+      "group": "分享至",
       "x": "分享至 {{groupName}} 聊天",
       "chat": "分享至聊天"
     }
@@ -437,114 +437,114 @@
   "action-open": "打開",
   "action-zap": "打閃",
   "media": {
-    "reveal": "Reveal"
+    "reveal": "顯示"
   },
   "header": {
-    "public": "Public",
-    "unknown": "Unknown"
+    "public": "公開",
+    "unknown": "未知"
   },
   "book": {
-    "by": "by {{ author }}",
+    "by": "{{ author }} 著",
     "current-chapter": "{{ chapter }} / {{ total }}"
   },
   "goal": {
-    "expires-in": "Expires in",
-    "expired": "Goal expired",
-    "leaderboard": "Leaderboard"
+    "expires-in": "到期時間：",
+    "expired": "目標已過期",
+    "leaderboard": "排名榜"
   },
   "wallet": {
-    "title": "Incoming payment",
-    "keys": "Keys",
-    "sync": "Sync",
-    "sync-success": "Ecash synced",
-    "sync-error": "Error syncing wallet",
-    "keys-description": "Your wallet keys, it's important to keep them safe and backed up",
-    "debit": "Payment",
-    "credit": "Payment",
-    "connect": "Connect",
-    "not-found": "Wallet not found",
-    "no-transactions": "No transactions found",
-    "no-coins": "No coins found",
-    "make-default": "Make default",
-    "choose-wallet": "Choose wallet",
-    "choose-wallet-placeholder": "Choose a wallet to pay with",
-    "make-default-error": "Failed to set wallet as default",
-    "make-default-success": "Wallet set as default",
-    "create": "Create wallet",
+    "title": "收款",
+    "keys": "密鑰",
+    "sync": "同步",
+    "sync-success": "Ecash 已同步",
+    "sync-error": "同步錢包時出錯了",
+    "keys-description": "你的錢包密鑰至關重要，請務必安全保存並進行備份",
+    "debit": "付款",
+    "credit": "付款",
+    "connect": "連接",
+    "not-found": "未找到錢包",
+    "no-transactions": "找不到任何交易",
+    "no-coins": "找不到任何資金",
+    "make-default": "設為默認",
+    "choose-wallet": "選擇錢包",
+    "choose-wallet-placeholder": "請選擇用於付款的錢包",
+    "make-default-error": "無法設定錢包為默認",
+    "make-default-success": "錢包已設為默認",
+    "create": "創建錢包",
     "settings": {
-      "title": "Wallet settings",
-      "description": "Manage your wallet settings",
+      "title": "錢包設置",
+      "description": "管理你的錢包設置",
       "create": {
-        "title": "Create wallet",
-        "description": "Create a wallet to start sending and receiving zaps"
+        "title": "創建錢包",
+        "description": "創建錢包，即可開始發送和接收打閃"
       }
     },
-    "save": "Save changes",
-    "saved": "Changes saved",
-    "save-error": "Failed to save changes",
-    "mints": "Mints",
-    "add-mint": "Add mint",
-    "relays": "Relays",
-    "add-relay": "Add relay",
+    "save": "保存變更",
+    "saved": "變更已保存",
+    "save-error": "無法保存變更",
+    "mints": "鑄幣廠",
+    "add-mint": "添加鑄幣廠",
+    "relays": "中繼",
+    "add-relay": "添加中繼",
     "deposit": {
-      "title": "Receive",
-      "cashu-description": "Deposit funds into a mint or redeem ecash tokens",
-      "description": "Deposit funds into your wallet",
-      "mint": "Mint",
-      "amount": "Amount",
-      "confirm": "Confirm",
-      "success": "Deposit successful",
-      "error": "Failed to deposit",
+      "title": "接受",
+      "cashu-description": "將資金存入鑄幣廠或兌換 ecash 代幣",
+      "description": "充值錢包",
+      "mint": "鑄幣廠",
+      "amount": "金額",
+      "confirm": "確認",
+      "success": "充值成功",
+      "error": "充值失敗",
       "receive-cash": "Ecash",
-      "mint-error": "You are not accepting ecash from this mint",
-      "redeem": "Redeem",
-      "redeem-error": "Failed to redeem ecash",
-      "redeem-success": "Ecash redeemed",
-      "from-wallet": "Choose a wallet to pay this invoice",
-      "confirm-wallet": "Pay"
+      "mint-error": "你不接受來自此鑄幣廠的 ecash",
+      "redeem": "兌換",
+      "redeem-error": "兌換 ecash 失敗",
+      "redeem-success": "Ecash 已兌換",
+      "from-wallet": "請選擇用於支付此發票的錢包",
+      "confirm-wallet": "支付"
     },
     "withdraw": {
-      "title": "Send",
-      "description": "Pay a lightning invoice, send money to a profile or a lightning address",
-      "placeholder": "Lightning invoice, profile or address",
-      "to": "To",
-      "confirm": "Pay",
-      "error": "Failed to send",
-      "unrecognized-invoice": "Unrecognized invoice",
-      "to-wallet": "Choose a wallet to send to",
-      "choose-wallet": "Send to wallet",
-      "confirm-cash": "Send ecash",
-      "no-wallet": "No wallet selected",
-      "success": "Send successful",
-      "p2pk-success": "Sent {{ amount }} to {{ name }}",
-      "lud16-success": "Sent {{ amount }} to {{ lud16 }}",
-      "amount-success": "Sent {{ amount }}",
-      "message": "Message",
-      "message-placeholder": "Write an optional message",
-      "confirm-wallet": "Send"
+      "title": "發送",
+      "description": "支付閃電發票或向個人檔案或閃電地址發送資金",
+      "placeholder": "閃電發票、個人檔案或閃電地址",
+      "to": "至",
+      "confirm": "支付",
+      "error": "無法發送",
+      "unrecognized-invoice": "無法辨識發票",
+      "to-wallet": "請選擇用於收款的錢包",
+      "choose-wallet": "發送至錢包",
+      "confirm-cash": "發送 ecash",
+      "no-wallet": "尚未選擇錢包",
+      "success": "發送成功",
+      "p2pk-success": "已發送 {{ amount }} 至 {{ name }}",
+      "lud16-success": "已發送 {{ amount }} 至 {{ lud16 }}",
+      "amount-success": "已發送 {{ amount }}",
+      "message": "消息",
+      "message-placeholder": "填寫消息（可選）",
+      "confirm-wallet": "發送"
     },
-    "mints-description": "Mints are the custodians of the funds. Withdraw your funds to your wallet regularly.",
-    "relays-description": "Relays where the wallet data is stored.",
-    "name": "Name",
-    "name-description": "A name for your wallet",
-    "ready": "Wallet `{{ name }}` ready",
+    "mints-description": "鑄幣廠是資金的保管人。請定期將你的資金提取到你自己的錢包。",
+    "relays-description": "儲存錢包資料的中繼。",
+    "name": "名稱",
+    "name-description": "為你的錢包取個名字",
+    "ready": "錢包 `{{ name }}` 已準備就緒",
     "dialog": {
-      "title": "Connect wallet",
-      "description": "Connect your wallet to send tips and support your favorite creators",
-      "connect-webln": "Connect web wallet",
-      "webln-connected": "Connected to web wallet",
-      "webln-unavailable": "WebLN wallet not available",
-      "webln-error": "Failed to connect to WebLN wallet",
-      "connect-nip60": "Connect remote wallet",
-      "nwc-empty": "NWC address is empty",
-      "nwc-error": "Failed to connect to remote wallet",
-      "nwc-connected": "Connected to remote wallet"
+      "title": "連接錢包",
+      "description": "連接你的錢包以發送小費並支持你最喜歡的創作者",
+      "connect-webln": "連接網絡錢包",
+      "webln-connected": "已連接網絡錢包",
+      "webln-unavailable": "WebLN 錢包無法使用",
+      "webln-error": "無法連接 WebLN 錢包",
+      "connect-nip60": "連接遠程錢包",
+      "nwc-empty": "NWC 地址為空",
+      "nwc-error": "無法連接遠程錢包",
+      "nwc-connected": "已連接遠程錢包"
     },
-    "coins": "Cash",
+    "coins": "資金",
     "transactions": {
-      "title": "Transactions",
-      "loading": "Loading transactions",
-      "loading-error": "Error loading transactions"
+      "title": "交易",
+      "loading": "正在加載交易",
+      "loading-error": "加載交易時出錯了"
     }
   },
   "zap": {
@@ -553,71 +553,71 @@
     "dialog": {
       "title": "打閃 {{ name }}",
       "description": "打閃 {{ name }}",
-      "amount": "Amount",
-      "invoice": "Invoice",
-      "message": "Message",
-      "message-placeholder": "Add a message",
+      "amount": "金額",
+      "invoice": "發票",
+      "message": "消息",
+      "message-placeholder": "添加消息",
       "tip": "打閃 {{ amount }}",
-      "copy": "Copy invoice",
-      "wallet": "Open in wallet",
-      "wallet-error": "Couldn't open wallet",
-      "error": "Failed to zap",
-      "success": "Zapped {{ amount }} to {{ name }}"
+      "copy": "複製發票",
+      "wallet": "在錢包中打開",
+      "wallet-error": "無法打開錢包",
+      "error": "打閃失敗",
+      "success": "已打閃 {{ amount }} 至 {{ name }}"
     }
   },
   "ecash": {
-    "redeem": "Redeem",
-    "fee": "fee:"
+    "redeem": "兌換",
+    "fee": "費用："
   },
   "settings": {
-    "title": "Settings",
+    "title": "設置",
     "ui": {
-      "title": "Appearance",
+      "title": "外觀",
       "language": {
-        "title": "Language",
-        "description": "Choose your preferred language"
+        "title": "語言",
+        "description": "選擇你的語言"
       },
       "theme": {
-        "title": "Theme",
-        "description": "Choose your preferred theme",
-        "light": "Light",
-        "dark": "Dark",
-        "system": "System"
+        "title": "主題",
+        "description": "選擇你的主題",
+        "light": "淡色",
+        "dark": "深色",
+        "system": "系統"
       }
     },
     "wallet": {
-      "title": "Wallets",
-      "settings": "Settings",
-      "mints": "Mints",
-      "enable": "Enable",
-      "enabled": "Enabled",
-      "enable-success": "Wallet enabled",
-      "enable-error": "Failed to enable wallet",
-      "relays": "Relays",
+      "title": "錢包",
+      "settings": "設置",
+      "mints": "鑄幣廠",
+      "enable": "啟用",
+      "enabled": "已啟用",
+      "enable-success": "錢包已啟用",
+      "enable-error": "無法啟用錢包",
+      "relays": "中繼",
       "default-wallet": {
-        "title": "Active wallet",
-        "none": "No wallet selected"
+        "title": "活躍錢包",
+        "none": "尚未選擇錢包"
       },
       "payments": {
-        "title": "Payments",
-        "description": "Manage the mints and relays you'll use to receive payments"
+        "title": "付款",
+        "description": "管理你將用來接收付款的鑄幣廠和中繼"
       },
       "wallets": {
-        "title": "Wallets",
-        "none": "No wallets",
-        "remove": "Remove",
-        "description": "Manage your wallets",
-        "create": "Create wallet",
-        "default": "Default",
-        "make-default": "Make default",
-        "delete": "Delete",
-        "delete-error": "Failed to delete wallet",
-        "delete-success": "Wallet deleted",
-        "create-error": "Failed to create wallet",
-        "create-success": "Wallet created",
-        "sync": "Sync",
-        "synced": "Synced",
-        "sync-error": "Error syncing wallet",
+        "title": "錢包",
+        "none": "尚無錢包",
+        "remove": "移除",
+        "description": "管理你的錢包",
+        "create": "創建錢包",
+        "default": "默認",
+        "make-default": "設為默認",
+        "delete": "刪除",
+        "delete-error": "無法刪除錢包",
+        "delete-success": "錢包已刪除",
+        "create-error": "無法創建錢包",
+        "create-success": "錢包已創建",
+        "sync": "同步",
+        "synced": "已同步",
+        "sync-error": "同步錢包時出錯了",
         "open": "打開"
       }
     },
@@ -631,23 +631,23 @@
   "nutzaps": {
     "no-message": "無消息",
     "title": "打閃",
-    "redeemed": "Redeemed",
+    "redeemed": "已兌換",
     "failed": "失敗",
-    "log-in": "Log in to see your zaps",
-    "invalid": "Invalid zap",
-    "redeem": "Redeem",
-    "redeem-success": "Redeemed {{ amount }} zap",
-    "redeem-error": "Failed to redeem zap",
-    "received": "Received",
+    "log-in": "登入以查看你的打閃",
+    "invalid": "無效打閃",
+    "redeem": "兌換",
+    "redeem-success": "已兌換 {{ amount }} 打閃",
+    "redeem-error": "兌換打閃失敗",
+    "received": "已接收",
     "sent": "已發送",
-    "no-received": "Nothing to see here... yet",
-    "no-sent": "Nothing to see here... yet",
+    "no-received": "這裏還沒有什麼可看的…",
+    "no-sent": "這裏還沒有什麼可看的…",
     "open": "打開"
   },
   "mint": {
     "contact": "聯繫人",
     "version": "版本",
-    "features": "Features",
+    "features": "功能",
     "nuts": "Nuts",
     "sat": "比特幣",
     "eur": "歐元",
@@ -663,7 +663,7 @@
   },
   "qr": {
     "scan": "掃碼",
-    "scan-error": "Error scanning QR Code",
-    "unknown": "Unknown QR Code"
+    "scan-error": "掃碼時出錯了",
+    "unknown": "未知二維碼"
   }
 }
