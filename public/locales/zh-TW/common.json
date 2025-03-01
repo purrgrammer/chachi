@@ -23,7 +23,7 @@
       "connect": "連接"
     },
     "logout": "登出",
-    "zaps": "Zaps",
+    "zaps": "打閃",
     "language": "語言",
     "theme": {
       "trigger": "主題",
@@ -218,7 +218,7 @@
     "message": {
       "loading": "正在加載消息…",
       "tip": {
-        "action": "Zap"
+        "action": "打閃"
       },
       "copy": {
         "action": "複製",
@@ -231,7 +231,7 @@
         "redeemed": "Redeemed"
       },
       "zap": {
-        "action": "Zap"
+        "action": "打閃"
       },
       "react": {
         "action": "回應",
@@ -435,7 +435,7 @@
   },
   "share-in": "分享至",
   "action-open": "打開",
-  "action-zap": "Zap",
+  "action-zap": "打閃",
   "media": {
     "reveal": "Reveal"
   },
@@ -548,16 +548,16 @@
     }
   },
   "zap": {
-    "trigger": "Tip",
-    "action": "Tip",
+    "trigger": "打閃",
+    "action": "打閃",
     "dialog": {
-      "title": "Zap {{ name }}",
-      "description": "Send a tip to {{ name }}",
+      "title": "打閃 {{ name }}",
+      "description": "打閃 {{ name }}",
       "amount": "Amount",
       "invoice": "Invoice",
       "message": "Message",
       "message-placeholder": "Add a message",
-      "tip": "Zap {{ amount }}",
+      "tip": "打閃 {{ amount }}",
       "copy": "Copy invoice",
       "wallet": "Open in wallet",
       "wallet-error": "Couldn't open wallet",
@@ -618,51 +618,51 @@
         "sync": "Sync",
         "synced": "Synced",
         "sync-error": "Error syncing wallet",
-        "open": "Open"
+        "open": "打開"
       }
     },
     "media": {
-      "title": "Media"
+      "title": "多媒體"
     },
     "relays": {
-      "title": "Relays"
+      "title": "中繼"
     }
   },
   "nutzaps": {
-    "no-message": "No message",
-    "title": "Zaps",
+    "no-message": "無消息",
+    "title": "打閃",
     "redeemed": "Redeemed",
-    "failed": "Failed",
+    "failed": "失敗",
     "log-in": "Log in to see your zaps",
     "invalid": "Invalid zap",
     "redeem": "Redeem",
     "redeem-success": "Redeemed {{ amount }} zap",
     "redeem-error": "Failed to redeem zap",
     "received": "Received",
-    "sent": "Sent",
+    "sent": "已發送",
     "no-received": "Nothing to see here... yet",
     "no-sent": "Nothing to see here... yet",
-    "open": "Open"
+    "open": "打開"
   },
   "mint": {
-    "contact": "Contact",
-    "version": "Version",
+    "contact": "聯繫人",
+    "version": "版本",
     "features": "Features",
     "nuts": "Nuts",
-    "sat": "Bitcoin",
-    "eur": "Euro",
-    "usd": "US Dollar",
-    "currencies": "Currencies"
+    "sat": "比特幣",
+    "eur": "歐元",
+    "usd": "美元",
+    "currencies": "貨幣"
   },
   "ln": {
     "send": {
-      "title": "Send {{ amount }}",
-      "show-qr": "Show QR",
-      "hide-qr": "Hide QR"
+      "title": "發送 {{ amount }}",
+      "show-qr": "顯示二維碼",
+      "hide-qr": "隱藏二維碼"
     }
   },
   "qr": {
-    "scan": "Scan QR Code",
+    "scan": "掃碼",
     "scan-error": "Error scanning QR Code",
     "unknown": "Unknown QR Code"
   }
