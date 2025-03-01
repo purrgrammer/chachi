@@ -227,11 +227,11 @@
       },
       "redeem": {
         "action": "Redimir",
-        "failed": "Failed",
-        "redeemed": "Redeemed"
+        "failed": "Fallido",
+        "redeemed": "Redimido"
       },
       "zap": {
-        "action": "Zap"
+        "action": "Zapear"
       },
       "react": {
         "action": "Reaccionar",
@@ -243,8 +243,8 @@
         "error": "No se pudo responder"
       },
       "forward": {
-        "action": "Forward",
-        "forwarded": "forwarded from"
+        "action": "Reenviar",
+        "forwarded": "reenviado desde"
       },
       "delete": {
         "action": "Borrar"
@@ -304,19 +304,19 @@
     }
   },
   "image": {
-    "new": "New image",
-    "post": "Post an image",
+    "new": "Nueva imagen",
+    "post": "Publicar una imagen",
     "title": {
-      "label": "Title",
-      "placeholder": "Add a title"
+      "label": "Título",
+      "placeholder": "Añadir un título"
     },
     "publish": {
-      "success": "Image posted",
-      "error": "Failed to post image"
+      "success": "Imagen publicada",
+      "error": "Error al publicar la imagen"
     },
     "description": {
-      "label": "Description",
-      "placeholder": "Add a description"
+      "label": "Descripción",
+      "placeholder": "Añadir una descripción"
     }
   },
   "copy": {
@@ -339,7 +339,7 @@
     }
   },
   "post": {
-    "new": "New",
+    "new": "Nueva",
     "action": "Publicar",
     "placeholder": "¿Qué tienes en mente?",
     "success": "Publicado",
@@ -428,242 +428,242 @@
       "in": "Compartir esta publicación en {{groupName}}"
     },
     "in": {
-      "group": "Share in",
+      "group": "Compartir en",
       "x": "Compartir en chat {{groupName}}",
       "chat": "Compartir en chat"
     }
   },
   "share-in": "Compartir en ",
   "action-open": "Abrir",
-  "action-zap": "Zap",
+  "action-zap": "Zapear",
   "media": {
-    "reveal": "Reveal"
+    "reveal": "Revelar"
   },
   "header": {
-    "public": "Public",
-    "unknown": "Unknown"
+    "public": "Público",
+    "unknown": "Desconocido"
   },
   "book": {
-    "by": "by {{ author }}",
+    "by": "por {{ author }}",
     "current-chapter": "{{ chapter }} / {{ total }}"
   },
   "goal": {
-    "expires-in": "Expires in",
-    "expired": "Goal expired",
-    "leaderboard": "Leaderboard"
+    "expires-in": "Caduca en",
+    "expired": "Meta caducada",
+    "leaderboard": "Marcador"
   },
   "wallet": {
-    "title": "Incoming payment",
-    "keys": "Keys",
-    "sync": "Sync",
-    "sync-success": "Ecash synced",
-    "sync-error": "Error syncing wallet",
-    "keys-description": "Your wallet keys, it's important to keep them safe and backed up",
-    "debit": "Payment",
-    "credit": "Payment",
-    "connect": "Connect",
-    "not-found": "Wallet not found",
-    "no-transactions": "No transactions found",
-    "no-coins": "No coins found",
-    "make-default": "Make default",
-    "choose-wallet": "Choose wallet",
-    "choose-wallet-placeholder": "Choose a wallet to pay with",
-    "make-default-error": "Failed to set wallet as default",
-    "make-default-success": "Wallet set as default",
-    "create": "Create wallet",
+    "title": "Pago entrante",
+    "keys": "Claves",
+    "sync": "Sincronizar",
+    "sync-success": "Ecash sincronizado",
+    "sync-error": "Error al sincronizar la billetera",
+    "keys-description": "Tus claves de la billetera, es importante mantenerlas seguras y respaldadas",
+    "debit": "Pago",
+    "credit": "Pago",
+    "connect": "Conectarse",
+    "not-found": "Billetera no encontrada",
+    "no-transactions": "Ninguna transacción encontrada",
+    "no-coins": "Ninguna moneda encontrada",
+    "make-default": "Establecer como predeterminada",
+    "choose-wallet": "Elegir billetera",
+    "choose-wallet-placeholder": "Elige una billetera con la que pagar",
+    "make-default-error": "Error al establecer la billetera como predeterminada",
+    "make-default-success": "Billetera establecida como predeterminada",
+    "create": "Crear billetera",
     "settings": {
-      "title": "Wallet settings",
-      "description": "Manage your wallet settings",
+      "title": "Ajustes de billetera",
+      "description": "Gestionar la configuración de tu billetera",
       "create": {
-        "title": "Create wallet",
-        "description": "Create a wallet to start sending and receiving zaps"
+        "title": "Crear billetera",
+        "description": "Crear una billetera para empezar a enviar y recibir zaps"
       }
     },
-    "save": "Save changes",
-    "saved": "Changes saved",
-    "save-error": "Failed to save changes",
+    "save": "Guardar cambios",
+    "saved": "Cambios guardados",
+    "save-error": "Error al guardar los cambios",
     "mints": "Mints",
-    "add-mint": "Add mint",
-    "relays": "Relays",
-    "add-relay": "Add relay",
+    "add-mint": "Añadir mint",
+    "relays": "Relés",
+    "add-relay": "Añadir relé",
     "deposit": {
-      "title": "Receive",
-      "cashu-description": "Deposit funds into a mint or redeem ecash tokens",
-      "description": "Deposit funds into your wallet",
+      "title": "Recibir",
+      "cashu-description": "Depositar fondos en un mint o redimir tokens de ecash",
+      "description": "Depositar fondos en tu billetera",
       "mint": "Mint",
-      "amount": "Amount",
-      "confirm": "Confirm",
-      "success": "Deposit successful",
-      "error": "Failed to deposit",
+      "amount": "Cantidad",
+      "confirm": "Confirmar",
+      "success": "Depósito exitoso",
+      "error": "Error al depositar",
       "receive-cash": "Ecash",
-      "mint-error": "You are not accepting ecash from this mint",
-      "redeem": "Redeem",
-      "redeem-error": "Failed to redeem ecash",
-      "redeem-success": "Ecash redeemed",
-      "from-wallet": "Choose a wallet to pay this invoice",
-      "confirm-wallet": "Pay"
+      "mint-error": "No aceptas ecash de este mint",
+      "redeem": "Redimir",
+      "redeem-error": "Error al redimir ecash",
+      "redeem-success": "Ecash redimido",
+      "from-wallet": "Elige una billetera para pagar esta factura",
+      "confirm-wallet": "Pagar"
     },
     "withdraw": {
-      "title": "Send",
-      "description": "Pay a lightning invoice, send money to a profile or a lightning address",
-      "placeholder": "Lightning invoice, profile or address",
-      "to": "To",
-      "confirm": "Pay",
-      "error": "Failed to send",
-      "unrecognized-invoice": "Unrecognized invoice",
-      "to-wallet": "Choose a wallet to send to",
-      "choose-wallet": "Send to wallet",
-      "confirm-cash": "Send ecash",
-      "no-wallet": "No wallet selected",
-      "success": "Send successful",
-      "p2pk-success": "Sent {{ amount }} to {{ name }}",
-      "lud16-success": "Sent {{ amount }} to {{ lud16 }}",
-      "amount-success": "Sent {{ amount }}",
-      "message": "Message",
-      "message-placeholder": "Write an optional message",
-      "confirm-wallet": "Send"
+      "title": "Enviar",
+      "description": "Pagar una factura Lightning, enviar dinero a un perfil o una dirección Lightning",
+      "placeholder": "Factura Lightning, perfil o dirección",
+      "to": "A",
+      "confirm": "Pagar",
+      "error": "Error al enviar",
+      "unrecognized-invoice": "Factura no reconocida",
+      "to-wallet": "Elige una billetera de destino",
+      "choose-wallet": "Enviar a billetera",
+      "confirm-cash": "Enviar ecash",
+      "no-wallet": "Ninguna billetera seleccionada",
+      "success": "Enviado con éxito",
+      "p2pk-success": "Enviado {{ amount }} a {{ name }}",
+      "lud16-success": "Enviado {{ amount }} a {{ lud16 }}",
+      "amount-success": "Enviado {{ amount }}",
+      "message": "Mensaje",
+      "message-placeholder": "Escribe un mensaje opcional",
+      "confirm-wallet": "Enviar"
     },
-    "mints-description": "Mints are the custodians of the funds. Withdraw your funds to your wallet regularly.",
-    "relays-description": "Relays where the wallet data is stored.",
-    "name": "Name",
-    "name-description": "A name for your wallet",
-    "ready": "Wallet `{{ name }}` ready",
+    "mints-description": "Los mints son los custodios de los fondos. Retira tus fondos a tu billetera con regularidad.",
+    "relays-description": "Relés donde se almacenan los datos de la billetera.",
+    "name": "Nombre",
+    "name-description": "Un nombre para tu billetera",
+    "ready": "Billetera `{{ name }}` lista",
     "dialog": {
-      "title": "Connect wallet",
-      "description": "Connect your wallet to send tips and support your favorite creators",
-      "connect-webln": "Connect web wallet",
-      "webln-connected": "Connected to web wallet",
-      "webln-unavailable": "WebLN wallet not available",
-      "webln-error": "Failed to connect to WebLN wallet",
-      "connect-nip60": "Connect remote wallet",
-      "nwc-empty": "NWC address is empty",
-      "nwc-error": "Failed to connect to remote wallet",
-      "nwc-connected": "Connected to remote wallet"
+      "title": "Conectar billetera",
+      "description": "Conecta tu billetera para enviar propinas y apoyar a tus creadores favoritos",
+      "connect-webln": "Conectar billetera web",
+      "webln-connected": "Conectado a billetera web",
+      "webln-unavailable": "Billetera WebLN no disponible",
+      "webln-error": "Error al conectar a la billetera WebLN",
+      "connect-nip60": "Conectar billetera remota",
+      "nwc-empty": "La dirección NWC está vacía",
+      "nwc-error": "Error al conectar a la billetera remota",
+      "nwc-connected": "Conectado a billetera remota"
     },
-    "coins": "Cash",
+    "coins": "Efectivo",
     "transactions": {
-      "title": "Transactions",
-      "loading": "Loading transactions",
-      "loading-error": "Error loading transactions"
+      "title": "Transacciones",
+      "loading": "Cargando transacciones",
+      "loading-error": "Error al cargar las transacciones"
     }
   },
   "zap": {
-    "trigger": "Tip",
-    "action": "Tip",
+    "trigger": "Zapear",
+    "action": "Zapear",
     "dialog": {
-      "title": "Zap {{ name }}",
-      "description": "Send a tip to {{ name }}",
-      "amount": "Amount",
-      "invoice": "Invoice",
-      "message": "Message",
-      "message-placeholder": "Add a message",
-      "tip": "Zap {{ amount }}",
-      "copy": "Copy invoice",
-      "wallet": "Open in wallet",
-      "wallet-error": "Couldn't open wallet",
-      "error": "Failed to zap",
-      "success": "Zapped {{ amount }} to {{ name }}"
+      "title": "Zapear a {{ name }}",
+      "description": "Enviar una propina a {{ name }}",
+      "amount": "Cantidad",
+      "invoice": "Factura",
+      "message": "Mensaje",
+      "message-placeholder": "Añadir un mensaje",
+      "tip": "Zapear {{ amount }}",
+      "copy": "Copiar factura",
+      "wallet": "Abrir en billetera",
+      "wallet-error": "No se pudo abrir la billetera",
+      "error": "Error al zapear",
+      "success": "Zapeado {{ amount }} a {{ name }}"
     }
   },
   "ecash": {
-    "redeem": "Redeem",
-    "fee": "fee:"
+    "redeem": "Redimir",
+    "fee": "comisión:"
   },
   "settings": {
-    "title": "Settings",
+    "title": "Ajustes",
     "ui": {
-      "title": "Appearance",
+      "title": "Apariencia",
       "language": {
-        "title": "Language",
-        "description": "Choose your preferred language"
+        "title": "Idioma",
+        "description": "Elige tu idioma preferido"
       },
       "theme": {
-        "title": "Theme",
-        "description": "Choose your preferred theme",
-        "light": "Light",
-        "dark": "Dark",
-        "system": "System"
+        "title": "Tema",
+        "description": "Elige tu tema preferido",
+        "light": "Claro",
+        "dark": "Oscuro",
+        "system": "Sistema"
       }
     },
     "wallet": {
-      "title": "Wallets",
-      "settings": "Settings",
+      "title": "Billeteras",
+      "settings": "Ajustes",
       "mints": "Mints",
-      "enable": "Enable",
-      "enabled": "Enabled",
-      "enable-success": "Wallet enabled",
-      "enable-error": "Failed to enable wallet",
-      "relays": "Relays",
+      "enable": "Habilitar",
+      "enabled": "Habilitada",
+      "enable-success": "Billetera habilitada",
+      "enable-error": "Error al habilitar la billetera",
+      "relays": "Relés",
       "default-wallet": {
-        "title": "Active wallet",
-        "none": "No wallet selected"
+        "title": "Billetera activa",
+        "none": "Ninguna billetera seleccionada"
       },
       "payments": {
-        "title": "Payments",
-        "description": "Manage the mints and relays you'll use to receive payments"
+        "title": "Pagos",
+        "description": "Gestiona los mints y relés que usarás para recibir pagos"
       },
       "wallets": {
-        "title": "Wallets",
-        "none": "No wallets",
-        "remove": "Remove",
-        "description": "Manage your wallets",
-        "create": "Create wallet",
-        "default": "Default",
-        "make-default": "Make default",
-        "delete": "Delete",
-        "delete-error": "Failed to delete wallet",
-        "delete-success": "Wallet deleted",
-        "create-error": "Failed to create wallet",
-        "create-success": "Wallet created",
-        "sync": "Sync",
-        "synced": "Synced",
-        "sync-error": "Error syncing wallet",
-        "open": "Open"
+        "title": "Billeteras",
+        "none": "No hay billeteras",
+        "remove": "Eliminar",
+        "description": "Gestionar tus billeteras",
+        "create": "Crear billetera",
+        "default": "Predeterminada",
+        "make-default": "Establecer como predeterminada",
+        "delete": "Borrar",
+        "delete-error": "Error al borrar la billetera",
+        "delete-success": "Billetera borrada",
+        "create-error": "Error al crear la billetera",
+        "create-success": "Billetera creada",
+        "sync": "Sincronizar",
+        "synced": "Sincronizada",
+        "sync-error": "Error al sincronizar la billetera",
+        "open": "Abrir"
       }
     },
     "media": {
-      "title": "Media"
+      "title": "Medios"
     },
     "relays": {
-      "title": "Relays"
+      "title": "Relés"
     }
   },
   "nutzaps": {
-    "no-message": "No message",
+    "no-message": "Sin mensaje",
     "title": "Zaps",
-    "redeemed": "Redeemed",
-    "failed": "Failed",
-    "log-in": "Log in to see your zaps",
-    "invalid": "Invalid zap",
-    "redeem": "Redeem",
-    "redeem-success": "Redeemed {{ amount }} zap",
-    "redeem-error": "Failed to redeem zap",
-    "received": "Received",
-    "sent": "Sent",
-    "no-received": "Nothing to see here... yet",
-    "no-sent": "Nothing to see here... yet",
-    "open": "Open"
+    "redeemed": "Redimido",
+    "failed": "Fallido",
+    "log-in": "Inicia sesión para ver tus zaps",
+    "invalid": "Zap inválido",
+    "redeem": "Redimir",
+    "redeem-success": "Zap de {{ amount }} redimido",
+    "redeem-error": "Error al redimir zap",
+    "received": "Recibido",
+    "sent": "Enviado",
+    "no-received": "Nada para ver aquí... aún",
+    "no-sent": "Nada para ver aquí... aún",
+    "open": "Abrir"
   },
   "mint": {
-    "contact": "Contact",
-    "version": "Version",
-    "features": "Features",
+    "contact": "Contacto",
+    "version": "Versión",
+    "features": "Características",
     "nuts": "Nuts",
     "sat": "Bitcoin",
     "eur": "Euro",
-    "usd": "US Dollar",
-    "currencies": "Currencies"
+    "usd": "Dólar US",
+    "currencies": "Monedas"
   },
   "ln": {
     "send": {
-      "title": "Send {{ amount }}",
-      "show-qr": "Show QR",
-      "hide-qr": "Hide QR"
+      "title": "Enviar {{ amount }}",
+      "show-qr": "Mostrar QR",
+      "hide-qr": "Ocultar QR"
     }
   },
   "qr": {
-    "scan": "Scan QR Code",
-    "scan-error": "Error scanning QR Code",
-    "unknown": "Unknown QR Code"
+    "scan": "Escanear el código QR",
+    "scan-error": "Error al escanear el código QR",
+    "unknown": "Código QR desconocido"
   }
 }
