@@ -31,7 +31,7 @@
       "dark": "Obscuro",
       "system": "Sistema"
     },
-    "settings": "Settings"
+    "settings": "Ajustes"
   },
   "dashboard": {
     "activity": {
@@ -85,7 +85,7 @@
           "placeholder": "Esta es la descripción del grupo."
         },
         "relay": {
-          "label": "Relay",
+          "label": "Relé",
           "placeholder": "Elige un relay.",
           "description": "Este es el servidor donde se almacenarán las publicaciones.",
           "required": "Por favor, selecciona un relay"
@@ -209,7 +209,7 @@
     },
     "info": {
       "admin": "Admin",
-      "admins": "Admins ({{adminsLength}})",
+      "admins": "Administradores ({{adminsLength}})",
       "members": "Miembros ({{membersLength}})",
       "no-members": "No hay miembros"
     }
@@ -218,7 +218,7 @@
     "message": {
       "loading": "Cargando mensaje...",
       "tip": {
-        "action": "Zap"
+        "action": "Zapear"
       },
       "copy": {
         "action": "Copiar",
@@ -226,7 +226,7 @@
         "error": "No se pudo copiar al portapapeles"
       },
       "redeem": {
-        "action": "Redeem",
+        "action": "Redimir",
         "failed": "Failed",
         "redeemed": "Redeemed"
       },
