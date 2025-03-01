@@ -496,6 +496,7 @@
       "success": "Insättning lyckades",
       "error": "Misslyckades med insättning",
       "receive-cash": "Ecash",
+      "mint-error": "You are not accepting ecash from this mint",
       "redeem": "Lös in",
       "redeem-error": "Misslyckades med att lösa in ecash",
       "redeem-success": "Ecash inlöst",
