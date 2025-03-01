@@ -13,9 +13,10 @@ interface UserProps {
   pubkey: string;
   classNames?: UserClassNames;
   relays?: string[];
+  notClickable?: boolean;
 }
 
-export function User({ pubkey, classNames, relays }: UserProps) {
+export function User({ pubkey, classNames, relays, notClickable }: UserProps) {
   const user = (
     <div
       className={cn("flex flex-row items-center gap-2", classNames?.wrapper)}
@@ -26,5 +27,5 @@ export function User({ pubkey, classNames, relays }: UserProps) {
       </span>
     </div>
   );
-  return <ProfileDrawer trigger={user} pubkey={pubkey} />;
+  return notClickable ? user : <ProfileDrawer trigger={user} pubkey={pubkey} />;
 }

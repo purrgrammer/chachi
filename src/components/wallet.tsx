@@ -677,6 +677,7 @@ function Tx({ tx }: { tx: Transaction }) {
         author ? (
           <div className={iconClassname}>
             <User
+              notClickable
               pubkey={author}
               classNames={{
                 wrapper: "flex-col gap-0",
@@ -694,6 +695,7 @@ function Tx({ tx }: { tx: Transaction }) {
       ) : target ? (
         <div className={iconClassname}>
           <User
+            notClickable
             pubkey={target}
             classNames={{
               wrapper: "flex-col gap-0",
@@ -1318,6 +1320,7 @@ function SendToPubkey({
           {t("wallet.withdraw.confirm")}
           <User
             pubkey={pubkey}
+            notClickable
             classNames={{
               wrapper: "gap-1",
               avatar: "size-4",
@@ -2395,6 +2398,7 @@ function NWCWalletName({ wallet }: { wallet: NDKNWCWallet }) {
   const name = walletId(wallet);
   return wallet.walletService ? (
     <User
+      notClickable
       pubkey={wallet.walletService.pubkey}
       classNames={{
         avatar: "size-4",
@@ -2481,6 +2485,7 @@ export function WebLNWalletBalanceAmount({
 function CashuWalletName({ wallet }: { wallet: NDKCashuWallet }) {
   return wallet.event ? (
     <User
+      notClickable
       pubkey={wallet.event.pubkey}
       classNames={{
         wrapper: "gap-1.5",
