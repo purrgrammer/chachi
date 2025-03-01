@@ -450,7 +450,7 @@
   "goal": {
     "expires-in": "到期時間：",
     "expired": "目標已過期",
-    "leaderboard": "排名榜"
+    "leaderboard": "排行榜"
   },
   "wallet": {
     "title": "收款",
@@ -479,15 +479,15 @@
         "description": "創建錢包，即可開始發送和接收打閃"
       }
     },
-    "save": "保存變更",
-    "saved": "變更已保存",
-    "save-error": "無法保存變更",
+    "save": "保存更改",
+    "saved": "更改已保存",
+    "save-error": "無法保存更改",
     "mints": "鑄幣廠",
     "add-mint": "添加鑄幣廠",
     "relays": "中繼",
     "add-relay": "添加中繼",
     "deposit": {
-      "title": "接受",
+      "title": "接收",
       "cashu-description": "將資金存入鑄幣廠或兌換 ecash 代幣",
       "description": "充值錢包",
       "mint": "鑄幣廠",
@@ -530,7 +530,7 @@
     "ready": "錢包 `{{ name }}` 已準備就緒",
     "dialog": {
       "title": "連接錢包",
-      "description": "連接你的錢包以發送小費並支持你最喜歡的創作者",
+      "description": "連接你的錢包以打賞並支持你最喜歡的創作者",
       "connect-webln": "連接網絡錢包",
       "webln-connected": "已連接網絡錢包",
       "webln-unavailable": "WebLN 錢包無法使用",
