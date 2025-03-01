@@ -525,7 +525,6 @@ export async function createCashuWallet(
     resolve(w);
     w.on("ready", () => {
       resolve(w);
-      w.checkProofs();
     });
   });
 }
