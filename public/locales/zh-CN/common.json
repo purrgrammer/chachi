@@ -496,6 +496,7 @@
       "success": "Deposit successful",
       "error": "Failed to deposit",
       "receive-cash": "Ecash",
+      "mint-error": "You are not accepting ecash from this mint",
       "redeem": "Redeem",
       "redeem-error": "Failed to redeem ecash",
       "redeem-success": "Ecash redeemed",
