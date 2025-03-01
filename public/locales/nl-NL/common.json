@@ -657,7 +657,7 @@
   "ln": {
     "send": {
       "title": "Send {{ amount }}",
-      "show-qr": "Show QR",
+      "show-qr": "Toon QR",
       "hide-qr": "Hide QR"
     }
   },
