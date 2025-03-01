@@ -1,4 +1,5 @@
 import { Name } from "@/components/nostr/name";
+import { ProfileDrawer } from "@/components/nostr/profile";
 import { cn } from "@/lib/utils";
 
 export function Mention({
@@ -10,9 +11,10 @@ export function Mention({
   relays: string[];
   className?: string;
 }) {
-  return (
+  const name = (
     <span className={cn("font-semibold", className)}>
       @<Name pubkey={pubkey} relays={relays} />
     </span>
   );
+  return <ProfileDrawer trigger={name} pubkey={pubkey} />;
 }

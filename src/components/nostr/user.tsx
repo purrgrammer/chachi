@@ -1,5 +1,6 @@
 import { Avatar } from "@/components/nostr/avatar";
 import { Name } from "@/components/nostr/name";
+import { ProfileDrawer } from "@/components/nostr/profile";
 import { cn } from "@/lib/utils";
 
 interface UserClassNames {
@@ -15,7 +16,7 @@ interface UserProps {
 }
 
 export function User({ pubkey, classNames, relays }: UserProps) {
-  return (
+  const user = (
     <div
       className={cn("flex flex-row items-center gap-2", classNames?.wrapper)}
     >
@@ -25,4 +26,5 @@ export function User({ pubkey, classNames, relays }: UserProps) {
       </span>
     </div>
   );
+  return <ProfileDrawer trigger={user} pubkey={pubkey} />;
 }
