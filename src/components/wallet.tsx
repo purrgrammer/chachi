@@ -360,7 +360,9 @@ export function CashuWalletSettings({
           ...wallet.mints.map((m) => ["mint", m]),
         ],
       } as NostrEvent);
-      await event.publish(NDKRelaySet.fromRelayUrls(myRelays, ndk));
+      const allRelays = Array.from(new Set([...selectedRelays, ...myRelays]));
+      const publishRelaySet = NDKRelaySet.fromRelayUrls(allRelays, ndk);
+      await event.publish(publishRelaySet);
       toast.success(t("wallet.saved"));
     } catch (err) {
       console.error(err);

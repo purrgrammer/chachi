@@ -88,12 +88,14 @@ export function useChachiWallet() {
 
   useEffect(() => {
     if (cashu && pubkey && !cashuWallet) {
+      let wallet: NDKCashuWallet | undefined = undefined;
       createCashuWallet(cashu, ndk, mintList ? mintList.relays : relays)
         .then((w) => {
           if (!w) {
             toast.error(t("wallet.sync-error"));
             return;
           }
+          wallet = w;
           setCashuWallet(w);
           setNDKWallets((wallets) => [w, ...wallets]);
         })
@@ -101,6 +103,7 @@ export function useChachiWallet() {
           console.error(err);
           toast.error(t("wallet.sync-error"));
         });
+      return () => wallet?.stop();
     }
   }, [cashu, cashuWallet, pubkey]);
 }
@@ -523,9 +526,6 @@ export async function createCashuWallet(
     };
     w.start();
     resolve(w);
-    w.on("ready", () => {
-      resolve(w);
-    });
   });
 }
 
