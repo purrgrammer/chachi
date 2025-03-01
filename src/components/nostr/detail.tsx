@@ -72,7 +72,7 @@ import { useNDK } from "@/lib/ndk";
 import { useRelaySet, useRelays } from "@/lib/nostr";
 import { useReplies } from "@/lib/nostr/comments";
 import { useGroupAdminsList } from "@/lib/nostr/groups";
-import { useMyGroups, useOpenGroup, groupId } from "@/lib/groups";
+import { useOpenGroup, groupId } from "@/lib/groups";
 import { MintEventPreview, MintEventDetail } from "@/components/mint";
 import {
   POLL,
@@ -108,7 +108,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { WikiPreview, WikiDetail } from "@/components/nostr/wiki";
-import { saveGroupEvent } from "@/lib/messages";
+import { useSortedGroups, saveGroupEvent } from "@/lib/messages";
 import { usePubkey, useCanSign } from "@/lib/account";
 import type { Group, Emoji as EmojiType } from "@/lib/types";
 import { useTranslation } from "react-i18next";
@@ -366,7 +366,7 @@ function EventMenu({
   const [shareGroup, setShareGroup] = useState<Group | undefined>(group);
   const ndk = useNDK();
   const navigate = useNavigate();
-  const groups = useMyGroups();
+  const groups = useSortedGroups();
   const isGroupEvent =
     group &&
     group.id !== "_" &&
