@@ -7,6 +7,10 @@
     "no-groups": "尚無群聊"
   },
   "user": {
+    "donate": "Donate",
+    "thank-you": "Thank you for your donation 💜",
+    "support-chachi": "Donate to Chachi",
+    "support-chachi-description": "Chachi is a free and open source project. Your donation helps keep the project alive and supports the development of new features.",
     "login": {
       "start": "开始",
       "title": "开始",
