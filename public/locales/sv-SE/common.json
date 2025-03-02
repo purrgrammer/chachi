@@ -7,9 +7,9 @@
     "no-groups": "Inga grupper"
   },
   "user": {
-    "donate": "Donate",
-    "thank-you": "Thank you for your donation 💜",
-    "support-chachi": "Donate to Chachi",
+    "donate": "Skänk",
+    "thank-you": "Tack för din gåva 💜",
+    "support-chachi": "Donera till Chachi",
     "support-chachi-description": "Chachi is a free and open source project. Your donation helps keep the project alive and supports the development of new features.",
     "login": {
       "start": "Kom igång",
