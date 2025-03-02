@@ -14,7 +14,7 @@
     "login": {
       "start": "ابدأ",
       "title": "ابدأ الآن",
-      "description": "اختر طريقة تسجيل الدخول أدناه.",
+      "description": "اختر طريقة تسجيل الدخول أدناه",
       "extension": {
         "label": "إضافة المتصفح",
         "error": "تعذر التسجيل بواسطة إضافة المتصفح"
@@ -96,18 +96,18 @@
         },
         "visibility": {
           "label": "الظهور",
-          "anyone": "الجميع",
+          "anyone": "أي شخص",
           "members-only": "الأعضاء فقط",
-          "description": "الرسائل غير مشفرة ويمكن قراءتها عن طريق relays. لأقصى قدر من الخصوصية قم باستضافة relay خاص بك."
+          "description": "الرسائل غير مشفرة ويمكن قراءتها بواسطة المرحل. للحصول على أقصى درجات الخصوصية، استضف المرحل الخاص بك."
         },
         "access": {
           "label": "الوصول",
-          "anyone": "الجميع",
-          "invite-only": "الدعوة فقط"
+          "anyone": "أي شخص",
+          "invite-only": "المدعو فقط"
         },
         "submit": {
           "trigger": "إنشاء",
-          "success": "تم إنشاء المجموعة",
+          "success": "تم إنشاء المجموعة بنجاح",
           "error": "تعذر إنشاء مجموعة"
         }
       }
@@ -157,19 +157,19 @@
     },
     "deleted": "تم حذف هذه المجموعة",
     "bookmark": {
-      "trigger": "Bookmark",
-      "error": "Error bookmarking group"
+      "trigger": "إشارة مرجعية",
+      "error": "خطأ في إضافة إشارة مرجعية للمجموعة"
     },
     "unbookmark": {
-      "trigger": "Unbookmark",
-      "error": "Error unbookmarking group"
+      "trigger": "إلغاء الإشارة المرجعية",
+      "error": "خطأ في إلغاء الإشارة المرجعية للمجموعة"
     },
     "join": "انضم",
     "leave": {
       "trigger": "مغادرة",
       "confirmation": {
         "title": "هل أنت متأكد من أنك تريد المغادرة؟",
-        "description": "This action cannot be undone. You will be removed from the group members list.",
+        "description": "لا يمكن التراجع عن هذا الإجراء. سيتم إزالتك من قائمة أعضاء المجموعة.",
         "confirm": "مغادرة",
         "cancel": "إلغاء"
       },
@@ -222,7 +222,7 @@
     "message": {
       "loading": "تحميل الرسالة...",
       "tip": {
-        "action": "Zap"
+        "action": "حركة"
       },
       "copy": {
         "action": "نسخ",
@@ -230,12 +230,12 @@
         "error": "تعذر النسخ إلى الحافظة"
       },
       "redeem": {
-        "action": "Redeem",
+        "action": "استرداد",
         "failed": "فشل",
-        "redeemed": "Redeemed"
+        "redeemed": "تم استرداده"
       },
       "zap": {
-        "action": "Zap"
+        "action": "حركة"
       },
       "react": {
         "action": "تفاعل",
@@ -364,19 +364,19 @@
     "new": "استطلاع جديد",
     "question": "سؤال",
     "expiration": {
-      "label": "Expiration",
+      "label": "النفاذ",
       "date": "تاريخ الانتهاء",
       "check": "يجب أن يكون تاريخ الانتهاء في المستقبل"
     },
     "options": "الخيارات",
     "multiple-choices": "خيارات متعددة",
-    "closed": "Poll closed",
+    "closed": "تم إغلاق الاستطلاع",
     "ends": "ينتهي "
   },
   "vote": {
     "action": "صوت",
-    "success": "Vote cast",
-    "error": "Couldn't cast vote"
+    "success": "تم الإدلاء بالصوت",
+    "error": "لم يتمكن من إدلاء بالصوت"
   },
   "video": {
     "post": "انشر فيديو",
@@ -399,12 +399,12 @@
   "emoji": {
     "set": {
       "bookmark": {
-        "error": "Failed to bookmark emoji set"
+        "error": "فشل إضافة إشارة مرجعية لمجموعة الملصقات"
       }
     }
   },
-  "peer": " peer",
-  "peers": " peers",
+  "peer": " نظير",
+  "peers": " نظراء",
   "message": "رسالة",
   "write-a-message": "اكتب رسالة...",
   "send": {
@@ -417,7 +417,7 @@
     "details": "التفاصيل",
     "loading": "تحميل الحدث",
     "not-found": "لم يتم العثور على الحدث",
-    "fetch-error": "Error fetching event"
+    "fetch-error": "خطأ في جلب الحدث"
   },
   "events": {
     "loading": "تحميل الأحداث",
@@ -453,14 +453,14 @@
   },
   "goal": {
     "expires-in": "ينتهي في",
-    "expired": "Goal expired",
+    "expired": "تم انتهاء الهدف",
     "leaderboard": "لائحة المتصدرين"
   },
   "wallet": {
-    "title": "Incoming payment",
+    "title": "دفع وارد",
     "keys": "المفاتيح",
     "sync": "المزامنة",
-    "sync-success": "Ecash synced",
+    "sync-success": "تم مزامنة النقود الإلكترونية",
     "sync-error": "خطأ في مزامنة المحفظة",
     "keys-description": "مفاتيح محفظتك، من الضروري الاحتفاظ بها بأمان وعمل نسخة احتياطية منها",
     "debit": "الدفع",
@@ -520,9 +520,9 @@
       "confirm-cash": "Send ecash",
       "no-wallet": "لم يتم اختيار محفظة",
       "success": "Send successful",
-      "p2pk-success": "Sent {{ amount }} to {{ name }}",
-      "lud16-success": "Sent {{ amount }} to {{ lud16 }}",
-      "amount-success": "Sent {{ amount }}",
+      "p2pk-success": "تم إرسال {{ amount }} إلى {{ name }}",
+      "lud16-success": "تم إرسال {{ amount }} إلى {{ lud16 }}",
+      "amount-success": "تم الإرسال {{ amount }}",
       "message": "الرسالة",
       "message-placeholder": "اكتب رسالة اختيارية",
       "confirm-wallet": "إرسال"
