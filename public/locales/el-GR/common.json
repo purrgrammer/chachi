@@ -4,7 +4,7 @@
   },
   "home": "Home",
   "nav": {
-    "no-groups": "No groups"
+    "no-groups": "Δεν υπάρχουν γκρουπ"
   },
   "user": {
     "donate": "Donate",
@@ -168,7 +168,7 @@
     "leave": {
       "trigger": "Leave",
       "confirmation": {
-        "title": "Are you sure you want to leave?",
+        "title": "Είστε σίγουρος ότι θέλετε να αποχωρήσετε;",
         "description": "This action cannot be undone. You will be removed from the group members list.",
         "confirm": "Leave",
         "cancel": "Cancel"
@@ -184,7 +184,7 @@
       "event": {
         "delete": {
           "success": "Message deleted",
-          "error": "Couldn't delete message"
+          "error": "Αδυναμία διαγραφής μηνύματος"
         }
       }
     },
