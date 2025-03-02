@@ -1,14 +1,14 @@
 {
   "locale": {
-    "today": "Today"
+    "today": "اليوم"
   },
   "home": "Home",
   "nav": {
     "no-groups": "No groups"
   },
   "user": {
-    "donate": "Donate",
-    "thank-you": "Thank you for your donation 💜",
+    "donate": "تبرع",
+    "thank-you": "شكرا لك على تبرعك 💜",
     "support-chachi": "Donate to Chachi",
     "support-chachi-description": "Chachi is a free and open source project. Your donation helps keep the project alive and supports the development of new features.",
     "login": {
@@ -85,7 +85,7 @@
           "required": "Please add a name"
         },
         "about": {
-          "label": "About",
+          "label": "حول",
           "placeholder": "This is the group's description."
         },
         "relay": {
@@ -582,16 +582,16 @@
         "description": "Choose your preferred language"
       },
       "theme": {
-        "title": "Theme",
+        "title": "السمة",
         "description": "Choose your preferred theme",
-        "light": "Light",
-        "dark": "Dark",
+        "light": "فاتح",
+        "dark": "داكن",
         "system": "System"
       }
     },
     "wallet": {
       "title": "Wallets",
-      "settings": "Settings",
+      "settings": "الإعدادات",
       "mints": "Mints",
       "enable": "Enable",
       "enabled": "Enabled",
@@ -609,13 +609,13 @@
       "wallets": {
         "title": "Wallets",
         "none": "No wallets",
-        "remove": "Remove",
+        "remove": "إزالة",
         "description": "Manage your wallets",
         "create": "Create wallet",
         "default": "Default",
         "make-default": "Make default",
-        "delete": "Delete",
-        "delete-error": "Failed to delete wallet",
+        "delete": "حذف",
+        "delete-error": "فشل في حذف المحفظة",
         "delete-success": "Wallet deleted",
         "create-error": "Failed to create wallet",
         "create-success": "Wallet created",
@@ -650,13 +650,13 @@
   },
   "mint": {
     "contact": "Contact",
-    "version": "Version",
+    "version": "الإصدار",
     "features": "Features",
     "nuts": "Nuts",
-    "sat": "Bitcoin",
-    "eur": "Euro",
-    "usd": "US Dollar",
-    "currencies": "Currencies"
+    "sat": "بتكوين",
+    "eur": "يورو",
+    "usd": "دولار أمريكي",
+    "currencies": "العملات"
   },
   "ln": {
     "send": {
