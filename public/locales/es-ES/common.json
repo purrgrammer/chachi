@@ -7,10 +7,10 @@
     "no-groups": "No hay grupos"
   },
   "user": {
-    "donate": "Donate",
-    "thank-you": "Thank you for your donation 💜",
-    "support-chachi": "Donate to Chachi",
-    "support-chachi-description": "Chachi is a free and open source project. Your donation helps keep the project alive and supports the development of new features.",
+    "donate": "Donar",
+    "thank-you": "Gracias por tu donación 💜",
+    "support-chachi": "Donar a Chachi",
+    "support-chachi-description": "Chachi es un proyecto libre y de código abierto. Tu donación ayuda a mantener vivo el proyecto y apoya el desarrollo de nuevas características.",
     "login": {
       "start": "Empezar",
       "title": "Empezar",
