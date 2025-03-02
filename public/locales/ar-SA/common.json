@@ -52,7 +52,7 @@
     },
     "search": {
       "prompt": "ألا تستطيع العثور على ما تبحث عنه؟",
-      "trigger": "ابحث عن المجموعات",
+      "trigger": "إبحث عن مجموعات",
       "title": "ابحث عن مجموعة",
       "input": {
         "placeholder": "ابحث عن المجموعات",
@@ -352,10 +352,10 @@
       "success": "تم حذف المنشور",
       "error": "تعذر حذف المنشور"
     },
-    "start": "بدء محادثة"
+    "start": "بَدْء محادثة"
   },
   "poll": {
-    "start": "بدء استطلاع الرأي",
+    "start": "بَدْء استطلاع الرأي",
     "create": {
       "action": "إنشاء استطلاع الرأي",
       "success": "تم إنشاء استطلاع الرأي",
@@ -487,13 +487,13 @@
     "saved": "تم حفظ التغييرات",
     "save-error": "تعذر حفظ التغييرات",
     "mints": "سك العملات",
-    "add-mint": "Add mint",
+    "add-mint": "إضافة سك",
     "relays": "Relays",
     "add-relay": "إضافة relay",
     "deposit": {
-      "title": "Receive",
-      "cashu-description": "Deposit funds into a mint or redeem ecash tokens",
-      "description": "Deposit funds into your wallet",
+      "title": "استلام",
+      "cashu-description": "إيداع الأموال في دار السك أو استرداد رموز النقود الإلكترونية",
+      "description": "إيداع الأموال في محفظتك",
       "mint": "Mint",
       "amount": "المبلغ",
       "confirm": "تأكيد",
@@ -505,21 +505,21 @@
       "redeem-error": "Failed to redeem ecash",
       "redeem-success": "Ecash redeemed",
       "from-wallet": "Choose a wallet to pay this invoice",
-      "confirm-wallet": "Pay"
+      "confirm-wallet": "دفع"
     },
     "withdraw": {
-      "title": "Send",
+      "title": "إرسال",
       "description": "Pay a lightning invoice, send money to a profile or a lightning address",
       "placeholder": "Lightning invoice, profile or address",
       "to": "إلى",
-      "confirm": "Pay",
-      "error": "Failed to send",
+      "confirm": "دفع",
+      "error": "فشل الإرسال",
       "unrecognized-invoice": "Unrecognized invoice",
       "to-wallet": "Choose a wallet to send to",
-      "choose-wallet": "Send to wallet",
+      "choose-wallet": "إرسال إلى المحفظة",
       "confirm-cash": "Send ecash",
       "no-wallet": "لم يتم اختيار محفظة",
-      "success": "Send successful",
+      "success": "تم الإرسال بنجاح",
       "p2pk-success": "تم إرسال {{ amount }} إلى {{ name }}",
       "lud16-success": "تم إرسال {{ amount }} إلى {{ lud16 }}",
       "amount-success": "تم الإرسال {{ amount }}",
@@ -556,7 +556,7 @@
     "action": "Tip",
     "dialog": {
       "title": "Zap {{ name }}",
-      "description": "Send a tip to {{ name }}",
+      "description": "إرسال إكرامية إلى {{ name }}",
       "amount": "المبلغ",
       "invoice": "الفاتورة",
       "message": "الرسالة",
@@ -610,10 +610,10 @@
         "title": "المحافظ",
         "none": "لا توجد محافظ",
         "remove": "إزالة",
-        "description": "Manage your wallets",
+        "description": "إدارة المحافظ الخاصة بك",
         "create": "إنشاء محفظة",
-        "default": "Default",
-        "make-default": "Make default",
+        "default": "افتراضي",
+        "make-default": "تعيين كافتراضي",
         "delete": "حذف",
         "delete-error": "فشل في حذف المحفظة",
         "delete-success": "تم حذف المحفظة",
