@@ -129,7 +129,7 @@
           "label": "الظهور",
           "anyone": "الجميع",
           "members-only": "الأعضاء فقط",
-          "description": "الرسائل غير مشفرة ويمكن قراءتها عن طريق relays. لأقصى قدر من الخصوصية تستضيف relay الخاص بك."
+          "description": "الرسائل غير مشفرة ويمكن للمرحلات قراءتها. للحصول على أقصى درجات الخصوصية، استضف المرحل الخاص بك."
         },
         "access": {
           "label": "الوصول",
@@ -468,25 +468,25 @@
     "connect": "اتصل",
     "not-found": "لم يتم العثور على المحفظة",
     "no-transactions": "لا توجد معاملات",
-    "no-coins": "No coins found",
-    "make-default": "Make default",
+    "no-coins": "لم يتم العثور على عملات",
+    "make-default": "تعيين كافتراضي",
     "choose-wallet": "اختر محفظة",
     "choose-wallet-placeholder": "اختر محفظة لدفعها مع",
     "make-default-error": "تعذر تعيين المحفظة الافتراضية",
-    "make-default-success": "Wallet set as default",
+    "make-default-success": "تم تعيين المحفظة كافتراضية",
     "create": "إنشاء محفظة",
     "settings": {
       "title": "إعدادات المحفظة",
       "description": "إدارة إعدادات محفظتك",
       "create": {
         "title": "إنشاء محفظة",
-        "description": "Create a wallet to start sending and receiving zaps"
+        "description": "أنشئ محفظة لبدء إرسال واستقبال التحويلات"
       }
     },
     "save": "حفظ التغييرات",
     "saved": "تم حفظ التغييرات",
     "save-error": "تعذر حفظ التغييرات",
-    "mints": "Mints",
+    "mints": "سك العملات",
     "add-mint": "Add mint",
     "relays": "Relays",
     "add-relay": "إضافة relay",
