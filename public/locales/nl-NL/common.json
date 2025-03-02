@@ -31,8 +31,8 @@
     "language": "Taal",
     "theme": {
       "trigger": "Thema",
-      "light": "Light",
-      "dark": "Dark",
+      "light": "Licht",
+      "dark": "Donker",
       "system": "Systeem"
     },
     "settings": "Instellingen"
@@ -41,7 +41,7 @@
     "activity": {
       "heading": "Activiteit",
       "unread": "ongelezen",
-      "mentions": "mentions",
+      "mentions": "vermeldingen",
       "none": "Nog niets nieuws voor jou..."
     },
     "featured": {
@@ -147,8 +147,8 @@
     "delete": {
       "trigger": "Verwijderen",
       "confirmation": {
-        "title": "Are you sure you want to delete the group?",
-        "description": "This action cannot be undone. This group and all its history will be deleted.",
+        "title": "Weet je zeker dat je deze groep wilt verwijderen?",
+        "description": "Deze actie kan niet ongedaan worden gemaakt. Deze groep en al zijn geschiedenis worden verwijderd.",
         "confirm": "Verwijderen",
         "cancel": "Annuleren"
       },
@@ -164,22 +164,22 @@
       "trigger": "Verwijderen uit bladwijzers",
       "error": "Error unbookmarking group"
     },
-    "join": "Join",
+    "join": "Lid worden",
     "leave": {
       "trigger": "Verlaten",
       "confirmation": {
-        "title": "Are you sure you want to leave?",
-        "description": "This action cannot be undone. You will be removed from the group members list.",
+        "title": "Weet je zeker dat je de groep wilt verlaten?",
+        "description": "Deze actie kan niet ongedaan worden gemaakt. Je wordt verwijderd uit de ledenlijst.",
         "confirm": "Verlaten",
-        "cancel": "Anneleren"
+        "cancel": "Annuleren"
       },
       "success": "Groep verlaten",
       "error": "Fout bij verlaten groep"
     },
     "chat": {
       "user": {
-        "joined": "joined",
-        "left": "left"
+        "joined": "is lid geworden",
+        "left": "heeft de groep verlaten"
       },
       "event": {
         "delete": {
@@ -209,7 +209,7 @@
           "content": "Iedereen kan lid worden"
         }
       },
-      "join-the-conversation": "Join the conversation"
+      "join-the-conversation": "Neem deel aan het gesprek"
     },
     "info": {
       "admin": "Admin",
@@ -266,11 +266,11 @@
       }
     },
     "join": {
-      "action": "Join",
+      "action": "Lid worden",
       "request": {
-        "sent": "Request sent",
-        "success": "Join request sent",
-        "error": "Failed to send join request"
+        "sent": "Verzoek verstuurd",
+        "success": "Lidverzoek verstuurd",
+        "error": "Verzoek versturen mislukt"
       }
     },
     "debug": "Debug"
@@ -278,8 +278,8 @@
   "join": {
     "request": {
       "send": {
-        "success": "Join request sent",
-        "error": "Failed to send join request"
+        "success": "Lidverzoek verstuurd",
+        "error": "Verzoek versturen mislukt"
       },
       "accept": {
         "action": "Accepteren",
@@ -288,13 +288,13 @@
       },
       "reject": {
         "action": "Afwijzen",
-        "success": "User join request rejected",
-        "error": "Couldn't reject user from group"
+        "success": "Lidverzoek afgewezen",
+        "error": "Kan gebruiker niet afwijzen"
       }
     },
     "requests": {
-      "n": "Join requests ({{requestsLength}})",
-      "none": "No join requests... yet"
+      "n": "Lidverzoeken ({{requestsLength}})",
+      "none": "Nog geen lidverzoeken..."
     }
   },
   "gif": {
@@ -403,8 +403,8 @@
       }
     }
   },
-  "peer": " peer",
-  "peers": " peers",
+  "peer": " contact",
+  "peers": " contacten",
   "message": "Bericht",
   "write-a-message": "Schrijf een bericht...",
   "send": {
@@ -415,12 +415,12 @@
     "content": "Inhoud",
     "replies": "Antwoorden",
     "details": "Gegevens",
-    "loading": "Loading event",
-    "not-found": "Event not found",
-    "fetch-error": "Error fetching event"
+    "loading": "Event laden",
+    "not-found": "Event niet gevonden",
+    "fetch-error": "Fout bij ophalen event"
   },
   "events": {
-    "loading": "Loading events",
+    "loading": "Events laden",
     "none": "Nog niets te zien hier..."
   },
   "share": {
@@ -576,16 +576,16 @@
   "settings": {
     "title": "Instellingen",
     "ui": {
-      "title": "Appearance",
+      "title": "Weergave",
       "language": {
         "title": "Taal",
-        "description": "Choose your preferred language"
+        "description": "Kies je taal"
       },
       "theme": {
         "title": "Thema",
-        "description": "Choose your preferred theme",
-        "light": "Light",
-        "dark": "Dark",
+        "description": "Kies je thema",
+        "light": "Licht",
+        "dark": "Donker",
         "system": "Systeem"
       }
     },
