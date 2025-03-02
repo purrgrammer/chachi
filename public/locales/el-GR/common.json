@@ -279,7 +279,7 @@
     "request": {
       "send": {
         "success": "Join request sent",
-        "error": "Failed to send join request"
+        "error": "Αποτυχία αποστολής αίτησης μέλους"
       },
       "accept": {
         "action": "Accept",
@@ -366,7 +366,7 @@
     "expiration": {
       "label": "Expiration",
       "date": "Expiry date",
-      "check": "Expiry date must be in the future"
+      "check": "Η ημερομηνία λήξης πρέπει να είναι στο μέλλον"
     },
     "options": "Options",
     "multiple-choices": "Multiple choices",
@@ -454,7 +454,7 @@
   "goal": {
     "expires-in": "Expires in",
     "expired": "Goal expired",
-    "leaderboard": "Leaderboard"
+    "leaderboard": "Πίνακας κατάταξης"
   },
   "wallet": {
     "title": "Incoming payment",
@@ -515,7 +515,7 @@
       "confirm": "Pay",
       "error": "Failed to send",
       "unrecognized-invoice": "Unrecognized invoice",
-      "to-wallet": "Choose a wallet to send to",
+      "to-wallet": "Επιλέξτε ένα πορτοφόλι για αποστολή",
       "choose-wallet": "Send to wallet",
       "confirm-cash": "Send ecash",
       "no-wallet": "No wallet selected",
@@ -535,7 +535,7 @@
     "dialog": {
       "title": "Connect wallet",
       "description": "Connect your wallet to send tips and support your favorite creators",
-      "connect-webln": "Connect web wallet",
+      "connect-webln": "Σύνδεση πορτοφολιού web",
       "webln-connected": "Connected to web wallet",
       "webln-unavailable": "WebLN wallet not available",
       "webln-error": "Failed to connect to WebLN wallet",
