@@ -2,160 +2,160 @@
   "locale": {
     "today": "اليوم"
   },
-  "home": "Home",
+  "home": "البداية",
   "nav": {
-    "no-groups": "No groups"
+    "no-groups": "لا يوجد مجموعات"
   },
   "user": {
     "donate": "تبرع",
     "thank-you": "شكرا لك على تبرعك 💜",
-    "support-chachi": "Donate to Chachi",
-    "support-chachi-description": "Chachi is a free and open source project. Your donation helps keep the project alive and supports the development of new features.",
+    "support-chachi": "التبرع لنا",
+    "support-chachi-description": "هو مشروع مجاني ومفتوح المصدر. تبرعك يساعد في إبقاء المشروع حي ويدعم تطوير ميزات جديدة.",
     "login": {
-      "start": "Get started",
-      "title": "Get started",
-      "description": "Select the login method below.",
+      "start": "ابدأ",
+      "title": "ابدأ الآن",
+      "description": "اختر طريقة تسجيل الدخول أدناه.",
       "extension": {
-        "label": "Browser extension",
-        "error": "Failed to log in with extension"
+        "label": "إضافة المتصفح",
+        "error": "تعذر التسجيل بواسطة إضافة المتصفح"
       },
       "remote": {
-        "label": "Remote signer",
-        "error": "Failed to log in with remote signer"
+        "label": "الموقّع عن بُعد",
+        "error": "فشل تسجيل الدخول باستخدام الموقّع عن بُعد"
       },
-      "or": "OR",
-      "connect": "Connect"
+      "or": "أو",
+      "connect": "اتصال"
     },
-    "logout": "Log out",
-    "zaps": "Zaps",
-    "language": "Language",
+    "logout": "تسجيل الخروج",
+    "zaps": "التحويلات",
+    "language": "اللغة",
     "theme": {
-      "trigger": "Theme",
-      "light": "Light",
-      "dark": "Dark",
-      "system": "System"
+      "trigger": "السمة",
+      "light": "فاتح",
+      "dark": "مظلم",
+      "system": "النظام"
     },
-    "settings": "Settings"
+    "settings": "الإعدادات"
   },
   "dashboard": {
     "activity": {
-      "heading": "Activity",
-      "unread": "unread",
-      "mentions": "mentions",
-      "none": "Nothing new for you... yet"
+      "heading": "النشاط",
+      "unread": "غير مقروء",
+      "mentions": "الإشارات",
+      "none": "لا شيء جديد لك... حتى الآن"
     },
     "featured": {
-      "heading": "Featured"
+      "heading": "مميز"
     },
     "popular": {
-      "heading": "Popular in your network"
+      "heading": "شائع في شبكتك"
     },
     "search": {
-      "prompt": "Can't find what you're looking for?",
-      "trigger": "Search groups",
-      "title": "Find a group",
+      "prompt": "ألا تستطيع العثور على ما تبحث عنه؟",
+      "trigger": "ابحث عن المجموعات",
+      "title": "ابحث عن مجموعة",
       "input": {
-        "placeholder": "Search groups",
-        "no-results-for-x": "No results for \"{{search}}\"",
-        "n-results-for-x": "{{n}} results for \"{{search}}\"",
-        "start-typing-to-filter-groups": "Start typing to filter groups"
+        "placeholder": "ابحث عن المجموعات",
+        "no-results-for-x": "لا توجد نتائج لـ \"{{search}}\"",
+        "n-results-for-x": "{{n}} نتيجة لـ \"{{search}}\"",
+        "start-typing-to-filter-groups": "ابدأ الكتابة لتصفية المجموعات"
       },
       "result": {
-        "visit": "Visit",
-        "no-description-available": "No description available",
-        "no-groups-found-for-x-want-to": "No groups found for \"{{search}}\", want to ",
-        "start-one": "start one",
-        "?": "?"
+        "visit": "زيارة",
+        "no-description-available": "لا يوجد وصف متاح",
+        "no-groups-found-for-x-want-to": "لم يتم العثور على مجموعات لـ \"{{search}}\"، تريد ",
+        "start-one": "ابدأ واحدة",
+        "?": "؟"
       }
     }
   },
   "group": {
     "hosted": {
-      "by": "Hosted by ",
-      "and": " and "
+      "by": "الاستضافة بواسطة ",
+      "and": " و "
     },
     "create": {
-      "new": "New group",
-      "title": "Create group",
-      "description": "Create a new group to chat with your friends",
+      "new": "مجموعة جديدة",
+      "title": "إنشاء مجموعة",
+      "description": "أنشئ مجموعة جديدة للدردشة مع أصدقائك",
       "form": {
         "name": {
-          "label": "Name",
-          "placeholder": "This is the group's name.",
-          "required": "Please add a name"
+          "label": "الاسم",
+          "placeholder": "هذا هو اسم المجموعة.",
+          "required": "الرجاء إضافة اسم"
         },
         "about": {
           "label": "حول",
-          "placeholder": "This is the group's description."
+          "placeholder": "هذا هو وصف المجموعة."
         },
         "relay": {
-          "label": "Relay",
-          "placeholder": "Choose a relay.",
-          "description": "This is the server where the posts will be stored.",
-          "required": "Please select a relay"
+          "label": "مرحلات",
+          "placeholder": "اختر المرحل.",
+          "description": "هذا هو الخادم الذي ستُخزن فيه المنشورات.",
+          "required": "يرجى اختيار مرحل"
         },
         "visibility": {
-          "label": "Visibility",
-          "anyone": "Anyone",
-          "members-only": "Members only",
-          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+          "label": "الظهور",
+          "anyone": "الجميع",
+          "members-only": "الأعضاء فقط",
+          "description": "الرسائل غير مشفرة ويمكن قراءتها عن طريق relays. لأقصى قدر من الخصوصية قم باستضافة relay خاص بك."
         },
         "access": {
-          "label": "Access",
-          "anyone": "Anyone",
-          "invite-only": "Invite only"
+          "label": "الوصول",
+          "anyone": "الجميع",
+          "invite-only": "الدعوة فقط"
         },
         "submit": {
-          "trigger": "Create",
-          "success": "Group created",
-          "error": "Couldn't create group"
+          "trigger": "إنشاء",
+          "success": "تم إنشاء المجموعة",
+          "error": "تعذر إنشاء مجموعة"
         }
       }
     },
     "edit": {
-      "title": "Group settings",
+      "title": "إعدادات المجموعة",
       "form": {
         "name": {
-          "label": "Name",
-          "placeholder": "My Group",
-          "description": "This is the group's name"
+          "label": "الاسم",
+          "placeholder": "مجموعتي",
+          "description": "هذا هو اسم المجموعة"
         },
         "about": {
-          "label": "About",
-          "placeholder": "A group for my frens",
-          "description": "This is the group's description"
+          "label": "حول",
+          "placeholder": "مجموعة لأصدقائي",
+          "description": "هذا هو وصف المجموعة"
         },
         "visibility": {
-          "label": "Visibility",
-          "anyone": "Anyone",
-          "members-only": "Members only",
-          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+          "label": "الظهور",
+          "anyone": "الجميع",
+          "members-only": "الأعضاء فقط",
+          "description": "الرسائل غير مشفرة ويمكن قراءتها عن طريق relays. لأقصى قدر من الخصوصية تستضيف relay الخاص بك."
         },
         "access": {
-          "label": "Access",
-          "anyone": "Anyone",
-          "invite-only": "Invite only",
-          "description": "Anyone can join an open group. Closed groups require approval"
+          "label": "الوصول",
+          "anyone": "الجميع",
+          "invite-only": "الدعوة فقط",
+          "description": "يمكن لأي شخص الانضمام إلى مجموعة مفتوحة. المجموعات المغلقة تحتاج إلى موافقة"
         },
         "submit": {
-          "trigger": "Save",
-          "success": "Group updated",
-          "error": "Couldn't update group"
+          "trigger": "حفظ",
+          "success": "تم تحديث المجموعة",
+          "error": "تعذر تحديث المجموعة"
         }
       }
     },
     "delete": {
-      "trigger": "Delete",
+      "trigger": "حذف",
       "confirmation": {
-        "title": "Are you sure you want to delete the group?",
-        "description": "This action cannot be undone. This group and all its history will be deleted.",
-        "confirm": "Delete",
-        "cancel": "Cancel"
+        "title": "هل أنت متأكد من أنك تريد حذف المجموعة؟",
+        "description": "لا يمكن التراجع عن هذا الإجراء. سيتم حذف هذه المجموعة وكل سجلاتها.",
+        "confirm": "حذف",
+        "cancel": "إلغاء"
       },
-      "success": "Group deleted",
-      "error": "Couldn't delete group"
+      "success": "تم حذف المجموعة",
+      "error": "تعذر تحديث المجموعة"
     },
-    "deleted": "This group has been deleted",
+    "deleted": "تم حذف هذه المجموعة",
     "bookmark": {
       "trigger": "Bookmark",
       "error": "Error bookmarking group"
@@ -164,113 +164,113 @@
       "trigger": "Unbookmark",
       "error": "Error unbookmarking group"
     },
-    "join": "Join",
+    "join": "انضم",
     "leave": {
-      "trigger": "Leave",
+      "trigger": "مغادرة",
       "confirmation": {
-        "title": "Are you sure you want to leave?",
+        "title": "هل أنت متأكد من أنك تريد المغادرة؟",
         "description": "This action cannot be undone. You will be removed from the group members list.",
-        "confirm": "Leave",
-        "cancel": "Cancel"
+        "confirm": "مغادرة",
+        "cancel": "إلغاء"
       },
-      "success": "Left group",
-      "error": "Error leaving group"
+      "success": "تمت مغادرة المجموعة",
+      "error": "تعذر مغادرة المجموعة"
     },
     "chat": {
       "user": {
-        "joined": "joined",
-        "left": "left"
+        "joined": "انضم",
+        "left": "غادر"
       },
       "event": {
         "delete": {
-          "success": "Message deleted",
-          "error": "Couldn't delete message"
+          "success": "رسالة محذوفة",
+          "error": "تعذر حذف الرسالة"
         }
       }
     },
     "metadata": {
       "visibility": {
         "private": {
-          "trigger": "Members only",
-          "content": "Only members can read content"
+          "trigger": "الأعضاء فقط",
+          "content": "فقط الأعضاء يمكنهم قراءة المحتوى"
         },
         "public": {
-          "trigger": "Public",
-          "content": "Can be read by anyone"
+          "trigger": "عام",
+          "content": "يمكن أن يقرأه أي شخص"
         }
       },
       "access": {
         "closed": {
-          "trigger": "Closed",
-          "content": "Requires approval or an invitation to join"
+          "trigger": "مغلق",
+          "content": "يتطلب موافقة أو دعوة للانضمام"
         },
         "open": {
-          "trigger": "Open",
-          "content": "Anyone can join"
+          "trigger": "فتح",
+          "content": "يمكن لأي شخص الانضمام"
         }
       },
-      "join-the-conversation": "Join the conversation"
+      "join-the-conversation": "الانضمام إلى المحادثة"
     },
     "info": {
-      "admin": "Admin",
-      "admins": "Admins ({{adminsLength}})",
-      "members": "Members ({{membersLength}})",
-      "no-members": "No members"
+      "admin": "المشرف",
+      "admins": "المشرفون ({{adminsLength}})",
+      "members": "الأعضاء ({{membersLength}})",
+      "no-members": "لا يوجد أعضاء"
     }
   },
   "chat": {
     "message": {
-      "loading": "Loading message...",
+      "loading": "تحميل الرسالة...",
       "tip": {
         "action": "Zap"
       },
       "copy": {
-        "action": "Copy",
-        "success": "Copied to clipboard",
-        "error": "Can't copy to clipboard"
+        "action": "نسخ",
+        "success": "تم النسخ إلى الحافظة",
+        "error": "تعذر النسخ إلى الحافظة"
       },
       "redeem": {
         "action": "Redeem",
-        "failed": "Failed",
+        "failed": "فشل",
         "redeemed": "Redeemed"
       },
       "zap": {
         "action": "Zap"
       },
       "react": {
-        "action": "React",
-        "with": "Reacted with ",
-        "error": "Can't react"
+        "action": "تفاعل",
+        "with": "تفاعل بـ ",
+        "error": "لا يمكن التفاعل"
       },
       "reply": {
-        "action": "Reply",
-        "error": "Couldn't reply"
+        "action": "الرد",
+        "error": "تعذر الرد"
       },
       "forward": {
-        "action": "Forward",
-        "forwarded": "forwarded from"
+        "action": "إرسال",
+        "forwarded": "إرسال من"
       },
       "delete": {
-        "action": "Delete"
+        "action": "حذف"
       },
-      "deleted": "Message deleted",
-      "save-as-last-seen": "Save as last seen"
+      "deleted": "تم حذف الرسالة",
+      "save-as-last-seen": "حفظ كما شوهدت آخر مرة"
     },
-    "new-messages": "New messages",
+    "new-messages": "رسائل جديدة",
     "user": {
-      "not-member": "You are not a member of this group yet",
+      "not-member": "أنت لست عضوا في هذه المجموعة بعد",
       "kick": {
-        "action": "Kick",
-        "success": "Kicked user",
-        "error": "Couldn't kick user"
+        "action": "طرد",
+        "success": "تم طرد المستخدم",
+        "error": "تعذر طرد المستخدم"
       }
     },
     "join": {
-      "action": "Join",
+      "action": "انضم",
       "request": {
-        "sent": "Request sent",
-        "success": "Join request sent",
-        "error": "Failed to send join request"
+        "sent": "تم إرسال الطلب",
+        "success": "تم إرسال طلب الانضمام",
+        "error": "تعذر إرسال طلب الانضمام"
       }
     },
     "debug": "Debug"
@@ -278,122 +278,122 @@
   "join": {
     "request": {
       "send": {
-        "success": "Join request sent",
-        "error": "Failed to send join request"
+        "success": "تم إرسال طلب الانضمام",
+        "error": "تعذر إرسال طلب الانضمام"
       },
       "accept": {
-        "action": "Accept",
-        "success": "User added to group",
-        "error": "Couldn't add user to group"
+        "action": "قَبُول",
+        "success": "تمت إضافة المستخدم إلى المجموعة",
+        "error": "تعذر إضافة مستخدم إلى المجموعة"
       },
       "reject": {
-        "action": "Reject",
-        "success": "User join request rejected",
-        "error": "Couldn't reject user from group"
+        "action": "رفض",
+        "success": "تم رفض طلب الانضمام للمستخدم",
+        "error": "تعذر رفض المستخدم من المجموعة"
       }
     },
     "requests": {
-      "n": "Join requests ({{requestsLength}})",
-      "none": "No join requests... yet"
+      "n": "طلبات الانضمام ({{requestsLength}})",
+      "none": "لا توجد طلبات انضمام... حتى الآن"
     }
   },
   "gif": {
-    "search": "Search GIF",
-    "tenor": "Search Tenor",
-    "error": "Error searching GIFs"
+    "search": "البحث عن GIF",
+    "tenor": "البحث في Tenor",
+    "error": "خطأ في البحث عن GIFs"
   },
   "file": {
     "upload": {
-      "error": "Couldn't upload file"
+      "error": "تعذر رفع الملف"
     }
   },
   "image": {
-    "new": "New image",
-    "post": "Post an image",
+    "new": "صورة جديدة",
+    "post": "نشر صورة",
     "title": {
-      "label": "Title",
-      "placeholder": "Add a title"
+      "label": "العنوان",
+      "placeholder": "إضافة عنوان"
     },
     "publish": {
-      "success": "Image posted",
-      "error": "Failed to post image"
+      "success": "تم نشر الصورة",
+      "error": "تعذر نشر الصورة"
     },
     "description": {
-      "label": "Description",
-      "placeholder": "Add a description"
+      "label": "الوصف",
+      "placeholder": "إضافة وصف"
     }
   },
   "copy": {
-    "success": "Copied",
-    "error": "Couldn't copy"
+    "success": "تم النسخ بنجاح",
+    "error": "تعذر النسخ"
   },
   "content": {
-    "prompt": "What do you want to create?",
-    "create": "Create",
+    "prompt": "ماذا تريد أن تنشئ؟",
+    "create": "إنشاء",
     "type": {
-      "chat": "Chat",
-      "post": "Post",
-      "posts": "Posts",
-      "poll": "Poll",
-      "polls": "Polls",
-      "video": "Video",
-      "videos": "Videos",
-      "image": "Image",
-      "images": "Images"
+      "chat": "الدردشة",
+      "post": "نشر",
+      "posts": "منشورات",
+      "poll": "استطلاع",
+      "polls": "استطلاعات",
+      "video": "فيديو",
+      "videos": "فيديوهات",
+      "image": "صورة",
+      "images": "صور"
     }
   },
   "post": {
-    "new": "New",
-    "action": "Post",
-    "placeholder": "What's on your mind?",
-    "success": "Posted",
-    "error": "Couldn't post",
+    "new": "جديد",
+    "action": "نشر",
+    "placeholder": "ماذا يدور في ذهنك؟",
+    "success": "تم النشر",
+    "error": "تعذر النشر",
     "delete": {
-      "success": "Post deleted",
-      "error": "Couldn't delete post"
+      "success": "تم حذف المنشور",
+      "error": "تعذر حذف المنشور"
     },
-    "start": "Start a conversation"
+    "start": "بدء محادثة"
   },
   "poll": {
-    "start": "Start a poll",
+    "start": "بدء استطلاع الرأي",
     "create": {
-      "action": "Create poll",
-      "success": "Poll created",
-      "error": "Couldn't create poll"
+      "action": "إنشاء استطلاع الرأي",
+      "success": "تم إنشاء استطلاع الرأي",
+      "error": "تعذر إنشاء استطلاع الرأي"
     },
-    "new": "New poll",
-    "question": "Question",
+    "new": "استطلاع جديد",
+    "question": "سؤال",
     "expiration": {
       "label": "Expiration",
-      "date": "Expiry date",
-      "check": "Expiry date must be in the future"
+      "date": "تاريخ الانتهاء",
+      "check": "يجب أن يكون تاريخ الانتهاء في المستقبل"
     },
-    "options": "Options",
-    "multiple-choices": "Multiple choices",
+    "options": "الخيارات",
+    "multiple-choices": "خيارات متعددة",
     "closed": "Poll closed",
-    "ends": "Ends "
+    "ends": "ينتهي "
   },
   "vote": {
-    "action": "Vote",
+    "action": "صوت",
     "success": "Vote cast",
     "error": "Couldn't cast vote"
   },
   "video": {
-    "post": "Post a video",
-    "upload": "Upload",
-    "record": "Record",
+    "post": "انشر فيديو",
+    "upload": "رفع",
+    "record": "تسجيل",
     "publish": {
-      "success": "Video posted",
-      "error": "Failed to post video"
+      "success": "تم نشر الفيديو",
+      "error": "تعذر نشر الفيديو"
     },
-    "new": "New video",
+    "new": "فيديو جديد",
     "title": {
-      "label": "Title",
-      "placeholder": "Add a title"
+      "label": "العنوان",
+      "placeholder": "إضافة عنوان"
     },
     "description": {
-      "label": "Description",
-      "placeholder": "Add a description"
+      "label": "الوصف",
+      "placeholder": "إضافة وصف"
     }
   },
   "emoji": {
@@ -405,100 +405,100 @@
   },
   "peer": " peer",
   "peers": " peers",
-  "message": "Message",
-  "write-a-message": "Write a message...",
+  "message": "رسالة",
+  "write-a-message": "اكتب رسالة...",
   "send": {
-    "login-required": "Log in to send message",
-    "error": "Failed to send message"
+    "login-required": "سجل الدخول لإرسال رسالة",
+    "error": "تعذر إرسال الرسالة"
   },
   "event": {
-    "content": "Content",
-    "replies": "Replies",
-    "details": "Details",
-    "loading": "Loading event",
-    "not-found": "Event not found",
+    "content": "محتوى",
+    "replies": "الردود",
+    "details": "التفاصيل",
+    "loading": "تحميل الحدث",
+    "not-found": "لم يتم العثور على الحدث",
     "fetch-error": "Error fetching event"
   },
   "events": {
-    "loading": "Loading events",
-    "none": "Nothing to see here... yet"
+    "loading": "تحميل الأحداث",
+    "none": "لا شيء لرؤيته هنا... حتى الآن"
   },
   "share": {
-    "success": "Shared",
-    "error": "Couldn't share post",
-    "publication": "Share publication",
+    "success": "تمت المشاركة بنجاح",
+    "error": "تعذر مشاركة المنشور",
+    "publication": "مشاركة المنشور",
     "this": {
-      "publication": "Share this publication",
-      "in": "Share this publication in {{groupName}}"
+      "publication": "مشاركة هذا المنشور",
+      "in": "مشاركة هذا المنشور في {{groupName}}"
     },
     "in": {
-      "group": "Share in",
-      "x": "Share in {{groupName}} chat",
-      "chat": "Share in chat"
+      "group": "مشاركة في",
+      "x": "مشاركة في محادثة {{groupName}}",
+      "chat": "مشاركة في الدردشة"
     }
   },
-  "share-in": "Share in ",
-  "action-open": "Open",
+  "share-in": "مشاركة في ",
+  "action-open": "فتح",
   "action-zap": "Zap",
   "media": {
-    "reveal": "Reveal"
+    "reveal": "إظهار"
   },
   "header": {
-    "public": "Public",
-    "unknown": "Unknown"
+    "public": "عام",
+    "unknown": "غير معروف"
   },
   "book": {
-    "by": "by {{ author }}",
+    "by": "بواسطة {{ author }}",
     "current-chapter": "{{ chapter }} / {{ total }}"
   },
   "goal": {
-    "expires-in": "Expires in",
+    "expires-in": "ينتهي في",
     "expired": "Goal expired",
-    "leaderboard": "Leaderboard"
+    "leaderboard": "لائحة المتصدرين"
   },
   "wallet": {
     "title": "Incoming payment",
-    "keys": "Keys",
-    "sync": "Sync",
+    "keys": "المفاتيح",
+    "sync": "المزامنة",
     "sync-success": "Ecash synced",
-    "sync-error": "Error syncing wallet",
-    "keys-description": "Your wallet keys, it's important to keep them safe and backed up",
-    "debit": "Payment",
-    "credit": "Payment",
-    "connect": "Connect",
-    "not-found": "Wallet not found",
-    "no-transactions": "No transactions found",
+    "sync-error": "خطأ في مزامنة المحفظة",
+    "keys-description": "مفاتيح محفظتك، من الضروري الاحتفاظ بها بأمان وعمل نسخة احتياطية منها",
+    "debit": "الدفع",
+    "credit": "الدفع",
+    "connect": "اتصل",
+    "not-found": "لم يتم العثور على المحفظة",
+    "no-transactions": "لا توجد معاملات",
     "no-coins": "No coins found",
     "make-default": "Make default",
-    "choose-wallet": "Choose wallet",
-    "choose-wallet-placeholder": "Choose a wallet to pay with",
-    "make-default-error": "Failed to set wallet as default",
+    "choose-wallet": "اختر محفظة",
+    "choose-wallet-placeholder": "اختر محفظة لدفعها مع",
+    "make-default-error": "تعذر تعيين المحفظة الافتراضية",
     "make-default-success": "Wallet set as default",
-    "create": "Create wallet",
+    "create": "إنشاء محفظة",
     "settings": {
-      "title": "Wallet settings",
-      "description": "Manage your wallet settings",
+      "title": "إعدادات المحفظة",
+      "description": "إدارة إعدادات محفظتك",
       "create": {
-        "title": "Create wallet",
+        "title": "إنشاء محفظة",
         "description": "Create a wallet to start sending and receiving zaps"
       }
     },
-    "save": "Save changes",
-    "saved": "Changes saved",
-    "save-error": "Failed to save changes",
+    "save": "حفظ التغييرات",
+    "saved": "تم حفظ التغييرات",
+    "save-error": "تعذر حفظ التغييرات",
     "mints": "Mints",
     "add-mint": "Add mint",
     "relays": "Relays",
-    "add-relay": "Add relay",
+    "add-relay": "إضافة relay",
     "deposit": {
       "title": "Receive",
       "cashu-description": "Deposit funds into a mint or redeem ecash tokens",
       "description": "Deposit funds into your wallet",
       "mint": "Mint",
-      "amount": "Amount",
-      "confirm": "Confirm",
-      "success": "Deposit successful",
-      "error": "Failed to deposit",
+      "amount": "المبلغ",
+      "confirm": "تأكيد",
+      "success": "تم الإيداع بنجاح",
+      "error": "تعذر الإيداع",
       "receive-cash": "Ecash",
       "mint-error": "You are not accepting ecash from this mint",
       "redeem": "Redeem",
@@ -511,31 +511,31 @@
       "title": "Send",
       "description": "Pay a lightning invoice, send money to a profile or a lightning address",
       "placeholder": "Lightning invoice, profile or address",
-      "to": "To",
+      "to": "إلى",
       "confirm": "Pay",
       "error": "Failed to send",
       "unrecognized-invoice": "Unrecognized invoice",
       "to-wallet": "Choose a wallet to send to",
       "choose-wallet": "Send to wallet",
       "confirm-cash": "Send ecash",
-      "no-wallet": "No wallet selected",
+      "no-wallet": "لم يتم اختيار محفظة",
       "success": "Send successful",
       "p2pk-success": "Sent {{ amount }} to {{ name }}",
       "lud16-success": "Sent {{ amount }} to {{ lud16 }}",
       "amount-success": "Sent {{ amount }}",
-      "message": "Message",
-      "message-placeholder": "Write an optional message",
-      "confirm-wallet": "Send"
+      "message": "الرسالة",
+      "message-placeholder": "اكتب رسالة اختيارية",
+      "confirm-wallet": "إرسال"
     },
     "mints-description": "Mints are the custodians of the funds. Withdraw your funds to your wallet regularly.",
     "relays-description": "Relays where the wallet data is stored.",
-    "name": "Name",
-    "name-description": "A name for your wallet",
-    "ready": "Wallet `{{ name }}` ready",
+    "name": "الاسم",
+    "name-description": "اسم للمحفظتك",
+    "ready": "المحفظة `{{ name }}` جاهزة",
     "dialog": {
-      "title": "Connect wallet",
+      "title": "ربط المحفظة",
       "description": "Connect your wallet to send tips and support your favorite creators",
-      "connect-webln": "Connect web wallet",
+      "connect-webln": "ربط محفظة الويب",
       "webln-connected": "Connected to web wallet",
       "webln-unavailable": "WebLN wallet not available",
       "webln-error": "Failed to connect to WebLN wallet",
@@ -546,9 +546,9 @@
     },
     "coins": "Cash",
     "transactions": {
-      "title": "Transactions",
-      "loading": "Loading transactions",
-      "loading-error": "Error loading transactions"
+      "title": "المعاملات",
+      "loading": "تحميل المعاملات",
+      "loading-error": "خطأ في تحميل المعاملات"
     }
   },
   "zap": {
@@ -557,101 +557,101 @@
     "dialog": {
       "title": "Zap {{ name }}",
       "description": "Send a tip to {{ name }}",
-      "amount": "Amount",
-      "invoice": "Invoice",
-      "message": "Message",
-      "message-placeholder": "Add a message",
+      "amount": "المبلغ",
+      "invoice": "الفاتورة",
+      "message": "الرسالة",
+      "message-placeholder": "إضافة رسالة",
       "tip": "Zap {{ amount }}",
-      "copy": "Copy invoice",
-      "wallet": "Open in wallet",
-      "wallet-error": "Couldn't open wallet",
+      "copy": "نسخ الفاتورة",
+      "wallet": "فتح في المحفظة",
+      "wallet-error": "تعذر فتح المحفظة",
       "error": "Failed to zap",
       "success": "Zapped {{ amount }} to {{ name }}"
     }
   },
   "ecash": {
     "redeem": "Redeem",
-    "fee": "fee:"
+    "fee": "الرسوم:"
   },
   "settings": {
-    "title": "Settings",
+    "title": "الإعدادات",
     "ui": {
-      "title": "Appearance",
+      "title": "المظهر",
       "language": {
-        "title": "Language",
-        "description": "Choose your preferred language"
+        "title": "اللغة",
+        "description": "اختر لغتك المفضلة"
       },
       "theme": {
         "title": "السمة",
-        "description": "Choose your preferred theme",
+        "description": "اختر السمة المفضلة لديك",
         "light": "فاتح",
         "dark": "داكن",
-        "system": "System"
+        "system": "النظام"
       }
     },
     "wallet": {
-      "title": "Wallets",
+      "title": "محافظ",
       "settings": "الإعدادات",
       "mints": "Mints",
-      "enable": "Enable",
-      "enabled": "Enabled",
-      "enable-success": "Wallet enabled",
-      "enable-error": "Failed to enable wallet",
+      "enable": "تفعيل",
+      "enabled": "مفعّل",
+      "enable-success": "المحفظة مفعلة",
+      "enable-error": "تعذر تفعيل المحفظة",
       "relays": "Relays",
       "default-wallet": {
-        "title": "Active wallet",
-        "none": "No wallet selected"
+        "title": "المحفظة النشطة",
+        "none": "لم يتم اختيار محفظة"
       },
       "payments": {
         "title": "Payments",
         "description": "Manage the mints and relays you'll use to receive payments"
       },
       "wallets": {
-        "title": "Wallets",
-        "none": "No wallets",
+        "title": "المحافظ",
+        "none": "لا توجد محافظ",
         "remove": "إزالة",
         "description": "Manage your wallets",
-        "create": "Create wallet",
+        "create": "إنشاء محفظة",
         "default": "Default",
         "make-default": "Make default",
         "delete": "حذف",
         "delete-error": "فشل في حذف المحفظة",
-        "delete-success": "Wallet deleted",
+        "delete-success": "تم حذف المحفظة",
         "create-error": "Failed to create wallet",
-        "create-success": "Wallet created",
+        "create-success": "تم إنشاء المحفظة",
         "sync": "Sync",
-        "synced": "Synced",
-        "sync-error": "Error syncing wallet",
-        "open": "Open"
+        "synced": "تمت المزامنة",
+        "sync-error": "خطأ في مزامنة المحفظة",
+        "open": "فتح"
       }
     },
     "media": {
-      "title": "Media"
+      "title": "الوسائط"
     },
     "relays": {
       "title": "Relays"
     }
   },
   "nutzaps": {
-    "no-message": "No message",
+    "no-message": "لا توجد رسالة",
     "title": "Zaps",
     "redeemed": "Redeemed",
-    "failed": "Failed",
-    "log-in": "Log in to see your zaps",
+    "failed": "فشل",
+    "log-in": "قم بتسجيل الدخول لرؤية zaps الخاص بك",
     "invalid": "Invalid zap",
     "redeem": "Redeem",
     "redeem-success": "Redeemed {{ amount }} zap",
     "redeem-error": "Failed to redeem zap",
     "received": "Received",
     "sent": "Sent",
-    "no-received": "Nothing to see here... yet",
-    "no-sent": "Nothing to see here... yet",
-    "open": "Open"
+    "no-received": "لا شيء لرؤيته هنا... حتى الآن",
+    "no-sent": "لا شيء لرؤيته هنا... حتى الآن",
+    "open": "فتح"
   },
   "mint": {
     "contact": "Contact",
     "version": "الإصدار",
-    "features": "Features",
+    "features": "المميزات",
     "nuts": "Nuts",
     "sat": "بتكوين",
     "eur": "يورو",
@@ -660,14 +660,14 @@
   },
   "ln": {
     "send": {
-      "title": "Send {{ amount }}",
-      "show-qr": "Show QR",
-      "hide-qr": "Hide QR"
+      "title": "إرسال {{ amount }}",
+      "show-qr": "إظهار رمز QR",
+      "hide-qr": "إخفاء رمز QR"
     }
   },
   "qr": {
-    "scan": "Scan QR Code",
-    "scan-error": "Error scanning QR Code",
-    "unknown": "Unknown QR Code"
+    "scan": "مسح رمز QR",
+    "scan-error": "خطأ في مسح QR",
+    "unknown": "رمز QR غير معروف"
   }
 }
