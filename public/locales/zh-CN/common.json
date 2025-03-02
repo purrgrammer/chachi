@@ -7,10 +7,10 @@
     "no-groups": "尚無群聊"
   },
   "user": {
-    "donate": "Donate",
-    "thank-you": "Thank you for your donation 💜",
-    "support-chachi": "Donate to Chachi",
-    "support-chachi-description": "Chachi is a free and open source project. Your donation helps keep the project alive and supports the development of new features.",
+    "donate": "捐款",
+    "thank-you": "感谢你的捐款 💜",
+    "support-chachi": "捐款给 Chachi",
+    "support-chachi-description": "Chachi 是一个自由且开放源代码的项目。 你的捐赠能帮助此项目持续发展，并赞助新功能的开发。",
     "login": {
       "start": "开始",
       "title": "开始",
