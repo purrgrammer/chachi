@@ -121,7 +121,7 @@
           "description": "Dit is de naam van de groep"
         },
         "about": {
-          "label": "About",
+          "label": "Over",
           "placeholder": "A group for my frens",
           "description": "Dit is de omschrijving van de groep"
         },
@@ -134,13 +134,13 @@
         "access": {
           "label": "Toegang",
           "anyone": "Iedereen",
-          "invite-only": "Invite only",
+          "invite-only": "Alleen op uitnodiging",
           "description": "Anyone can join an open group. Closed groups require approval"
         },
         "submit": {
           "trigger": "Opslaan",
-          "success": "Group updated",
-          "error": "Couldn't update group"
+          "success": "Groep bijgewerkt",
+          "error": "Kon groep niet bijwerken"
         }
       }
     },
@@ -171,7 +171,7 @@
         "title": "Are you sure you want to leave?",
         "description": "This action cannot be undone. You will be removed from the group members list.",
         "confirm": "Leave",
-        "cancel": "Cancel"
+        "cancel": "Anneleren"
       },
       "success": "Left group",
       "error": "Error leaving group"
@@ -183,15 +183,15 @@
       },
       "event": {
         "delete": {
-          "success": "Message deleted",
-          "error": "Couldn't delete message"
+          "success": "Bericht verwijderd",
+          "error": "Kon bericht niet verwijderen"
         }
       }
     },
     "metadata": {
       "visibility": {
         "private": {
-          "trigger": "Members only",
+          "trigger": "Alleen leden",
           "content": "Only members can read content"
         },
         "public": {
@@ -225,13 +225,13 @@
         "action": "Zap"
       },
       "copy": {
-        "action": "Copy",
+        "action": "Kopieer",
         "success": "Copied to clipboard",
         "error": "Can't copy to clipboard"
       },
       "redeem": {
         "action": "Redeem",
-        "failed": "Failed",
+        "failed": "Mislukt",
         "redeemed": "Redeemed"
       },
       "zap": {
@@ -243,18 +243,18 @@
         "error": "Can't react"
       },
       "reply": {
-        "action": "Reply",
-        "error": "Couldn't reply"
+        "action": "Antwoorden",
+        "error": "Kon niet antwoorden"
       },
       "forward": {
-        "action": "Forward",
-        "forwarded": "forwarded from"
+        "action": "Doorsturen",
+        "forwarded": "doorgestuurd van"
       },
       "delete": {
-        "action": "Delete"
+        "action": "Verwijderen"
       },
-      "deleted": "Message deleted",
-      "save-as-last-seen": "Save as last seen"
+      "deleted": "Bericht verwijderd",
+      "save-as-last-seen": "Opslaan als laatst gezien"
     },
     "new-messages": "Nieuwe berichten",
     "user": {
@@ -464,7 +464,7 @@
     "sync-error": "Error syncing wallet",
     "keys-description": "Your wallet keys, it's important to keep them safe and backed up",
     "debit": "Payment",
-    "credit": "Payment",
+    "credit": "Betaling",
     "connect": "Connect",
     "not-found": "Wallet not found",
     "no-transactions": "No transactions found",
@@ -485,7 +485,7 @@
     },
     "save": "Wijzigingen opslaan",
     "saved": "Wijzigingen opgeslagen",
-    "save-error": "Failed to save changes",
+    "save-error": "Wijzigingen opslaan mislukt",
     "mints": "Mints",
     "add-mint": "Add mint",
     "relays": "Relays",
