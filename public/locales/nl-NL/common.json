@@ -135,7 +135,7 @@
           "label": "Toegang",
           "anyone": "Iedereen",
           "invite-only": "Alleen op uitnodiging",
-          "description": "Anyone can join an open group. Closed groups require approval"
+          "description": "Iedereen kan lid worden van een openbare groep. Voor besloten groepen is goedkeuring nodig"
         },
         "submit": {
           "trigger": "Opslaan",
@@ -195,14 +195,14 @@
           "content": "Alleen leden kunnen inhoud lezen"
         },
         "public": {
-          "trigger": "Public",
-          "content": "Can be read by anyone"
+          "trigger": "Openbaar",
+          "content": "Kan door iedereen worden gelezen"
         }
       },
       "access": {
         "closed": {
-          "trigger": "Closed",
-          "content": "Requires approval or an invitation to join"
+          "trigger": "Besloten",
+          "content": "Vereist goedkeuring of een uitnodiging om lid te worden"
         },
         "open": {
           "trigger": "Open",
@@ -222,7 +222,7 @@
     "message": {
       "loading": "Bericht laden...",
       "tip": {
-        "action": "Zap"
+        "action": "Zappen"
       },
       "copy": {
         "action": "Kopieer",
@@ -235,7 +235,7 @@
         "redeemed": "Redeemed"
       },
       "zap": {
-        "action": "Zap"
+        "action": "Zappen"
       },
       "react": {
         "action": "Reageren",
@@ -260,9 +260,9 @@
     "user": {
       "not-member": "Je bent nog geen lid van deze groep",
       "kick": {
-        "action": "Kick",
-        "success": "Kicked user",
-        "error": "Couldn't kick user"
+        "action": "Kicken",
+        "success": "Gebruiker gekickt",
+        "error": "Kan gebruiker niet kicken"
       }
     },
     "join": {
@@ -309,14 +309,14 @@
   },
   "image": {
     "new": "Nieuwe afbeelding",
-    "post": "Post an image",
+    "post": "Post een afbeelding",
     "title": {
       "label": "Titel",
       "placeholder": "Voeg een titel toe"
     },
     "publish": {
-      "success": "Image posted",
-      "error": "Failed to post image"
+      "success": "Afbeelding gepost",
+      "error": "Afbeelding posten mislukt"
     },
     "description": {
       "label": "Omschrijving",
@@ -334,8 +334,8 @@
       "chat": "Chat",
       "post": "Post",
       "posts": "Posts",
-      "poll": "Peiling",
-      "polls": "Peilingen",
+      "poll": "Poll",
+      "polls": "Polls",
       "video": "Video",
       "videos": "Video's",
       "image": "Afbeelding",
@@ -344,47 +344,47 @@
   },
   "post": {
     "new": "Nieuw",
-    "action": "Post",
+    "action": "Posten",
     "placeholder": "What's on your mind?",
-    "success": "Posted",
-    "error": "Couldn't post",
+    "success": "Gepost",
+    "error": "Kan niet posten",
     "delete": {
-      "success": "Post deleted",
-      "error": "Couldn't delete post"
+      "success": "Post verwijderd",
+      "error": "Kon post niet verwijderen"
     },
     "start": "Begin een gesprek"
   },
   "poll": {
-    "start": "Start een peiling",
+    "start": "Start een poll",
     "create": {
-      "action": "Create poll",
-      "success": "Poll created",
-      "error": "Couldn't create poll"
+      "action": "Poll maken",
+      "success": "Poll gemaakt",
+      "error": "Kan geen poll maken"
     },
-    "new": "Nieuwe peiling",
+    "new": "Nieuwe poll",
     "question": "Vraag",
     "expiration": {
-      "label": "Expiration",
-      "date": "Expiry date",
-      "check": "Expiry date must be in the future"
+      "label": "Verloopdatum",
+      "date": "Verloopdatum",
+      "check": "Verloopdatum moet in de toekomst liggen"
     },
     "options": "Antwoordopties",
     "multiple-choices": "Meerdere antwoorden",
-    "closed": "Peiling gesloten",
-    "ends": "Ends "
+    "closed": "Poll gesloten",
+    "ends": "Eindigt "
   },
   "vote": {
-    "action": "Vote",
-    "success": "Vote cast",
-    "error": "Couldn't cast vote"
+    "action": "Stemmen",
+    "success": "Je heb gestemd",
+    "error": "Kan niet stemmen"
   },
   "video": {
-    "post": "Plaats een video",
+    "post": "Post een video",
     "upload": "Uploaden",
     "record": "Opnemen",
     "publish": {
-      "success": "Video geplaatst",
-      "error": "Video plaatsen mislukt"
+      "success": "Video gepost",
+      "error": "Video posten mislukt"
     },
     "new": "Nieuwe video",
     "title": {
@@ -428,8 +428,8 @@
     "error": "Kan post niet delen",
     "publication": "Publicatie delen",
     "this": {
-      "publication": "Share this publication",
-      "in": "Share this publication in {{groupName}}"
+      "publication": "Deze publicatie delen",
+      "in": "Deze publicatie delen in {{groupName}}"
     },
     "in": {
       "group": "Delen in",
@@ -438,13 +438,13 @@
     }
   },
   "share-in": "Delen in ",
-  "action-open": "Open",
-  "action-zap": "Zap",
+  "action-open": "Openen",
+  "action-zap": "Zappen",
   "media": {
     "reveal": "Reveal"
   },
   "header": {
-    "public": "Public",
+    "public": "Openbaar",
     "unknown": "Onbekend"
   },
   "book": {
@@ -457,30 +457,30 @@
     "leaderboard": "Leaderboard"
   },
   "wallet": {
-    "title": "Incoming payment",
+    "title": "Inkomende betaling",
     "keys": "Keys",
     "sync": "Synchroniseren",
     "sync-success": "Ecash gesynchroniseerd",
-    "sync-error": "Error syncing wallet",
+    "sync-error": "Fout bij synchroniseren wallet",
     "keys-description": "Your wallet keys, it's important to keep them safe and backed up",
     "debit": "Betaling",
     "credit": "Betaling",
     "connect": "Verbinden",
-    "not-found": "Wallet not found",
+    "not-found": "Wallet niet gevonden",
     "no-transactions": "Geen transacties gevonden",
     "no-coins": "No coins found",
-    "make-default": "Make default",
-    "choose-wallet": "Choose wallet",
-    "choose-wallet-placeholder": "Choose a wallet to pay with",
-    "make-default-error": "Failed to set wallet as default",
-    "make-default-success": "Wallet set as default",
-    "create": "Create wallet",
+    "make-default": "Als standaard instellen",
+    "choose-wallet": "Kies wallet",
+    "choose-wallet-placeholder": "Kies een wallet om mee te betalen",
+    "make-default-error": "Instellen van wallet als standaard mislukt",
+    "make-default-success": "Wallet als standaard ingesteld",
+    "create": "Wallet aanmaken",
     "settings": {
-      "title": "Wallet settings",
-      "description": "Manage your wallet settings",
+      "title": "Wallet-instellingen",
+      "description": "Beheer je wallet instellingen",
       "create": {
-        "title": "Create wallet",
-        "description": "Create a wallet to start sending and receiving zaps"
+        "title": "Wallet aanmaken",
+        "description": "Maak een wallet aan om te beginnen met het verzenden en ontvangen van zaps"
       }
     },
     "save": "Wijzigingen opslaan",
@@ -493,12 +493,12 @@
     "deposit": {
       "title": "Ontvangen",
       "cashu-description": "Deposit funds into a mint or redeem ecash tokens",
-      "description": "Deposit funds into your wallet",
+      "description": "Geld toevoegen aan je wallet",
       "mint": "Mint",
       "amount": "Bedrag",
       "confirm": "Bevestigen",
-      "success": "Deposit successful",
-      "error": "Failed to deposit",
+      "success": "Succesvol toegevoegd",
+      "error": "Toevoegen misluk",
       "receive-cash": "Ecash",
       "mint-error": "You are not accepting ecash from this mint",
       "redeem": "Redeem",
@@ -513,34 +513,34 @@
       "placeholder": "Lightning invoice, profile or address",
       "to": "Naar",
       "confirm": "Betalen",
-      "error": "Failed to send",
+      "error": "Verzenden mislukt",
       "unrecognized-invoice": "Unrecognized invoice",
-      "to-wallet": "Choose a wallet to send to",
-      "choose-wallet": "Send to wallet",
-      "confirm-cash": "Send ecash",
-      "no-wallet": "No wallet selected",
-      "success": "Send successful",
-      "p2pk-success": "Sent {{ amount }} to {{ name }}",
-      "lud16-success": "Sent {{ amount }} to {{ lud16 }}",
-      "amount-success": "Sent {{ amount }}",
+      "to-wallet": "Kies een wallet om naar te verzenden",
+      "choose-wallet": "Verzenden naar wallet",
+      "confirm-cash": "Ecash verzenden",
+      "no-wallet": "Geen wallet geselecteerd",
+      "success": "Succesvol verzonden",
+      "p2pk-success": "{{ amount }} verzonden naar {{ name }}",
+      "lud16-success": "{{ amount }} verzonden naar {{ lud16 }}",
+      "amount-success": "Verzend {{ amount }}",
       "message": "Bericht",
       "message-placeholder": "Schrijf een optioneel bericht",
-      "confirm-wallet": "Send"
+      "confirm-wallet": "Verzenden"
     },
     "mints-description": "Mints are the custodians of the funds. Withdraw your funds to your wallet regularly.",
-    "relays-description": "Relays where the wallet data is stored.",
+    "relays-description": "Relays waar de wallet data is opgeslagen.",
     "name": "Naam",
-    "name-description": "A name for your wallet",
-    "ready": "Wallet `{{ name }}` ready",
+    "name-description": "Een naam voor je wallet",
+    "ready": "Wallet `{{ name }}` klaar",
     "dialog": {
       "title": "Wallet verbinden",
       "description": "Connect your wallet to send tips and support your favorite creators",
       "connect-webln": "Webwallet verbinden",
       "webln-connected": "Verbonden met webwallet",
-      "webln-unavailable": "WebLN wallet not available",
-      "webln-error": "Failed to connect to WebLN wallet",
+      "webln-unavailable": "WebLN wallet niet beschikbaar",
+      "webln-error": "Kan geen verbinding maken met WebLN wallet",
       "connect-nip60": "Connect remote wallet",
-      "nwc-empty": "NWC address is empty",
+      "nwc-empty": "NWC-adres is leeg",
       "nwc-error": "Failed to connect to remote wallet",
       "nwc-connected": "Connected to remote wallet"
     },
@@ -552,21 +552,21 @@
     }
   },
   "zap": {
-    "trigger": "Tip",
-    "action": "Tip",
+    "trigger": "Tippen",
+    "action": "Tippen",
     "dialog": {
       "title": "Zap {{ name }}",
-      "description": "Send a tip to {{ name }}",
+      "description": "Stuur een tip naar {{ name }}",
       "amount": "Bedrag",
       "invoice": "Invoice",
       "message": "Bericht",
       "message-placeholder": "Voeg een bericht toe",
       "tip": "Zap {{ amount }}",
       "copy": "Copy invoice",
-      "wallet": "Open in wallet",
-      "wallet-error": "Couldn't open wallet",
-      "error": "Failed to zap",
-      "success": "Zapped {{ amount }} to {{ name }}"
+      "wallet": "Openen in wallet",
+      "wallet-error": "Kan wallet niet openen",
+      "error": "Zappen mislukt",
+      "success": "{{ amount }} gezapt naar {{ name }}"
     }
   },
   "ecash": {
@@ -593,14 +593,14 @@
       "title": "Wallets",
       "settings": "Instellingen",
       "mints": "Mints",
-      "enable": "Enable",
-      "enabled": "Enabled",
-      "enable-success": "Wallet enabled",
-      "enable-error": "Failed to enable wallet",
+      "enable": "Inschakelen",
+      "enabled": "Ingeschakeld",
+      "enable-success": "Wallet ingeschakeld",
+      "enable-error": "Kan wallet niet inschakelen",
       "relays": "Relays",
       "default-wallet": {
-        "title": "Active wallet",
-        "none": "No wallet selected"
+        "title": "Actieve wallet",
+        "none": "Geen wallet geselecteerd"
       },
       "payments": {
         "title": "Betalingen",
@@ -608,21 +608,21 @@
       },
       "wallets": {
         "title": "Wallets",
-        "none": "No wallets",
-        "remove": "Remove",
-        "description": "Manage your wallets",
-        "create": "Create wallet",
-        "default": "Default",
-        "make-default": "Make default",
+        "none": "Geen wallets",
+        "remove": "Verwijderen",
+        "description": "Beheer je wallets",
+        "create": "Wallet aanmaken",
+        "default": "Standaard",
+        "make-default": "Als standaard instellen",
         "delete": "Verwijderen",
-        "delete-error": "Failed to delete wallet",
-        "delete-success": "Wallet deleted",
-        "create-error": "Failed to create wallet",
-        "create-success": "Wallet created",
+        "delete-error": "Verwijderen van wallet mislukt",
+        "delete-success": "Wallet verwijderd",
+        "create-error": "Aanmaken van wallet mislukt",
+        "create-success": "Wallet aangemaakt",
         "sync": "Synchroniseren",
         "synced": "Gesynchroniseerd",
-        "sync-error": "Error syncing wallet",
-        "open": "Open"
+        "sync-error": "Fout bij synchroniseren wallet",
+        "open": "Openen"
       }
     },
     "media": {
@@ -637,16 +637,16 @@
     "title": "Zaps",
     "redeemed": "Redeemed",
     "failed": "Mislukt",
-    "log-in": "Log in to see your zaps",
-    "invalid": "Invalid zap",
+    "log-in": "Log in om je zaps te zien",
+    "invalid": "Ongeldige zap",
     "redeem": "Redeem",
     "redeem-success": "Redeemed {{ amount }} zap",
     "redeem-error": "Failed to redeem zap",
-    "received": "Received",
-    "sent": "Sent",
-    "no-received": "Nothing to see here... yet",
-    "no-sent": "Nothing to see here... yet",
-    "open": "Open"
+    "received": "Ontvangen",
+    "sent": "Verzonden",
+    "no-received": "Nog niets te zien hier...",
+    "no-sent": "Nog niets te zien hier...",
+    "open": "Openen"
   },
   "mint": {
     "contact": "Contactpersoon",
@@ -660,7 +660,7 @@
   },
   "ln": {
     "send": {
-      "title": "Send {{ amount }}",
+      "title": "Verzend {{ amount }}",
       "show-qr": "Toon QR",
       "hide-qr": "QR verbergen"
     }
