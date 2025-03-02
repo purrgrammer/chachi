@@ -98,7 +98,7 @@
           "label": "Zichtbaarheid",
           "anyone": "Iedereen",
           "members-only": "Alleen leden",
-          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+          "description": "Berichten zijn niet versleuteld en kunnen worden gelezen door relays. Voor maximale privacy, host je eigen relay."
         },
         "access": {
           "label": "Toegang",
@@ -129,7 +129,7 @@
           "label": "Zichtbaarheid",
           "anyone": "Iedereen",
           "members-only": "Alleen leden",
-          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+          "description": "Berichten zijn niet versleuteld en kunnen worden gelezen door relays. Voor maximale privacy, host je eigen relay."
         },
         "access": {
           "label": "Toegang",
@@ -158,11 +158,11 @@
     "deleted": "Deze groep is verwijderd",
     "bookmark": {
       "trigger": "Toevoegen aan bladwijzers",
-      "error": "Error bookmarking group"
+      "error": "Fout bij het toevoegen van de groep aan bladwijzers"
     },
     "unbookmark": {
       "trigger": "Verwijderen uit bladwijzers",
-      "error": "Error unbookmarking group"
+      "error": "Fout bij het verwijderen van de groep uit bladwijzers"
     },
     "join": "Lid worden",
     "leave": {
@@ -345,7 +345,7 @@
   "post": {
     "new": "Nieuw",
     "action": "Posten",
-    "placeholder": "What's on your mind?",
+    "placeholder": "Waar denk je aan?",
     "success": "Gepost",
     "error": "Kan niet posten",
     "delete": {
@@ -399,7 +399,7 @@
   "emoji": {
     "set": {
       "bookmark": {
-        "error": "Failed to bookmark emoji set"
+        "error": "Kan de emoji-set niet aan bladwijzers toevoegen"
       }
     }
   },
@@ -441,7 +441,7 @@
   "action-open": "Openen",
   "action-zap": "Zappen",
   "media": {
-    "reveal": "Reveal"
+    "reveal": "Weergeven"
   },
   "header": {
     "public": "Openbaar",
@@ -458,11 +458,11 @@
   },
   "wallet": {
     "title": "Inkomende betaling",
-    "keys": "Keys",
+    "keys": "Sleutels",
     "sync": "Synchroniseren",
     "sync-success": "Ecash gesynchroniseerd",
     "sync-error": "Fout bij synchroniseren wallet",
-    "keys-description": "Your wallet keys, it's important to keep them safe and backed up",
+    "keys-description": "Je wallet-sleutels, het is belangrijk om ze veilig te bewaren en er een back-up van te maken",
     "debit": "Betaling",
     "credit": "Betaling",
     "connect": "Verbinden",
@@ -487,12 +487,12 @@
     "saved": "Wijzigingen opgeslagen",
     "save-error": "Wijzigingen opslaan mislukt",
     "mints": "Mints",
-    "add-mint": "Add mint",
+    "add-mint": "Mint toevoegen",
     "relays": "Relays",
     "add-relay": "Voeg relay toe",
     "deposit": {
       "title": "Ontvangen",
-      "cashu-description": "Deposit funds into a mint or redeem ecash tokens",
+      "cashu-description": "Geld toevoegen aan een mint of ecash tokens inwisselen",
       "description": "Geld toevoegen aan je wallet",
       "mint": "Mint",
       "amount": "Bedrag",
@@ -500,7 +500,7 @@
       "success": "Succesvol toegevoegd",
       "error": "Toevoegen misluk",
       "receive-cash": "Ecash",
-      "mint-error": "You are not accepting ecash from this mint",
+      "mint-error": "Je accepteert geen ecash van deze mint",
       "redeem": "Redeem",
       "redeem-error": "Failed to redeem ecash",
       "redeem-success": "Ecash redeemed",
@@ -527,7 +527,7 @@
       "message-placeholder": "Schrijf een optioneel bericht",
       "confirm-wallet": "Verzenden"
     },
-    "mints-description": "Mints are the custodians of the funds. Withdraw your funds to your wallet regularly.",
+    "mints-description": "Mints beheren je geld. Trek je geld regelmatig op naar je wallet.",
     "relays-description": "Relays waar de wallet data is opgeslagen.",
     "name": "Naam",
     "name-description": "Een naam voor je wallet",
@@ -604,7 +604,7 @@
       },
       "payments": {
         "title": "Betalingen",
-        "description": "Manage the mints and relays you'll use to receive payments"
+        "description": "Beheer de mints en relays waarmee je betalingen ontvangt"
       },
       "wallets": {
         "title": "Wallets",
