@@ -145,7 +145,7 @@ export function NavUser() {
           onZap={onZap}
           pubkey={CHACHI_PUBKEY}
           group={CHACHI_GROUP}
-          zapType="nip-57"
+          zapType="nip-61"
         />
       ) : null}
     </>
