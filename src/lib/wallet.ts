@@ -120,9 +120,24 @@ export function useChachiWallet() {
         const ev = new NDKEvent(ndk, event.rawEvent());
         try {
           await ev.publish(cashuWallet.relaySet);
-          cache.discardUnpublishedEvent(token.event.id);
+          cache.discardUnpublishedEvent(event.id);
         } catch (err) {
           console.debug("[cashu] Can't publish token", ev.rawEvent(), mintList);
+          console.error(err);
+        }
+      }
+      const unpublishedNutzaps = unpublished.filter(
+        (e) => e.event.kind === NDKKind.Nutzap,
+      );
+      for (const nutzap of unpublishedNutzaps) {
+        const { event, relays } = nutzap;
+        const relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
+        const ev = new NDKEvent(ndk, event.rawEvent());
+        try {
+          await ev.publish(relaySet);
+          cache.discardUnpublishedEvent(event.id);
+        } catch (err) {
+          console.debug("[cashu] Can't publish nutzap", ev.rawEvent());
           console.error(err);
         }
       }
