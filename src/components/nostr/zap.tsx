@@ -53,7 +53,7 @@ export function NewZapDialog({
   group,
   trigger,
   reply,
-  zapType = "nip-57",
+  zapType = "nip-61",
   title,
   description,
   defaultAmount = 21,
@@ -118,6 +118,7 @@ export function NewZapDialog({
       setIsZapping(true);
       if (zapType === "nip-57") {
         const tags = [
+          ...(group ? [["h", group.id, group.relay]] : []),
           ...(event ? [["e", event.id]] : []),
           ...(group?.id && metadata && metadata.pubkey
             ? [["a", `${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`]]
