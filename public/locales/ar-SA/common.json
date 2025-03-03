@@ -14,7 +14,7 @@
     "login": {
       "start": "ابدأ",
       "title": "ابدأ الآن",
-      "description": "اختر طريقة تسجيل الدخول أدناه",
+      "description": "اختر طريقة تسجيل الدخول المناسبة.",
       "extension": {
         "label": "إضافة المتصفح",
         "error": "تعذر التسجيل بواسطة إضافة المتصفح"
@@ -52,7 +52,7 @@
     },
     "search": {
       "prompt": "ألا تستطيع العثور على ما تبحث عنه؟",
-      "trigger": "إبحث عن مجموعات",
+      "trigger": "استكشف المجموعات",
       "title": "ابحث عن مجموعة",
       "input": {
         "placeholder": "ابحث عن المجموعات",
@@ -147,7 +147,7 @@
     "delete": {
       "trigger": "حذف",
       "confirmation": {
-        "title": "هل أنت متأكد من أنك تريد حذف المجموعة؟",
+        "title": "هل أنت متيقن من أنك تريد حذف المجموعة؟",
         "description": "لا يمكن التراجع عن هذا الإجراء. سيتم حذف هذه المجموعة وكل سجلاتها.",
         "confirm": "حذف",
         "cancel": "إلغاء"
@@ -168,7 +168,7 @@
     "leave": {
       "trigger": "مغادرة",
       "confirmation": {
-        "title": "هل أنت متأكد من أنك تريد المغادرة؟",
+        "title": "هل أنت متيقن أنك تريد المغادرة؟",
         "description": "لا يمكن التراجع عن هذا الإجراء. سيتم إزالتك من قائمة أعضاء المجموعة.",
         "confirm": "مغادرة",
         "cancel": "إلغاء"
@@ -273,7 +273,7 @@
         "error": "تعذر إرسال طلب الانضمام"
       }
     },
-    "debug": "Debug"
+    "debug": "تصحيح الأخطاء"
   },
   "join": {
     "request": {
@@ -298,13 +298,13 @@
     }
   },
   "gif": {
-    "search": "البحث عن GIF",
-    "tenor": "البحث في Tenor",
-    "error": "خطأ في البحث عن GIFs"
+    "search": "البحث عن صورة متحركة",
+    "tenor": "مدة البحث",
+    "error": "خطأ في البحث الصور المتحركة"
   },
   "file": {
     "upload": {
-      "error": "تعذر رفع الملف"
+      "error": "تعذر رفع العنصر"
     }
   },
   "image": {
@@ -439,7 +439,7 @@
   },
   "share-in": "مشاركة في ",
   "action-open": "فتح",
-  "action-zap": "Zap",
+  "action-zap": "تحويل",
   "media": {
     "reveal": "إظهار"
   },
@@ -488,18 +488,18 @@
     "save-error": "تعذر حفظ التغييرات",
     "mints": "سك العملات",
     "add-mint": "إضافة سك",
-    "relays": "Relays",
-    "add-relay": "إضافة relay",
+    "relays": "مُرحلات",
+    "add-relay": "إضافة مُرحلات",
     "deposit": {
       "title": "استلام",
       "cashu-description": "إيداع الأموال في دار السك أو استرداد رموز النقود الإلكترونية",
       "description": "إيداع الأموال في محفظتك",
-      "mint": "Mint",
+      "mint": "سكّ",
       "amount": "المبلغ",
       "confirm": "تأكيد",
       "success": "تم الإيداع بنجاح",
       "error": "تعذر الإيداع",
-      "receive-cash": "Ecash",
+      "receive-cash": "النقد الإلكتروني",
       "mint-error": "أنت لا تقبل النقود الإلكترونية من دار السك هذه",
       "redeem": "استرداد",
       "redeem-error": "تعذّر استرداد النقود الإلكترونية",
@@ -555,13 +555,13 @@
     "trigger": "إكرامية",
     "action": "إكرامية",
     "dialog": {
-      "title": "Zap {{ name }}",
+      "title": "تحويل {{ name }}",
       "description": "إرسال إكرامية إلى {{ name }}",
       "amount": "المبلغ",
       "invoice": "الفاتورة",
       "message": "الرسالة",
       "message-placeholder": "إضافة رسالة",
-      "tip": "Zap {{ amount }}",
+      "tip": "تحويل {{ amount }}",
       "copy": "نسخ الفاتورة",
       "wallet": "فتح في المحفظة",
       "wallet-error": "تعذر فتح المحفظة",
@@ -592,12 +592,12 @@
     "wallet": {
       "title": "محافظ",
       "settings": "الإعدادات",
-      "mints": "Mints",
+      "mints": "سكوك",
       "enable": "تفعيل",
       "enabled": "مفعّل",
       "enable-success": "المحفظة مفعلة",
       "enable-error": "تعذر تفعيل المحفظة",
-      "relays": "Relays",
+      "relays": "مُرحلات",
       "default-wallet": {
         "title": "المحفظة النشطة",
         "none": "لم يتم اختيار محفظة"
@@ -615,7 +615,7 @@
         "default": "افتراضي",
         "make-default": "تعيين كافتراضي",
         "delete": "حذف",
-        "delete-error": "فشل في حذف المحفظة",
+        "delete-error": "تعذر حذف المحفظة",
         "delete-success": "تم حذف المحفظة",
         "create-error": "تعذر إنشاء المحفظة",
         "create-success": "تم إنشاء المحفظة",
@@ -629,7 +629,7 @@
       "title": "الوسائط"
     },
     "relays": {
-      "title": "Relays"
+      "title": "مُرحلات"
     }
   },
   "nutzaps": {
@@ -637,7 +637,7 @@
     "title": "تحويلات",
     "redeemed": "تم استرداده",
     "failed": "فشل",
-    "log-in": "قم بتسجيل الدخول لرؤية zaps الخاص بك",
+    "log-in": "أدخل لرؤية التحويلات الخاص بك",
     "invalid": "تحويل غير صالح",
     "redeem": "استرداد",
     "redeem-success": "تم استرداده {{ amount }} تحويل",
