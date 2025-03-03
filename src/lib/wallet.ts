@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { decode } from "light-bolt11-decoder";
+import { cache } from "@/lib/db";
 import { useQuery } from "@tanstack/react-query";
 import {
   queryClient,
@@ -106,6 +107,28 @@ export function useChachiWallet() {
       return () => wallet?.stop();
     }
   }, [cashu, cashuWallet, pubkey]);
+
+  useEffect(() => {
+    async function syncWallet() {
+      if (!cashuWallet) return;
+      const unpublished = await cache.getUnpublishedEvents();
+      const unpublishedTokens = unpublished.filter(
+        (e) => e.event.kind === NDKKind.CashuToken,
+      );
+      for (const token of unpublishedTokens) {
+        const { event } = token;
+        const ev = new NDKEvent(ndk, event.rawEvent());
+        try {
+          await ev.publish(cashuWallet.relaySet);
+          cache.discardUnpublishedEvent(token.event.id);
+        } catch (err) {
+          console.debug("[cashu] Can't publish token", ev.rawEvent(), mintList);
+          console.error(err);
+        }
+      }
+    }
+    syncWallet();
+  }, [cashuWallet]);
 }
 
 export function useNDKWallet(): [
@@ -525,6 +548,10 @@ export async function createCashuWallet(
       return keys;
     };
     w.start();
+    w.on("ready", () => {
+      console.log("[cashu] wallet ready, checking proofs");
+      w.checkProofs();
+    });
     resolve(w);
   });
 }

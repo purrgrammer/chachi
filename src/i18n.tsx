@@ -9,7 +9,15 @@ import deTranslations from "../public/locales/de-DE/common.json";
 import arTranslations from "../public/locales/ar-SA/common.json";
 import nlTranslations from "../public/locales/nl-NL/common.json";
 
-export type Language = "en" | "es" | "zh-CN" | "zh-TW" | "sv-SE" | "de-DE" | "ar-SA" | "nl-NL";
+export type Language =
+  | "en"
+  | "es"
+  | "zh-CN"
+  | "zh-TW"
+  | "sv-SE"
+  | "de-DE"
+  | "ar-SA"
+  | "nl-NL";
 
 export const languages = [
   "en",
@@ -65,8 +73,8 @@ i18n.use(initReactI18next).init({
       translations: arTranslations,
     },
     "nl-NL": {
-	    translations: nlTranslations,
-    }
+      translations: nlTranslations,
+    },
   },
   ns: ["translations"],
   defaultNS: "translations",
