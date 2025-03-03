@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import { decode } from "light-bolt11-decoder";
-import { cache } from "@/lib/db";
 import { useQuery } from "@tanstack/react-query";
 import {
   queryClient,
@@ -14,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import { NostrEvent } from "nostr-tools";
 import NDK, {
+  NDKCashuToken,
   NDKUser,
   NDKKind,
   NDKEvent,
@@ -115,40 +115,47 @@ export function useChachiWallet() {
 
   useEffect(() => {
     async function syncWallet() {
-      if (!cashuWallet) return;
-      const unpublished = await cache.getUnpublishedEvents();
-      const unpublishedTokens = unpublished.filter(
-        (e) => e.event.kind === NDKKind.CashuToken,
+      if (!cashuWallet || !pubkey) return;
+
+      const filter = {
+        kinds: [NDKKind.CashuToken],
+        authors: [pubkey],
+      };
+      const unpublished = Array.from(
+        await ndk.fetchEvents(
+          filter,
+          {
+            groupable: false,
+            closeOnEose: true,
+            subId: "cashu-wallet",
+          },
+          cashuWallet.relaySet,
+        ),
       );
-      for (const token of unpublishedTokens) {
-        const { event } = token;
-        const ev = new NDKEvent(ndk, event.rawEvent());
-        try {
-          await ev.publish(cashuWallet.relaySet);
-          cache.discardUnpublishedEvent(event.id);
-        } catch (err) {
-          console.debug("[cashu] Can't publish token", ev.rawEvent(), mintList);
-          console.error(err);
-        }
-      }
-      const unpublishedNutzaps = unpublished.filter(
-        (e) => e.event.kind === NDKKind.Nutzap,
+      const tokens = await Promise.all(
+        unpublished.map((e) => NDKCashuToken.from(e)),
       );
-      for (const nutzap of unpublishedNutzaps) {
-        const { event, relays } = nutzap;
-        const relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
-        const ev = new NDKEvent(ndk, event.rawEvent());
-        try {
-          await ev.publish(relaySet);
-          cache.discardUnpublishedEvent(event.id);
-        } catch (err) {
-          console.debug("[cashu] Can't publish nutzap", ev.rawEvent());
-          console.error(err);
+      const validTokens = tokens.filter((t) => t instanceof NDKCashuToken);
+      for (const token of validTokens) {
+        if (!token?.id) {
+          continue;
         }
+        if (cashuWallet.state.tokens.has(token.id)) {
+          continue;
+        }
+
+        for (const deletedTokenId of token.deletedTokens) {
+          cashuWallet.state.removeTokenId(deletedTokenId);
+        }
+
+        cashuWallet.state.addToken(token);
       }
+      const now = Date.now();
+      cashuWallet.checkProofs();
+      cashuWallet.start({ since: now });
     }
     syncWallet();
-  }, [cashuWallet]);
+  }, [pubkey, cashuWallet]);
 }
 
 export function useNDKWallet(): [
@@ -567,12 +574,6 @@ export async function createCashuWallet(
       const keys = await fetchMintKeys(mint);
       return keys;
     };
-    w.start();
-    w.on("ready", () => {
-      // fixme: this never gets called for some reason
-      console.log("[cashu] wallet ready, checking proofs");
-      w.checkProofs();
-    });
     resolve(w);
   });
 }
