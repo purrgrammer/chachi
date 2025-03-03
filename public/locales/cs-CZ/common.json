@@ -1,673 +1,673 @@
 {
   "locale": {
-    "today": "Today"
+    "today": "Dnes"
   },
-  "home": "Home",
+  "home": "Domů",
   "nav": {
-    "no-groups": "No groups"
+    "no-groups": "Žádné skupiny"
   },
   "user": {
-    "donate": "Donate",
-    "thank-you": "Thank you for your donation 💜",
-    "support-chachi": "Donate to Chachi",
-    "support-chachi-description": "Chachi is a free and open source project. Your donation helps keep the project alive and supports the development of new features.",
+    "donate": "Přispět",
+    "thank-you": "Děkujeme za váš příspěvek 💜",
+    "support-chachi": "Podpořit Chachi",
+    "support-chachi-description": "Chachi je bezplatný a open-source projekt. Váš dar pomáhá udržet projekt naživu a podporuje vývoj nových funkcí.",
     "login": {
-      "start": "Get started",
-      "title": "Get started",
-      "description": "Select the login method below.",
+      "start": "Začít",
+      "title": "Začít",
+      "description": "Vyberte metodu přihlášení níže.",
       "extension": {
-        "label": "Browser extension",
-        "error": "Failed to log in with extension"
+        "label": "Rozšíření prohlížeče",
+        "error": "Nepodařilo se přihlásit pomocí rozšíření"
       },
       "remote": {
-        "label": "Remote signer",
-        "error": "Failed to log in with remote signer"
+        "label": "Vzdálený podepisovač",
+        "error": "Nepodařilo se přihlásit pomocí vzdáleného podepisovače"
       },
-      "or": "OR",
-      "connect": "Connect"
+      "or": "NEBO",
+      "connect": "Připojit"
     },
-    "logout": "Log out",
-    "zaps": "Zaps",
-    "language": "Language",
+    "logout": "Odhlásit se",
+    "zaps": "Zapy",
+    "language": "Jazyk",
     "theme": {
-      "trigger": "Theme",
-      "light": "Light",
-      "dark": "Dark",
-      "system": "System"
+      "trigger": "Motiv",
+      "light": "Světlý",
+      "dark": "Tmavý",
+      "system": "Systémový"
     },
-    "settings": "Settings"
+    "settings": "Nastavení"
   },
   "dashboard": {
     "activity": {
-      "heading": "Activity",
-      "unread": "unread",
-      "mentions": "mentions",
-      "none": "Nothing new for you... yet"
+      "heading": "Aktivita",
+      "unread": "nepřečtené",
+      "mentions": "zmínění",
+      "none": "Zatím nic nového..."
     },
     "featured": {
-      "heading": "Featured"
+      "heading": "Doporučené"
     },
     "popular": {
-      "heading": "Popular in your network"
+      "heading": "Oblíbené ve vaší síti"
     },
     "search": {
-      "prompt": "Can't find what you're looking for?",
-      "trigger": "Search groups",
-      "title": "Find a group",
+      "prompt": "Nemůžete najít to, co hledáte?",
+      "trigger": "Hledat skupiny",
+      "title": "Najít skupinu",
       "input": {
-        "placeholder": "Search groups",
-        "no-results-for-x": "No results for \"{{search}}\"",
-        "n-results-for-x": "{{n}} results for \"{{search}}\"",
-        "start-typing-to-filter-groups": "Start typing to filter groups"
+        "placeholder": "Hledat skupiny",
+        "no-results-for-x": "Žádné výsledky pro \"{{search}}\"",
+        "n-results-for-x": "{{n}} výsledků pro \"{{search}}\"",
+        "start-typing-to-filter-groups": "Začněte psát pro filtrování skupin"
       },
       "result": {
-        "visit": "Visit",
-        "no-description-available": "No description available",
-        "no-groups-found-for-x-want-to": "No groups found for \"{{search}}\", want to ",
-        "start-one": "start one",
+        "visit": "Navštívit",
+        "no-description-available": "Popis není k dispozici",
+        "no-groups-found-for-x-want-to": "Žádné skupiny nalezeny pro \"{{search}}\", chcete ",
+        "start-one": "vytvořit novou",
         "?": "?"
       }
     }
   },
   "group": {
     "hosted": {
-      "by": "Hosted by ",
-      "and": " and "
+      "by": "Hostuje ",
+      "and": " a "
     },
     "create": {
-      "new": "New group",
-      "title": "Create group",
-      "description": "Create a new group to chat with your friends",
+      "new": "Nová skupina",
+      "title": "Vytvořit skupinu",
+      "description": "Vytvořte novou skupinu pro chatování s přáteli",
       "form": {
         "name": {
-          "label": "Name",
-          "placeholder": "This is the group's name.",
-          "required": "Please add a name"
+          "label": "Název",
+          "placeholder": "Toto je název skupiny.",
+          "required": "Prosím, přidejte název"
         },
         "about": {
-          "label": "About",
-          "placeholder": "This is the group's description."
+          "label": "O skupině",
+          "placeholder": "Toto je popis skupiny."
         },
         "relay": {
-          "label": "Relay",
-          "placeholder": "Choose a relay.",
-          "description": "This is the server where the posts will be stored.",
-          "required": "Please select a relay"
+          "label": "Relé",
+          "placeholder": "Vyberte relé.",
+          "description": "Toto je server, kde budou příspěvky uloženy.",
+          "required": "Prosím, vyberte relé"
         },
         "visibility": {
-          "label": "Visibility",
-          "anyone": "Anyone",
-          "members-only": "Members only",
-          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+          "label": "Viditelnost",
+          "anyone": "Kdokoliv",
+          "members-only": "Pouze členové",
+          "description": "Zprávy nejsou šifrovány a mohou být čteny relé servery. Pro maximální soukromí hostujte vlastní relé."
         },
         "access": {
-          "label": "Access",
-          "anyone": "Anyone",
-          "invite-only": "Invite only"
+          "label": "Přístup",
+          "anyone": "Kdokoliv",
+          "invite-only": "Pouze na pozvání"
         },
         "submit": {
-          "trigger": "Create",
-          "success": "Group created",
-          "error": "Couldn't create group"
+          "trigger": "Vytvořit",
+          "success": "Skupina vytvořena",
+          "error": "Nepodařilo se vytvořit skupinu"
         }
       }
     },
     "edit": {
-      "title": "Group settings",
+      "title": "Nastavení skupiny",
       "form": {
         "name": {
-          "label": "Name",
-          "placeholder": "My Group",
-          "description": "This is the group's name"
+          "label": "Název",
+          "placeholder": "Moje skupina",
+          "description": "Toto je název skupiny"
         },
         "about": {
-          "label": "About",
-          "placeholder": "A group for my frens",
-          "description": "This is the group's description"
+          "label": "O skupině",
+          "placeholder": "Skupina pro mé přátele",
+          "description": "Toto je popis skupiny"
         },
         "visibility": {
-          "label": "Visibility",
-          "anyone": "Anyone",
-          "members-only": "Members only",
-          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+          "label": "Viditelnost",
+          "anyone": "Kdokoliv",
+          "members-only": "Pouze členové",
+          "description": "Zprávy nejsou šifrovány a mohou být čteny relé servery. Pro maximální soukromí hostujte vlastní relé."
         },
         "access": {
-          "label": "Access",
-          "anyone": "Anyone",
-          "invite-only": "Invite only",
-          "description": "Anyone can join an open group. Closed groups require approval"
+          "label": "Přístup",
+          "anyone": "Kdokoliv",
+          "invite-only": "Pouze na pozvání",
+          "description": "Kdokoliv se může připojit k otevřené skupině. Uzavřené skupiny vyžadují schválení"
         },
         "submit": {
-          "trigger": "Save",
-          "success": "Group updated",
-          "error": "Couldn't update group"
+          "trigger": "Uložit",
+          "success": "Skupina aktualizována",
+          "error": "Nepodařilo se aktualizovat skupinu"
         }
       }
     },
     "delete": {
-      "trigger": "Delete",
+      "trigger": "Smazat",
       "confirmation": {
-        "title": "Are you sure you want to delete the group?",
-        "description": "This action cannot be undone. This group and all its history will be deleted.",
-        "confirm": "Delete",
-        "cancel": "Cancel"
+        "title": "Opravdu chcete smazat tuto skupinu?",
+        "description": "Tato akce je nevratná. Tato skupina a celá její historie budou smazány.",
+        "confirm": "Smazat",
+        "cancel": "Zrušit"
       },
-      "success": "Group deleted",
-      "error": "Couldn't delete group"
+      "success": "Skupina smazána",
+      "error": "Nepodařilo se smazat skupinu"
     },
-    "deleted": "This group has been deleted",
+    "deleted": "Tato skupina byla smazána",
     "bookmark": {
-      "trigger": "Bookmark",
-      "error": "Error bookmarking group"
+      "trigger": "Přidat do záložek",
+      "error": "Chyba při přidávání do záložek"
     },
     "unbookmark": {
-      "trigger": "Unbookmark",
-      "error": "Error unbookmarking group"
+      "trigger": "Odebrat ze záložek",
+      "error": "Chyba při odebírání ze záložek"
     },
-    "join": "Join",
+    "join": "Připojit se",
     "leave": {
-      "trigger": "Leave",
+      "trigger": "Opustit",
       "confirmation": {
-        "title": "Are you sure you want to leave?",
-        "description": "This action cannot be undone. You will be removed from the group members list.",
-        "confirm": "Leave",
-        "cancel": "Cancel"
+        "title": "Opravdu chcete opustit skupinu?",
+        "description": "Tato akce je nevratná. Budete odstraněni ze seznamu členů skupiny.",
+        "confirm": "Opustit",
+        "cancel": "Zrušit"
       },
-      "success": "Left group",
-      "error": "Error leaving group"
+      "success": "Skupina opuštěna",
+      "error": "Chyba při opouštění skupiny"
     },
     "chat": {
       "user": {
-        "joined": "joined",
-        "left": "left"
+        "joined": "se připojil(a)",
+        "left": "opustil(a)"
       },
       "event": {
         "delete": {
-          "success": "Message deleted",
-          "error": "Couldn't delete message"
+          "success": "Zpráva smazána",
+          "error": "Nepodařilo se smazat zprávu"
         }
       }
     },
     "metadata": {
       "visibility": {
         "private": {
-          "trigger": "Members only",
-          "content": "Only members can read content"
+          "trigger": "Pouze členové",
+          "content": "Pouze členové mohou číst obsah"
         },
         "public": {
-          "trigger": "Public",
-          "content": "Can be read by anyone"
+          "trigger": "Veřejné",
+          "content": "Může číst kdokoliv"
         }
       },
       "access": {
         "closed": {
-          "trigger": "Closed",
-          "content": "Requires approval or an invitation to join"
+          "trigger": "Uzavřené",
+          "content": "Vyžaduje schválení nebo pozvání k připojení"
         },
         "open": {
-          "trigger": "Open",
-          "content": "Anyone can join"
+          "trigger": "Otevřené",
+          "content": "Kdokoliv se může připojit"
         }
       },
-      "join-the-conversation": "Join the conversation"
+      "join-the-conversation": "Připojte se k diskuzi"
     },
     "info": {
       "admin": "Admin",
-      "admins": "Admins ({{adminsLength}})",
-      "members": "Members ({{membersLength}})",
-      "no-members": "No members"
+      "admins": "Admini ({{adminsLength}})",
+      "members": "Členové ({{membersLength}})",
+      "no-members": "Žádní členové"
     }
   },
   "chat": {
     "message": {
-      "loading": "Loading message...",
+      "loading": "Načítání zprávy...",
       "tip": {
         "action": "Zap"
       },
       "copy": {
-        "action": "Copy",
-        "success": "Copied to clipboard",
-        "error": "Can't copy to clipboard"
+        "action": "Kopírovat",
+        "success": "Zkopírováno do schránky",
+        "error": "Nelze zkopírovat do schránky"
       },
       "redeem": {
-        "action": "Redeem",
-        "failed": "Failed",
-        "redeemed": "Redeemed"
+        "action": "Uplatnit",
+        "failed": "Selhalo",
+        "redeemed": "Uplatněno"
       },
       "zap": {
         "action": "Zap"
       },
       "react": {
-        "action": "React",
-        "with": "Reacted with ",
-        "error": "Can't react"
+        "action": "Reagovat",
+        "with": "Reagoval(a) s ",
+        "error": "Nelze reagovat"
       },
       "reply": {
-        "action": "Reply",
-        "error": "Couldn't reply"
+        "action": "Odpovědět",
+        "error": "Nelze odpovědět"
       },
       "forward": {
-        "action": "Forward",
-        "forwarded": "forwarded from"
+        "action": "Přeposlat",
+        "forwarded": "přeposláno od"
       },
       "delete": {
-        "action": "Delete"
+        "action": "Smazat"
       },
-      "deleted": "Message deleted",
-      "save-as-last-seen": "Save as last seen"
+      "deleted": "Zpráva smazána",
+      "save-as-last-seen": "Uložit jako poslední zobrazené"
     },
-    "new-messages": "New messages",
+    "new-messages": "Nové zprávy",
     "user": {
-      "not-member": "You are not a member of this group yet",
+      "not-member": "Zatím nejste členem této skupiny",
       "kick": {
-        "action": "Kick",
-        "success": "Kicked user",
-        "error": "Couldn't kick user"
+        "action": "Vykopnout",
+        "success": "Uživatel vykopnut",
+        "error": "Nelze vykopnout uživatele"
       }
     },
     "join": {
-      "action": "Join",
+      "action": "Připojit se",
       "request": {
-        "sent": "Request sent",
-        "success": "Join request sent",
-        "error": "Failed to send join request"
+        "sent": "Žádost odeslána",
+        "success": "Žádost o připojení odeslána",
+        "error": "Nepodařilo se odeslat žádost o připojení"
       }
     },
-    "debug": "Debug"
+    "debug": "Ladění"
   },
   "join": {
     "request": {
       "send": {
-        "success": "Join request sent",
-        "error": "Failed to send join request"
+        "success": "Žádost o připojení odeslána",
+        "error": "Nepodařilo se odeslat žádost o připojení"
       },
       "accept": {
-        "action": "Accept",
-        "success": "User added to group",
-        "error": "Couldn't add user to group"
+        "action": "Přijmout",
+        "success": "Uživatel přidán do skupiny",
+        "error": "Nepodařilo se přidat uživatele do skupiny"
       },
       "reject": {
-        "action": "Reject",
-        "success": "User join request rejected",
-        "error": "Couldn't reject user from group"
+        "action": "Odmítnout",
+        "success": "Žádost o připojení odmítnuta",
+        "error": "Nepodařilo se odmítnout uživatele ze skupiny"
       }
     },
     "requests": {
-      "n": "Join requests ({{requestsLength}})",
-      "none": "No join requests... yet"
+      "n": "Žádosti o připojení ({{requestsLength}})",
+      "none": "Zatím žádné žádosti o připojení"
     }
   },
   "gif": {
-    "search": "Search GIF",
-    "tenor": "Search Tenor",
-    "error": "Error searching GIFs"
+    "search": "Hledat GIF",
+    "tenor": "Hledat na Tenoru",
+    "error": "Chyba při hledání GIFů"
   },
   "file": {
     "upload": {
-      "error": "Couldn't upload file"
+      "error": "Nepodařilo se nahrát soubor"
     }
   },
   "image": {
-    "new": "New image",
-    "post": "Post an image",
+    "new": "Nový obrázek",
+    "post": "Přidat obrázek",
     "title": {
-      "label": "Title",
-      "placeholder": "Add a title"
+      "label": "Název",
+      "placeholder": "Přidejte název"
     },
     "publish": {
-      "success": "Image posted",
-      "error": "Failed to post image"
+      "success": "Obrázek přidán",
+      "error": "Nepodařilo se přidat obrázek"
     },
     "description": {
-      "label": "Description",
-      "placeholder": "Add a description"
+      "label": "Popis",
+      "placeholder": "Přidejte popis"
     }
   },
   "copy": {
-    "success": "Copied",
-    "error": "Couldn't copy"
+    "success": "Zkopírováno",
+    "error": "Nelze zkopírovat"
   },
   "content": {
-    "prompt": "What do you want to create?",
-    "create": "Create",
+    "prompt": "Co chcete vytvořit?",
+    "create": "Vytvořit",
     "type": {
       "chat": "Chat",
-      "post": "Post",
-      "posts": "Posts",
-      "poll": "Poll",
-      "polls": "Polls",
+      "post": "Příspěvek",
+      "posts": "Příspěvky",
+      "poll": "Anketa",
+      "polls": "Ankety",
       "video": "Video",
-      "videos": "Videos",
-      "image": "Image",
-      "images": "Images"
+      "videos": "Videa",
+      "image": "Obrázek",
+      "images": "Obrázky"
     }
   },
   "post": {
-    "new": "New",
-    "action": "Post",
-    "placeholder": "What's on your mind?",
-    "success": "Posted",
-    "error": "Couldn't post",
+    "new": "Nový",
+    "action": "Přidat příspěvek",
+    "placeholder": "Co máte na mysli?",
+    "success": "Příspěvek přidán",
+    "error": "Nepodařilo se přidat příspěvek",
     "delete": {
-      "success": "Post deleted",
-      "error": "Couldn't delete post"
+      "success": "Příspěvek smazán",
+      "error": "Nepodařilo se smazat příspěvek"
     },
-    "start": "Start a conversation"
+    "start": "Začněte konverzaci"
   },
   "poll": {
-    "start": "Start a poll",
+    "start": "Spustit anketu",
     "create": {
-      "action": "Create poll",
-      "success": "Poll created",
-      "error": "Couldn't create poll"
+      "action": "Vytvořit anketu",
+      "success": "Anketa vytvořena",
+      "error": "Nepodařilo se vytvořit anketu"
     },
-    "new": "New poll",
-    "question": "Question",
+    "new": "Nová anketa",
+    "question": "Otázka",
     "expiration": {
-      "label": "Expiration",
-      "date": "Expiry date",
-      "check": "Expiry date must be in the future"
+      "label": "Platnost",
+      "date": "Datum ukončení",
+      "check": "Datum ukončení musí být v budoucnosti"
     },
-    "options": "Options",
-    "multiple-choices": "Multiple choices",
-    "closed": "Poll closed",
-    "ends": "Ends "
+    "options": "Možnosti",
+    "multiple-choices": "Více možností",
+    "closed": "Anketa uzavřena",
+    "ends": "Končí "
   },
   "vote": {
-    "action": "Vote",
-    "success": "Vote cast",
-    "error": "Couldn't cast vote"
+    "action": "Hlasovat",
+    "success": "Hlas zaznamenán",
+    "error": "Nelze odeslat hlas"
   },
   "video": {
-    "post": "Post a video",
-    "upload": "Upload",
-    "record": "Record",
+    "post": "Přidat video",
+    "upload": "Nahrát",
+    "record": "Nahrát video",
     "publish": {
-      "success": "Video posted",
-      "error": "Failed to post video"
+      "success": "Video přidáno",
+      "error": "Nepodařilo se přidat video"
     },
-    "new": "New video",
+    "new": "Nové video",
     "title": {
-      "label": "Title",
-      "placeholder": "Add a title"
+      "label": "Název",
+      "placeholder": "Přidejte název"
     },
     "description": {
-      "label": "Description",
-      "placeholder": "Add a description"
+      "label": "Popis",
+      "placeholder": "Přidejte popis"
     }
   },
   "emoji": {
     "set": {
       "bookmark": {
-        "error": "Failed to bookmark emoji set"
+        "error": "Nepodařilo se uložit sadu emoji"
       }
     }
   },
-  "peer": " peer",
-  "peers": " peers",
-  "message": "Message",
-  "write-a-message": "Write a message...",
+  "peer": " partner",
+  "peers": " partnery",
+  "message": "Zpráva",
+  "write-a-message": "Napište zprávu...",
   "send": {
-    "login-required": "Log in to send message",
-    "error": "Failed to send message"
+    "login-required": "Přihlaste se pro odeslání zprávy",
+    "error": "Nepodařilo se odeslat zprávu"
   },
   "event": {
-    "content": "Content",
-    "replies": "Replies",
-    "details": "Details",
-    "loading": "Loading event",
-    "not-found": "Event not found",
-    "fetch-error": "Error fetching event"
+    "content": "Obsah",
+    "replies": "Odpovědi",
+    "details": "Podrobnosti",
+    "loading": "Načítání události",
+    "not-found": "Událost nenalezena",
+    "fetch-error": "Chyba při načítání události"
   },
   "events": {
-    "loading": "Loading events",
-    "none": "Nothing to see here... yet"
+    "loading": "Načítání událostí",
+    "none": "Zatím zde nic není k vidění..."
   },
   "share": {
-    "success": "Shared",
-    "error": "Couldn't share post",
-    "publication": "Share publication",
+    "success": "Sdíleno",
+    "error": "Nepodařilo se sdílet příspěvek",
+    "publication": "Sdílet publikaci",
     "this": {
-      "publication": "Share this publication",
-      "in": "Share this publication in {{groupName}}"
+      "publication": "Sdílet tuto publikaci",
+      "in": "Sdílet tuto publikaci ve skupině {{groupName}}"
     },
     "in": {
-      "group": "Share in",
-      "x": "Share in {{groupName}} chat",
-      "chat": "Share in chat"
+      "group": "Sdílet ve",
+      "x": "Sdílet v chatu {{groupName}}",
+      "chat": "Sdílet v chatu"
     }
   },
-  "share-in": "Share in ",
-  "action-open": "Open",
+  "share-in": "Sdílet v ",
+  "action-open": "Otevřít",
   "action-zap": "Zap",
   "media": {
-    "reveal": "Reveal"
+    "reveal": "Zobrazit"
   },
   "header": {
-    "public": "Public",
-    "unknown": "Unknown"
+    "public": "Veřejné",
+    "unknown": "Neznámé"
   },
   "book": {
-    "by": "by {{ author }}",
+    "by": "od {{ author }}",
     "current-chapter": "{{ chapter }} / {{ total }}"
   },
   "goal": {
-    "expires-in": "Expires in",
-    "expired": "Goal expired",
-    "leaderboard": "Leaderboard"
+    "expires-in": "Vyprší za",
+    "expired": "Cíl vypršel",
+    "leaderboard": "Žebříček"
   },
   "wallet": {
-    "title": "Incoming payment",
-    "keys": "Keys",
-    "sync": "Sync",
-    "sync-success": "Ecash synced",
-    "sync-error": "Error syncing wallet",
-    "keys-description": "Your wallet keys, it's important to keep them safe and backed up",
-    "debit": "Payment",
-    "credit": "Payment",
-    "connect": "Connect",
-    "not-found": "Wallet not found",
-    "no-transactions": "No transactions found",
-    "no-coins": "No coins found",
-    "make-default": "Make default",
-    "choose-wallet": "Choose wallet",
-    "choose-wallet-placeholder": "Choose a wallet to pay with",
-    "make-default-error": "Failed to set wallet as default",
-    "make-default-success": "Wallet set as default",
-    "create": "Create wallet",
+    "title": "Příchozí platba",
+    "keys": "Klíče",
+    "sync": "Synchronizovat",
+    "sync-success": "Ecash synchronizován",
+    "sync-error": "Chyba při synchronizaci peněženky",
+    "keys-description": "Vaše klíče peněženky, je důležité je uchovat v bezpečí a zálohovat",
+    "debit": "Platba",
+    "credit": "Platba",
+    "connect": "Připojit",
+    "not-found": "Peněženka nenalezena",
+    "no-transactions": "Žádné transakce nenalezeny",
+    "no-coins": "Žádné mince nenalezeny",
+    "make-default": "Nastavit jako výchozí",
+    "choose-wallet": "Vybrat peněženku",
+    "choose-wallet-placeholder": "Vyberte peněženku k platbě",
+    "make-default-error": "Nepodařilo se nastavit peněženku jako výchozí",
+    "make-default-success": "Peněženka nastavena jako výchozí",
+    "create": "Vytvořit peněženku",
     "settings": {
-      "title": "Wallet settings",
-      "description": "Manage your wallet settings",
+      "title": "Nastavení peněženky",
+      "description": "Spravujte nastavení své peněženky",
       "create": {
-        "title": "Create wallet",
-        "description": "Create a wallet to start sending and receiving zaps"
+        "title": "Vytvořit peněženku",
+        "description": "Vytvořte si peněženku pro odesílání a přijímání zapů"
       }
     },
-    "save": "Save changes",
-    "saved": "Changes saved",
-    "save-error": "Failed to save changes",
-    "mints": "Mints",
-    "add-mint": "Add mint",
-    "relays": "Relays",
-    "add-relay": "Add relay",
+    "save": "Uložit změny",
+    "saved": "Změny uloženy",
+    "save-error": "Nepodařilo se uložit změny",
+    "mints": "Minty",
+    "add-mint": "Přidat mint",
+    "relays": "Relaye",
+    "add-relay": "Přidat relay",
     "deposit": {
-      "title": "Receive",
-      "cashu-description": "Deposit funds into a mint or redeem ecash tokens",
-      "description": "Deposit funds into your wallet",
+      "title": "Přijmout",
+      "cashu-description": "Vložit prostředky do mintu nebo uplatnit ecash tokeny",
+      "description": "Vložit prostředky do vaší peněženky",
       "mint": "Mint",
-      "amount": "Amount",
-      "confirm": "Confirm",
-      "success": "Deposit successful",
-      "error": "Failed to deposit",
+      "amount": "Částka",
+      "confirm": "Potvrdit",
+      "success": "Vklad úspěšný",
+      "error": "Nepodařilo se vložit prostředky",
       "receive-cash": "Ecash",
-      "mint-error": "You are not accepting ecash from this mint",
-      "redeem": "Redeem",
-      "redeem-error": "Failed to redeem ecash",
-      "redeem-success": "Ecash redeemed",
+      "mint-error": "Nepřijímáte ecash z tohoto mintu",
+      "redeem": "Uplatnit",
+      "redeem-error": "Nepodařilo se uplatnit ecash",
+      "redeem-success": "Ecash uplatněn",
       "from-wallet": "Choose a wallet to pay this invoice",
       "confirm-wallet": "Pay"
     },
     "withdraw": {
-      "title": "Send",
-      "description": "Pay a lightning invoice, send money to a profile or a lightning address",
-      "placeholder": "Lightning invoice, profile or address",
-      "to": "To",
-      "confirm": "Pay",
-      "error": "Failed to send",
-      "unrecognized-invoice": "Unrecognized invoice",
-      "to-wallet": "Choose a wallet to send to",
-      "choose-wallet": "Send to wallet",
-      "confirm-cash": "Send ecash",
-      "no-wallet": "No wallet selected",
-      "success": "Send successful",
-      "p2pk-success": "Sent {{ amount }} to {{ name }}",
-      "lud16-success": "Sent {{ amount }} to {{ lud16 }}",
-      "amount-success": "Sent {{ amount }}",
-      "message": "Message",
-      "message-placeholder": "Write an optional message",
-      "confirm-wallet": "Send"
+      "title": "Odeslat",
+      "description": "Zaplaťte lightning fakturu, pošlete peníze profilu nebo na lightning adresu",
+      "placeholder": "Lightning faktura, profil nebo adresa",
+      "to": "Komu",
+      "confirm": "Zaplatit",
+      "error": "Nepodařilo se odeslat",
+      "unrecognized-invoice": "Neznámá faktura",
+      "to-wallet": "Vyberte peněženku pro odeslání",
+      "choose-wallet": "Odeslat do peněženky",
+      "confirm-cash": "Odeslat ecash",
+      "no-wallet": "Žádná peněženka není vybrána",
+      "success": "Odeslání úspěšné",
+      "p2pk-success": "Odesláno {{ amount }} uživateli {{ name }}",
+      "lud16-success": "Odesláno {{ amount }} na adresu {{ lud16 }}",
+      "amount-success": "Odesláno {{ amount }}",
+      "message": "Zpráva",
+      "message-placeholder": "Napište volitelnou zprávu",
+      "confirm-wallet": "Odeslat"
     },
-    "mints-description": "Mints are the custodians of the funds. Withdraw your funds to your wallet regularly.",
-    "relays-description": "Relays where the wallet data is stored.",
-    "name": "Name",
-    "name-description": "A name for your wallet",
-    "ready": "Wallet `{{ name }}` ready",
+    "mints-description": "Minty jsou správci fondů. Pravidelně vybírejte své prostředky do peněženky.",
+    "relays-description": "Relaye, kde jsou uložena data peněženky.",
+    "name": "Název",
+    "name-description": "Název pro vaši peněženku",
+    "ready": "Peněženka `{{ name }}` připravena",
     "dialog": {
-      "title": "Connect wallet",
-      "description": "Connect your wallet to send tips and support your favorite creators",
-      "connect-webln": "Connect web wallet",
-      "webln-connected": "Connected to web wallet",
-      "webln-unavailable": "WebLN wallet not available",
-      "webln-error": "Failed to connect to WebLN wallet",
-      "connect-nip60": "Connect remote wallet",
-      "nwc-empty": "NWC address is empty",
-      "nwc-error": "Failed to connect to remote wallet",
-      "nwc-connected": "Connected to remote wallet"
+      "title": "Připojit peněženku",
+      "description": "Připojte svou peněženku pro posílání spropitného a podporu oblíbených tvůrců",
+      "connect-webln": "Připojit webovou peněženku",
+      "webln-connected": "Připojeno k webové peněžence",
+      "webln-unavailable": "WebLN peněženka není dostupná",
+      "webln-error": "Nepodařilo se připojit k WebLN peněžence",
+      "connect-nip60": "Připojit vzdálenou peněženku",
+      "nwc-empty": "Adresa NWC je prázdná",
+      "nwc-error": "Nepodařilo se připojit ke vzdálené peněžence",
+      "nwc-connected": "Připojeno ke vzdálené peněžence"
     },
-    "coins": "Cash",
+    "coins": "Hotovost",
     "transactions": {
-      "title": "Transactions",
-      "loading": "Loading transactions",
-      "loading-error": "Error loading transactions"
+      "title": "Transakce",
+      "loading": "Načítání transakcí",
+      "loading-error": "Chyba při načítání transakcí"
     }
   },
   "zap": {
-    "trigger": "Tip",
-    "action": "Tip",
+    "trigger": "Spropitné",
+    "action": "Spropitné",
     "dialog": {
       "title": "Zap {{ name }}",
-      "description": "Send a tip to {{ name }}",
-      "amount": "Amount",
-      "invoice": "Invoice",
-      "message": "Message",
-      "message-placeholder": "Add a message",
+      "description": "Pošlete spropitné {{ name }}",
+      "amount": "Částka",
+      "invoice": "Faktura",
+      "message": "Zpráva",
+      "message-placeholder": "Přidat zprávu",
       "tip": "Zap {{ amount }}",
-      "copy": "Copy invoice",
-      "wallet": "Open in wallet",
-      "wallet-error": "Couldn't open wallet",
-      "error": "Failed to zap",
-      "success": "Zapped {{ amount }} to {{ name }}"
+      "copy": "Kopírovat fakturu",
+      "wallet": "Otevřít v peněžence",
+      "wallet-error": "Nepodařilo se otevřít peněženku",
+      "error": "Nepodařilo se poslat zap",
+      "success": "Odesláno {{ amount }} uživateli {{ name }}"
     }
   },
   "ecash": {
-    "redeem": "Redeem",
-    "fee": "fee:"
+    "redeem": "Uplatnit",
+    "fee": "poplatek:"
   },
   "settings": {
-    "title": "Settings",
+    "title": "Nastavení",
     "ui": {
-      "title": "Appearance",
+      "title": "Vzhled",
       "language": {
-        "title": "Language",
-        "description": "Choose your preferred language"
+        "title": "Jazyk",
+        "description": "Vyberte preferovaný jazyk"
       },
       "theme": {
-        "title": "Theme",
-        "description": "Choose your preferred theme",
-        "light": "Light",
-        "dark": "Dark",
-        "system": "System"
+        "title": "Motiv",
+        "description": "Vyberte preferovaný motiv",
+        "light": "Světlý",
+        "dark": "Tmavý",
+        "system": "Systémový"
       }
     },
     "wallet": {
-      "title": "Wallets",
-      "settings": "Settings",
-      "mints": "Mints",
-      "enable": "Enable",
-      "enabled": "Enabled",
-      "enable-success": "Wallet enabled",
-      "enable-error": "Failed to enable wallet",
-      "relays": "Relays",
+      "title": "Peněženky",
+      "settings": "Nastavení",
+      "mints": "Minty",
+      "enable": "Povolit",
+      "enabled": "Povoleno",
+      "enable-success": "Peněženka povolena",
+      "enable-error": "Nepodařilo se povolit peněženku",
+      "relays": "Relaye",
       "default-wallet": {
-        "title": "Active wallet",
-        "none": "No wallet selected"
+        "title": "Aktivní peněženka",
+        "none": "Žádná peněženka není vybrána"
       },
       "payments": {
-        "title": "Payments",
-        "description": "Manage the mints and relays you'll use to receive payments"
+        "title": "Platby",
+        "description": "Spravujte minty a relaye, které budete používat k přijímání plateb"
       },
       "wallets": {
-        "title": "Wallets",
-        "none": "No wallets",
-        "remove": "Remove",
-        "description": "Manage your wallets",
-        "create": "Create wallet",
-        "default": "Default",
-        "make-default": "Make default",
-        "delete": "Delete",
-        "delete-error": "Failed to delete wallet",
-        "delete-success": "Wallet deleted",
-        "create-error": "Failed to create wallet",
-        "create-success": "Wallet created",
-        "sync": "Sync",
-        "synced": "Synced",
-        "sync-error": "Error syncing wallet",
-        "open": "Open"
+        "title": "Peněženky",
+        "none": "Žádné peněženky",
+        "remove": "Odstranit",
+        "description": "Spravujte své peněženky",
+        "create": "Vytvořit peněženku",
+        "default": "Výchozí",
+        "make-default": "Nastavit jako výchozí",
+        "delete": "Smazat",
+        "delete-error": "Nepodařilo se smazat peněženku",
+        "delete-success": "Peněženka smazána",
+        "create-error": "Nepodařilo se vytvořit peněženku",
+        "create-success": "Peněženka vytvořena",
+        "sync": "Synchronizovat",
+        "synced": "Synchronizováno",
+        "sync-error": "Chyba při synchronizaci peněženky",
+        "open": "Otevřít"
       }
     },
     "media": {
-      "title": "Media"
+      "title": "Média"
     },
     "relays": {
-      "title": "Relays"
+      "title": "Relaye"
     }
   },
   "nutzaps": {
-    "no-message": "No message",
-    "title": "Zaps",
-    "redeemed": "Redeemed",
-    "failed": "Failed",
-    "log-in": "Log in to see your zaps",
-    "invalid": "Invalid zap",
-    "redeem": "Redeem",
-    "redeem-success": "Redeemed {{ amount }} zap",
-    "redeem-error": "Failed to redeem zap",
-    "received": "Received",
-    "sent": "Sent",
-    "no-received": "Nothing to see here... yet",
-    "no-sent": "Nothing to see here... yet",
-    "open": "Open"
+    "no-message": "Žádná zpráva",
+    "title": "Zapy",
+    "redeemed": "Uplatněno",
+    "failed": "Neúspěšné",
+    "log-in": "Přihlaste se pro zobrazení svých zapů",
+    "invalid": "Neplatný zap",
+    "redeem": "Uplatnit",
+    "redeem-success": "Uplatněno {{ amount }} zap",
+    "redeem-error": "Nepodařilo se uplatnit zap",
+    "received": "Přijato",
+    "sent": "Odesláno",
+    "no-received": "Zatím zde nic není k vidění...",
+    "no-sent": "Zatím zde nic není k vidění...",
+    "open": "Otevřít"
   },
   "mint": {
-    "contact": "Contact",
-    "version": "Version",
-    "features": "Features",
+    "contact": "Kontakt",
+    "version": "Verze",
+    "features": "Funkce",
     "nuts": "Nuts",
     "sat": "Bitcoin",
     "eur": "Euro",
-    "usd": "US Dollar",
-    "currencies": "Currencies"
+    "usd": "Americký dolar",
+    "currencies": "Měny"
   },
   "ln": {
     "send": {
-      "title": "Send {{ amount }}",
-      "show-qr": "Show QR",
-      "hide-qr": "Hide QR"
+      "title": "Odeslat {{ amount }}",
+      "show-qr": "Zobrazit QR kód",
+      "hide-qr": "Skrýt QR kód"
     }
   },
   "qr": {
-    "scan": "Scan QR Code",
-    "scan-error": "Error scanning QR Code",
-    "unknown": "Unknown QR Code"
+    "scan": "Naskenovat QR kód",
+    "scan-error": "Chyba při skenování QR kódu",
+    "unknown": "Neznámý QR kód"
   }
 }
