@@ -500,9 +500,9 @@
       "success": "تم الإيداع بنجاح",
       "error": "تعذر الإيداع",
       "receive-cash": "Ecash",
-      "mint-error": "You are not accepting ecash from this mint",
-      "redeem": "Redeem",
-      "redeem-error": "Failed to redeem ecash",
+      "mint-error": "أنت لا تقبل النقود الإلكترونية من دار السك هذه",
+      "redeem": "استرداد",
+      "redeem-error": "تعذّر استرداد النقود الإلكترونية",
       "redeem-success": "Ecash redeemed",
       "from-wallet": "Choose a wallet to pay this invoice",
       "confirm-wallet": "دفع"
