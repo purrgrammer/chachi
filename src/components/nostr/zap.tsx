@@ -17,7 +17,7 @@ import { Emoji } from "@/components/emoji";
 import { Input } from "@/components/ui/input";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
 import { User } from "@/components/nostr/user";
-import { NDKKind } from "@nostr-dev-kit/ndk";
+import { NDKKind, NDKNutzap } from "@nostr-dev-kit/ndk";
 import { validateZap, Zap as ZapType } from "@/lib/nip-57";
 import { formatShortNumber } from "@/lib/number";
 import {
@@ -117,7 +117,7 @@ export function NewZapDialog({
     try {
       setIsZapping(true);
       if (zapType === "nip-57") {
-        await sendZap(message.trim(), Number(amount), [
+        const tags = [
           ...(event ? [["e", event.id]] : []),
           ...(group?.id && metadata && metadata.pubkey
             ? [["a", `${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`]]
@@ -125,7 +125,8 @@ export function NewZapDialog({
           ...customEmojis.flatMap((e) =>
             e.name && e.image ? [["emoji", e.name, e.image]] : [],
           ),
-        ]);
+        ];
+        await sendZap(message.trim(), Number(amount), tags);
         setIsZapping(false);
         onZap?.();
         toast.success(
@@ -135,24 +136,17 @@ export function NewZapDialog({
           }),
         );
       } else {
-        await sendNutzap(
-          message.trim(),
-          Number(amount),
-          [
-            ...(group ? [["h", group.id, group.relay]] : []),
-            ...(group && metadata?.pubkey
-              ? [
-                  [
-                    "a",
-                    `${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`,
-                  ],
-                ]
-              : []),
-            ...customEmojis.flatMap((e) =>
-              e.name && e.image ? [["emoji", e.name, e.image]] : [],
-            ),
-          ],
-          (nutzap) => {
+        const tags = [
+          ...(group ? [["h", group.id, group.relay]] : []),
+          ...(group && metadata?.pubkey
+            ? [["a", `${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`]]
+            : []),
+          ...customEmojis.flatMap((e) =>
+            e.name && e.image ? [["emoji", e.name, e.image]] : [],
+          ),
+        ];
+        await sendNutzap(message.trim(), Number(amount), tags, (nutzap) => {
+          if (nutzap instanceof NDKNutzap) {
             onOpenChange(false);
             onZap?.(nutzap.rawEvent() as NostrEvent);
             toast.success(
@@ -162,8 +156,8 @@ export function NewZapDialog({
                   profile?.name || profile?.display_name || pubkey.slice(0, 6),
               }),
             );
-          },
-        );
+          }
+        });
       }
       increaseZapAmount(Number(amount));
     } catch (err) {

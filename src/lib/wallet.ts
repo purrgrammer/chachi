@@ -35,6 +35,7 @@ import { cashuAtom } from "@/app/store";
 import { useRelays } from "@/lib/nostr";
 import { fetchMintInfo, fetchMintKeys } from "@/lib/cashu";
 import { useNutzapMonitor } from "@/lib/nutzaps";
+import { isRelayURL } from "@/lib/relay";
 
 export type ChachiWallet =
   | { type: "nip60" }
@@ -48,8 +49,6 @@ export const walletsAtom = atomWithStorage<ChachiWallet[]>(
   createJSONStorage<ChachiWallet[]>(() => localStorage),
   { getOnInit: true },
 );
-
-export const defaultMints = ["https://mint.0xchat.com"];
 
 export function useCashuWallet() {
   return useAtomValue(cashuWalletAtom);
@@ -90,7 +89,13 @@ export function useChachiWallet() {
   useEffect(() => {
     if (cashu && pubkey && !cashuWallet) {
       let wallet: NDKCashuWallet | undefined = undefined;
-      createCashuWallet(cashu, ndk, mintList ? mintList.relays : relays)
+      createCashuWallet(
+        cashu,
+        ndk,
+        mintList
+          ? mintList.relays.filter(isRelayURL)
+          : relays.filter(isRelayURL),
+      )
         .then((w) => {
           if (!w) {
             toast.error(t("wallet.sync-error"));
@@ -352,7 +357,7 @@ export function useCreateWallet() {
   const [, setWallets] = useAtom(walletsAtom);
   return async (mints: string[], relays: string[]) => {
     const wallet = new NDKCashuWallet(ndk);
-    wallet.mints = mints ? mints : defaultMints;
+    wallet.mints = mints;
     wallet.relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
     const p2pk = await wallet.getP2pk();
     const ev = new NDKEvent(ndk, {
@@ -564,6 +569,7 @@ export async function createCashuWallet(
     };
     w.start();
     w.on("ready", () => {
+      // fixme: this never gets called for some reason
       console.log("[cashu] wallet ready, checking proofs");
       w.checkProofs();
     });

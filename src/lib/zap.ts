@@ -12,7 +12,6 @@ import {
 } from "@nostr-dev-kit/ndk";
 import { useMintList } from "@/lib/cashu";
 import { useNDK } from "@/lib/ndk";
-import { defaultMints } from "@/lib/wallet";
 import { useRelaySet, useStream, useRelays } from "@/lib/nostr";
 import { NostrEvent } from "nostr-tools";
 import { LNURL } from "@/lib/query";
@@ -130,6 +129,15 @@ export function useNutzap(
       // todo: filter mint list for mints that can mitn tokens
       return new Promise(async (resolve, reject) => {
         try {
+          if (!mintList) {
+            reject("No mint list found");
+            return;
+          }
+          if (!mintList?.pubkey) {
+            reject("No P2PK pubkey found");
+            return;
+          }
+
           const zapped = event ? new NDKEvent(ndk, event) : null;
           const zapper = new Zapper(
             zapped ? zapped : new NDKUser({ pubkey }),
@@ -139,7 +147,7 @@ export function useNutzap(
               ndk,
               tags,
             },
-            { relays },
+            { relays, tags },
           );
           zapper.on("complete", (res) => {
             resolve(res);
@@ -152,9 +160,9 @@ export function useNutzap(
             {
               // @ts-expect-error: needed to override default comment
               paymentDescription: content,
-              relays: mintList?.relays || relays,
-              mints: mintList ? shuffle(mintList.mints) : defaultMints,
-              p2pk: mintList?.pubkey || pubkey,
+              relays: mintList.relays,
+              mints: shuffle(mintList.mints),
+              p2pk: mintList.pubkey,
               allowIntramintFallback: true,
             },
           );
@@ -186,7 +194,7 @@ export function useZap(pubkey: string, relays: string[], event?: NostrEvent) {
               ndk,
               tags,
             },
-            { relays },
+            { relays, tags },
           );
           zapper.on("complete", (res) => {
             resolve(res);
@@ -302,6 +310,7 @@ export function useZaps(event: NostrEvent, relays: string[], live = true) {
 
 interface ZapperConfig {
   relays: string[];
+  tags: string[][];
 }
 
 export class Zapper extends NDKZapper {
@@ -311,10 +320,11 @@ export class Zapper extends NDKZapper {
     target: NDKEvent | NDKUser,
     amount: number,
     options = {},
-    config: ZapperConfig = { relays: [] },
+    config: ZapperConfig = { relays: [], tags: [] },
   ) {
     super(target, amount, "msat", options);
     this.config = config;
+    this.tags = config.tags;
   }
 
   public async relays(): Promise<string[]> {

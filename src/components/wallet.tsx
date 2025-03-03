@@ -66,7 +66,6 @@ import {
 } from "@/lib/lnurl";
 import { useHost } from "@/lib/hooks";
 import {
-  defaultMints,
   useNDKWallet,
   useNDKWallets,
   useCashuWallet,
@@ -166,8 +165,8 @@ export function CreateWallet() {
   const [isOpen, setIsOpen] = useState(false);
   const [mint, setMint] = useState("");
   const [relay, setRelay] = useState("");
-  const [mints, setMints] = useState<string[]>(defaultMints);
-  const [selectedMints, setSelectedMints] = useState<string[]>(defaultMints);
+  const [mints, setMints] = useState<string[]>([]);
+  const [selectedMints, setSelectedMints] = useState<string[]>([]);
   const [relays, setRelays] = useState<string[]>(myRelays);
   const [selectedRelays, setSelectedRelays] = useState<string[]>(myRelays);
   const createWallet = useCreateWallet();

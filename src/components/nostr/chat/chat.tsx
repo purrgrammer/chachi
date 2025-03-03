@@ -456,7 +456,7 @@ export function ChatMessage({
                 kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
                 live={isInView}
               />
-              {showingZapDialog ? (
+              {showingZapDialog && group ? (
                 <NewZapDialog
                   open
                   event={event}
