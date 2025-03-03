@@ -583,7 +583,7 @@
       },
       "theme": {
         "title": "Theme",
-        "description": "Choose your preferred theme",
+        "description": "Επιλέξτε το επιθυμητό θέμα",
         "light": "Light",
         "dark": "Dark",
         "system": "System"
