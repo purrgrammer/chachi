@@ -159,7 +159,12 @@ export const emojiListAtom = atomWithStorage<EmojiList>(
   createJSONStorage<EmojiList>(() => localStorage),
   { getOnInit: true },
 );
-export const emojiSetsAtom = atom<EmojiSet[]>([]);
+export const emojiSetsAtom = atomWithStorage<EmojiSet[]>(
+  "emoji-sets",
+  [],
+  createJSONStorage<EmojiSet[]>(() => localStorage),
+  { getOnInit: true },
+);
 
 export function useResetState() {
   const [, setAccount] = useAtom(accountAtom);

@@ -17,7 +17,6 @@ export async function fetchCustomEmojis(
     filters,
     {
       closeOnEose: true,
-      groupable: false,
     },
     relaySet,
   );
