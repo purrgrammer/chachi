@@ -53,7 +53,7 @@ export function NewZapDialog({
   group,
   trigger,
   reply,
-  zapType = "nip-61",
+  zapType = "nip-57",
   title,
   description,
   defaultAmount = 21,
