@@ -6,8 +6,10 @@ import zhCNTranslations from "../public/locales/zh-CN/common.json";
 import zhTWTranslations from "../public/locales/zh-TW/common.json";
 import svTranslations from "../public/locales/sv-SE/common.json";
 import deTranslations from "../public/locales/de-DE/common.json";
+import arTranslations from "../public/locales/ar-SA/common.json";
+import nlTranslations from "../public/locales/nl-NL/common.json";
 
-export type Language = "en" | "es" | "zh-CN" | "zh-TW" | "sv-SE" | "de-DE";
+export type Language = "en" | "es" | "zh-CN" | "zh-TW" | "sv-SE" | "de-DE" | "ar-SA" | "nl-NL";
 
 export const languages = [
   "en",
@@ -16,6 +18,7 @@ export const languages = [
   "zh-TW",
   "sv-SE",
   "de-DE",
+  "ar-SA",
 ] as const;
 
 export function getLanguage(): Language {
@@ -31,6 +34,7 @@ export function changeLanguage(lang: Language) {
   i18n.changeLanguage(lang);
 }
 
+// todo: lazily load languages
 i18n.use(initReactI18next).init({
   fallbackLng: "en",
   lng: getLanguage(),
@@ -56,6 +60,12 @@ i18n.use(initReactI18next).init({
     "de-DE": {
       translations: deTranslations,
     },
+    "ar-SA": {
+      translations: arTranslations,
+    },
+    "nl-NL": {
+	    translations: nlTranslations,
+    }
   },
   ns: ["translations"],
   defaultNS: "translations",
