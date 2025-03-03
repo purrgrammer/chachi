@@ -19,6 +19,7 @@ export const languages = [
   "sv-SE",
   "de-DE",
   "ar-SA",
+  "nl-NL",
 ] as const;
 
 export function getLanguage(): Language {
