@@ -82,11 +82,11 @@
         "name": {
           "label": "Name",
           "placeholder": "This is the group's name.",
-          "required": "Please add a name"
+          "required": "Παρακαλώ προσθέστε ένα όνομα"
         },
         "about": {
           "label": "About",
-          "placeholder": "This is the group's description."
+          "placeholder": "Αυτή είναι η περιγραφή της ομάδας."
         },
         "relay": {
           "label": "Relay",
@@ -148,7 +148,7 @@
       "trigger": "Delete",
       "confirmation": {
         "title": "Are you sure you want to delete the group?",
-        "description": "This action cannot be undone. This group and all its history will be deleted.",
+        "description": "Αυτή η ενέργεια είναι οριστική. Η ομάδα και όλο της το ιστορικό θα διαγραφεί.",
         "confirm": "Delete",
         "cancel": "Cancel"
       },
@@ -170,11 +170,11 @@
       "confirmation": {
         "title": "Είστε σίγουρος ότι θέλετε να αποχωρήσετε;",
         "description": "This action cannot be undone. You will be removed from the group members list.",
-        "confirm": "Leave",
+        "confirm": "Αποχώρηση",
         "cancel": "Cancel"
       },
       "success": "Left group",
-      "error": "Error leaving group"
+      "error": "Σφάλμα αποχώρησης από την ομάδα"
     },
     "chat": {
       "user": {
@@ -258,7 +258,7 @@
     },
     "new-messages": "New messages",
     "user": {
-      "not-member": "You are not a member of this group yet",
+      "not-member": "Δεν είστε ακόμα μέλος αυτής της ομάδας",
       "kick": {
         "action": "Kick",
         "success": "Kicked user",
@@ -282,13 +282,13 @@
         "error": "Αποτυχία αποστολής αίτησης μέλους"
       },
       "accept": {
-        "action": "Accept",
+        "action": "Αποδοχή",
         "success": "User added to group",
         "error": "Couldn't add user to group"
       },
       "reject": {
         "action": "Reject",
-        "success": "User join request rejected",
+        "success": "Απορρίφθηκε το αίτημα ένταξης χρήστη",
         "error": "Couldn't reject user from group"
       }
     },
@@ -349,7 +349,7 @@
     "success": "Posted",
     "error": "Couldn't post",
     "delete": {
-      "success": "Post deleted",
+      "success": "Η δημοσίευση διαγράφηκε",
       "error": "Couldn't delete post"
     },
     "start": "Start a conversation"
@@ -370,7 +370,7 @@
     },
     "options": "Options",
     "multiple-choices": "Multiple choices",
-    "closed": "Poll closed",
+    "closed": "Η δημοσκόπηση έκλεισε",
     "ends": "Ends "
   },
   "vote": {
@@ -459,7 +459,7 @@
   "wallet": {
     "title": "Incoming payment",
     "keys": "Keys",
-    "sync": "Sync",
+    "sync": "Συγχρονισμός",
     "sync-success": "Ecash synced",
     "sync-error": "Error syncing wallet",
     "keys-description": "Your wallet keys, it's important to keep them safe and backed up",
@@ -516,9 +516,9 @@
       "error": "Failed to send",
       "unrecognized-invoice": "Unrecognized invoice",
       "to-wallet": "Επιλέξτε ένα πορτοφόλι για αποστολή",
-      "choose-wallet": "Send to wallet",
+      "choose-wallet": "Αποστολή σε πορτοφόλι",
       "confirm-cash": "Send ecash",
-      "no-wallet": "No wallet selected",
+      "no-wallet": "Δεν επιλέχθηκε πορτοφόλι",
       "success": "Send successful",
       "p2pk-success": "Sent {{ amount }} to {{ name }}",
       "lud16-success": "Sent {{ amount }} to {{ lud16 }}",
@@ -586,7 +586,7 @@
         "description": "Επιλέξτε το επιθυμητό θέμα",
         "light": "Light",
         "dark": "Dark",
-        "system": "System"
+        "system": "Σύστημα"
       }
     },
     "wallet": {
@@ -654,8 +654,8 @@
     "features": "Features",
     "nuts": "Nuts",
     "sat": "Bitcoin",
-    "eur": "Euro",
-    "usd": "US Dollar",
+    "eur": "Ευρώ",
+    "usd": "Δολάριο ΗΠΑ",
     "currencies": "Currencies"
   },
   "ln": {
