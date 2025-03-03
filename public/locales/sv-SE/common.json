@@ -7,6 +7,10 @@
     "no-groups": "Inga grupper"
   },
   "user": {
+    "donate": "Skänk",
+    "thank-you": "Tack för din gåva 💜",
+    "support-chachi": "Donera till Chachi",
+    "support-chachi-description": "Chachi är ett gratis projekt med öppen källkod. Din donation hjälper till att hålla projektet vid liv och stödjer utvecklingen av nya funktioner.",
     "login": {
       "start": "Kom igång",
       "title": "Kom igång",
