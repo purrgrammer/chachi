@@ -21,7 +21,7 @@
       },
       "remote": {
         "label": "Remote signer",
-        "error": "Failed to log in with remote signer"
+        "error": "Inloggen met remote signer mislukt"
       },
       "or": "OF",
       "connect": "Koppelen"
@@ -225,7 +225,7 @@
         "action": "Zappen"
       },
       "copy": {
-        "action": "Kopieer",
+        "action": "Kopiëren",
         "success": "Gekopieerd naar klembord",
         "error": "Kan niet naar klembord kopiëren"
       },
@@ -454,7 +454,7 @@
   "goal": {
     "expires-in": "Verloopt over",
     "expired": "Doel verlopen",
-    "leaderboard": "Leaderboard"
+    "leaderboard": "Ranglijst"
   },
   "wallet": {
     "title": "Inkomende betaling",
@@ -468,7 +468,7 @@
     "connect": "Verbinden",
     "not-found": "Wallet niet gevonden",
     "no-transactions": "Geen transacties gevonden",
-    "no-coins": "No coins found",
+    "no-coins": "Geen coins gevonden",
     "make-default": "Als standaard instellen",
     "choose-wallet": "Kies wallet",
     "choose-wallet-placeholder": "Kies een wallet om mee te betalen",
@@ -504,17 +504,17 @@
       "redeem": "Inwisselen",
       "redeem-error": "Kan ecash niet inwisselen",
       "redeem-success": "Ecash ingewisseld",
-      "from-wallet": "Choose a wallet to pay this invoice",
+      "from-wallet": "Kies een wallet om deze invoice te betalen",
       "confirm-wallet": "Betalen"
     },
     "withdraw": {
       "title": "Verzenden",
-      "description": "Pay a lightning invoice, send money to a profile or a lightning address",
-      "placeholder": "Lightning invoice, profile or address",
+      "description": "Betaal een lightning invoice, verzend geld naar een profiel of lightning adres",
+      "placeholder": "Lightning invoice, profiel of adres",
       "to": "Naar",
       "confirm": "Betalen",
       "error": "Verzenden mislukt",
-      "unrecognized-invoice": "Unrecognized invoice",
+      "unrecognized-invoice": "Onbekende invoice",
       "to-wallet": "Kies een wallet om naar te verzenden",
       "choose-wallet": "Verzenden naar wallet",
       "confirm-cash": "Ecash verzenden",
@@ -534,15 +534,15 @@
     "ready": "Wallet `{{ name }}` klaar",
     "dialog": {
       "title": "Wallet verbinden",
-      "description": "Connect your wallet to send tips and support your favorite creators",
+      "description": "Verbind je wallet om tips te verzenden en je favoriete creators te steunen",
       "connect-webln": "Webwallet verbinden",
       "webln-connected": "Verbonden met webwallet",
       "webln-unavailable": "WebLN wallet niet beschikbaar",
       "webln-error": "Kan geen verbinding maken met WebLN wallet",
-      "connect-nip60": "Connect remote wallet",
+      "connect-nip60": "Remote wallet verbinden",
       "nwc-empty": "NWC-adres is leeg",
-      "nwc-error": "Failed to connect to remote wallet",
-      "nwc-connected": "Connected to remote wallet"
+      "nwc-error": "Kan geen verbinding maken met remote wallet",
+      "nwc-connected": "Remote wallet verbonden"
     },
     "coins": "Cash",
     "transactions": {
@@ -562,7 +562,7 @@
       "message": "Bericht",
       "message-placeholder": "Voeg een bericht toe",
       "tip": "Zap {{ amount }}",
-      "copy": "Copy invoice",
+      "copy": "Invoice kopiëren",
       "wallet": "Openen in wallet",
       "wallet-error": "Kan wallet niet openen",
       "error": "Zappen mislukt",
