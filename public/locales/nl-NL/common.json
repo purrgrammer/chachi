@@ -10,11 +10,11 @@
     "donate": "Doneren",
     "thank-you": "Bedankt voor je donatie 💜",
     "support-chachi": "Doneren aan Chachi",
-    "support-chachi-description": "Chachi is a free and open source project. Your donation helps keep the project alive and supports the development of new features.",
+    "support-chachi-description": "Chachi is een vrij en open source project. Je donatie houdt het project in leven en ondersteunt de ontwikkeling van nieuwe functies.",
     "login": {
       "start": "Aan de slag",
       "title": "Aan de slag",
-      "description": "Select the login method below.",
+      "description": "Kies hieronder de inlogmethode.",
       "extension": {
         "label": "Browser extensie",
         "error": "Inloggen met extensie mislukt"
@@ -230,9 +230,9 @@
         "error": "Kan niet naar klembord kopiëren"
       },
       "redeem": {
-        "action": "Redeem",
+        "action": "Inwisselen",
         "failed": "Mislukt",
-        "redeemed": "Redeemed"
+        "redeemed": "Ingewisseld"
       },
       "zap": {
         "action": "Zappen"
@@ -300,7 +300,7 @@
   "gif": {
     "search": "Zoek GIF",
     "tenor": "Zoek Tenor",
-    "error": "Error searching GIFs"
+    "error": "Fout bij zoeken GIF's"
   },
   "file": {
     "upload": {
@@ -501,9 +501,9 @@
       "error": "Toevoegen misluk",
       "receive-cash": "Ecash",
       "mint-error": "Je accepteert geen ecash van deze mint",
-      "redeem": "Redeem",
-      "redeem-error": "Failed to redeem ecash",
-      "redeem-success": "Ecash redeemed",
+      "redeem": "Inwisselen",
+      "redeem-error": "Kan ecash niet inwisselen",
+      "redeem-success": "Ecash ingewisseld",
       "from-wallet": "Choose a wallet to pay this invoice",
       "confirm-wallet": "Betalen"
     },
@@ -570,7 +570,7 @@
     }
   },
   "ecash": {
-    "redeem": "Redeem",
+    "redeem": "Inwisselen",
     "fee": "fee:"
   },
   "settings": {
@@ -635,13 +635,13 @@
   "nutzaps": {
     "no-message": "Geen bericht",
     "title": "Zaps",
-    "redeemed": "Redeemed",
+    "redeemed": "Ingewisseld",
     "failed": "Mislukt",
     "log-in": "Log in om je zaps te zien",
     "invalid": "Ongeldige zap",
-    "redeem": "Redeem",
-    "redeem-success": "Redeemed {{ amount }} zap",
-    "redeem-error": "Failed to redeem zap",
+    "redeem": "Inwisselen",
+    "redeem-success": "{{ amount }} zap ingewisseld",
+    "redeem-error": "Kan zap niet inwisselen",
     "received": "Ontvangen",
     "sent": "Verzonden",
     "no-received": "Nog niets te zien hier...",
