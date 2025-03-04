@@ -121,7 +121,7 @@ export function useChachiWallet() {
         kinds: [NDKKind.CashuToken],
         authors: [pubkey],
       };
-      const unpublished = Array.from(
+      const tokenEvents = Array.from(
         await ndk.fetchEvents(
           filter,
           {
@@ -133,7 +133,7 @@ export function useChachiWallet() {
         ),
       );
       const tokens = await Promise.all(
-        unpublished.map((e) => NDKCashuToken.from(e)),
+        tokenEvents.map((e) => NDKCashuToken.from(e)),
       );
       const validTokens = tokens.filter((t) => t instanceof NDKCashuToken);
       for (const token of validTokens) {
