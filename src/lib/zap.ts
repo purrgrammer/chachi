@@ -6,8 +6,10 @@ import {
   NDKEvent,
   NDKKind,
   NDKNutzap,
+  NDKZapSplit,
   NDKUser,
   NDKZapper,
+  NDKPaymentConfirmation,
   NDKSubscriptionCacheUsage,
 } from "@nostr-dev-kit/ndk";
 import { useMintList } from "@/lib/cashu";
@@ -182,28 +184,26 @@ export function useNutzap(
 export function useZap(pubkey: string, relays: string[], event?: NostrEvent) {
   const ndk = useNDK();
   return useCallback(
-    async (content: string, amount: number, tags: string[][]) => {
-      return new Promise(async (resolve, reject) => {
-        try {
-          const zapped = event ? new NDKEvent(ndk, event) : null;
-          const zapper = new Zapper(
-            zapped ? zapped : new NDKUser({ pubkey }),
-            Number(amount) * 1000,
-            {
-              comment: content,
-              ndk,
-              tags,
-            },
-            { relays, tags },
-          );
-          zapper.on("complete", (res) => {
-            resolve(res);
-          });
-          zapper.zap().then(resolve);
-        } catch (err) {
-          reject(err);
-        }
-      });
+    async (
+      content: string,
+      amount: number,
+      tags: string[][],
+    ): Promise<
+      Map<NDKZapSplit, NDKPaymentConfirmation | Error | undefined>
+    > => {
+      const zapped = event ? new NDKEvent(ndk, event) : null;
+      const zapper = new Zapper(
+        zapped ? zapped : new NDKUser({ pubkey }),
+        Number(amount) * 1000,
+        {
+          comment: content,
+          ndk,
+          tags,
+          nutzapAsFallback: true,
+        },
+        { relays, tags },
+      );
+      return zapper.zap();
     },
     [pubkey, relays, event],
   );

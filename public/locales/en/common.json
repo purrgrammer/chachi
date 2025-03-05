@@ -575,8 +575,9 @@
       "copy": "Copy invoice",
       "wallet": "Open in wallet",
       "wallet-error": "Couldn't open wallet",
-      "error": "Failed to zap",
-      "success": "Zapped {{ amount }} to {{ name }}"
+      "success": "Zapped {{ amount }} to {{ name }}",
+      "fail": "Failed to zap",
+      "error": "Failed to zap {{ amount }} to {{ name }}"
     }
   },
   "ecash": {

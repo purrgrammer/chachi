@@ -50,6 +50,7 @@ export function useEvent({
 }) {
   const ndk = useNDK();
 
+  // todo: try cache first
   return useQuery({
     enabled: Boolean(id),
     queryKey: [EVENT, id ? id : "empty"],

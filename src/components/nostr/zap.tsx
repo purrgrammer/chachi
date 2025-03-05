@@ -127,15 +127,31 @@ export function NewZapDialog({
             e.name && e.image ? [["emoji", e.name, e.image]] : [],
           ),
         ];
-        await sendZap(message.trim(), Number(amount), tags);
-        setIsZapping(false);
-        onZap?.();
-        toast.success(
-          t("zap.dialog.success", {
-            amount: formatShortNumber(Number(amount)),
-            name: profile?.name || profile?.display_name || pubkey.slice(0, 6),
-          }),
-        );
+        const results = await sendZap(message.trim(), Number(amount), tags);
+        // todo: do the same with nutzaps, could be splitted too
+        for (const split of results.entries()) {
+          const [key, value] = split;
+          const { amount, pubkey } = key;
+          if (value && !(value instanceof Error)) {
+            onZap?.();
+            setIsZapping(false);
+            toast.success(
+              t("zap.dialog.success", {
+                amount: formatShortNumber(Number(amount)),
+                name:
+                  profile?.name || profile?.display_name || pubkey.slice(0, 6),
+              }),
+            );
+          } else {
+            toast.error(
+              t("zap.dialog.error", {
+                amount: formatShortNumber(Number(amount)),
+                name:
+                  profile?.name || profile?.display_name || pubkey.slice(0, 6),
+              }),
+            );
+          }
+        }
       } else {
         const tags = [
           ...(group ? [["h", group.id, group.relay]] : []),
@@ -163,7 +179,7 @@ export function NewZapDialog({
       increaseZapAmount(Number(amount));
     } catch (err) {
       console.error(err);
-      toast.error(t("zap.dialog.error"));
+      toast.error(t("zap.dialog.fail"));
     } finally {
       setIsZapping(false);
     }
@@ -202,6 +218,7 @@ export function NewZapDialog({
               >
                 <div className="flex flex-row gap-4 items-center mx-2">
                   <Input
+                    disabled={isZapping}
                     type="number"
                     className="w-full text-center font-mono text-6xl h-15"
                     value={amount}
@@ -222,6 +239,7 @@ export function NewZapDialog({
                   ))}
                 </div>
                 <AutocompleteTextarea
+                  disabled={isZapping}
                   group={group}
                   message={message}
                   setMessage={setMessage}

@@ -1,12 +1,11 @@
 import { createContext, useContext } from "react";
 import NDK, { NDKRelayAuthPolicies } from "@nostr-dev-kit/ndk";
 import { cache } from "@/lib/db";
-
-export const outboxRelayUrls = ["wss://purplepag.es"];
+import { bootstrapRelays, discoveryRelays } from "@/lib/relay";
 
 const ndk = new NDK({
-  explicitRelayUrls: ["wss://purplepag.es"],
-  outboxRelayUrls,
+  explicitRelayUrls: bootstrapRelays,
+  outboxRelayUrls: discoveryRelays,
   enableOutboxModel: false,
   cacheAdapter: cache,
 });

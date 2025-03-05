@@ -11,7 +11,8 @@ import NDK, {
   NDKNip46Signer,
   NDKPrivateKeySigner,
 } from "@nostr-dev-kit/ndk";
-import { useNDK, outboxRelayUrls } from "@/lib/ndk";
+import { useNDK } from "@/lib/ndk";
+import { discoveryRelays } from "@/lib/relay";
 import {
   accountAtom,
   accountsAtom,
@@ -105,7 +106,7 @@ function useUserEvents() {
         cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
         closeOnEose: false,
       },
-      NDKRelaySet.fromRelayUrls(outboxRelayUrls, ndk),
+      NDKRelaySet.fromRelayUrls(discoveryRelays, ndk),
     );
 
     sub.on("event", (event) => {
@@ -135,7 +136,7 @@ function useUserEvents() {
         cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
         closeOnEose: false,
       },
-      NDKRelaySet.fromRelayUrls(outboxRelayUrls, ndk),
+      NDKRelaySet.fromRelayUrls(discoveryRelays, ndk),
     );
 
     sub.on("event", (event) => {

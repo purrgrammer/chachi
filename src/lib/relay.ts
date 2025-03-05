@@ -1,5 +1,3 @@
-"use client";
-
 import { useQuery } from "@tanstack/react-query";
 
 export const discoveryRelays = [
@@ -9,6 +7,10 @@ export const discoveryRelays = [
 ];
 
 export const profileRelays = ["wss://purplepag.es", "wss://relay.nostr.band"];
+
+export const bootstrapRelays = Array.from(
+  new Set(discoveryRelays.concat(profileRelays)),
+);
 
 export const fallbackRelays = ["wss://relay.nostr.band"];
 
