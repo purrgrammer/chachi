@@ -168,7 +168,9 @@ export function NewZapDialog({
             onZap?.(nutzap.rawEvent() as NostrEvent);
             toast.success(
               t("zap.dialog.success", {
-                amount: formatShortNumber(nutzap.amount),
+                amount: formatShortNumber(
+                  nutzap.unit === "msat" ? nutzap.amount / 1000 : nutzap.amount,
+                ),
                 name:
                   profile?.name || profile?.display_name || pubkey.slice(0, 6),
               }),
