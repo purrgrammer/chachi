@@ -21,6 +21,21 @@ import { CUSTOM_EMOJI_CONTENT_REGEX } from "@/lib/emoji";
 import { HUGE_AMOUNT } from "@/lib/zap";
 import { useMintList } from "@/lib/cashu";
 
+const richTextClassname = "max-w-16 text-xs break-all line-clamp-1";
+const richTextOptions = {
+  inline: true,
+  events: false,
+  ecash: false,
+  video: false,
+  images: true,
+  audio: false,
+  emojis: true,
+};
+
+const richTextclassNames = {
+  image: "w-4 h-4 rounded-sm",
+};
+
 function Reacters({
   reactions,
   isCompact,
@@ -36,7 +51,7 @@ function Reacters({
       acc.deduped.push(r);
       return acc;
     },
-    { deduped: [] as NostrEvent[], seen: new Set<string>() },
+    { deduped: [] as NostrEvent[], seen: new Set<string>() }
   );
   const zIndexes = ["z-40", "z-30", "z-20", "z-10"];
   return (
@@ -77,7 +92,7 @@ function Reaction({
   const isCustomEmoji = CUSTOM_EMOJI_CONTENT_REGEX.test(content);
   const emojiName = content.slice(1, -1);
   const emojiImage = reactions[0].tags.find(
-    (t) => t[0] === "emoji" && t[1] === emojiName,
+    (t) => t[0] === "emoji" && t[1] === emojiName
   )?.[2];
   const me = usePubkey();
   const iReacted = reactions.some((r) => r.pubkey === me);
@@ -158,15 +173,9 @@ function NutzapReaction({ nutzap }: { nutzap: Nutzap }) {
           <Tooltip>
             <TooltipTrigger asChild>
               <RichText
-                className="max-w-16 text-xs break-all line-clamp-1"
-                options={{
-                  inline: true,
-                  events: false,
-                  ecash: false,
-                  video: false,
-                  images: false,
-                  audio: false,
-                }}
+                className={richTextClassname}
+                options={richTextOptions}
+                classNames={richTextclassNames}
                 tags={nutzap.tags}
               >
                 {nutzap.content.trim()}
@@ -174,15 +183,9 @@ function NutzapReaction({ nutzap }: { nutzap: Nutzap }) {
             </TooltipTrigger>
             <TooltipContent>
               <RichText
-                className="text-xs break-all"
-                options={{
-                  inline: true,
-                  events: false,
-                  ecash: false,
-                  video: false,
-                  images: false,
-                  audio: false,
-                }}
+                className={richTextClassname}
+                options={richTextOptions}
+                classNames={richTextclassNames}
                 tags={nutzap.tags}
               >
                 {nutzap.content.trim()}
@@ -214,32 +217,20 @@ function ZapReaction({ zap }: { zap: Zap }) {
           <Tooltip>
             <TooltipTrigger asChild>
               <RichText
-                className="text-xs line-clamp-1"
+                className={richTextClassname}
+                options={richTextOptions}
+                classNames={richTextclassNames}
                 tags={zap.tags}
-                options={{
-                  inline: true,
-                  events: false,
-                  ecash: false,
-                  video: false,
-                  images: false,
-                  audio: false,
-                }}
               >
                 {zap.content.trim()}
               </RichText>
             </TooltipTrigger>
             <TooltipContent>
               <RichText
-                className="text-xs"
+                className={richTextClassname}
+                options={richTextOptions}
+                classNames={richTextclassNames}
                 tags={zap.tags}
-                options={{
-                  inline: true,
-                  events: false,
-                  ecash: false,
-                  video: false,
-                  images: false,
-                  audio: false,
-                }}
               >
                 {zap.content.trim()}
               </RichText>
@@ -264,7 +255,7 @@ function getOldestReaction(reactions: NostrEvent[]): NostrEvent | null {
       if (!oldest) return r;
       return r.created_at < (oldest.created_at ?? 0) ? r : oldest;
     },
-    null as NostrEvent | null,
+    null as NostrEvent | null
   );
 }
 
@@ -308,7 +299,7 @@ export function Reactions({
     <div
       className={cn(
         `flex flex-row gap-1.5 ${reactions.length > 0 ? "p-0.5 pt-1" : ""} w-full overflow-x-auto no-scrollbar`,
-        className,
+        className
       )}
     >
       {zaps.map((zap) => (
