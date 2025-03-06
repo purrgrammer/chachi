@@ -456,6 +456,7 @@ function ChatNutzap({
         if (nutzap) {
           await wallet.redeemNutzap(nutzap, {
             onRedeemed: (proofs) => {
+              // todo: msat unit
               const amount = proofs.reduce(
                 (acc, proof) => acc + proof.amount,
                 0,

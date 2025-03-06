@@ -7,16 +7,12 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { nip19 } from "nostr-tools";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar } from "@/components/nostr/avatar";
 import { Name } from "@/components/nostr/name";
 import { useProfile, useRelayList } from "@/lib/nostr";
-import { Group } from "@/components/nostr/group";
 import { InputCopy } from "@/components/ui/input-copy";
-import { groupId } from "@/lib/groups";
 import { RichText } from "@/components/rich-text";
 import { LnAddress } from "@/components/ln";
-import { useUserGroups } from "@/lib/nostr/groups";
 import type { Group as GroupType } from "@/lib/types";
 
 function ProfileDrawerContent({
@@ -27,7 +23,6 @@ function ProfileDrawerContent({
   group?: GroupType;
 }) {
   const { data: profile } = useProfile(pubkey);
-  const { data: groups } = useUserGroups(pubkey);
   const { data: relays } = useRelayList(pubkey);
   const about = profile?.about;
   return (
@@ -55,15 +50,6 @@ function ProfileDrawerContent({
           >
             {about}
           </RichText>
-        ) : null}
-        {groups && groups.length > 0 ? (
-          <ScrollArea className="h-80">
-            {groups.map((group) => (
-              <div key={groupId(group)} className="mb-2">
-                <Group group={group} />
-              </div>
-            ))}
-          </ScrollArea>
         ) : null}
       </DrawerHeader>
     </div>
