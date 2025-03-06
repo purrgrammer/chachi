@@ -565,8 +565,9 @@
       "copy": "نسخ الفاتورة",
       "wallet": "فتح في المحفظة",
       "wallet-error": "تعذر فتح المحفظة",
-      "error": "فشل التحويل",
-      "success": "تم التحويل {{ amount }} إلى {{ name }}"
+      "success": "تم التحويل {{ amount }} إلى {{ name }}",
+      "fail": "Failed to zap",
+      "error": "Failed to zap {{ amount }} to {{ name }}"
     }
   },
   "ecash": {

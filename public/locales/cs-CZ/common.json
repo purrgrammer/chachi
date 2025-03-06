@@ -565,8 +565,9 @@
       "copy": "Kopírovat fakturu",
       "wallet": "Otevřít v peněžence",
       "wallet-error": "Nepodařilo se otevřít peněženku",
-      "error": "Nepodařilo se poslat zap",
-      "success": "Odesláno {{ amount }} uživateli {{ name }}"
+      "success": "Odesláno {{ amount }} uživateli {{ name }}",
+      "fail": "Nepodařilo se poslat zap",
+      "error": "Nepodařilo se zap {{ amount }} uživateli {{ name }}"
     }
   },
   "ecash": {

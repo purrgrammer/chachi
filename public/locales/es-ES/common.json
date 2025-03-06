@@ -565,8 +565,9 @@
       "copy": "Copiar factura",
       "wallet": "Abrir en billetera",
       "wallet-error": "No se pudo abrir la billetera",
-      "error": "Error al zapear",
-      "success": "Zapeado {{ amount }} a {{ name }}"
+      "success": "Zapeado {{ amount }} a {{ name }}",
+      "fail": "Error al zapear",
+      "error": "Error al zapear {{ amount }} a {{ name }}"
     }
   },
   "ecash": {

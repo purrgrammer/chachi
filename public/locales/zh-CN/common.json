@@ -565,8 +565,9 @@
       "copy": "复制发票",
       "wallet": "在钱包中打开",
       "wallet-error": "无法打开钱包",
-      "error": "打闪失败",
-      "success": "已打闪 {{ amount }} 至 {{ name }}"
+      "success": "已打闪 {{ amount }} 至 {{ name }}",
+      "fail": "打闪失败",
+      "error": "无法打闪 {{ amount }} 至 {{ name }}"
     }
   },
   "ecash": {

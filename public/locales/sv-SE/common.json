@@ -565,8 +565,9 @@
       "copy": "Kopiera faktura",
       "wallet": "Öppna i plånbok",
       "wallet-error": "Kunde inte öppna plånbok",
-      "error": "Misslyckades med att zap",
-      "success": "Zappade {{ amount }} till {{ name }}"
+      "success": "Zappade {{ amount }} till {{ name }}",
+      "fail": "Misslyckades med att skicka zap",
+      "error": "Misslyckades att zapa {{ amount }} till {{ name }}"
     }
   },
   "ecash": {
