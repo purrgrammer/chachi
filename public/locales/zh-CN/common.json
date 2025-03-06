@@ -566,8 +566,8 @@
       "wallet": "在钱包中打开",
       "wallet-error": "无法打开钱包",
       "success": "已打闪 {{ amount }} 至 {{ name }}",
-      "fail": "Failed to zap",
-      "error": "Failed to zap {{ amount }} to {{ name }}"
+      "fail": "打闪失败",
+      "error": "无法打闪 {{ amount }} 至 {{ name }}"
     }
   },
   "ecash": {
