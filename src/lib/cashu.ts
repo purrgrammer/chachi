@@ -110,7 +110,7 @@ export function useRedeemedNutzaps(): Set<string> {
   const { data: mintList } = useMintList(pubkey!);
   const relays = mintList ? mintList.relays : relayList || [];
   const filter = {
-    kinds: [NDKKind.WalletChange],
+    kinds: [NDKKind.CashuWalletTx],
     authors: [pubkey!],
   };
   const { events } = useRequest(filter, relays);

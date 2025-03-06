@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import ndk, { nwcNdk, NDKNWCContext, NDKContext } from "@/lib/ndk";
+import ndk, { NDKContext } from "@/lib/ndk";
 import { queryClient } from "@/lib/query";
 
 const Layout = lazy(() => import("@/pages/layout"));
@@ -151,23 +151,21 @@ const router = createBrowserRouter([
 export default function App() {
   return (
     <Provider>
-      <NDKNWCContext.Provider value={nwcNdk}>
-        <NDKContext.Provider value={ndk}>
-          <QueryClientProvider client={queryClient}>
-            <SidebarProvider>
-              <ThemeProvider defaultTheme="dark" storageKey="chachi-theme">
-                <RouterProvider router={router} />
-                <Toaster
-                  toastOptions={{
-                    duration: 1500,
-                  }}
-                  position="top-right"
-                />
-              </ThemeProvider>
-            </SidebarProvider>
-          </QueryClientProvider>
-        </NDKContext.Provider>
-      </NDKNWCContext.Provider>
+      <NDKContext.Provider value={ndk}>
+        <QueryClientProvider client={queryClient}>
+          <SidebarProvider>
+            <ThemeProvider defaultTheme="dark" storageKey="chachi-theme">
+              <RouterProvider router={router} />
+              <Toaster
+                toastOptions={{
+                  duration: 1500,
+                }}
+                position="top-right"
+              />
+            </ThemeProvider>
+          </SidebarProvider>
+        </QueryClientProvider>
+      </NDKContext.Provider>
     </Provider>
   );
 }

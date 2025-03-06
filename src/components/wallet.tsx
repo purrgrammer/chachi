@@ -54,7 +54,7 @@ import { Input } from "@/components/ui/input";
 import { Event, A } from "@/components/nostr/event";
 import { Label } from "@/components/ui/label";
 import { Invoice } from "@/components/ln";
-import { useNDK, useNWCNDK } from "@/lib/ndk";
+import { useNDK } from "@/lib/ndk";
 import { useRelays, useEvent, useProfile } from "@/lib/nostr";
 import { formatShortNumber } from "@/lib/number";
 import {
@@ -82,7 +82,6 @@ import {
   //useWebLNTransactions,
   useCashuBalance,
   refreshWallet,
-  mintEcash,
   walletId,
   Transaction,
   Unit,
@@ -106,7 +105,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { EcashToken } from "@/components/cashu";
-import { cn } from "@/lib/utils";
+import { cn, once } from "@/lib/utils";
 
 function Relay({
   url,
@@ -527,7 +526,7 @@ export function CashuWalletSettings({
 
 export function ConnectWallet() {
   const { t } = useTranslation();
-  const nwcNdk = useNWCNDK();
+  const ndk = useNDK();
   const [isOpen, setIsOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isLoadingWebln, setIsLoadingWebln] = useState(false);
@@ -557,34 +556,29 @@ export function ConnectWallet() {
   }
 
   async function connectNwc() {
+    if (isConnecting) return;
+
     if (!connectString) {
       toast.error(t("wallet.dialog.nwc-empty"));
       return;
     }
+
     try {
       setIsConnecting(true);
-      const u = new URL(connectString);
-      const relayUrls = u.searchParams.getAll("relay");
-      for (const relay of relayUrls) {
-        nwcNdk.addExplicitRelay(relay);
-      }
-      const nwc = new NDKNWCWallet(nwcNdk, {
-        timeout: 5_000,
+      const nwc = new NDKNWCWallet(ndk, {
+        timeout: 10_000,
         pairingCode: connectString,
       });
-      try {
-        setIsConnecting(true);
-        setWallets((ws) => [...ws, { type: "nwc", connection: connectString }]);
-        setNDKWallets((ws) => [...ws, nwc]);
-        nwc.on("ready", () => {
+      setWallets((ws) => [...ws, { type: "nwc", connection: connectString }]);
+      setNDKWallets((ws) => [...ws, nwc]);
+      nwc.on(
+        "ready",
+        once(() => {
           setIsConnecting(false);
           setIsOpen(false);
           toast.success(t("wallet.dialog.nwc-connected"));
-        });
-      } catch (e) {
-        console.error(e);
-        toast.error(t("wallet.dialog.nwc-error"));
-      }
+        }),
+      );
     } catch (e) {
       console.error(e);
       toast.error(t("wallet.dialog.nwc-error"));
@@ -609,13 +603,13 @@ export function ConnectWallet() {
 
         <div className="flex flex-col gap-2">
           <Input
-            disabled={isConnecting}
+            disabled={isConnecting || isLoadingWebln}
             placeholder="nostr+walletconnect://"
             value={connectString}
             onChange={(e) => setConnectString(e.target.value)}
           />
           <Button
-            disabled={!isValidNwcString || isConnecting}
+            disabled={!isValidNwcString || isConnecting || isLoadingWebln}
             variant="secondary"
             onClick={connectNwc}
           >
@@ -629,7 +623,7 @@ export function ConnectWallet() {
         <div className="flex flex-col gap-3">
           <Button
             variant="secondary"
-            disabled={isLoadingWebln || !window.webln}
+            disabled={isLoadingWebln || !window.webln || isConnecting}
             onClick={connectWebln}
           >
             {isLoadingWebln ? (
@@ -1583,6 +1577,7 @@ function SendToWallet({
       onOpenChange(false);
     } catch (err) {
       toast.error(t("wallet.withdraw.error"));
+      console.error(err);
     } finally {
       setIsWithdrawing(false);
     }
@@ -1629,6 +1624,11 @@ function SendEcash({
   const [token, setToken] = useState<string>("");
   const [amount, setAmount] = useState("21");
   const isAmountValid = amount && Number(amount) > 0;
+
+  function mintEcash(w: NDKCashuWallet, amount: number) {
+    console.log("TODO", w, amount);
+    return null;
+  }
 
   async function onWithdrawCash() {
     try {
@@ -1883,7 +1883,7 @@ function Deposit({
     }
   }, [token]);
   const [isDepositing, setIsDepositing] = useState(false);
-  const [invoice, setInvoice] = useState(null);
+  const [invoice, setInvoice] = useState<string | null>(null);
   const [amount, setAmount] = useState("21");
   const [mint, setMint] = useState<string | undefined>(
     wallet instanceof NDKCashuWallet ? wallet.mints[0] : undefined,
@@ -1913,7 +1913,11 @@ function Deposit({
           toast.error(t("wallet.deposit.error"));
         },
       );
-      setInvoice(pr);
+      if (pr) {
+        setInvoice(pr);
+      } else {
+        toast.error(t("wallet.deposit.error"));
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -1966,6 +1970,7 @@ function Deposit({
       refreshWallet(toWallet);
       handleOpenChange(false);
     } catch (err) {
+      console.error(err);
       toast.error(t("wallet.withdraw.error"));
     } finally {
       setIsDepositing(false);

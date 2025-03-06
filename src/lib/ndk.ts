@@ -8,23 +8,15 @@ const ndk = new NDK({
   outboxRelayUrls: discoveryRelays,
   enableOutboxModel: false,
   cacheAdapter: cache,
+  initialValidationRatio: 0.0,
+  lowestValidationRatio: 0.0,
 });
 ndk.relayAuthDefaultPolicy = NDKRelayAuthPolicies.signIn({ ndk });
-
-export const nwcNdk = new NDK({
-  explicitRelayUrls: [],
-  enableOutboxModel: false,
-});
 
 export function useNDK() {
   return useContext(NDKContext);
 }
 
-export function useNWCNDK() {
-  return useContext(NDKNWCContext);
-}
-
 export const NDKContext = createContext<NDK>(ndk);
-export const NDKNWCContext = createContext<NDK>(nwcNdk);
 
 export default ndk;

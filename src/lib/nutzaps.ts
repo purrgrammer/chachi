@@ -73,10 +73,11 @@ export function useNutzapMonitor() {
     if (!knownNutzaps) return;
     if (nutzapMonitor) return;
 
+    // todo: fetch and pass mint list
     const monitor = new NDKNutzapMonitor(
       ndk,
       new NDKUser({ pubkey }),
-      cashuWallet.relaySet,
+      //cashuWallet.relaySet,
     );
     monitor.wallet = cashuWallet;
 
@@ -87,19 +88,21 @@ export function useNutzapMonitor() {
       saveNutzap(event.rawEvent() as NostrEvent);
     });
 
-    monitor.on("redeem", (event) => {
+    monitor.on("redeem", (events) => {
       //console.log("NUTZAP.REDEEM", event.rawEvent());
-      saveNutzap(
-        event.rawEvent() as NostrEvent,
-        "redeemed",
-        event.id,
-        Math.floor(Date.now() / 1000),
-      );
-      toast.success(
-        t("nutzaps.redeem-success", {
-          amount: formatShortNumber(event.amount),
-        }),
-      );
+      for (const event of events) {
+        saveNutzap(
+          event.rawEvent() as NostrEvent,
+          "redeemed",
+          event.id,
+          Math.floor(Date.now() / 1000),
+        );
+        toast.success(
+          t("nutzaps.redeem-success", {
+            amount: formatShortNumber(event.amount),
+          }),
+        );
+      }
     });
 
     monitor.on("spent", (event) => {

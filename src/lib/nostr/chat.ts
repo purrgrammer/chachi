@@ -27,11 +27,11 @@ export function useGroupMessages(groups: Group[]) {
   const ndk = useNDK();
   const [subs, setSubs] = useState<NDKSubscription[]>([]);
   useEffect(() => {
-    for (const group of groups) {
-      const { id, relay } = group;
-      getLastGroupMessage(group).then((lastMessage) => {
+    async function syncGroupMessages() {
+      for (const group of groups) {
+        const { id, relay } = group;
+        const lastMessage = await getLastGroupMessage(group);
         const relaySet = NDKRelaySet.fromRelayUrls([relay], ndk);
-        let sub: NDKSubscription | undefined;
         const filter = {
           kinds: [
             NDKKind.GroupChat,
@@ -43,7 +43,7 @@ export function useGroupMessages(groups: Group[]) {
           "#h": [id],
           ...(lastMessage ? { since: lastMessage.created_at } : {}),
         };
-        sub = ndk.subscribe(
+        const sub = ndk.subscribe(
           filter,
           {
             cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
@@ -54,17 +54,13 @@ export function useGroupMessages(groups: Group[]) {
         );
 
         sub.on("event", (event) => {
-          // todo: check that event.h is the same as group.id
-          // todo: check that event.h relay is the group relay
-          if (event.tags.find((tag) => tag[0] === "h" && tag[1] === group.id)) {
-            saveGroupEvent(event.rawEvent() as NostrEvent, group);
-          }
+          saveGroupEvent(event.rawEvent() as NostrEvent, group);
         });
 
         setSubs((subs) => [...subs, sub as NDKSubscription]);
-      });
+      }
     }
-
+    syncGroupMessages();
     return () => {
       for (const sub of subs) sub.stop();
       setSubs([]);

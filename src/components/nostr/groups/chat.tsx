@@ -11,10 +11,13 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
 import { useInView } from "framer-motion";
 import {
+  Coins,
   HandCoins,
   Reply as ReplyIcon,
   SmilePlus,
   Bitcoin,
+  Euro,
+  DollarSign,
   Copy,
   ShieldBan,
   Trash,
@@ -23,6 +26,7 @@ import {
 } from "lucide-react";
 import { NostrEvent, UnsignedEvent } from "nostr-tools";
 import { Avatar } from "@/components/nostr/avatar";
+import { User } from "@/components/nostr/user";
 import { ProfileDrawer } from "@/components/nostr/profile";
 import { NDKNutzap, NDKKind, NDKEvent } from "@nostr-dev-kit/ndk";
 import { NDKCashuWallet } from "@nostr-dev-kit/ndk-wallet";
@@ -30,8 +34,7 @@ import { useSettings } from "@/lib/settings";
 import { formatShortNumber } from "@/lib/number";
 import { Badge } from "@/components/ui/badge";
 import { Name } from "@/components/nostr/name";
-import { useGroupAdminsList } from "@/lib/nostr/groups";
-import { useMembers } from "@/lib/messages";
+import { useGroupParticipants } from "@/lib/nostr/groups";
 import { Zap } from "@/components/nostr/zap";
 import { validateZap } from "@/lib/nip-57";
 import { ChatInput } from "@/components/nostr/chat/input";
@@ -97,8 +100,6 @@ function ChatZap({
 }: ChatZapProps) {
   // todo: gestures
   const zap = validateZap(event);
-  if (!zap) return null;
-
   const ndk = useNDK();
   const ref = useRef<HTMLDivElement | null>(null);
   const isInView = useInView(ref);
@@ -106,7 +107,7 @@ function ChatZap({
   const navigate = useNavigate();
   const [showingZapDialog, setShowingZapDialog] = useState(false);
   const pubkey = usePubkey();
-  const isMine = zap.pubkey === pubkey;
+  const isMine = zap?.pubkey === pubkey;
   const amIAdmin = pubkey && admins.includes(pubkey);
   const relaySet = useRelaySet([group.relay]);
   const { t } = useTranslation();
@@ -114,7 +115,7 @@ function ChatZap({
   const [settings] = useSettings();
   const isMobile = useIsMobile();
   const canSign = useCanSign();
-  const isFocused = scrollTo?.id === zap.id;
+  const isFocused = scrollTo?.id === zap?.id;
 
   useEffect(() => {
     if (isFocused && ref.current) {
@@ -124,6 +125,8 @@ function ChatZap({
       });
     }
   }, [isFocused]);
+
+  if (!zap) return null;
 
   // todo: extract to hook
   async function react(e: EmojiType) {
@@ -390,6 +393,10 @@ function ChatNutzap({
   const isMobile = useIsMobile();
   const canSign = useCanSign();
   const isFocused = scrollTo?.id === event.id;
+  const amount = event.tags.find((t) => t[0] === "amount")?.[1];
+  const unit = event.tags.find((t) => t[0] === "unit")?.[1];
+  const target = event.tags.find((t) => t[0] === "p")?.[1];
+  const isShownInline = event.content.trim() === "" && amount && target;
 
   useEffect(() => {
     if (isFocused && ref.current) {
@@ -459,9 +466,6 @@ function ChatNutzap({
                 }),
               );
             },
-            onTxEventCreated: (txEvent) => {
-              saveNutzap(event, "redeemed", txEvent.id, txEvent.created_at);
-            },
           });
         }
       }
@@ -488,7 +492,7 @@ function ChatNutzap({
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <div
-            className={`flex flex-row ${isMine ? "justify-end" : ""} w-full z-0 ${isFocused ? "bg-accent/30 rounded-lg" : ""}`}
+            className={`flex flex-row ${isMine ? "justify-end" : ""} w-full z-0 ${isFocused ? "bg-accent/30 rounded-lg" : ""} ${isShownInline ? "items-center justify-center" : ""}`}
           >
             <motion.div
               // Drag controls
@@ -504,11 +508,21 @@ function ChatNutzap({
                 }
               }}
               ref={ref}
-              className="z-0 border-none my-1 max-w-[18rem] sm:max-w-sm md:max-w-md"
+              className={`z-0 border-none my-1 ${isShownInline ? "" : "max-w-[19rem] sm:max-w-sm md:max-w-md"}`}
             >
               <div className="flex flex-col gap-0">
-                <div className="flex flex-row gap-2 items-end">
-                  {isMine ? null : (
+                <div
+                  className={`flex flex-row gap-2 items-end ${isShownInline ? "gap-0" : ""}`}
+                >
+                  {isMine ? null : isShownInline ? (
+                    <div className="flex flex-row gap-2 items-center">
+                      <Coins className="size-5 text-muted-foreground" />
+                      <User
+                        pubkey={event.pubkey}
+                        classNames={{ avatar: "size-7" }}
+                      />
+                    </div>
+                  ) : (
                     <ProfileDrawer
                       group={group}
                       pubkey={event.pubkey}
@@ -517,25 +531,43 @@ function ChatNutzap({
                       }
                     />
                   )}
-                  <div className="flex flex-col gap-1 relative p-1 px-2 bg-background/80 rounded-md">
-                    <Nutzap
-                      event={event}
-                      group={group}
-                      showAuthor={false}
-                      animateGradient
-                      onReplyClick={onNutzapReplyClick}
-                      classNames={{
-                        singleCustomEmoji: isMine ? "ml-auto" : "",
-                        onlyEmojis: isMine ? "ml-auto" : "",
-                      }}
-                    />
-                    <Reactions
-                      event={event}
-                      relays={[group.relay]}
-                      kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
-                      live={isInView}
-                    />
-                  </div>
+                  {isShownInline ? (
+                    <>
+                      <div className="flex flex-row items-center gap-0">
+                        {unit === "eur" ? (
+                          <Euro className="size-5 text-muted-foreground" />
+                        ) : unit === "usd" ? (
+                          <DollarSign className="size-5 text-muted-foreground" />
+                        ) : (
+                          <Bitcoin className="size-5 text-muted-foreground" />
+                        )}
+                        <span className="font-mono text-lg">
+                          {formatShortNumber(Number(amount))}
+                        </span>
+                      </div>
+                      <User pubkey={target} classNames={{ avatar: "size-7" }} />
+                    </>
+                  ) : (
+                    <div className="flex flex-col gap-1 relative p-1 px-2 bg-background/80 rounded-md">
+                      <Nutzap
+                        event={event}
+                        group={group}
+                        showAuthor={false}
+                        animateGradient
+                        onReplyClick={onNutzapReplyClick}
+                        classNames={{
+                          singleCustomEmoji: isMine ? "ml-auto" : "",
+                          onlyEmojis: isMine ? "ml-auto" : "",
+                        }}
+                      />
+                      <Reactions
+                        event={event}
+                        relays={[group.relay]}
+                        kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
+                        live={isInView}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -720,9 +752,11 @@ function ChatNutzap({
 function UserActivity({
   event,
   action,
+  group,
 }: {
   event: UnsignedEvent;
   action: "join" | "leave";
+  group: Group;
 }) {
   const member = event.tags.find((t) => t[0] === "p")?.[1];
   const { t } = useTranslation();
@@ -730,7 +764,11 @@ function UserActivity({
     <div className="flex justify-center my-0.5 w-full">
       <Badge variant="outline" className="self-center">
         <div className="flex gap-1">
-          <Name pubkey={member} />
+          <ProfileDrawer
+            group={group}
+            pubkey={member}
+            trigger={<Name pubkey={member} />}
+          />
           <span>
             {action === "join"
               ? t("group.chat.user.joined")
@@ -745,10 +783,8 @@ function UserActivity({
 export const GroupChat = forwardRef(
   ({ group }: { group: Group }, ref: ForwardedRef<HTMLDivElement | null>) => {
     // todo: load older messages when scrolling up
-    const members: string[] = useMembers(group);
-    const { data: adminsList } = useGroupAdminsList(group);
+    const { members, admins } = useGroupParticipants(group);
     const { data: relayInfo } = useRelayInfo(group.relay);
-    const admins = adminsList || [];
     const events = useGroupchat(group);
     const hasBeenDeleted = events.some((e) => e.kind === DELETE_GROUP);
     const [replyingTo, setReplyingTo] = useState<NostrEvent | undefined>();
@@ -760,6 +796,7 @@ export const GroupChat = forwardRef(
     const nonChatHeight = inputHeight + headerHeight;
     const me = usePubkey();
     const canSign = useCanSign();
+    const isMember = me && members?.includes(me);
     const isAdmin = canSign && me && admins?.includes(me);
     const ndk = useNDK();
     const relaySet = useRelaySet([group.relay]);
@@ -773,8 +810,8 @@ export const GroupChat = forwardRef(
       me &&
       canSign &&
       (isRelayGroup ||
-        members?.includes(me) ||
-        admins?.includes(me) ||
+        isMember ||
+        isAdmin ||
         events.find(
           (e) =>
             e.kind === NDKKind.GroupAdminAddUser &&
@@ -863,10 +900,10 @@ export const GroupChat = forwardRef(
               />
             ),
             [NDKKind.GroupAdminAddUser]: (props) => (
-              <UserActivity {...props} action="join" />
+              <UserActivity {...props} group={group} action="join" />
             ),
             [NDKKind.GroupAdminRemoveUser]: (props) => (
-              <UserActivity {...props} action="leave" />
+              <UserActivity {...props} group={group} action="leave" />
             ),
           }}
           setReplyingTo={setReplyingTo}

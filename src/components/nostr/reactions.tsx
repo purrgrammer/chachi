@@ -51,7 +51,7 @@ function Reacters({
       acc.deduped.push(r);
       return acc;
     },
-    { deduped: [] as NostrEvent[], seen: new Set<string>() }
+    { deduped: [] as NostrEvent[], seen: new Set<string>() },
   );
   const zIndexes = ["z-40", "z-30", "z-20", "z-10"];
   return (
@@ -92,7 +92,7 @@ function Reaction({
   const isCustomEmoji = CUSTOM_EMOJI_CONTENT_REGEX.test(content);
   const emojiName = content.slice(1, -1);
   const emojiImage = reactions[0].tags.find(
-    (t) => t[0] === "emoji" && t[1] === emojiName
+    (t) => t[0] === "emoji" && t[1] === emojiName,
   )?.[2];
   const me = usePubkey();
   const iReacted = reactions.some((r) => r.pubkey === me);
@@ -255,7 +255,7 @@ function getOldestReaction(reactions: NostrEvent[]): NostrEvent | null {
       if (!oldest) return r;
       return r.created_at < (oldest.created_at ?? 0) ? r : oldest;
     },
-    null as NostrEvent | null
+    null as NostrEvent | null,
   );
 }
 
@@ -299,7 +299,7 @@ export function Reactions({
     <div
       className={cn(
         `flex flex-row gap-1.5 ${reactions.length > 0 ? "p-0.5 pt-1" : ""} w-full overflow-x-auto no-scrollbar`,
-        className
+        className,
       )}
     >
       {zaps.map((zap) => (

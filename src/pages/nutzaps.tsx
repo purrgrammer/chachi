@@ -251,6 +251,7 @@ function Nutzap({
         const nutzap = NDKNutzap.from(new NDKEvent(ndk, event));
         if (nutzap) {
           await wallet.redeemNutzap(nutzap, {
+            // todo: msat unit
             onRedeemed: (proofs) => {
               const amount = proofs.reduce(
                 (acc, proof) => acc + proof.amount,
@@ -261,9 +262,6 @@ function Nutzap({
                   amount: formatShortNumber(amount),
                 }),
               );
-            },
-            onTxEventCreated: (txEvent) => {
-              saveNutzap(event, "redeemed", txEvent.id, txEvent.created_at);
             },
           });
         }

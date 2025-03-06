@@ -23,12 +23,11 @@ import NDK, {
 } from "@nostr-dev-kit/ndk";
 import {
   NDKWallet,
-  NDKWalletChange,
   NDKCashuWallet,
   NDKWebLNWallet,
   NDKNWCWallet,
 } from "@nostr-dev-kit/ndk-wallet";
-import { useNDK, useNWCNDK } from "@/lib/ndk";
+import { useNDK } from "@/lib/ndk";
 import { Zap, validateZapRequest } from "@/lib/nip-57";
 import { usePubkey, useMintList } from "@/lib/account";
 import { cashuAtom } from "@/app/store";
@@ -57,7 +56,6 @@ export function useCashuWallet() {
 export function useChachiWallet() {
   const { t } = useTranslation();
   const ndk = useNDK();
-  const nwcNdk = useNWCNDK();
   const pubkey = usePubkey();
   const relays = useRelays();
   const mintList = useMintList();
@@ -72,7 +70,7 @@ export function useChachiWallet() {
     Promise.allSettled(
       wallets.map(async (w) => {
         if (w.type === "nwc") {
-          return createNWCWallet(w.connection, nwcNdk);
+          return createNWCWallet(w.connection, ndk);
         } else if (w.type === "webln") {
           return createWebLNWallet();
         }
@@ -240,15 +238,12 @@ function useStreamMap(
 }
 
 export function useTransactions(pubkey: string, wallet: NDKCashuWallet) {
-  // todo: implement for NWC wallet
-  // todo: implement for webln wallet
   const ndk = useNDK();
   const myRelays = useRelays();
   return useStreamMap(
     {
-      kinds: [NDKKind.WalletChange],
+      kinds: [NDKKind.CashuWalletTx],
       authors: [pubkey],
-      //...wallet.event!.filter(),
     },
     wallet.relaySet || NDKRelaySet.fromRelayUrls(myRelays, ndk),
     async (ev: NostrEvent): Promise<Transaction | null> => {
@@ -332,7 +327,6 @@ export function useDeposit(wallet: NDKWallet) {
             options.amount,
             options.description || t("wallet.deposit"),
           );
-          // @ts-expect-error: wrongly typed
           return res.invoice;
         } catch (err) {
           if (err instanceof Error) {
@@ -459,7 +453,7 @@ interface NWCWalletTransaction {
 function tryParseZap(raw: string, invoice: string): Zap | null {
   try {
     return validateZapRequest(raw, invoice);
-  } catch (err) {
+  } catch {
     return null;
   }
 }
@@ -508,7 +502,6 @@ export function useNWCTransactions(wallet: NDKNWCWallet) {
   return useQuery({
     queryKey: [WALLET_TXS, walletId(wallet)],
     queryFn: () => fetchNWCTransactions(wallet),
-    staleTime: Infinity,
   });
 }
 
@@ -558,23 +551,19 @@ export async function createCashuWallet(
   ndk: NDK,
   relays: string[],
 ): Promise<NDKCashuWallet> {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const ev = new NDKEvent(ndk, event);
-    const w = await NDKCashuWallet.from(ev);
-    if (!w) {
-      reject("Failed to create wallet");
-      return;
-    }
-    w.relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
-    w.onMintInfoNeeded = async (mint: string) => {
-      const info = await fetchMintInfo(mint);
-      return info;
-    };
-    w.onMintKeysNeeded = async (mint: string) => {
-      const keys = await fetchMintKeys(mint);
-      return keys;
-    };
-    resolve(w);
+    NDKCashuWallet.from(ev).then((w) => {
+      if (!w) {
+        reject("Failed to create wallet");
+        return;
+      }
+      w.relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
+      w.onMintInfoNeeded = fetchMintInfo.bind(w);
+      w.onMintKeysNeeded = fetchMintKeys.bind(w);
+
+      resolve(w);
+    });
   });
 }
 
@@ -599,85 +588,6 @@ export function refreshWallet(wallet: NDKWallet) {
     queryKey: [WALLET_BALANCE, walletId(wallet)],
   });
   queryClient.invalidateQueries({ queryKey: [WALLET_TXS, walletId(wallet)] });
-}
-
-export async function createCashuOutTxEvent(
-  wallet: NDKCashuWallet,
-  paymentRequest: { amount: number; description?: string },
-  paymentResult: {
-    fee?: number;
-    mint: string;
-    stateUpdate?: any;
-    result: { proofs: any[]; mint: string };
-    proofsChange: any;
-  },
-): Promise<NDKWalletChange> {
-  const { amount, description } = paymentRequest;
-  const { fee, mint, stateUpdate } = paymentResult;
-
-  const historyEvent = new NDKWalletChange(wallet.ndk);
-  if (wallet.event) historyEvent.tags.push(wallet.event.tagReference());
-  historyEvent.direction = "out";
-  historyEvent.amount = amount ?? 0;
-  historyEvent.mint = mint;
-  if (description) historyEvent.description = description;
-
-  if (fee) historyEvent.fee = fee;
-  if (stateUpdate?.created)
-    historyEvent.createdTokens = [paymentResult.stateUpdate.created];
-  if (stateUpdate?.deleted)
-    historyEvent.destroyedTokenIds = paymentResult.stateUpdate.deleted;
-  if (stateUpdate?.reserved)
-    historyEvent.reservedTokens = [paymentResult.stateUpdate.reserved];
-
-  await historyEvent.sign();
-  await historyEvent.publish(wallet.relaySet);
-
-  return historyEvent;
-}
-
-export async function mintEcash(w: NDKCashuWallet, totalAmount: number) {
-  let result;
-  const amounts = [totalAmount];
-  for (const mint of w.mints) {
-    const wallet = await w.cashuWallet(mint);
-    const mintProofs = await w.state.getProofs({ mint });
-    result = await wallet.send(totalAmount, mintProofs, {
-      proofsWeHave: mintProofs,
-      includeFees: true,
-      outputAmounts: {
-        sendAmounts: amounts,
-      },
-    });
-
-    if (result.send.length > 0) {
-      const change = {
-        store: result?.keep ?? [],
-        destroy: result.send,
-        mint,
-      };
-      const updateRes = await w.state.update(change);
-      // create a change event
-      createCashuOutTxEvent(
-        w,
-        {
-          description: "Send ecash",
-          amount: amounts.reduce((acc, amount) => acc + amount, 0),
-        },
-        {
-          result: { proofs: result.send, mint },
-          proofsChange: change,
-          stateUpdate: updateRes,
-          mint,
-          fee: 0,
-        },
-      );
-      return {
-        mint,
-        proofs: result.send,
-      };
-    }
-  }
 }
 
 export function walletId(w: NDKWallet): string {

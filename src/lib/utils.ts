@@ -29,3 +29,15 @@ export function groupBy<T>(arr: T[], callback: (t: T) => string) {
     {} as Record<string, T[]>,
   );
 }
+
+export function once<A, B>(fn: (v: A) => B) {
+  let called = false;
+  return function (...args: A[]) {
+    if (called) return;
+    called = true;
+    if (args.length === 1) {
+      return fn.apply(window, args as [v: A]);
+    }
+    throw new Error("Wrong number of arguments");
+  };
+}
