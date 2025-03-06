@@ -565,8 +565,9 @@
       "copy": "Invoice kopieren",
       "wallet": "In Wallet öffnen",
       "wallet-error": "Wallet konnte nicht geöffnet werden",
-      "error": "Zap fehlgeschlagen",
-      "success": "{{ amount }} an {{ name }} gesendet"
+      "success": "{{ amount }} an {{ name }} gesendet",
+      "fail": "Failed to zap",
+      "error": "Failed to zap {{ amount }} to {{ name }}"
     }
   },
   "ecash": {
