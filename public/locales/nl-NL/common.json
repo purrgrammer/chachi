@@ -566,8 +566,8 @@
       "wallet": "Openen in wallet",
       "wallet-error": "Kan wallet niet openen",
       "success": "{{ amount }} gezapt naar {{ name }}",
-      "fail": "Failed to zap",
-      "error": "Failed to zap {{ amount }} to {{ name }}"
+      "fail": "Zappen mislukt",
+      "error": "Mislukt om {{ amount }} te zappen naar {{ name }}"
     }
   },
   "ecash": {
