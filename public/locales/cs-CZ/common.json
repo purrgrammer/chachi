@@ -567,7 +567,7 @@
       "wallet-error": "Nepodařilo se otevřít peněženku",
       "success": "Odesláno {{ amount }} uživateli {{ name }}",
       "fail": "Nepodařilo se poslat zap",
-      "error": "Failed to zap {{ amount }} to {{ name }}"
+      "error": "Nepodařilo se zap {{ amount }} uživateli {{ name }}"
     }
   },
   "ecash": {
