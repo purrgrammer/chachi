@@ -20,6 +20,7 @@ import {
   fallbackRelays,
 } from "@/lib/relay";
 import { EVENT, ADDRESS, PROFILE, RELAY_LIST } from "@/lib/query";
+import db from "@/lib/db";
 
 interface NostrREQResult<A> {
   events: A[];
@@ -36,6 +37,27 @@ export function useRelaySet(relays: string[]): NDKRelaySet | undefined {
       : undefined;
   }, [relayUrls]);
   return relaySet;
+}
+
+async function fetchCachedEvent(ndk: NDK, id: string) {
+  const stored = await db.events.get(id);
+  if (stored) {
+    return stored as unknown as NostrEvent;
+  }
+  return ndk
+    .fetchEvent(
+      { ids: [id] },
+      {
+        closeOnEose: true,
+        cacheUsage: NDKSubscriptionCacheUsage.ONLY_CACHE,
+      },
+    )
+    .then((ev) => {
+      if (ev) {
+        return ev.rawEvent() as NostrEvent;
+      }
+      return null;
+    });
 }
 
 // todo: rename useEventId
@@ -56,15 +78,23 @@ export function useEvent({
     queryKey: [EVENT, id ? id : "empty"],
     queryFn: async () => {
       if (!id) throw new Error("No id");
+
+      const cached = await fetchCachedEvent(ndk, id);
+      if (cached) {
+        return cached;
+      }
+
       const relayList =
         pubkey && relays.length === 0
           ? await fetchRelayList(ndk, pubkey)
           : relays.length > 0
             ? relays
             : null;
+
       const relaySet = relayList
         ? NDKRelaySet.fromRelayUrls(relayList, ndk)
         : undefined;
+
       return ndk
         .fetchEvent(
           { ids: [id] },
@@ -85,6 +115,28 @@ export function useEvent({
   });
 }
 
+function fetchCachedAddress(
+  ndk: NDK,
+  kind: number,
+  pubkey: string,
+  identifier: string,
+) {
+  return ndk
+    .fetchEvent(
+      { kinds: [kind], authors: [pubkey], "#d": [identifier] },
+      {
+        closeOnEose: true,
+        cacheUsage: NDKSubscriptionCacheUsage.ONLY_CACHE,
+      },
+    )
+    .then((ev) => {
+      if (ev) {
+        return ev.rawEvent() as NostrEvent;
+      }
+      return null;
+    });
+}
+
 export function useAddress({
   pubkey,
   kind,
@@ -102,6 +154,10 @@ export function useAddress({
   return useQuery({
     queryKey: [ADDRESS, `${kind}:${pubkey}:${identifier}`],
     queryFn: async () => {
+      const cached = await fetchCachedAddress(ndk, kind, pubkey, identifier);
+      if (cached) {
+        return cached;
+      }
       const relayList =
         relays.length === 0
           ? await fetchRelayList(ndk, pubkey)
