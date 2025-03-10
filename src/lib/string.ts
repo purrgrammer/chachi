@@ -31,7 +31,7 @@ function isURLWithExtension(s: string, extensions: string[]) {
 }
 
 export function isImageLink(s: string) {
-  return isURLWithExtension(s, ["jpg", "jpeg", "png", "gif", "webp"]);
+  return isURLWithExtension(s, ["jpg", "jpeg", "png", "gif", "webp", "ico"]);
 }
 
 export function isVideoLink(s: string) {
