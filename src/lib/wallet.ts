@@ -152,6 +152,7 @@ export function useChachiWallet() {
       //cashuWallet.checkProofs();
       //cashuWallet.start({ since: now });
       cashuWallet.start();
+      cashuWallet.checkProofs();
     }
     syncWallet();
   }, [pubkey, cashuWallet]);
