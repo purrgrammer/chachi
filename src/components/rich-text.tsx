@@ -677,8 +677,12 @@ export function RichText({
     toNode(f, idx, classNames, group, opts),
   );
   return options.inline ? (
-    <span className={className}>{...body}</span>
+    <span dir="auto" className={className}>
+      {...body}
+    </span>
   ) : (
-    <div className={cn("flex flex-col gap-3", className)}>{...body}</div>
+    <div dir="auto" className={cn("flex flex-col gap-3", className)}>
+      {...body}
+    </div>
   );
 }
