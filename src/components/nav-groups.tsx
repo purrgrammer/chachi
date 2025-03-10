@@ -90,6 +90,7 @@ function RelayItem({ group }: { group: Group }) {
                     emojis: "size-4 opacity-70",
                     spans: "break-all",
                     urls: "pointer-events-none",
+                    mentions: "pointer-events-none",
                   }}
                   tags={lastMessage.tags}
                 >
