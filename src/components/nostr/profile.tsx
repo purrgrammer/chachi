@@ -14,6 +14,7 @@ import { InputCopy } from "@/components/ui/input-copy";
 import { RichText } from "@/components/rich-text";
 import { LnAddress } from "@/components/ln";
 import type { Group as GroupType } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 function ProfileDrawerContent({
   pubkey,
@@ -60,14 +61,18 @@ export function ProfileDrawer({
   trigger,
   group,
   pubkey,
+  className,
 }: {
   trigger: ReactNode;
   pubkey: string;
   group?: GroupType;
+  className?: string;
 }) {
   return (
     <Drawer>
-      <DrawerTrigger className="cursor-pointer">{trigger}</DrawerTrigger>
+      <DrawerTrigger className={cn("cursor-pointer", className)}>
+        {trigger}
+      </DrawerTrigger>
       <DrawerContent>
         <ProfileDrawerContent pubkey={pubkey} group={group} />
       </DrawerContent>

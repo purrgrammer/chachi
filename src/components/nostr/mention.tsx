@@ -16,5 +16,5 @@ export function Mention({
       @<Name pubkey={pubkey} relays={relays} />
     </span>
   );
-  return <ProfileDrawer trigger={name} pubkey={pubkey} />;
+  return <ProfileDrawer trigger={name} pubkey={pubkey} className={className} />;
 }

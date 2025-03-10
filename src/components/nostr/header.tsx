@@ -1,15 +1,13 @@
-import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Globe, MessageCircleQuestion } from "lucide-react";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
-import { Name } from "@/components/nostr/name";
 import { formatRelativeTime } from "@/lib/time";
 import { useGroup } from "@/lib/nostr/groups";
 import { groupURL } from "@/lib/groups";
 import { validateZap } from "@/lib/nip-57";
-import { Avatar } from "@/components/nostr/avatar";
+import { User } from "@/components/nostr/user";
 
 function GroupName({ id, relay }: { id: string; relay: string }) {
   const group = { id, relay };
@@ -29,14 +27,7 @@ function GroupName({ id, relay }: { id: string; relay: string }) {
   ) : null;
 }
 
-// todo: link to user profile
-export function Header({
-  event,
-  icons,
-}: {
-  event: NostrEvent;
-  icons?: ReactNode;
-}) {
+export function Header({ event }: { event: NostrEvent }) {
   const { t } = useTranslation();
   const groupTag = event.tags.find((t) => t[0] === "h");
   const [, group, relay] = groupTag ? groupTag : [];
@@ -53,16 +44,11 @@ export function Header({
   return (
     <div className="flex flex-row items-center justify-between w-full">
       <div className="flex flex-row items-center w-full gap-2">
-        <Avatar pubkey={author ?? event.pubkey} className="size-9" />
-        <div className="flex flex-col w-full gap-0">
-          <div className="flex flex-row gap-1 items-center">
-            <div className="flex flex-row items-center gap-1.5">
-              <span className="font-semibold">
-                <Name pubkey={author ?? event.pubkey} />
-              </span>
-              {icons}
-            </div>
-          </div>
+        <User
+          pubkey={author ?? event.pubkey}
+          classNames={{ avatar: "size-6", name: "text-md" }}
+        />
+        <div className="w-full flex items-center justify-between">
           <span className="text-xs text-muted-foreground">
             {group && relay ? (
               <GroupName id={group} relay={relay} />
@@ -78,10 +64,10 @@ export function Header({
               </div>
             )}
           </span>
+          <span className="text-xs text-muted-foreground">
+            {formatRelativeTime(timestamp ?? 0)}
+          </span>
         </div>
-        <span className="text-xs text-muted-foreground">
-          {formatRelativeTime(timestamp ?? 0)}
-        </span>
       </div>
     </div>
   );
