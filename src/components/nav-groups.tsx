@@ -173,6 +173,7 @@ function GroupItem({ group }: { group: Group }) {
                   classNames={{
                     emojis: "size-4 opacity-70",
                     spans: "break-all",
+                    mentions: "pointer-events-none",
                   }}
                   tags={lastMessage.tags}
                 >

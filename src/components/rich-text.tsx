@@ -603,7 +603,6 @@ const defaultOptions = {
   video: true,
   audio: true,
   youtube: true,
-  mentions: true,
 };
 
 export function RichText({

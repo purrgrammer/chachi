@@ -17,7 +17,7 @@ import {
   Puzzle,
   Cable,
   RotateCw,
-  RefreshCw,
+  //RefreshCw,
   Network,
   ServerCrash,
   Plus,
@@ -923,23 +923,44 @@ export function WalletSelector() {
 }
 
 function CashuWalletCoins({ wallet }: { wallet: NDKCashuWallet }) {
-  const { t } = useTranslation();
-  const [isSyncing, setIsSyncing] = useState(false);
+  //const { t } = useTranslation();
+  //const [isSyncing, setIsSyncing] = useState(false);
   const proofs = wallet.state.getProofEntries({ onlyAvailable: true });
-  async function syncProofs() {
-    try {
-      setIsSyncing(true);
-      await wallet.checkProofs();
-      toast.success(t("wallet.sync-success"));
-    } catch (err) {
-      console.error(err);
-      toast.success(t("wallet.sync-error"));
-    } finally {
-      setIsSyncing(false);
-    }
-  }
+  const balances = wallet.mintBalances;
+
+  //async function syncProofs() {
+  //  try {
+  //    setIsSyncing(true);
+  //    await wallet.checkProofs();
+  //    toast.success(t("wallet.sync-success"));
+  //  } catch (err) {
+  //    console.error(err);
+  //    toast.success(t("wallet.sync-error"));
+  //  } finally {
+  //    setIsSyncing(false);
+  //  }
+  //}
   return (
-    <div className="flex flex-col gap-2 pr-0.5 h-[68vh] overflow-y-scroll pretty-scrollbar">
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center justify-center gap-2 w-full overflow-x-scroll no-scrollbar">
+        {Object.entries(balances).map(([mint, balance]) => (
+          <div
+            key={mint}
+            className="w-96 h-24 flex flex-col gap-3 items-center justify-center rounded-md border p-4"
+          >
+            <MintLink
+              url={mint}
+              classNames={{ icon: "size-6", name: "text-lg line-clamp-1" }}
+            />
+            <div className="flex items-center gap-0">
+              <Bitcoin className="size-7 text-muted-foreground" />
+              <span className="text-2xl font-mono">{balance}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="flex flex-col gap-2 pr-0.5 h-[68vh] overflow-y-scroll pretty-scrollbar">
+        {/*
       <div className="flex items-center justify-center">
         <Button
           disabled={isSyncing}
@@ -951,9 +972,11 @@ function CashuWalletCoins({ wallet }: { wallet: NDKCashuWallet }) {
           {t("wallet.sync")}
         </Button>
       </div>
-      {proofs.map((info: ProofInfo) => (
-        <Proof key={info.proof.C} info={info} />
-      ))}
+      */}
+        {proofs.map((info: ProofInfo) => (
+          <Proof key={info.proof.C} info={info} />
+        ))}
+      </div>
     </div>
   );
 }
