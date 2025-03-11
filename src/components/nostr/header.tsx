@@ -41,33 +41,40 @@ export function Header({ event }: { event: NostrEvent }) {
   const publishedAt = event.tags.find((t) => t[0] === "published_at")?.[1];
   const startsAt = event.tags.find((t) => t[0] === "starts")?.[1];
   const timestamp = Number(publishedAt) || Number(startsAt) || event.created_at;
+  const op = (
+    <User
+      pubkey={author ?? event.pubkey}
+      classNames={{ avatar: "size-6", name: "text-md", wrapper: "gap-1.5" }}
+    />
+  );
+  const groupName = (
+    <span className="text-xs text-muted-foreground">
+      {group && relay ? (
+        <GroupName id={group} relay={relay} />
+      ) : group ? (
+        <div className="flex flex-row items-center gap-1">
+          <MessageCircleQuestion className="size-3" />
+          <span>{t("header.unknown")}</span>
+        </div>
+      ) : (
+        <div className="flex flex-row items-center gap-1">
+          <Globe className="size-3" />
+          <span>{t("header.public")}</span>
+        </div>
+      )}
+    </span>
+  );
+  const time = (
+    <span className="text-xs text-muted-foreground">
+      {formatRelativeTime(timestamp ?? 0)}
+    </span>
+  );
   return (
     <div className="flex flex-row items-center justify-between w-full">
-      <div className="flex flex-row items-center w-full gap-2">
-        <User
-          pubkey={author ?? event.pubkey}
-          classNames={{ avatar: "size-6", name: "text-md" }}
-        />
-        <div className="w-full flex items-center justify-between">
-          <span className="text-xs text-muted-foreground">
-            {group && relay ? (
-              <GroupName id={group} relay={relay} />
-            ) : group ? (
-              <div className="flex flex-row items-center gap-1">
-                <MessageCircleQuestion className="size-3" />
-                <span>{t("header.unknown")}</span>
-              </div>
-            ) : (
-              <div className="flex flex-row items-center gap-1">
-                <Globe className="size-3" />
-                <span>{t("header.public")}</span>
-              </div>
-            )}
-          </span>
-          <span className="text-xs text-muted-foreground">
-            {formatRelativeTime(timestamp ?? 0)}
-          </span>
-        </div>
+      {op}
+      <div className="flex flex-row items-center gap-3">
+        {groupName}
+        {time}
       </div>
     </div>
   );

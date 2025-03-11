@@ -413,7 +413,7 @@ function EventMenu({
       ) : null}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="smallIcon">
             <Ellipsis />
           </Button>
         </DropdownMenuTrigger>
