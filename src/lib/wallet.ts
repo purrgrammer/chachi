@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import { NostrEvent } from "nostr-tools";
 import NDK, {
-  // NDKCashuToken,
+  NDKCashuToken,
   NDKUser,
   NDKKind,
   NDKEvent,
@@ -115,44 +115,44 @@ export function useChachiWallet() {
     async function syncWallet() {
       if (!cashuWallet || !pubkey) return;
 
-      //const filter = {
-      //  kinds: [NDKKind.CashuToken],
-      //  authors: [pubkey],
-      //};
-      //const tokenEvents = Array.from(
-      //  await ndk.fetchEvents(
-      //    filter,
-      //    {
-      //      groupable: false,
-      //      closeOnEose: true,
-      //      subId: "cashu-wallet",
-      //    },
-      //    cashuWallet.relaySet,
-      //  ),
-      //);
-      //const tokens = await Promise.all(
-      //  tokenEvents.map((e) => NDKCashuToken.from(e)),
-      //);
-      //const validTokens = tokens.filter((t) => t instanceof NDKCashuToken);
-      //for (const token of validTokens) {
-      //  if (!token?.id) {
-      //    continue;
-      //  }
-      //  if (cashuWallet.state.tokens.has(token.id)) {
-      //    continue;
-      //  }
+      const filter = {
+        kinds: [NDKKind.CashuToken],
+        authors: [pubkey],
+      };
+      const tokenEvents = Array.from(
+        await ndk.fetchEvents(
+          filter,
+          {
+            groupable: false,
+            closeOnEose: true,
+            subId: "cashu-wallet",
+          },
+          cashuWallet.relaySet,
+        ),
+      );
+      const tokens = await Promise.all(
+        tokenEvents.map((e) => NDKCashuToken.from(e)),
+      );
+      const validTokens = tokens.filter((t) => t instanceof NDKCashuToken);
+      for (const token of validTokens) {
+        if (!token?.id) {
+          continue;
+        }
+        if (cashuWallet.state.tokens.has(token.id)) {
+          continue;
+        }
 
-      //  for (const deletedTokenId of token.deletedTokens) {
-      //    cashuWallet.state.removeTokenId(deletedTokenId);
-      //  }
+        for (const deletedTokenId of token.deletedTokens) {
+          cashuWallet.state.removeTokenId(deletedTokenId);
+        }
 
-      //  cashuWallet.state.addToken(token);
-      //}
-      //const now = Date.now();
-      //cashuWallet.checkProofs();
-      //cashuWallet.start({ since: now });
-      cashuWallet.start();
+        cashuWallet.state.addToken(token);
+      }
+      const now = Date.now();
       cashuWallet.checkProofs();
+      cashuWallet.start({ since: now });
+      //cashuWallet.start();
+      //cashuWallet.checkProofs();
     }
     syncWallet();
   }, [pubkey, cashuWallet]);
