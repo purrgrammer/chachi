@@ -97,6 +97,22 @@
     }
   }
 
+  /* Thin scrollbar for code blocks */
+  .code-block-thin-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .code-block-thin-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .code-block-thin-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(128, 128, 128, 0.3);
+    border-radius: 4px;
+  }
+  .code-block-thin-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(128, 128, 128, 0.5);
+  }
+
   /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;

@@ -20,6 +20,8 @@ const badgeVariants = cva(
           "bg-primary text-primary-foreground rounded-full py-0 px-1",
         tag: "py-0.5 px-2 text-xs font-light border-primary",
         live: "border-transparent bg-destructive text-destructive-foreground p-1",
+        language:
+          "py-0.5 px-1.5 text-xs font-mono font-light bg-accent text-accent-foreground border-none uppercase",
       },
     },
     defaultVariants: {

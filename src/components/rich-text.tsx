@@ -18,6 +18,7 @@ import { isImageLink, isVideoLink, isAudioLink } from "@/lib/string";
 import type { Group } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { CUSTOM_EMOJI_REGEX } from "@/lib/emoji";
+import { CodeBlock } from "@/components/code-block";
 
 // todo: blossom link fallbacks
 
@@ -96,6 +97,27 @@ export type EcashFragment = {
   token: string;
 };
 
+export type CodeBlockFragment = {
+  type: "codeBlock";
+  code: string;
+  language?: string;
+};
+
+export type BoldFragment = {
+  type: "bold";
+  text: string;
+};
+
+export type ItalicFragment = {
+  type: "italic";
+  text: string;
+};
+
+export type MonospaceFragment = {
+  type: "monospace";
+  text: string;
+};
+
 // fixme: event/address as block?
 
 export type InlineFragment =
@@ -110,14 +132,17 @@ export type InlineFragment =
   | AudioFragment
   | EmojiFragment
   | HashtagFragment
-  | EcashFragment;
+  | EcashFragment
+  | BoldFragment
+  | ItalicFragment
+  | MonospaceFragment;
 
 export type BlockFragment = {
   type: "block";
   nodes: InlineFragment[];
 };
 
-export type Fragment = BlockFragment | InlineFragment;
+export type Fragment = BlockFragment | InlineFragment | CodeBlockFragment;
 
 function isRenderedAsBlock(fragment: Fragment): boolean {
   return (
@@ -128,7 +153,8 @@ function isRenderedAsBlock(fragment: Fragment): boolean {
     fragment.type === "video" ||
     fragment.type === "youtube" ||
     fragment.type === "image" ||
-    fragment.type === "audio"
+    fragment.type === "audio" ||
+    fragment.type === "codeBlock"
   );
 }
 
@@ -245,6 +271,47 @@ function toNode(
     );
   }
 
+  if (fragment.type === "codeBlock") {
+    return (
+      <CodeBlock
+        key={idx}
+        code={fragment.code}
+        language={fragment.language}
+        className={classNames.codeBlock || ""}
+      />
+    );
+  }
+
+  if (fragment.type === "bold") {
+    return (
+      <strong key={idx} className={cn("whitespace-pre-wrap", classNames.bold)}>
+        {fragment.text}
+      </strong>
+    );
+  }
+
+  if (fragment.type === "italic") {
+    return (
+      <em key={idx} className={cn("whitespace-pre-wrap", classNames.italic)}>
+        {fragment.text}
+      </em>
+    );
+  }
+
+  if (fragment.type === "monospace") {
+    return (
+      <code
+        key={idx}
+        className={cn(
+          "bg-background text-foreground px-1 py-0.5 rounded text-sm whitespace-pre-wrap",
+          classNames.monospace,
+        )}
+      >
+        {fragment.text}
+      </code>
+    );
+  }
+
   if (fragment.type === "text") {
     return (
       <span
@@ -278,238 +345,6 @@ function toNode(
   return null;
 }
 
-function toFragments(text: string): Fragment[] {
-  return text
-    .split(/\n/)
-    .filter(Boolean)
-    .map((line) => {
-      return { type: "block", nodes: [{ type: "text", text: line }] };
-    });
-}
-
-function extract(
-  fragments: Fragment[],
-  regexp: RegExp,
-  match: (s: string) => boolean,
-  parse: (s: string) => Fragment,
-): Fragment[] {
-  return fragments
-    .map((f) => {
-      if (f.type === "text") {
-        return f.text
-          .split(regexp)
-          .filter(Boolean)
-          .map((s) => {
-            if (match(s)) {
-              try {
-                return parse(s);
-              } catch {
-                return { type: "text", text: s } as Fragment;
-              }
-            } else {
-              return { type: "text", text: s } as Fragment;
-            }
-          });
-      } else if (f.type === "block") {
-        return {
-          type: "block",
-          nodes: extract(f.nodes, regexp, match, parse),
-        } as Fragment;
-      }
-      return f;
-    })
-    .flat();
-}
-
-function parseNpub(s: string): Fragment {
-  const raw = s.replace(NostrPrefixRegex, "");
-  const pubkey = nip19.decode(raw).data;
-  return { type: "mention", pubkey, relays: [] } as Fragment;
-}
-
-function extractMentions(fragments: Fragment[]): Fragment[] {
-  return extract(
-    fragments,
-    /(nostr:npub1[a-z0-9]+)/g,
-    (s: string) => s.startsWith("nostr:npub1"),
-    parseNpub,
-  );
-}
-
-function parseNprofile(s: string): Fragment {
-  const raw = s.replace(NostrPrefixRegex, "");
-  const { pubkey, relays } = nip19.decode(raw).data as ProfilePointer;
-  return { type: "mention", pubkey, relays: relays || [] } as Fragment;
-}
-
-function extractProfiles(fragments: Fragment[]): Fragment[] {
-  return extract(
-    fragments,
-    /(nostr:nprofile1[a-z0-9]+)/g,
-    (s: string) => s.startsWith("nostr:nprofile1"),
-    parseNprofile,
-  );
-}
-
-function parseNote(s: string): Fragment {
-  const note = s.replace(NostrPrefixRegex, "");
-  const id = nip19.decode(note).data;
-  return { type: "event", id, relays: [], kind: 1 } as Fragment;
-}
-
-function extractNote(fragments: Fragment[]): Fragment[] {
-  return extract(
-    fragments,
-    /(nostr:note1[a-z0-9]+)/g,
-    (s: string) => s.startsWith("nostr:note1"),
-    parseNote,
-  );
-}
-
-function parseEvent(s: string): Fragment {
-  const nevent = s.replace(NostrPrefixRegex, "");
-  const { id, relays, author, kind } = nip19.decode(nevent)
-    .data as EventPointer;
-  return {
-    type: "event",
-    id,
-    relays: relays || [],
-    kind,
-    pubkey: author,
-  } as Fragment;
-}
-
-function extractNevent(fragments: Fragment[]): Fragment[] {
-  return extract(
-    fragments,
-    /(nostr:nevent1[a-z0-9]+)/g,
-    (s: string) => s.startsWith("nostr:nevent1"),
-    parseEvent,
-  );
-}
-
-function parseAddress(s: string): Fragment {
-  const nevent = s.replace(NostrPrefixRegex, "");
-  const { pubkey, identifier, kind, relays } = nip19.decode(nevent)
-    .data as AddressPointer;
-  return {
-    type: "address",
-    relays: relays || [],
-    pubkey,
-    identifier,
-    kind: Number(kind),
-  } as Fragment;
-}
-
-function extractNaddr(fragments: Fragment[]): Fragment[] {
-  return extract(
-    fragments,
-    /(nostr:naddr1[a-z0-9]+)/g,
-    (s: string) => s.startsWith("nostr:naddr1"),
-    parseAddress,
-  );
-}
-
-//const nostrEntityRegex = /^(npub1|nprofile1|note1|nevent1|naddr1)[a-z0-9]+$/g;
-
-function extractURLs(
-  fragments: Fragment[],
-  options: RichTextOptions,
-): Fragment[] {
-  return extract(
-    fragments,
-    urlRegex,
-    (s: string) => {
-      try {
-        const u = new URL(s);
-        return Boolean(u.hostname);
-      } catch {
-        return false;
-      }
-    },
-    (url: string) => {
-      //const last = url.split("/").pop()?.trim();
-      //if (last && nostrEntityRegex.test(last)) {
-      //  const fragment = last.startsWith("nevent1")
-      //    ? parseEvent(last)
-      //    : last.startsWith("note1")
-      //      ? parseNote(last)
-      //      : last.startsWith("npub1")
-      //        ? parseNpub(last)
-      //        : last.startsWith("nprofile1")
-      //          ? parseNprofile(last)
-      //          : parseAddress(last);
-      //  return fragment;
-      //}
-      if (isVideoLink(url) && options.video) {
-        return { type: "video", url };
-      }
-      if (isAudioLink(url) && options.audio) {
-        return { type: "audio", url };
-      }
-      if (isImageLink(url) && options.images) {
-        return { type: "image", url };
-      }
-      if (url.match(youtubeUrlRegex) && options.youtube) {
-        return { type: "youtube", url };
-      }
-      return { type: "url", url } as Fragment;
-    },
-  );
-}
-
-function extractCustomEmoji(
-  fragments: Fragment[],
-  tags: string[][],
-): Fragment[] {
-  return extract(
-    fragments,
-    CUSTOM_EMOJI_REGEX,
-    (name: string) => {
-      const code = name.slice(1, -1);
-      return Boolean(tags.find((a) => a[0] === "emoji" && a[1] === code));
-    },
-    (name: string) => {
-      const code = name.slice(1, -1);
-      const image = tags.find((t) => t[0] === "emoji" && t[1] === code)?.[2];
-      if (image) {
-        return { type: "emoji", name: code, image } as Fragment;
-      }
-      return { type: "text", text: name } as Fragment;
-    },
-  );
-}
-
-const hashtagRegex = /(?<=\s|^)(#[^\s!@#$%^&*()=+./,[{\]};:'"?><]+)/g;
-
-function extractHashtags(fragments: Fragment[]): Fragment[] {
-  return extract(
-    fragments,
-    hashtagRegex,
-    (tag: string) => {
-      return tag.startsWith("#");
-    },
-    (tag: string) => {
-      return { type: "hashtag", tag: tag.slice(1) } as Fragment;
-    },
-  );
-}
-
-const cashuRegex = /(cashu[AB][A-Za-z0-9_-]{0,10000}={0,3})/gi;
-
-function extractEcash(fragments: Fragment[]): Fragment[] {
-  return extract(
-    fragments,
-    cashuRegex,
-    (s: string) => {
-      return s.startsWith("cashuA") || s.startsWith("cashuB");
-    },
-    (token: string) => {
-      return { type: "ecash", token } as Fragment;
-    },
-  );
-}
-
 export interface RichTextOptions {
   inline?: boolean;
   emojis?: boolean;
@@ -522,6 +357,12 @@ export interface RichTextOptions {
   audio?: boolean;
   video?: boolean;
   youtube?: boolean;
+  syntax?: boolean;
+  bold?: boolean;
+  italic?: boolean;
+  monospace?: boolean;
+  codeBlock?: boolean;
+  preserveNewlines?: boolean;
 }
 
 export interface RichTextClassnames {
@@ -539,6 +380,10 @@ export interface RichTextClassnames {
   audio?: string;
   image?: string;
   youtube?: string;
+  codeBlock?: string;
+  bold?: string;
+  italic?: string;
+  monospace?: string;
 }
 
 export function useRichText(
@@ -547,7 +392,16 @@ export function useRichText(
   tags: string[][],
 ): Fragment[] {
   const fragments = useMemo(() => {
-    let result = toFragments(text || "");
+    // Process text with all formatting in one go
+    let result = toFragments(
+      text || "",
+      options.syntax,
+      options.codeBlock,
+      options.preserveNewlines !== false,
+      options,
+    );
+
+    // Processing other elements that aren't formatting-related
     if (options.urls) {
       result = extractURLs(result, options);
     }
@@ -566,6 +420,7 @@ export function useRichText(
     if (options.ecash) {
       result = extractEcash(result);
     }
+
     return result;
   }, [text, options, tags]);
   return fragments;
@@ -603,6 +458,12 @@ const defaultOptions = {
   video: true,
   audio: true,
   youtube: true,
+  syntax: true,
+  bold: true,
+  italic: true,
+  monospace: true,
+  codeBlock: true,
+  preserveNewlines: true,
 };
 
 export function RichText({
@@ -622,7 +483,15 @@ export function RichText({
 }) {
   const opts = { ...defaultOptions, ...options };
   const fragments = useMemo(() => {
-    let result = toFragments(children || "");
+    // Process text with all formatting in one go
+    let result = toFragments(
+      children || "",
+      opts.syntax,
+      opts.codeBlock,
+      opts.preserveNewlines !== false,
+      opts,
+    );
+
     if (opts.urls) {
       result = extractURLs(result, opts);
     }
@@ -641,6 +510,7 @@ export function RichText({
     if (opts.ecash) {
       result = extractEcash(result);
     }
+
     // flatten structure to avoid invalid DOM nesting
     return result.reduce((acc, f) => {
       if (f.type === "block") {
@@ -686,3 +556,437 @@ export function RichText({
     </div>
   );
 }
+
+function toFragments(
+  text: string,
+  enableSyntax: boolean = true,
+  enableCodeBlock: boolean = true,
+  preserveNewlines: boolean = true,
+  options?: RichTextOptions,
+): Fragment[] {
+  if (!text) return [];
+
+  // If syntax highlighting is disabled, just return the text
+  if (!enableSyntax) {
+    // If preserveNewlines is enabled, split by newlines
+    if (preserveNewlines) {
+      return text
+        .split(/\n/)
+        .filter(Boolean)
+        .map((line) => {
+          return { type: "block", nodes: [{ type: "text", text: line }] };
+        });
+    }
+    // Otherwise keep as a single block
+    return [{ type: "block", nodes: [{ type: "text", text }] }];
+  }
+
+  // If code blocks are disabled, process syntax on the entire text
+  if (!enableCodeBlock) {
+    // Process the text for formatting
+    let processedText = text;
+
+    // Apply bold formatting if enabled
+    if (options?.bold !== false) {
+      processedText = processedText.replace(boldRegex, (match) => {
+        const innerText = match.slice(1, -1);
+        return `<bold>${innerText}</bold>`;
+      });
+    }
+
+    // Apply italic formatting if enabled
+    if (options?.italic !== false) {
+      processedText = processedText.replace(italicRegex, (match) => {
+        const innerText = match.slice(1, -1);
+        return `<italic>${innerText}</italic>`;
+      });
+    }
+
+    // Apply monospace formatting if enabled
+    if (options?.monospace !== false) {
+      processedText = processedText.replace(monospaceRegex, (match) => {
+        const innerText = match.slice(1, -1);
+        return `<monospace>${innerText}</monospace>`;
+      });
+    }
+
+    // Parse the entire text for formatted elements
+    const nodes: InlineFragment[] = [];
+    const processedContent = processedText;
+    let matchResult;
+    let lastIndex = 0;
+
+    // Process all formatting tags in one pass
+    const formattingRegex = /<(bold|italic|monospace)>([\s\S]*?)<\/\1>/g;
+    while ((matchResult = formattingRegex.exec(processedContent)) !== null) {
+      // Add text before the match
+      if (matchResult.index > lastIndex) {
+        nodes.push({
+          type: "text",
+          text: processedContent.substring(lastIndex, matchResult.index),
+        });
+      }
+
+      // Add the formatted text based on tag type
+      const tagType = matchResult[1];
+      const content = matchResult[2];
+
+      if (tagType === "bold") {
+        nodes.push({ type: "bold", text: content });
+      } else if (tagType === "italic") {
+        nodes.push({ type: "italic", text: content });
+      } else if (tagType === "monospace") {
+        nodes.push({ type: "monospace", text: content });
+      }
+
+      lastIndex = matchResult.index + matchResult[0].length;
+    }
+
+    // Add any remaining text
+    if (lastIndex < processedContent.length) {
+      nodes.push({ type: "text", text: processedContent.substring(lastIndex) });
+    }
+
+    // If we need to preserve newlines, split the blocks appropriately
+    if (preserveNewlines) {
+      const result: Fragment[] = [];
+
+      // First, collect all the text and formatted nodes and combine them into lines
+      const lines: InlineFragment[][] = [[]];
+      let currentLine = 0;
+
+      for (const node of nodes) {
+        if (node.type === "text") {
+          // For plain text, split by newlines
+          const textLines = node.text.split(/\n/);
+
+          // Add the first part to current line
+          if (textLines[0]) {
+            lines[currentLine].push({ type: "text", text: textLines[0] });
+          }
+
+          // Create new lines for the rest
+          for (let i = 1; i < textLines.length; i++) {
+            currentLine++;
+            lines[currentLine] = [];
+            if (textLines[i]) {
+              lines[currentLine].push({ type: "text", text: textLines[i] });
+            }
+          }
+        } else if (
+          node.type === "bold" ||
+          node.type === "italic" ||
+          node.type === "monospace"
+        ) {
+          // For formatted text with newlines, we need to distribute it across the right lines
+          if (node.text.includes("\n")) {
+            const formattedLines = node.text.split(/\n/);
+
+            // Add the first part to current line
+            if (formattedLines[0]) {
+              lines[currentLine].push({
+                type: node.type,
+                text: formattedLines[0],
+              } as InlineFragment);
+            }
+
+            // Create new lines for the rest
+            for (let i = 1; i < formattedLines.length; i++) {
+              currentLine++;
+              lines[currentLine] = [];
+              if (formattedLines[i]) {
+                lines[currentLine].push({
+                  type: node.type,
+                  text: formattedLines[i],
+                } as InlineFragment);
+              }
+            }
+          } else {
+            // No newlines in the formatted text, keep on current line
+            lines[currentLine].push(node);
+          }
+        } else {
+          // For other node types, keep on current line
+          lines[currentLine].push(node);
+        }
+      }
+
+      // Convert the lines to block fragments
+      for (const line of lines) {
+        if (line.length > 0) {
+          result.push({
+            type: "block",
+            nodes: line,
+          });
+        }
+      }
+
+      return result;
+    } else {
+      // No need to preserve newlines, return as a single block
+      return [{ type: "block", nodes }];
+    }
+  }
+
+  // First, detect code blocks
+  const result: Fragment[] = [];
+  let lastIndex = 0;
+  let match;
+
+  // Create a copy of the regexp with the global flag to find code blocks
+  const regex = new RegExp(codeBlockRegex.source, codeBlockRegex.flags);
+
+  // Process the entire text to find code blocks first
+  while ((match = regex.exec(text)) !== null) {
+    // Process text before the code block with formatting
+    if (match.index > lastIndex) {
+      const textBefore = text.substring(lastIndex, match.index);
+
+      // Process the text for formatting (uses recursion to handle formatting)
+      const formattedBlocks = toFragments(
+        textBefore,
+        enableSyntax,
+        false,
+        preserveNewlines,
+        options,
+      );
+      result.push(...formattedBlocks);
+    }
+
+    let language: string | undefined = undefined;
+    let code: string;
+
+    // Check if the language part ends with a newline, indicating it's a proper language specifier
+    const languagePart = match[1];
+    if (languagePart && languagePart.endsWith("\n")) {
+      language = languagePart.slice(0, -1).trim(); // Remove the newline and trim
+      code = match[2];
+    } else {
+      // If no newline after potential language specifier, treat everything as code
+      code = (languagePart || "") + match[2];
+    }
+
+    // Add the code block
+    result.push({
+      type: "codeBlock",
+      code: code.trimEnd(),
+      language: language || undefined,
+    });
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Process remaining text after the last code block
+  if (lastIndex < text.length) {
+    const textAfter = text.substring(lastIndex);
+
+    // Process the text for formatting (uses recursion to handle formatting)
+    const formattedBlocks = toFragments(
+      textAfter,
+      enableSyntax,
+      false,
+      preserveNewlines,
+      options,
+    );
+    result.push(...formattedBlocks);
+  }
+
+  return result;
+}
+
+function extract(
+  fragments: Fragment[],
+  regexp: RegExp,
+  parse: (s: string) => Fragment,
+): Fragment[] {
+  return fragments
+    .map((f) => {
+      if (f.type === "text") {
+        const result: Fragment[] = [];
+        let lastIndex = 0;
+        let match;
+
+        // Create a copy of the regexp with the global flag
+        const globalRegexp = new RegExp(
+          regexp.source,
+          regexp.flags.includes("g") ? regexp.flags : regexp.flags + "g",
+        );
+
+        // Find all matches
+        while ((match = globalRegexp.exec(f.text)) !== null) {
+          // Add text before the match as a text fragment
+          if (match.index > lastIndex) {
+            result.push({
+              type: "text",
+              text: f.text.substring(lastIndex, match.index),
+            });
+          }
+
+          // Try to parse the matched text
+          try {
+            result.push(parse(match[0]));
+          } catch {
+            result.push({ type: "text", text: match[0] });
+          }
+
+          lastIndex = match.index + match[0].length;
+        }
+
+        // Add the remaining text after the last match
+        if (lastIndex < f.text.length) {
+          result.push({ type: "text", text: f.text.substring(lastIndex) });
+        }
+
+        return result;
+      } else if (f.type === "block") {
+        return {
+          type: "block",
+          nodes: extract(f.nodes, regexp, parse),
+        } as Fragment;
+      }
+      return f;
+    })
+    .flat();
+}
+
+function parseNpub(s: string): Fragment {
+  const raw = s.replace(NostrPrefixRegex, "");
+  const pubkey = nip19.decode(raw).data;
+  return { type: "mention", pubkey, relays: [] } as Fragment;
+}
+
+function extractMentions(fragments: Fragment[]): Fragment[] {
+  return extract(fragments, /(nostr:npub1[a-z0-9]+)/g, parseNpub);
+}
+
+function parseNprofile(s: string): Fragment {
+  const raw = s.replace(NostrPrefixRegex, "");
+  const { pubkey, relays } = nip19.decode(raw).data as ProfilePointer;
+  return { type: "mention", pubkey, relays: relays || [] } as Fragment;
+}
+
+function extractProfiles(fragments: Fragment[]): Fragment[] {
+  return extract(fragments, /(nostr:nprofile1[a-z0-9]+)/g, parseNprofile);
+}
+
+function parseNote(s: string): Fragment {
+  const note = s.replace(NostrPrefixRegex, "");
+  const id = nip19.decode(note).data;
+  return { type: "event", id, relays: [], kind: 1 } as Fragment;
+}
+
+function extractNote(fragments: Fragment[]): Fragment[] {
+  return extract(fragments, /(nostr:note1[a-z0-9]+)/g, parseNote);
+}
+
+function parseEvent(s: string): Fragment {
+  const nevent = s.replace(NostrPrefixRegex, "");
+  const { id, relays, author, kind } = nip19.decode(nevent)
+    .data as EventPointer;
+  return {
+    type: "event",
+    id,
+    relays: relays || [],
+    kind,
+    pubkey: author,
+  } as Fragment;
+}
+
+function extractNevent(fragments: Fragment[]): Fragment[] {
+  return extract(fragments, /(nostr:nevent1[a-z0-9]+)/g, parseEvent);
+}
+
+function parseAddress(s: string): Fragment {
+  const nevent = s.replace(NostrPrefixRegex, "");
+  const { pubkey, identifier, kind, relays } = nip19.decode(nevent)
+    .data as AddressPointer;
+  return {
+    type: "address",
+    relays: relays || [],
+    pubkey,
+    identifier,
+    kind: Number(kind),
+  } as Fragment;
+}
+
+function extractNaddr(fragments: Fragment[]): Fragment[] {
+  return extract(fragments, /(nostr:naddr1[a-z0-9]+)/g, parseAddress);
+}
+
+//const nostrEntityRegex = /^(npub1|nprofile1|note1|nevent1|naddr1)[a-z0-9]+$/g;
+
+function extractURLs(
+  fragments: Fragment[],
+  options: RichTextOptions,
+): Fragment[] {
+  return extract(fragments, urlRegex, (url: string) => {
+    //const last = url.split("/").pop()?.trim();
+    //if (last && nostrEntityRegex.test(last)) {
+    //  const fragment = last.startsWith("nevent1")
+    //    ? parseEvent(last)
+    //    : last.startsWith("note1")
+    //      ? parseNote(last)
+    //      : last.startsWith("npub1")
+    //        ? parseNpub(last)
+    //        : last.startsWith("nprofile1")
+    //          ? parseNprofile(last)
+    //          : parseAddress(last);
+    //  return fragment;
+    if (isVideoLink(url) && options.video) {
+      return { type: "video", url };
+    }
+    if (isAudioLink(url) && options.audio) {
+      return { type: "audio", url };
+    }
+    if (isImageLink(url) && options.images) {
+      return { type: "image", url };
+    }
+    if (url.match(youtubeUrlRegex) && options.youtube) {
+      return { type: "youtube", url };
+    }
+    return { type: "url", url } as Fragment;
+  });
+}
+
+function extractCustomEmoji(
+  fragments: Fragment[],
+  tags: string[][],
+): Fragment[] {
+  return extract(fragments, CUSTOM_EMOJI_REGEX, (name: string) => {
+    const code = name.slice(1, -1);
+    const image = tags.find((t) => t[0] === "emoji" && t[1] === code)?.[2];
+    if (image) {
+      return { type: "emoji", name: code, image } as Fragment;
+    }
+    return { type: "text", text: name } as Fragment;
+  });
+}
+
+const hashtagRegex = /(?<=\s|^)(#[^\s!@#$%^&*()=+./,[{\]};:'"?><]+)/g;
+
+function extractHashtags(fragments: Fragment[]): Fragment[] {
+  return extract(fragments, hashtagRegex, (tag: string) => {
+    return { type: "hashtag", tag: tag.slice(1) } as Fragment;
+  });
+}
+
+const cashuRegex = /(cashu[AB][A-Za-z0-9_-]{0,10000}={0,3})/gi;
+
+function extractEcash(fragments: Fragment[]): Fragment[] {
+  return extract(fragments, cashuRegex, (token: string) => {
+    return { type: "ecash", token } as Fragment;
+  });
+}
+
+// Regex for code blocks - improved to handle GitHub-style language specifiers
+const codeBlockRegex = /```((?:[a-zA-Z0-9\-+]+)\n|)([\s\S]*?)```/g;
+
+// Bold text regex - modified to handle multiline text
+const boldRegex = /\*([\s\S]*?)\*/g;
+
+// Italic text regex - modified to handle multiline text
+const italicRegex = /_([\s\S]*?)_/g;
+
+// Modified monospace regex to ensure it doesn't conflict with code blocks
+// and to handle multiline text
+const monospaceRegex = /(?<!(`))`([\s\S]*?)`(?!(`))/g;

@@ -112,6 +112,7 @@ import { useSortedGroups, saveGroupEvent } from "@/lib/messages";
 import { usePubkey, useCanSign } from "@/lib/account";
 import type { Group, Emoji as EmojiType } from "@/lib/types";
 import { useTranslation } from "react-i18next";
+import { CodeBlock } from "@/components/code-block";
 
 type EventComponent = (props: {
   event: NostrEvent;
@@ -1043,9 +1044,10 @@ md:w-[calc(100vw-16rem)]
           </TabsContent>
           <TabsContent value="details">
             <div className="flex flex-col gap-3 py-3 px-4">
-              <pre className="p-2 text-xs whitespace-pre-wrap break-words rounded-sm border">
-                {JSON.stringify(event, null, 2)}
-              </pre>
+              <CodeBlock
+                code={JSON.stringify(event, null, 2)}
+                language="json"
+              />
             </div>
           </TabsContent>
         </Tabs>

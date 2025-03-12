@@ -34,6 +34,7 @@ const buttonVariants = cva(
         bigIcon: "h-10 w-10 [&_svg]:size-6",
         wideIcon: "h-10 w-16 [&_svg]:size-5",
         smallIcon: "h-6 w-6",
+        tinyIcon: "h-5 w-5 [&_svg]:size-3",
         play: "w-12 h-12 [&_svg]:size-8",
         fit: "w-fit p-1",
         big: "h-16 w-16 [&_svg]:size-6",
