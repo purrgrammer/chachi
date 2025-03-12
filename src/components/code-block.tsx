@@ -150,7 +150,7 @@ export function CodeBlock({
 }: {
   code: string;
   language?: string;
-  className: string;
+  className?: string;
 }) {
   const [copied, copy] = useCopy();
   const { resolvedTheme } = useTheme();
