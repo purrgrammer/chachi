@@ -18,7 +18,7 @@ import { isImageLink, isVideoLink, isAudioLink } from "@/lib/string";
 import type { Group } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { CUSTOM_EMOJI_REGEX } from "@/lib/emoji";
-import { CodeBlock } from "@/components/code-block";
+import { LazyCodeBlock } from "@/components/lazy-code-block";
 
 // todo: blossom link fallbacks
 
@@ -273,7 +273,7 @@ function toNode(
 
   if (fragment.type === "codeBlock") {
     return (
-      <CodeBlock
+      <LazyCodeBlock
         key={idx}
         code={fragment.code}
         language={fragment.language}

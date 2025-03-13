@@ -112,7 +112,7 @@ import { useSortedGroups, saveGroupEvent } from "@/lib/messages";
 import { usePubkey, useCanSign } from "@/lib/account";
 import type { Group, Emoji as EmojiType } from "@/lib/types";
 import { useTranslation } from "react-i18next";
-import { CodeBlock } from "@/components/code-block";
+import { LazyCodeBlock } from "@/components/lazy-code-block";
 
 type EventComponent = (props: {
   event: NostrEvent;
@@ -1044,7 +1044,7 @@ md:w-[calc(100vw-16rem)]
           </TabsContent>
           <TabsContent value="details">
             <div className="flex flex-col gap-3 py-3 px-4">
-              <CodeBlock
+              <LazyCodeBlock
                 code={JSON.stringify(event, null, 2)}
                 language="json"
               />

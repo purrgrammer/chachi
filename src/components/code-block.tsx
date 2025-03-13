@@ -4,34 +4,284 @@ import { Button } from "@/components/ui/button";
 import { useCopy } from "@/lib/hooks";
 import { Badge } from "@/components/ui/badge";
 import { Highlight, type PrismTheme } from "prism-react-renderer";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/theme-provider";
 
 // Create a type for supported languages
 type SupportedLanguage =
-  | "javascript"
-  | "jsx"
-  | "typescript"
-  | "tsx"
-  | "css"
-  | "html"
-  | "json"
-  | "markdown"
-  | "python"
+  | "abap"
+  | "abnf"
+  | "actionscript"
+  | "ada"
+  | "agda"
+  | "al"
+  | "antlr4"
+  | "apacheconf"
+  | "apex"
+  | "apl"
+  | "applescript"
+  | "aql"
+  | "arduino"
+  | "arff"
+  | "asciidoc"
+  | "asm6502"
+  | "asmatmel"
+  | "aspnet"
+  | "autohotkey"
+  | "autoit"
   | "bash"
-  | "shell"
-  | "text"
-  | "json";
+  | "basic"
+  | "batch"
+  | "bbcode"
+  | "birb"
+  | "bison"
+  | "bnf"
+  | "brainfuck"
+  | "brightscript"
+  | "bro"
+  | "bsl"
+  | "c"
+  | "cil"
+  | "clike"
+  | "clojure"
+  | "cmake"
+  | "coffeescript"
+  | "concurnas"
+  | "coq"
+  | "cpp"
+  | "crystal"
+  | "csharp"
+  | "cshtml"
+  | "csp"
+  | "css"
+  | "css-extras"
+  | "csv"
+  | "cypher"
+  | "d"
+  | "dart"
+  | "dataweave"
+  | "dax"
+  | "dhall"
+  | "diff"
+  | "django"
+  | "dns-zone-file"
+  | "docker"
+  | "dot"
+  | "ebnf"
+  | "editorconfig"
+  | "eiffel"
+  | "ejs"
+  | "elixir"
+  | "elm"
+  | "erb"
+  | "erlang"
+  | "etlua"
+  | "excel-formula"
+  | "factor"
+  | "false"
+  | "firestore-security-rules"
+  | "flow"
+  | "fortran"
+  | "fsharp"
+  | "ftl"
+  | "gcode"
+  | "gdscript"
+  | "gedcom"
+  | "gherkin"
+  | "git"
+  | "glsl"
+  | "gml"
+  | "go"
+  | "graphql"
+  | "groovy"
+  | "haml"
+  | "handlebars"
+  | "haskell"
+  | "haxe"
+  | "hcl"
+  | "hlsl"
+  | "hoon"
+  | "hpkp"
+  | "hsts"
+  | "http"
+  | "ichigojam"
+  | "icon"
+  | "icu-message-format"
+  | "idris"
+  | "iecst"
+  | "ignore"
+  | "inform7"
+  | "ini"
+  | "io"
+  | "j"
+  | "java"
+  | "javadoc"
+  | "javadoclike"
+  | "javascript"
+  | "javastacktrace"
+  | "jexl"
+  | "jolie"
+  | "jq"
+  | "jsdoc"
+  | "js-extras"
+  | "json"
+  | "json5"
+  | "jsonp"
+  | "jsstacktrace"
+  | "js-templates"
+  | "jsx"
+  | "julia"
+  | "keyman"
+  | "kotlin"
+  | "kumir"
+  | "latex"
+  | "latte"
+  | "less"
+  | "lilypond"
+  | "liquid"
+  | "lisp"
+  | "livescript"
+  | "llvm"
+  | "log"
+  | "lolcode"
+  | "lua"
+  | "makefile"
+  | "markdown"
+  | "markup"
+  | "markup-templating"
+  | "matlab"
+  | "mel"
+  | "mermaid"
+  | "mizar"
+  | "mongodb"
+  | "monkey"
+  | "moonscript"
+  | "n1ql"
+  | "n4js"
+  | "nand2tetris-hdl"
+  | "naniscript"
+  | "nasm"
+  | "neon"
+  | "nevod"
+  | "nginx"
+  | "nim"
+  | "nix"
+  | "nsis"
+  | "objectivec"
+  | "ocaml"
+  | "opencl"
+  | "openqasm"
+  | "oz"
+  | "parigp"
+  | "parser"
+  | "pascal"
+  | "pascaligo"
+  | "pcaxis"
+  | "peoplecode"
+  | "perl"
+  | "php"
+  | "phpdoc"
+  | "php-extras"
+  | "plsql"
+  | "powerquery"
+  | "powershell"
+  | "processing"
+  | "prolog"
+  | "promql"
+  | "properties"
+  | "protobuf"
+  | "psl"
+  | "pug"
+  | "puppet"
+  | "pure"
+  | "purebasic"
+  | "purescript"
+  | "python"
+  | "q"
+  | "qml"
+  | "qore"
+  | "qsharp"
+  | "r"
+  | "racket"
+  | "reason"
+  | "regex"
+  | "rego"
+  | "renpy"
+  | "rest"
+  | "rip"
+  | "roboconf"
+  | "robotframework"
+  | "ruby"
+  | "rust"
+  | "sas"
+  | "sass"
+  | "scala"
+  | "scheme"
+  | "scss"
+  | "shell-session"
+  | "smali"
+  | "smalltalk"
+  | "smarty"
+  | "sml"
+  | "solidity"
+  | "solution-file"
+  | "soy"
+  | "sparql"
+  | "splunk-spl"
+  | "sqf"
+  | "sql"
+  | "squirrel"
+  | "stan"
+  | "stylus"
+  | "swift"
+  | "t4-cs"
+  | "t4-templating"
+  | "t4-vb"
+  | "tap"
+  | "tcl"
+  | "textile"
+  | "toml"
+  | "tremor"
+  | "tsx"
+  | "tt2"
+  | "turtle"
+  | "twig"
+  | "typescript"
+  | "typoscript"
+  | "unrealscript"
+  | "uri"
+  | "v"
+  | "vala"
+  | "vbnet"
+  | "velocity"
+  | "verilog"
+  | "vhdl"
+  | "vim"
+  | "visual-basic"
+  | "warpscript"
+  | "wasm"
+  | "web-idl"
+  | "wiki"
+  | "wolfram"
+  | "wren"
+  | "xeora"
+  | "xml-doc"
+  | "xojo"
+  | "xquery"
+  | "yaml"
+  | "yang"
+  | "zig"
+  | "text"; // Fallback
 
 // Create monochrome themes for light and dark modes
 const monochromeThemeLight: PrismTheme = {
   plain: {
-    color: "#1a1a1a",
-    backgroundColor: "transparent",
+    color: "hsl(var(--foreground))",
+    backgroundColor: "hsl(var(--background))",
   },
   styles: [
     {
       types: ["comment", "prolog", "doctype", "cdata"],
-      style: { color: "#636363", fontStyle: "italic" },
+      style: { color: "hsl(var(--muted-foreground))", fontStyle: "italic" },
     },
     {
       types: ["namespace"],
@@ -39,59 +289,56 @@ const monochromeThemeLight: PrismTheme = {
     },
     {
       types: ["string", "attr-value"],
-      style: { color: "#404040" },
+      style: { color: "hsl(var(--primary))" },
+    },
+    {
+      types: ["number"],
+      style: { color: "hsl(var(--primary))" },
     },
     {
       types: ["punctuation", "operator"],
       style: { color: "#4d4d4d" },
     },
     {
-      types: [
-        "entity",
-        "url",
-        "symbol",
-        "number",
-        "boolean",
-        "variable",
-        "constant",
-        "property",
-        "regex",
-        "inserted",
-      ],
-      style: { color: "#333333" },
+      types: ["entity", "symbol"],
+      style: { color: "hsl(var(--primary))" },
+    },
+    {
+      types: ["url", "boolean", "variable", "constant", "regex", "inserted"],
+      style: { color: "hsl(var(--muted-foreground))" },
     },
     {
       types: ["atrule", "keyword", "attr-name", "selector"],
-      style: { color: "#000000", fontWeight: "bold" },
+      style: { color: "hsl(var(--foreground))", fontWeight: "bold" },
     },
     {
       types: ["function", "deleted", "tag"],
-      style: { color: "#1a1a1a" },
+      style: { color: "hsl(var(--foreground))", fontWeight: "bold" },
     },
     {
       types: ["function-variable"],
-      style: { color: "#000000", fontWeight: "bold" },
+      style: { color: "hsl(var(--foreground))", fontWeight: "bold" },
     },
     {
       types: ["tag", "selector", "keyword", "null"],
-      style: { color: "#333333" },
+      style: { color: "hsl(var(--foreground))", fontWeight: "bold" },
     },
     {
       types: ["property"],
-      style: { color: "#000000", fontWeight: "bold" },
+      style: { color: "hsl(var(--foreground))", fontWeight: "bold" },
     },
   ],
 };
 
 const monochromeThemeDark: PrismTheme = {
   plain: {
-    color: "#e0e0e0",
-    backgroundColor: "transparent",
+    color: "hsl(var(--foreground))",
+    backgroundColor: "hsl(var(--background))",
   },
   styles: [
     {
       types: ["comment", "prolog", "doctype", "cdata"],
-      style: { color: "#999999", fontStyle: "italic" },
+      style: { color: "hsl(var(--muted-foreground))", fontStyle: "italic" },
     },
     {
       types: ["namespace"],
@@ -99,46 +346,43 @@ const monochromeThemeDark: PrismTheme = {
     },
     {
       types: ["string", "attr-value"],
-      style: { color: "#c7c7c7" },
+      style: { color: "hsl(var(--muted-foreground))" },
+    },
+    {
+      types: ["number"],
+      style: { color: "hsl(var(--muted-foreground))" },
     },
     {
       types: ["punctuation", "operator"],
-      style: { color: "#b3b3b3" },
+      style: { color: "hsl(var(--muted-foreground))" },
     },
     {
-      types: [
-        "entity",
-        "url",
-        "symbol",
-        "number",
-        "boolean",
-        "variable",
-        "constant",
-        "property",
-        "regex",
-        "inserted",
-      ],
-      style: { color: "#d9d9d9" },
+      types: ["entity", "symbol"],
+      style: { color: "hsl(var(--foreground))" },
+    },
+    {
+      types: ["url", "boolean", "variable", "constant", "regex", "inserted"],
+      style: { color: "hsl(var(--muted-foreground))" },
     },
     {
       types: ["atrule", "keyword", "attr-name", "selector"],
-      style: { color: "#ffffff", fontWeight: "bold" },
+      style: { color: "hsl(var(--foreground))", fontWeight: "bold" },
     },
     {
       types: ["function", "deleted", "tag"],
-      style: { color: "#e6e6e6" },
+      style: { color: "hsl(var(--foreground))", fontWeight: "bold" },
     },
     {
       types: ["function-variable"],
-      style: { color: "#ffffff", fontWeight: "bold" },
+      style: { color: "hsl(var(--foreground))", fontWeight: "bold" },
     },
     {
       types: ["tag", "selector", "keyword", "null"],
-      style: { color: "#d1d1d1" },
+      style: { color: "hsl(var(--foreground))", fontWeight: "bold" },
     },
     {
       types: ["property"],
-      style: { color: "#ffffff", fontWeight: "bold" },
+      style: { color: "hsl(var(--foreground))", fontWeight: "bold" },
     },
   ],
 };
@@ -153,24 +397,17 @@ export function CodeBlock({
   className?: string;
 }) {
   const [copied, copy] = useCopy();
-  const { resolvedTheme } = useTheme();
+  const { theme: resolvedTheme } = useTheme();
 
-  // Map the provided language to a Prism-supported language and cast it
   const mappedLanguage = getPrismLanguage(language);
-
-  // Choose monochrome theme based on the current color mode
   const theme =
     resolvedTheme === "dark" ? monochromeThemeDark : monochromeThemeLight;
-
-  // Handle error cases - provide a fallback if code is undefined and trim both leading and trailing newlines
   const codeToDisplay = (code || "").trim();
 
   return (
     <div
       className={cn(
-        "rounded relative overflow-hidden my-2 border",
-        resolvedTheme === "dark" ? "border-border/30" : "border-border/20",
-        "text-xs bg-background dark:bg-white",
+        "rounded relative overflow-hidden my-2 text-xs min-w-32",
         className,
       )}
     >
@@ -211,7 +448,7 @@ export function CodeBlock({
               highlightClassName,
               "pt-9 pb-2 overflow-auto code-block-thin-scrollbar",
             )}
-            style={{ ...style, background: "transparent" }}
+            style={{ ...style }}
             aria-label={`Code block${language ? ` in ${language}` : ""}`}
           >
             <code className="px-4 block">

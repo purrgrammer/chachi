@@ -36,6 +36,14 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
     --arrow: 220.9 39.3% 11%;
     --bg-gradient-opacity: 0.2;
+
+    /* Gradient Colors in HSL format */
+    --gradient-orange: 32 100% 58%;
+    --gradient-red: 0 93% 60%;
+    --gradient-light-blue: 195 100% 58%;
+    --gradient-purple: 239 76% 74%;
+    --gradient-pink: 315 93% 60%;
+    --gradient-yellow: 66 94% 60%;
   }
 
   .dark {
@@ -69,6 +77,14 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
     --bg-gradient-opacity: 0.5;
+
+    /* Gradient Colors in HSL format - same in dark mode */
+    --gradient-orange: 32 100% 58%;
+    --gradient-red: 0 93% 60%;
+    --gradient-light-blue: 195 100% 58%;
+    --gradient-purple: 239 76% 74%;
+    --gradient-pink: 315 93% 60%;
+    --gradient-yellow: 66 94% 60%;
   }
 
   .monochrome {
@@ -160,14 +176,18 @@
     left: 0;
     z-index: -1;
     margin: -2px;
-    background: linear-gradient(to bottom right, #ff902b, #f83838);
+    background: linear-gradient(
+      to bottom right,
+      hsl(var(--gradient-orange)),
+      hsl(var(--gradient-red))
+    );
     border-radius: inherit;
   }
   .bg-gradient {
     background: linear-gradient(
       to bottom right,
-      rgba(255, 144, 43, var(--bg-gradient-opacity)),
-      rgba(248, 56, 56, var(--bg-gradient-opacity))
+      hsla(var(--gradient-orange), var(--bg-gradient-opacity)),
+      hsla(var(--gradient-red), var(--bg-gradient-opacity))
     );
   }
   .border-animated-gradient:before {
@@ -181,12 +201,12 @@
     margin: -2px;
     background: linear-gradient(
       60deg,
-      #2bd9ff,
-      #8c8ded,
-      #f838d9,
-      #f83838,
-      #ff902b,
-      #ddf838
+      hsl(var(--gradient-light-blue)),
+      hsl(var(--gradient-purple)),
+      hsl(var(--gradient-pink)),
+      hsl(var(--gradient-red)),
+      hsl(var(--gradient-orange)),
+      hsl(var(--gradient-yellow))
     );
     animation: animatedgradient 6s ease-in-out alternate infinite;
     background-size: 300% 300%;
@@ -195,12 +215,12 @@
   .bg-animated-gradient {
     background: linear-gradient(
       60deg,
-      rgba(43, 217, 255, var(--bg-gradient-opacity)),
-      rgba(140, 141, 237, var(--bg-gradient-opacity)),
-      rgba(248, 56, 217, var(--bg-gradient-opacity)),
-      rgba(248, 56, 56, var(--bg-gradient-opacity)),
-      rgba(255, 144, 43, var(--bg-gradient-opacity)),
-      rgba(221, 248, 56, var(--bg-gradient-opacity))
+      hsla(var(--gradient-light-blue), var(--bg-gradient-opacity)),
+      hsla(var(--gradient-purple), var(--bg-gradient-opacity)),
+      hsla(var(--gradient-pink), var(--bg-gradient-opacity)),
+      hsla(var(--gradient-red), var(--bg-gradient-opacity)),
+      hsla(var(--gradient-orange), var(--bg-gradient-opacity)),
+      hsla(var(--gradient-yellow), var(--bg-gradient-opacity))
     );
     animation: animatedgradient 6s ease-in-out alternate infinite;
     background-size: 300% 300%;

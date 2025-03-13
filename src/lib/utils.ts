@@ -96,6 +96,7 @@ export function getPrismLanguage(language: string | undefined): string {
   const mappedLang = languageMap[lang] || lang;
 
   // List of supported languages in prism-react-renderer (basic set)
+  // Plus any languages we've defined manually in prism-languages.ts
   const supportedLanguages = [
     "bash",
     "css",
@@ -111,13 +112,14 @@ export function getPrismLanguage(language: string | undefined): string {
     "markdown",
     "md",
     "python",
+    "ruby", // We've manually defined this in prism-languages.ts
     "scss",
     "sql",
     "tsx",
     "typescript",
     "ts",
     "text",
-    "json",
+    "json", // We've manually defined this in prism-languages.ts
     "yaml",
     "yml",
   ];
