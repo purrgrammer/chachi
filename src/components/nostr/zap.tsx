@@ -387,7 +387,7 @@ export function Zap({
         {zap.content.trim()}
       </span>
     ) : (
-      <RichText tags={zap.tags}>{zap.content.trim()}</RichText>
+      <RichText tags={zap.tags} options={{ syntax: true }}>{zap.content.trim()}</RichText>
     );
   // todo: emoji, single custom emoji
   return (

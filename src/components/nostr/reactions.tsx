@@ -30,6 +30,7 @@ const richTextOptions = {
   images: true,
   audio: false,
   emojis: true,
+  syntax: true,
 };
 
 const richTextclassNames = {

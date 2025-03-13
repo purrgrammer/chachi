@@ -91,7 +91,7 @@ export function NutzapContent({
       {event.content.trim()}
     </span>
   ) : (
-    <RichText tags={event.tags.concat(zap.tags)} group={group}>
+    <RichText tags={event.tags.concat(zap.tags)} group={group} options={{ syntax: true }}>
       {zap.content}
     </RichText>
   );
