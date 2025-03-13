@@ -458,11 +458,8 @@ const defaultOptions = {
   video: true,
   audio: true,
   youtube: true,
-  syntax: true,
-  bold: true,
-  italic: true,
-  monospace: true,
-  codeBlock: true,
+  syntax: false,
+  codeBlock: false,
   preserveNewlines: true,
 };
 

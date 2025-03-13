@@ -439,7 +439,7 @@ export function ChatMessage({
                 <RichText
                   group={group}
                   tags={event.tags}
-                  options={richTextOptions}
+                  options={{ ...richTextOptions, syntax: true, codeBlock: true }}
                   classNames={{
                     ...{
                       singleEmoji: "w-32 h-32 aspect-auto rounded-md",
