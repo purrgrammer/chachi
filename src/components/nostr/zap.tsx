@@ -299,6 +299,27 @@ export function NewZap({
   );
 }
 
+export function ZapReply({
+  event,
+  group,
+}: {
+  event: NostrEvent;
+  group?: Group;
+}) {
+  const zap = validateZap(event);
+  return zap ? (
+    <Zap
+      zap={zap}
+      group={group}
+      animateGradient={false}
+      showRef={false}
+      showTarget={false}
+    />
+  ) : (
+    <span>Invalid zap</span>
+  );
+}
+
 export function ZapDetail({
   event,
   group,
@@ -336,6 +357,8 @@ export function Zap({
   showAuthor = true,
   onReplyClick,
   classNames,
+  showRef = true,
+  showTarget = true,
 }: {
   zap: ZapType;
   group?: Group;
@@ -346,6 +369,8 @@ export function Zap({
     singleCustomEmoji?: string;
     onlyEmojis?: string;
   };
+  showRef?: boolean;
+  showTarget?: boolean;
 }) {
   const pubkey = usePubkey();
   const fragments = useRichText(
@@ -387,7 +412,9 @@ export function Zap({
         {zap.content.trim()}
       </span>
     ) : (
-      <RichText tags={zap.tags} options={{ syntax: true }}>{zap.content.trim()}</RichText>
+      <RichText tags={zap.tags} options={{ syntax: true }}>
+        {zap.content.trim()}
+      </RichText>
     );
   // todo: emoji, single custom emoji
   return (
@@ -404,14 +431,14 @@ export function Zap({
             {formatShortNumber(zap.amount)}
           </span>
         </div>
-        {zap.p ? (
+        {showTarget && zap.p ? (
           <User
             pubkey={zap.p}
             classNames={{ avatar: "size-4", name: "font-normal" }}
           />
         ) : null}
       </div>
-      {zap.e ? (
+      {showRef && zap.e ? (
         <E
           id={zap.e}
           group={group}
@@ -421,7 +448,7 @@ export function Zap({
           asReply
           onClick={onReplyClick}
         />
-      ) : zap.a && !zap.a.startsWith("39000") ? (
+      ) : showRef && zap.a && !zap.a.startsWith("39000") ? (
         <A
           address={zap.a}
           group={group}

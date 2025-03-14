@@ -422,7 +422,8 @@
     "details": "Details",
     "loading": "Loading event",
     "not-found": "Event not found",
-    "fetch-error": "Error fetching event"
+    "fetch-error": "Error fetching event",
+    "replied": "replied"
   },
   "events": {
     "loading": "Loading events",
@@ -680,5 +681,9 @@
     "scan": "Scan QR Code",
     "scan-error": "Error scanning QR Code",
     "unknown": "Unknown QR Code"
+  },
+  "names": {
+    "comma": ",",
+    "and": "and"
   }
 }

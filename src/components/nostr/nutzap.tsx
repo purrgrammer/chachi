@@ -16,6 +16,24 @@ import { usePubkey } from "@/lib/account";
 import { Group } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+export function NutzapReply({
+  event,
+  group,
+}: {
+  event: NostrEvent;
+  group?: Group;
+}) {
+  return (
+    <Nutzap
+      event={event}
+      group={group}
+      animateGradient={false}
+      showRef={false}
+      showTarget={false}
+    />
+  );
+}
+
 export function NutzapDetail({
   event,
   group,
@@ -91,7 +109,11 @@ export function NutzapContent({
       {event.content.trim()}
     </span>
   ) : (
-    <RichText tags={event.tags.concat(zap.tags)} group={group} options={{ syntax: true }}>
+    <RichText
+      tags={event.tags.concat(zap.tags)}
+      group={group}
+      options={{ syntax: true }}
+    >
       {zap.content}
     </RichText>
   );
@@ -104,6 +126,8 @@ export function Nutzap({
   showAuthor = true,
   onReplyClick,
   classNames,
+  showRef = true,
+  showTarget = true,
 }: {
   event: NostrEvent;
   group?: Group;
@@ -111,6 +135,8 @@ export function Nutzap({
   showAuthor?: boolean;
   onReplyClick?: (ev: NostrEvent) => void;
   classNames?: NutzapClassnames;
+  showRef?: boolean;
+  showTarget?: boolean;
 }) {
   const zap = validateNutzap(event);
   const groupRelay = event.tags.find((t) => t[0] === "h")?.[2];
@@ -138,7 +164,7 @@ export function Nutzap({
             {formatShortNumber(zap.amount)}
           </span>
         </div>
-        {zap.p ? (
+        {showTarget && zap.p ? (
           <User
             pubkey={zap.p}
             classNames={{
@@ -149,7 +175,7 @@ export function Nutzap({
           />
         ) : null}
       </div>
-      {zap.e ? (
+      {showRef && zap.e ? (
         <E
           id={zap.e}
           group={group}
@@ -159,7 +185,7 @@ export function Nutzap({
           asReply
           onClick={onReplyClick}
         />
-      ) : zap.a ? (
+      ) : showRef && zap.a ? (
         <A
           address={zap.a}
           group={group}

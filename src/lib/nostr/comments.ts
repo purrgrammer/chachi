@@ -18,3 +18,30 @@ export function useReplies(event: NostrEvent, group?: Group, live = true) {
     true,
   );
 }
+
+export function useDirectReplies(
+  event: NostrEvent,
+  group?: Group,
+  live = true,
+) {
+  const ndk = useNDK();
+  const ev = new NDKEvent(ndk, event);
+  const [t, v] = ev.tagReference();
+  return useStream(
+    [
+      {
+        kinds: [1111 as NDKKind],
+        ...(group ? { "#h": [group.id] } : {}),
+        [`#${t.toUpperCase()}`]: [v],
+      },
+      {
+        kinds: [NDKKind.Zap, NDKKind.Nutzap],
+        ...(group ? { "#h": [group.id] } : {}),
+        ...ev.filter(),
+      },
+    ],
+    group ? [group.relay] : [],
+    live,
+    true,
+  );
+}

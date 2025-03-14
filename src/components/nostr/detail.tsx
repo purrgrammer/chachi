@@ -35,7 +35,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/nav-tabs";
-import { Post, PostWithReplies } from "@/components/nostr/post";
+import { Post } from "@/components/nostr/post";
 import { HorizontalVideo, VerticalVideo } from "@/components/nostr/video";
 import { Image } from "@/components/nostr/image";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
@@ -45,9 +45,13 @@ import {
   GroupName,
   GroupPicture,
 } from "@/components/nostr/groups/metadata";
-import { ZapPreview, ZapDetail } from "@/components/nostr/zap";
+import { ZapPreview, ZapDetail, ZapReply } from "@/components/nostr/zap";
 //import { ZapGoal } from "@/components/nostr/zap-goal";
-import { NutzapPreview, NutzapDetail } from "@/components/nostr/nutzap";
+import {
+  NutzapPreview,
+  NutzapDetail,
+  NutzapReply,
+} from "@/components/nostr/nutzap";
 import { Repo, Issues } from "@/components/nostr/repo";
 import { Highlight } from "@/components/nostr/highlight";
 import { Stream } from "@/components/nostr/stream";
@@ -70,7 +74,7 @@ import { useMintList } from "@/lib/cashu";
 import { getRelayHost } from "@/lib/relay";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet, useRelays } from "@/lib/nostr";
-import { useReplies } from "@/lib/nostr/comments";
+import { useDirectReplies, useReplies } from "@/lib/nostr/comments";
 import { useGroupAdminsList } from "@/lib/nostr/groups";
 import { useOpenGroup, groupId } from "@/lib/groups";
 import { MintEventPreview, MintEventDetail } from "@/components/mint";
@@ -113,6 +117,7 @@ import { usePubkey, useCanSign } from "@/lib/account";
 import type { Group, Emoji as EmojiType } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import { LazyCodeBlock } from "@/components/lazy-code-block";
+import { NameList } from "@/components/nostr//name-list";
 
 type EventComponent = (props: {
   event: NostrEvent;
@@ -129,21 +134,22 @@ const eventDetails: Record<
     noHeader?: boolean;
     className?: string;
     innerClassname?: string;
-    preview: EventComponent;
-    detail: EventComponent;
-    content?: EventComponent;
+    preview: EventComponent; // when an event appears mentioned in a post
+    reply?: EventComponent; // when an event appears as a reply
+    detail: EventComponent; // when an event is opened in detail
+    content?: EventComponent; // the content of an event detail
   }
 > = {
   [NDKKind.Text]: {
-    preview: PostWithReplies,
+    preview: Post,
     detail: Post,
   },
   [COMMENT]: {
-    preview: PostWithReplies,
+    preview: Post,
     detail: Post,
   },
   [NDKKind.GroupNote]: {
-    preview: PostWithReplies,
+    preview: Post,
     detail: Post,
   },
   [NDKKind.GroupChat]: {
@@ -154,7 +160,7 @@ const eventDetails: Record<
     detail: ChatBubbleDetail,
   },
   [NDKKind.GroupReply]: {
-    preview: PostWithReplies,
+    preview: Post,
     detail: Post,
   },
   [NDKKind.GroupMetadata]: {
@@ -191,7 +197,7 @@ const eventDetails: Record<
     content: Issues,
   },
   [ISSUE]: {
-    preview: PostWithReplies,
+    preview: Post,
     detail: Post,
   },
   [NDKKind.HorizontalVideo]: {
@@ -212,6 +218,7 @@ const eventDetails: Record<
       "relative rounded-md bg-background/80 border-none my-0.5 border-gradient",
     preview: ZapPreview,
     detail: ZapDetail,
+    reply: ZapReply,
   },
   //[GOAL]: {
   //  preview: ZapGoal,
@@ -219,9 +226,11 @@ const eventDetails: Record<
   //},
   [NDKKind.Nutzap]: {
     noHeader: true,
+    // todo: make this classname only apply to preview
     className: "relative rounded-md bg-background/80 border-none my-0.5",
     preview: NutzapPreview,
     detail: NutzapDetail,
+    reply: NutzapReply,
   },
   [BOOK]: {
     preview: Book,
@@ -566,6 +575,342 @@ function AsReply({
   );
 }
 
+export function ReplyEmbed({
+  event,
+  group,
+  className,
+  classNames,
+  canOpenDetails = false,
+  showReactions = true,
+  options = {},
+  relays = [],
+}: {
+  event: NostrEvent;
+  group?: Group;
+  className?: string;
+  canOpenDetails?: boolean;
+  showReactions?: boolean;
+  options?: RichTextOptions;
+  classNames?: RichTextClassnames;
+  relays: string[];
+}) {
+  const ndk = useNDK();
+  const userRelays = useRelays();
+  const canSign = useCanSign();
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showReplyDialog, setShowReplyDialog] = useState(false);
+  const [zapType, setZapType] = useState<"nip-57" | "nip-61">("nip-61");
+  const [showZapDialog, setShowZapDialog] = useState(false);
+  const components = eventDetails[event.kind];
+  const [isDeleted, setIsDeleted] = useState(false);
+  const relaySet = useRelaySet(group ? [group.relay] : userRelays);
+  // todo: if we have replies, allow to open the conversation thread
+  // NIP-31
+  const { t } = useTranslation();
+  const isRelayGroup = group?.id === "_";
+  const { data: mintList } = useMintList(event.pubkey);
+  const { events: comments } = useReplies(event, group);
+  const repliers = comments
+    .map((c) => {
+      if (c.kind === NDKKind.Zap) {
+        return c.tags.find((t) => t[0] === "P")?.[1];
+      }
+      return c.pubkey;
+    })
+    .filter(Boolean) as string[];
+
+  function openEmojiPicker() {
+    setShowEmojiPicker(true);
+  }
+
+  function openReplyDialog() {
+    setShowReplyDialog(true);
+  }
+
+  function openZapDialog(type: "nip-61" | "nip-57") {
+    setZapType(type);
+    setShowZapDialog(true);
+  }
+
+  async function onReply(content: string, tags: string[][]) {
+    try {
+      // todo: reply to `a` or `i` tags
+      const ndkEvent = new NDKEvent(ndk, event);
+      const [t, ref] = ndkEvent.tagReference();
+      const root = event.tags.find(
+        (t) => t[0] === "E" || t[0] === "A" || t[0] === "I",
+      );
+      const rootTag = root?.[0] ?? t.toUpperCase();
+      const rootKind =
+        event.tags.find((t) => t[0] === "K")?.[1] ?? String(event.kind);
+      const rootRef = root ? root[1] : ref;
+      const rootRelay = root ? root[2] : (group?.relay ?? "");
+      const rootPubkey = root ? root[3] : event.pubkey;
+      const ev = new NDKEvent(ndk, {
+        kind: COMMENT,
+        content,
+        tags: [
+          ...(group ? [["h", group.id, group.relay]] : []),
+          ...(group && group.id === "_" ? [["-"]] : []),
+          // root marker
+          rootTag === "E"
+            ? [rootTag, rootRef, rootRelay, rootPubkey]
+            : [rootTag, rootRef, rootRelay],
+          ["K", rootKind],
+          // parent item
+          t === "e"
+            ? [t, ref, group ? group.relay : "", event.pubkey]
+            : [t, ref, group ? group.relay : ""],
+          ["k", String(event.kind)],
+          ...tags,
+        ],
+      } as NostrEvent);
+      ev.tag(ndkEvent);
+      await ev.publish(relaySet);
+    } catch (err) {
+      console.error(err);
+      toast.error(t("chat.message.reply.error"));
+    } finally {
+      setShowReplyDialog(false);
+    }
+  }
+
+  async function onEmojiSelect(e: PickerEmoji) {
+    try {
+      const ev = new NDKEvent(ndk, {
+        kind: NDKKind.Reaction,
+        content: e.native ? e.native : e.shortcodes,
+      } as NostrEvent);
+      ev.tag(new NDKEvent(ndk, event));
+      if (e.src) {
+        ev.tags.push(["emoji", e.name, e.src]);
+      }
+      await ev.publish(relaySet);
+    } catch (err) {
+      console.error(err);
+      toast.error(t("chat.message.react.error"));
+    } finally {
+      setShowEmojiPicker(false);
+    }
+  }
+
+  const header = components?.noHeader ? null : (
+    <div className="flex gap-3 items-center py-2 px-3 space-between">
+      <Header event={event} />
+      <EventMenu
+        event={event}
+        group={group}
+        relays={relays}
+        canOpen={canOpenDetails}
+      />
+    </div>
+  );
+
+  const body = (
+    <div
+      className={cn(
+        "py-1 px-4 pb-2 space-y-3",
+        components?.reply ? "" : components?.className,
+      )}
+    >
+      {components?.reply ? (
+        components.reply({
+          event,
+          relays,
+          group,
+          options,
+          classNames,
+        })
+      ) : components?.preview ? (
+        components.preview({
+          event,
+          relays,
+          group,
+          options,
+          classNames,
+        })
+      ) : (
+        <RichText
+          options={options}
+          group={group}
+          tags={event.tags}
+          classNames={classNames}
+        >
+          {event.content}
+        </RichText>
+      )}
+      {repliers.length > 0 && (
+        <div className="my-0.5">
+          <NameList
+            pubkeys={repliers}
+            suffix={t("event.replied")}
+            avatarClassName="size-4"
+            textClassName="text-sm"
+          />
+        </div>
+      )}
+      {showReactions ? (
+        <Reactions
+          event={event}
+          relays={group ? [group.relay] : [...relays, ...userRelays]}
+          kinds={[NDKKind.Reaction]}
+        />
+      ) : null}
+    </div>
+  );
+
+  // todo: emojis show before dragging
+  return (
+    <div className="relative rounded-sm bg-accent">
+      <motion.div
+        className={cn(
+          "z-10 border relative bg-background text-foreground rounded-sm font-sans",
+          components?.reply ? "" : components?.className,
+          className,
+        )}
+        // Drag controls
+        drag={canSign && !isDeleted ? "x" : false}
+        dragSnapToOrigin={true}
+        dragConstraints={{ left: 30, right: 30 }}
+        dragElastic={{ left: 0.2, right: 0.2 }}
+        onDragEnd={(_, info) => {
+          // todo: tweak offsets
+          if (info.offset.x > 200) {
+            openReplyDialog();
+          } else if (info.offset.x < -200) {
+            openEmojiPicker();
+          }
+        }}
+      >
+        {canSign ? (
+          <ContextMenu>
+            <ContextMenuTrigger>
+              {header}
+              {isDeleted ? (
+                <div className="py-2 px-4 space-y-3">
+                  <div className="flex flex-row gap-1 items-center text-muted-foreground">
+                    <Ban className="size-3" />
+                    <span className="text-xs italic">
+                      {t("post.delete.success")}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                body
+              )}
+            </ContextMenuTrigger>
+            <ContextMenuContent>
+              <ContextMenuItem
+                className="cursor-pointer"
+                onClick={openReplyDialog}
+              >
+                {t("chat.message.reply.action")}
+                <ContextMenuShortcut>
+                  <Reply className="w-4 h-4" />
+                </ContextMenuShortcut>
+              </ContextMenuItem>
+              <ContextMenuItem
+                className="cursor-pointer"
+                onClick={openEmojiPicker}
+              >
+                {t("chat.message.react.action")}
+                <ContextMenuShortcut>
+                  <SmilePlus className="w-4 h-4" />
+                </ContextMenuShortcut>
+              </ContextMenuItem>
+              {isRelayGroup ? (
+                <ContextMenuItem
+                  className="cursor-pointer"
+                  onClick={() => openZapDialog("nip-57")}
+                >
+                  {t("chat.message.zap.action")}
+                  <ContextMenuShortcut>
+                    <Bitcoin className="w-4 h-4" />
+                  </ContextMenuShortcut>
+                </ContextMenuItem>
+              ) : mintList?.pubkey ? (
+                <ContextMenuItem
+                  className="cursor-pointer"
+                  onClick={() => openZapDialog("nip-61")}
+                >
+                  {t("chat.message.zap.action")}
+                  <ContextMenuShortcut>
+                    <Bitcoin className="w-4 h-4" />
+                  </ContextMenuShortcut>
+                </ContextMenuItem>
+              ) : null}
+              {group ? (
+                <DeleteGroupEventItem
+                  event={event}
+                  group={group}
+                  onDelete={() => setIsDeleted(true)}
+                />
+              ) : null}
+            </ContextMenuContent>
+          </ContextMenu>
+        ) : (
+          <>
+            {header}
+            {isDeleted ? (
+              <div className="py-2 px-4 space-y-3">
+                <div className="flex flex-row gap-1 items-center text-muted-foreground">
+                  <Ban className="size-3" />
+                  <span className="text-xs italic">
+                    {t("post.delete.success")}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              body
+            )}
+          </>
+        )}
+      </motion.div>
+      {isDeleted ? null : (
+        <>
+          <Reply className="absolute left-2 top-3 z-0 size-6" />
+          <SmilePlus className="absolute right-2 top-3 z-0 size-6" />
+        </>
+      )}
+      {showZapDialog ? (
+        <NewZapDialog
+          open={showZapDialog}
+          onZap={() => setShowZapDialog(false)}
+          onClose={() => setShowZapDialog(false)}
+          event={event}
+          pubkey={event.pubkey}
+          group={group}
+          zapType={zapType}
+        />
+      ) : null}
+      {showEmojiPicker && canSign ? (
+        <EmojiPicker
+          open={showEmojiPicker}
+          onOpenChange={setShowEmojiPicker}
+          onEmojiSelect={onEmojiSelect}
+        />
+      ) : null}
+      {showReplyDialog && canSign ? (
+        <ReplyDialog
+          group={group}
+          open={showReplyDialog}
+          onOpenChange={setShowReplyDialog}
+          onReply={onReply}
+        >
+          <Embed
+            canOpenDetails={false}
+            showReactions={false}
+            event={event}
+            group={group}
+            relays={relays}
+            className="overflow-y-auto overflow-x-hidden max-h-32 rounded-b-none border-none pretty-scrollbar"
+          />
+        </ReplyDialog>
+      ) : null}
+    </div>
+  );
+}
+
 export function FeedEmbed({
   event,
   group,
@@ -875,6 +1220,7 @@ export function FeedEmbed({
 export function Embed({
   event,
   group,
+  replies,
   className,
   classNames,
   isDetail = false,
@@ -887,6 +1233,7 @@ export function Embed({
 }: {
   event: NostrEvent;
   group?: Group;
+  replies?: NostrEvent[];
   className?: string;
   canOpenDetails?: boolean;
   isDetail?: boolean;
@@ -897,10 +1244,19 @@ export function Embed({
   asReply?: boolean;
   onClick?: (ev: NostrEvent) => void;
 }) {
+  const { t } = useTranslation();
   const userRelays = useRelays();
   const components = eventDetails[event.kind];
   // NIP-31
   const alt = event.tags.find((t) => t[0] === "alt")?.[1];
+  const repliers = replies
+    ?.map((r) => {
+      if (r.kind === NDKKind.Zap) {
+        return r.tags.find((t) => t[0] === "P")?.[1];
+      }
+      return r.pubkey;
+    })
+    .filter(Boolean) as string[];
   if (asReply) {
     return (
       <AsReply
@@ -952,6 +1308,16 @@ export function Embed({
             {event.content}
           </RichText>
         )}
+        {repliers?.length > 0 && (
+          <div className="my-0.5">
+            <NameList
+              pubkeys={repliers}
+              suffix={t("event.replied")}
+              avatarClassName="size-4"
+              textClassName="text-sm"
+            />
+          </div>
+        )}
         {showReactions ? (
           <Reactions
             event={event}
@@ -973,7 +1339,7 @@ export function EventDetail({
   group?: Group;
   relays: string[];
 }) {
-  const { eose, events: comments } = useReplies(event, group);
+  const { eose, events: comments } = useDirectReplies(event, group);
   const hasContent = eventDetails[event.kind]?.content;
   const { t } = useTranslation();
 
@@ -993,6 +1359,7 @@ md:w-[calc(100vw-16rem)]
           isDetail
           event={event}
           group={group}
+          replies={comments}
           className="border-none"
           canOpenDetails={false}
           classNames={{
@@ -1031,7 +1398,7 @@ md:w-[calc(100vw-16rem)]
               ) : null}
               {comments.map((comment) => (
                 // todo: subthreads as chat on click
-                <FeedEmbed
+                <ReplyEmbed
                   canOpenDetails
                   key={comment.id}
                   event={comment}
