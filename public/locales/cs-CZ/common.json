@@ -417,7 +417,8 @@
     "details": "Podrobnosti",
     "loading": "Načítání události",
     "not-found": "Událost nenalezena",
-    "fetch-error": "Chyba při načítání události"
+    "fetch-error": "Chyba při načítání události",
+    "replied": "replied"
   },
   "events": {
     "loading": "Načítání událostí",
@@ -670,5 +671,10 @@
     "scan": "Naskenovat QR kód",
     "scan-error": "Chyba při skenování QR kódu",
     "unknown": "Neznámý QR kód"
+  },
+  "names": {
+    "comma": ",",
+    "and": "and",
+    "and-more": "and {{ more }} more"
   }
 }
