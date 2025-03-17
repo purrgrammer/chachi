@@ -417,7 +417,8 @@
     "details": "Detaljer",
     "loading": "Laddar event",
     "not-found": "Event inte hittat",
-    "fetch-error": "Fel vid hämtning av event"
+    "fetch-error": "Fel vid hämtning av event",
+    "replied": "replied"
   },
   "events": {
     "loading": "Laddar event",
@@ -670,5 +671,10 @@
     "scan": "Skanna QR-kod",
     "scan-error": "Fel vid skanning av QR-kod",
     "unknown": "Okänd QR-kod"
+  },
+  "names": {
+    "comma": ",",
+    "and": "and",
+    "and-more": "and {{ more }} more"
   }
 }
