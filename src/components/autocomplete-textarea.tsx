@@ -85,6 +85,7 @@ function ReplyPreview({
 interface AutocompleteTextareaProps extends TextareaProps {
   group?: Group;
   className?: string;
+  pubkeys?: string[];
   topOffset?: number;
   message: string;
   setMessage: (msg: string) => void;
@@ -104,6 +105,7 @@ export function AutocompleteTextarea({
   message,
   setMessage,
   onFinish,
+  pubkeys,
   onCustomEmojisChange,
   reply,
   setReplyingTo,
@@ -135,7 +137,7 @@ export function AutocompleteTextarea({
   const [autocompleteEmojiTerm, setAutocompleteEmojiTerm] = useState("");
 
   const profiles = useProfiles(
-    group && members ? members : follows ? follows : [],
+    pubkeys ? pubkeys : group && members ? members : follows ? follows : [],
   );
   const profileList = profiles.map((p) => p.data).filter(Boolean);
   const autocompleteProfiles =

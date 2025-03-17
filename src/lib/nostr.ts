@@ -430,7 +430,7 @@ export function useProfile(pubkey?: string, relays: string[] = []) {
   });
 }
 
-async function fetchRelayList(ndk: NDK, pubkey: string) {
+export async function fetchRelayList(ndk: NDK, pubkey: string) {
   return await ndk
     .fetchEvent(
       {

@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { useMintList } from "@/lib/cashu";
 import { motion, useInView } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -9,33 +8,25 @@ import {
   Trash,
   ShieldBan,
   Bitcoin,
-  Coins,
-  DollarSign,
-  Euro,
-  Check,
-  X,
-  HandCoins,
 } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { NDKEvent, NDKKind, NDKNutzap } from "@nostr-dev-kit/ndk";
-import { NDKCashuWallet } from "@nostr-dev-kit/ndk-wallet";
-import { User } from "@/components/nostr/user";
+import { useNavigate } from "react-router-dom";
+import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { ProfileDrawer } from "@/components/nostr/profile";
+import { validateZap } from "@/lib/nip-57";
 import { useCopy } from "@/lib/hooks";
 import { useNDK } from "@/lib/ndk";
 import { Avatar } from "@/components/nostr/avatar";
 import { useRelaySet } from "@/lib/nostr";
 import { usePubkey, useCanSign } from "@/lib/account";
 import { Emoji as EmojiType, EmojiPicker } from "@/components/emoji-picker";
-import { saveGroupEvent, saveLastSeen } from "@/lib/messages";
+import { saveGroupEvent } from "@/lib/messages";
 import { useSettings } from "@/lib/settings";
+import { eventLink } from "@/lib/links";
 import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import { Reactions } from "@/components/nostr/reactions";
-import { useCashuWallet } from "@/lib/wallet";
-import { useNutzapStatus, saveNutzap } from "@/lib/nutzaps";
-import { formatShortNumber } from "@/lib/number";
+import { Zap } from "@/components/nostr/zap";
 import { NewZapDialog } from "@/components/nostr/zap";
 import {
   ContextMenu,
@@ -46,9 +37,7 @@ import {
   ContextMenuTrigger,
   ContextMenuShortcut,
 } from "@/components/ui/context-menu";
-import { useNavigate } from "react-router-dom";
-import { eventLink } from "@/lib/links";
-import { Nutzap } from "../nutzap";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ChatZapProps {
   event: NostrEvent;
@@ -61,7 +50,7 @@ interface ChatZapProps {
   canDelete?: (event: NostrEvent) => boolean;
 }
 
-export function ChatNutzap({
+export function ChatZap({
   event,
   group,
   admins,
@@ -72,21 +61,15 @@ export function ChatNutzap({
   deleteEvent,
 }: ChatZapProps) {
   // todo: gestures
+  const zap = validateZap(event);
   const ndk = useNDK();
   const ref = useRef<HTMLDivElement | null>(null);
-  const wallet = useCashuWallet();
   const isInView = useInView(ref);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
   const navigate = useNavigate();
   const [showingZapDialog, setShowingZapDialog] = useState(false);
-  const [isRedeeming, setIsRedeeming] = useState(false);
-  const { data: mintList } = useMintList(event.pubkey);
-  const nutzapStatus = useNutzapStatus(event.id);
-  const redeemed = nutzapStatus === "redeemed" || nutzapStatus === "spent";
-  const failed = nutzapStatus === "failed";
   const pubkey = usePubkey();
-  const isMine = event.pubkey === pubkey;
-  const isToMe = event.tags.some((t) => t[0] === "p" && t[1] === pubkey);
+  const isMine = zap?.pubkey === pubkey;
   const amIAdmin = pubkey && admins.includes(pubkey);
   const relaySet = useRelaySet(group ? [group.relay] : []);
   const { t } = useTranslation();
@@ -94,11 +77,7 @@ export function ChatNutzap({
   const [settings] = useSettings();
   const isMobile = useIsMobile();
   const canSign = useCanSign();
-  const isFocused = scrollTo?.id === event.id;
-  const amount = event.tags.find((t) => t[0] === "amount")?.[1];
-  const unit = event.tags.find((t) => t[0] === "unit")?.[1];
-  const target = event.tags.find((t) => t[0] === "p")?.[1];
-  const isShownInline = event.content.trim() === "" && amount && target;
+  const isFocused = scrollTo?.id === zap?.id;
 
   useEffect(() => {
     if (isFocused && ref.current) {
@@ -109,12 +88,15 @@ export function ChatNutzap({
     }
   }, [isFocused]);
 
+  if (!zap) return null;
+
   // todo: extract to hook
   async function react(e: EmojiType) {
     try {
       const ev = new NDKEvent(ndk, {
         kind: NDKKind.Reaction,
         content: e.native ? e.native : e.shortcodes,
+        tags: group ? [["h", group?.id, group?.relay]] : [],
       } as NostrEvent);
       ev.tag(new NDKEvent(ndk, event));
       if (e.src) {
@@ -134,10 +116,12 @@ export function ChatNutzap({
       const ev = new NDKEvent(ndk, {
         kind: NDKKind.GroupAdminRemoveUser,
         content: "",
-        tags: [
-          ...(group ? [["h", group.id, group.relay]] : []),
-          ["p", e.pubkey],
-        ],
+        tags: group
+          ? [
+              ["h", group.id, group.relay],
+              ["p", e.pubkey],
+            ]
+          : [],
       } as NostrEvent);
       await ev.publish(relaySet);
       toast.success(t("chat.user.kick.success"));
@@ -150,40 +134,13 @@ export function ChatNutzap({
     }
   }
 
-  async function redeem() {
-    setIsRedeeming(true);
-    try {
-      if (wallet instanceof NDKCashuWallet) {
-        const nutzap = NDKNutzap.from(new NDKEvent(ndk, event));
-        if (nutzap) {
-          await wallet.redeemNutzap(nutzap, {
-            onRedeemed: (proofs) => {
-              // todo: msat unit
-              const amount = proofs.reduce(
-                (acc, proof) => acc + proof.amount,
-                0,
-              );
-              toast.success(
-                t("nutzaps.redeem-success", {
-                  amount: formatShortNumber(amount),
-                }),
-              );
-            },
-          });
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      saveNutzap(event, "failed");
-      toast.error(t("nutzaps.redeem-error"));
-    } finally {
-      setIsRedeeming(false);
-    }
-  }
-
   function onNutzapReplyClick(ev: NostrEvent) {
     // todo: use messageKinds here
-    if (ev.kind === NDKKind.Nutzap || ev.kind === NDKKind.GroupChat) {
+    if (
+      ev.kind === NDKKind.Nutzap ||
+      ev.kind === NDKKind.GroupChat ||
+      ev.kind === NDKKind.Zap
+    ) {
       setScrollTo?.(ev);
     } else {
       navigate(eventLink(ev, group));
@@ -195,7 +152,7 @@ export function ChatNutzap({
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <div
-            className={`flex flex-row ${isMine ? "justify-end" : ""} w-full z-0 ${isFocused ? "bg-accent/30 rounded-lg" : ""} ${isShownInline ? "items-center justify-center" : ""}`}
+            className={`flex flex-row ${isMine ? "justify-end" : ""} w-full z-0 ${isFocused ? "bg-accent/30 rounded-lg" : ""}`}
           >
             <motion.div
               // Drag controls
@@ -211,66 +168,38 @@ export function ChatNutzap({
                 }
               }}
               ref={ref}
-              className={`z-0 border-none my-1 ${isShownInline ? "" : "max-w-[19rem] sm:max-w-sm md:max-w-md"}`}
+              className="z-0 border-none my-1 max-w-[18rem] sm:max-w-sm md:max-w-md"
             >
               <div className="flex flex-col gap-0">
-                <div
-                  className={`flex flex-row gap-2 items-end ${isShownInline ? "gap-0" : ""}`}
-                >
-                  {isMine ? null : isShownInline ? (
-                    <div className="flex flex-row gap-2 items-center">
-                      <Coins className="size-5 text-muted-foreground" />
-                      <User
-                        pubkey={event.pubkey}
-                        classNames={{ avatar: "size-7" }}
-                      />
-                    </div>
-                  ) : (
+                <div className="flex flex-row gap-2 items-end">
+                  {isMine ? null : (
                     <ProfileDrawer
                       group={group}
-                      pubkey={event.pubkey}
+                      pubkey={zap.pubkey}
                       trigger={
-                        <Avatar pubkey={event.pubkey} className="size-7" />
+                        <Avatar pubkey={zap.pubkey} className="size-7" />
                       }
                     />
                   )}
-                  {isShownInline ? (
-                    <>
-                      <div className="flex flex-row items-center gap-0">
-                        {unit === "eur" ? (
-                          <Euro className="size-5 text-muted-foreground" />
-                        ) : unit === "usd" ? (
-                          <DollarSign className="size-5 text-muted-foreground" />
-                        ) : (
-                          <Bitcoin className="size-5 text-muted-foreground" />
-                        )}
-                        <span className="font-mono text-lg">
-                          {formatShortNumber(Number(amount))}
-                        </span>
-                      </div>
-                      <User pubkey={target} classNames={{ avatar: "size-7" }} />
-                    </>
-                  ) : (
-                    <div className="flex flex-col gap-1 relative p-1 px-2 bg-background/80 rounded-md">
-                      <Nutzap
-                        event={event}
-                        group={group}
-                        showAuthor={false}
-                        animateGradient
-                        onReplyClick={onNutzapReplyClick}
-                        classNames={{
-                          singleCustomEmoji: isMine ? "ml-auto" : "",
-                          onlyEmojis: isMine ? "ml-auto" : "",
-                        }}
-                      />
-                      <Reactions
-                        event={event}
-                        relays={group ? [group.relay] : []}
-                        kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
-                        live={isInView}
-                      />
-                    </div>
-                  )}
+                  <div className="flex flex-col gap-1 relative p-1 px-2 bg-background/80 rounded-md">
+                    <Zap
+                      zap={zap}
+                      group={group}
+                      animateGradient
+                      showAuthor={false}
+                      onReplyClick={onNutzapReplyClick}
+                      classNames={{
+                        singleCustomEmoji: isMine ? "ml-auto" : "",
+                        onlyEmojis: isMine ? "ml-auto" : "",
+                      }}
+                    />
+                    <Reactions
+                      event={event}
+                      relays={group ? [group.relay] : []}
+                      kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
+                      live={isInView}
+                    />
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -295,43 +224,19 @@ export function ChatNutzap({
               <SmilePlus className="w-4 h-4" />
             </ContextMenuShortcut>
           </ContextMenuItem>
-          {mintList?.pubkey ? (
-            <ContextMenuItem
-              className="cursor-pointer"
-              onClick={() => setShowingZapDialog(true)}
-            >
-              {t("chat.message.tip.action")}
-              <ContextMenuShortcut>
-                <Bitcoin className="w-4 h-4" />
-              </ContextMenuShortcut>
-            </ContextMenuItem>
-          ) : null}
-          {isToMe ? (
-            <ContextMenuItem
-              className="cursor-pointer"
-              disabled={isRedeeming || redeemed || failed}
-              onClick={redeem}
-            >
-              {failed
-                ? t("chat.message.redeem.failed")
-                : redeemed
-                  ? t("chat.message.redeem.redeemed")
-                  : t("chat.message.redeem.action")}
-              <ContextMenuShortcut>
-                {failed ? (
-                  <X className="w-4 h-4 text-red-300" />
-                ) : redeemed ? (
-                  <Check className="w-4 h-4 text-green-500" />
-                ) : (
-                  <HandCoins className="w-4 h-4" />
-                )}
-              </ContextMenuShortcut>
-            </ContextMenuItem>
-          ) : null}
+          <ContextMenuItem
+            className="cursor-pointer"
+            onClick={() => setShowingZapDialog(true)}
+          >
+            {t("chat.message.tip.action")}
+            <ContextMenuShortcut>
+              <Bitcoin className="w-4 h-4" />
+            </ContextMenuShortcut>
+          </ContextMenuItem>
           <ContextMenuSeparator />
           <ContextMenuItem
             className="cursor-pointer"
-            onClick={() => copy(event.content)}
+            onClick={() => copy(zap.content)}
           >
             {t("chat.message.copy.action")}
             <ContextMenuShortcut>
@@ -386,14 +291,6 @@ export function ChatNutzap({
               >
                 Log
               </ContextMenuItem>
-              {group ? (
-                <ContextMenuItem
-                  className="cursor-pointer"
-                  onClick={() => saveLastSeen(event, group)}
-                >
-                  {t("chat.message.save-as-last-seen")}
-                </ContextMenuItem>
-              ) : null}
             </>
           ) : null}
         </ContextMenuContent>

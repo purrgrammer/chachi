@@ -46,7 +46,6 @@ import {
   GroupPicture,
 } from "@/components/nostr/groups/metadata";
 import { ZapPreview, ZapDetail, ZapReply } from "@/components/nostr/zap";
-//import { ZapGoal } from "@/components/nostr/zap-goal";
 import {
   NutzapPreview,
   NutzapDetail,
@@ -59,6 +58,7 @@ import People from "@/components/nostr/people";
 import { EmojiSet } from "@/components/nostr/emoji-set";
 import { GIFSet } from "@/components/nostr/gif-set";
 import Reaction from "@/components/nostr/reaction";
+import { Thread } from "@/components/nostr/thread";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -86,9 +86,7 @@ import {
   STREAM,
   CALENDAR_EVENT,
   GIF_SET,
-  //GOAL,
   BOOK,
-  //BOOK_CONTENT,
   CASHU_MINT,
 } from "@/lib/kinds";
 import {
@@ -109,6 +107,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { WikiPreview, WikiDetail } from "@/components/nostr/wiki";
@@ -220,10 +219,6 @@ const eventDetails: Record<
     detail: ZapDetail,
     reply: ZapReply,
   },
-  //[GOAL]: {
-  //  preview: ZapGoal,
-  //  detail: ZapGoal,
-  //},
   [NDKKind.Nutzap]: {
     noHeader: true,
     // todo: make this classname only apply to preview
@@ -256,7 +251,8 @@ const eventDetails: Record<
   },
   [NDKKind.Wiki]: {
     preview: WikiPreview,
-    detail: WikiDetail,
+    detail: WikiPreview,
+    content: WikiDetail,
   },
   [CASHU_MINT]: {
     noHeader: true,
@@ -361,6 +357,108 @@ function ShareDialog({
   );
 }
 
+// Add a hook to handle reply functionality
+function useReply(event: NostrEvent, group?: Group) {
+  const ndk = useNDK();
+  const userRelays = useRelays();
+  const relaySet = useRelaySet(group ? [group.relay] : userRelays);
+  const [showReplyDialog, setShowReplyDialog] = useState(false);
+  const { t } = useTranslation();
+
+  async function onReply(content: string, tags: string[][]) {
+    try {
+      // todo: reply to `a` or `i` tags
+      const ndkEvent = new NDKEvent(ndk, event);
+      const [t, ref] = ndkEvent.tagReference();
+      const root = event.tags.find(
+        (t) => t[0] === "E" || t[0] === "A" || t[0] === "I",
+      );
+      const rootTag = root?.[0] ?? t.toUpperCase();
+      const rootKind =
+        event.tags.find((t) => t[0] === "K")?.[1] ?? String(event.kind);
+      const rootRef = root ? root[1] : ref;
+      const rootRelay = root ? root[2] : (group?.relay ?? "");
+      const rootPubkey = root ? root[3] : event.pubkey;
+      const ev = new NDKEvent(ndk, {
+        kind: COMMENT,
+        content,
+        tags: [
+          ...(group ? [["h", group.id, group.relay]] : []),
+          ...(group && group.id === "_" ? [["-"]] : []),
+          // root marker
+          rootTag === "E"
+            ? [rootTag, rootRef, rootRelay, rootPubkey]
+            : [rootTag, rootRef, rootRelay],
+          ["K", rootKind],
+          // parent item
+          t === "e"
+            ? [t, ref, group ? group.relay : "", event.pubkey]
+            : [t, ref, group ? group.relay : ""],
+          ["k", String(event.kind)],
+          ...tags,
+        ],
+      } as NostrEvent);
+      ev.tag(ndkEvent);
+      await ev.publish(relaySet);
+    } catch (err) {
+      console.error(err);
+      toast.error(t("chat.message.reply.error"));
+    } finally {
+      setShowReplyDialog(false);
+    }
+  }
+
+  function openReplyDialog() {
+    setShowReplyDialog(true);
+  }
+
+  return {
+    showReplyDialog,
+    setShowReplyDialog,
+    onReply,
+    openReplyDialog,
+  };
+}
+
+// Add a hook to handle emoji reactions
+function useEmoji(event: NostrEvent, group?: Group) {
+  const ndk = useNDK();
+  const userRelays = useRelays();
+  const relaySet = useRelaySet(group ? [group.relay] : userRelays);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const { t } = useTranslation();
+
+  function openEmojiPicker() {
+    setShowEmojiPicker(true);
+  }
+
+  async function onEmojiSelect(e: PickerEmoji) {
+    try {
+      const ev = new NDKEvent(ndk, {
+        kind: NDKKind.Reaction,
+        content: e.native ? e.native : e.shortcodes,
+      } as NostrEvent);
+      ev.tag(new NDKEvent(ndk, event));
+      if (e.src) {
+        ev.tags.push(["emoji", e.name, e.src]);
+      }
+      await ev.publish(relaySet);
+    } catch (err) {
+      console.error(err);
+      toast.error(t("chat.message.react.error"));
+    } finally {
+      setShowEmojiPicker(false);
+    }
+  }
+
+  return {
+    showEmojiPicker,
+    setShowEmojiPicker,
+    onEmojiSelect,
+    openEmojiPicker,
+  };
+}
+
 function EventMenu({
   event,
   group,
@@ -384,12 +482,24 @@ function EventMenu({
   const { t } = useTranslation();
   const [showZapDialog, setShowZapDialog] = useState(false);
   const { data: mintList } = useMintList(event.pubkey);
+  const { showReplyDialog, setShowReplyDialog, onReply, openReplyDialog } =
+    useReply(event, group);
+  const {
+    showEmojiPicker,
+    setShowEmojiPicker,
+    onEmojiSelect,
+    openEmojiPicker,
+  } = useEmoji(event, group);
 
   function showDetail() {
     const ev = new NDKEvent(ndk, event);
     // @ts-expect-error for some reason it thinks this function takes a number
     const nlink = ev.encode(relays);
-    const prefix = group ? `/${getRelayHost(group.relay)}` : "";
+    const prefix = group
+      ? group.id === "_"
+        ? `/${getRelayHost(group.relay)}`
+        : `/${getRelayHost(group.relay)}/${group.id}`
+      : "";
     const url = `${prefix}/e/${nlink}`;
     navigate(url);
   }
@@ -421,6 +531,30 @@ function EventMenu({
           relays={relays}
         />
       ) : null}
+      {showReplyDialog ? (
+        <ReplyDialog
+          group={group}
+          open={showReplyDialog}
+          onOpenChange={setShowReplyDialog}
+          onReply={onReply}
+        >
+          <Embed
+            canOpenDetails={false}
+            showReactions={false}
+            event={event}
+            group={group}
+            relays={relays}
+            className="overflow-y-auto overflow-x-hidden max-h-32 rounded-b-none border-none pretty-scrollbar"
+          />
+        </ReplyDialog>
+      ) : null}
+      {showEmojiPicker ? (
+        <EmojiPicker
+          open={showEmojiPicker}
+          onOpenChange={setShowEmojiPicker}
+          onEmojiSelect={onEmojiSelect}
+        />
+      ) : null}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="smallIcon">
@@ -430,15 +564,27 @@ function EventMenu({
         <DropdownMenuContent className="w-56">
           <DropdownMenuGroup>
             {canOpen ? (
-              <DropdownMenuItem onClick={showDetail}>
-                <Maximize />
-                <span>{t("action-open")}</span>
-              </DropdownMenuItem>
+              <>
+                <DropdownMenuItem onClick={showDetail}>
+                  <Maximize />
+                  <span>{t("action-open")}</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
             ) : null}
+            <DropdownMenuItem onClick={openReplyDialog}>
+              <Reply />
+              <span>{t("chat.message.reply.action")}</span>
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setShowZapDialog(true)}>
               <Bitcoin />
               <span>{t("action-zap")}</span>
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={openEmojiPicker}>
+              <SmilePlus />
+              <span>{t("chat.message.react.action")}</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             {isGroupEvent && group ? (
               <DropdownMenuItem onClick={() => shareIn(group)}>
                 <MessageSquareShare />
@@ -577,6 +723,7 @@ function AsReply({
 
 export function ReplyEmbed({
   event,
+  root,
   group,
   className,
   classNames,
@@ -586,6 +733,7 @@ export function ReplyEmbed({
   relays = [],
 }: {
   event: NostrEvent;
+  root: NostrEvent;
   group?: Group;
   className?: string;
   canOpenDetails?: boolean;
@@ -597,19 +745,23 @@ export function ReplyEmbed({
   const ndk = useNDK();
   const userRelays = useRelays();
   const canSign = useCanSign();
+  const [showThread, setShowThread] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [showReplyDialog, setShowReplyDialog] = useState(false);
-  const [zapType, setZapType] = useState<"nip-57" | "nip-61">("nip-61");
   const [showZapDialog, setShowZapDialog] = useState(false);
+  const [zapType, setZapType] = useState<"nip-57" | "nip-61">("nip-61");
   const components = eventDetails[event.kind];
   const [isDeleted, setIsDeleted] = useState(false);
   const relaySet = useRelaySet(group ? [group.relay] : userRelays);
-  // todo: if we have replies, allow to open the conversation thread
+  // Use the shared hook for reply functionality
+  const { showReplyDialog, setShowReplyDialog, onReply, openReplyDialog } =
+    useReply(event, group);
   // NIP-31
   const { t } = useTranslation();
   const isRelayGroup = group?.id === "_";
   const { data: mintList } = useMintList(event.pubkey);
   const { events: comments } = useReplies(event, group);
+  const hasReplies = comments.length > 0;
+
   const repliers = comments
     .map((c) => {
       if (c.kind === NDKKind.Zap) {
@@ -623,56 +775,13 @@ export function ReplyEmbed({
     setShowEmojiPicker(true);
   }
 
-  function openReplyDialog() {
-    setShowReplyDialog(true);
+  function openThread() {
+    setShowThread(true);
   }
 
   function openZapDialog(type: "nip-61" | "nip-57") {
     setZapType(type);
     setShowZapDialog(true);
-  }
-
-  async function onReply(content: string, tags: string[][]) {
-    try {
-      // todo: reply to `a` or `i` tags
-      const ndkEvent = new NDKEvent(ndk, event);
-      const [t, ref] = ndkEvent.tagReference();
-      const root = event.tags.find(
-        (t) => t[0] === "E" || t[0] === "A" || t[0] === "I",
-      );
-      const rootTag = root?.[0] ?? t.toUpperCase();
-      const rootKind =
-        event.tags.find((t) => t[0] === "K")?.[1] ?? String(event.kind);
-      const rootRef = root ? root[1] : ref;
-      const rootRelay = root ? root[2] : (group?.relay ?? "");
-      const rootPubkey = root ? root[3] : event.pubkey;
-      const ev = new NDKEvent(ndk, {
-        kind: COMMENT,
-        content,
-        tags: [
-          ...(group ? [["h", group.id, group.relay]] : []),
-          ...(group && group.id === "_" ? [["-"]] : []),
-          // root marker
-          rootTag === "E"
-            ? [rootTag, rootRef, rootRelay, rootPubkey]
-            : [rootTag, rootRef, rootRelay],
-          ["K", rootKind],
-          // parent item
-          t === "e"
-            ? [t, ref, group ? group.relay : "", event.pubkey]
-            : [t, ref, group ? group.relay : ""],
-          ["k", String(event.kind)],
-          ...tags,
-        ],
-      } as NostrEvent);
-      ev.tag(ndkEvent);
-      await ev.publish(relaySet);
-    } catch (err) {
-      console.error(err);
-      toast.error(t("chat.message.reply.error"));
-    } finally {
-      setShowReplyDialog(false);
-    }
   }
 
   async function onEmojiSelect(e: PickerEmoji) {
@@ -740,7 +849,7 @@ export function ReplyEmbed({
         </RichText>
       )}
       {repliers.length > 0 && (
-        <div className="my-0.5">
+        <div className="my-0.5 flex items-center gap-1.5">
           <NameList
             pubkeys={repliers}
             suffix={t("event.replied")}
@@ -753,7 +862,7 @@ export function ReplyEmbed({
         <Reactions
           event={event}
           relays={group ? [group.relay] : [...relays, ...userRelays]}
-          kinds={[NDKKind.Reaction]}
+          kinds={[NDKKind.Reaction, NDKKind.Zap, NDKKind.Nutzap]}
         />
       ) : null}
     </div>
@@ -761,30 +870,102 @@ export function ReplyEmbed({
 
   // todo: emojis show before dragging
   return (
-    <div className="relative rounded-sm bg-accent">
-      <motion.div
-        className={cn(
-          "z-10 border relative bg-background text-foreground rounded-sm font-sans",
-          components?.reply ? "" : components?.className,
-          className,
-        )}
-        // Drag controls
-        drag={canSign && !isDeleted ? "x" : false}
-        dragSnapToOrigin={true}
-        dragConstraints={{ left: 30, right: 30 }}
-        dragElastic={{ left: 0.2, right: 0.2 }}
-        onDragEnd={(_, info) => {
-          // todo: tweak offsets
-          if (info.offset.x > 200) {
-            openReplyDialog();
-          } else if (info.offset.x < -200) {
-            openEmojiPicker();
-          }
-        }}
-      >
-        {canSign ? (
-          <ContextMenu>
-            <ContextMenuTrigger>
+    <>
+      <div className="relative rounded-sm bg-accent">
+        <motion.div
+          className={cn(
+            "z-10 border relative bg-background text-foreground rounded-sm font-sans",
+            components?.reply ? "" : components?.className,
+            hasReplies ? "hover:bg-accent cursor-zoom-in" : "",
+            className,
+          )}
+          // Drag controls
+          drag={canSign && !isDeleted ? "x" : false}
+          dragSnapToOrigin={true}
+          dragConstraints={{ left: 30, right: 30 }}
+          dragElastic={{ left: 0.2, right: 0.2 }}
+          onDragEnd={(_, info) => {
+            // todo: tweak offsets
+            if (info.offset.x > 200) {
+              openReplyDialog();
+            } else if (info.offset.x < -200) {
+              openEmojiPicker();
+            }
+          }}
+          onClick={() => {
+            if (hasReplies) {
+              openThread();
+            }
+          }}
+        >
+          {canSign ? (
+            <ContextMenu>
+              <ContextMenuTrigger>
+                {header}
+                {isDeleted ? (
+                  <div className="py-2 px-4 space-y-3">
+                    <div className="flex flex-row gap-1 items-center text-muted-foreground">
+                      <Ban className="size-3" />
+                      <span className="text-xs italic">
+                        {t("post.delete.success")}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  body
+                )}
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <ContextMenuItem
+                  className="cursor-pointer"
+                  onClick={openReplyDialog}
+                >
+                  {t("chat.message.reply.action")}
+                  <ContextMenuShortcut>
+                    <Reply className="w-4 h-4" />
+                  </ContextMenuShortcut>
+                </ContextMenuItem>
+                <ContextMenuItem
+                  className="cursor-pointer"
+                  onClick={openEmojiPicker}
+                >
+                  {t("chat.message.react.action")}
+                  <ContextMenuShortcut>
+                    <SmilePlus className="w-4 h-4" />
+                  </ContextMenuShortcut>
+                </ContextMenuItem>
+                {isRelayGroup ? (
+                  <ContextMenuItem
+                    className="cursor-pointer"
+                    onClick={() => openZapDialog("nip-57")}
+                  >
+                    {t("chat.message.zap.action")}
+                    <ContextMenuShortcut>
+                      <Bitcoin className="w-4 h-4" />
+                    </ContextMenuShortcut>
+                  </ContextMenuItem>
+                ) : mintList?.pubkey ? (
+                  <ContextMenuItem
+                    className="cursor-pointer"
+                    onClick={() => openZapDialog("nip-61")}
+                  >
+                    {t("chat.message.zap.action")}
+                    <ContextMenuShortcut>
+                      <Bitcoin className="w-4 h-4" />
+                    </ContextMenuShortcut>
+                  </ContextMenuItem>
+                ) : null}
+                {group ? (
+                  <DeleteGroupEventItem
+                    event={event}
+                    group={group}
+                    onDelete={() => setIsDeleted(true)}
+                  />
+                ) : null}
+              </ContextMenuContent>
+            </ContextMenu>
+          ) : (
+            <>
               {header}
               {isDeleted ? (
                 <div className="py-2 px-4 space-y-3">
@@ -798,116 +979,61 @@ export function ReplyEmbed({
               ) : (
                 body
               )}
-            </ContextMenuTrigger>
-            <ContextMenuContent>
-              <ContextMenuItem
-                className="cursor-pointer"
-                onClick={openReplyDialog}
-              >
-                {t("chat.message.reply.action")}
-                <ContextMenuShortcut>
-                  <Reply className="w-4 h-4" />
-                </ContextMenuShortcut>
-              </ContextMenuItem>
-              <ContextMenuItem
-                className="cursor-pointer"
-                onClick={openEmojiPicker}
-              >
-                {t("chat.message.react.action")}
-                <ContextMenuShortcut>
-                  <SmilePlus className="w-4 h-4" />
-                </ContextMenuShortcut>
-              </ContextMenuItem>
-              {isRelayGroup ? (
-                <ContextMenuItem
-                  className="cursor-pointer"
-                  onClick={() => openZapDialog("nip-57")}
-                >
-                  {t("chat.message.zap.action")}
-                  <ContextMenuShortcut>
-                    <Bitcoin className="w-4 h-4" />
-                  </ContextMenuShortcut>
-                </ContextMenuItem>
-              ) : mintList?.pubkey ? (
-                <ContextMenuItem
-                  className="cursor-pointer"
-                  onClick={() => openZapDialog("nip-61")}
-                >
-                  {t("chat.message.zap.action")}
-                  <ContextMenuShortcut>
-                    <Bitcoin className="w-4 h-4" />
-                  </ContextMenuShortcut>
-                </ContextMenuItem>
-              ) : null}
-              {group ? (
-                <DeleteGroupEventItem
-                  event={event}
-                  group={group}
-                  onDelete={() => setIsDeleted(true)}
-                />
-              ) : null}
-            </ContextMenuContent>
-          </ContextMenu>
-        ) : (
+            </>
+          )}
+        </motion.div>
+        {isDeleted ? null : (
           <>
-            {header}
-            {isDeleted ? (
-              <div className="py-2 px-4 space-y-3">
-                <div className="flex flex-row gap-1 items-center text-muted-foreground">
-                  <Ban className="size-3" />
-                  <span className="text-xs italic">
-                    {t("post.delete.success")}
-                  </span>
-                </div>
-              </div>
-            ) : (
-              body
-            )}
+            <Reply className="absolute left-2 top-3 z-0 size-6" />
+            <SmilePlus className="absolute right-2 top-3 z-0 size-6" />
           </>
         )}
-      </motion.div>
-      {isDeleted ? null : (
-        <>
-          <Reply className="absolute left-2 top-3 z-0 size-6" />
-          <SmilePlus className="absolute right-2 top-3 z-0 size-6" />
-        </>
-      )}
-      {showZapDialog ? (
-        <NewZapDialog
-          open={showZapDialog}
-          onZap={() => setShowZapDialog(false)}
-          onClose={() => setShowZapDialog(false)}
-          event={event}
-          pubkey={event.pubkey}
-          group={group}
-          zapType={zapType}
-        />
-      ) : null}
-      {showEmojiPicker && canSign ? (
-        <EmojiPicker
-          open={showEmojiPicker}
-          onOpenChange={setShowEmojiPicker}
-          onEmojiSelect={onEmojiSelect}
-        />
-      ) : null}
-      {showReplyDialog && canSign ? (
-        <ReplyDialog
-          group={group}
-          open={showReplyDialog}
-          onOpenChange={setShowReplyDialog}
-          onReply={onReply}
-        >
-          <Embed
-            canOpenDetails={false}
-            showReactions={false}
+        {showZapDialog ? (
+          <NewZapDialog
+            open={showZapDialog}
+            onZap={() => setShowZapDialog(false)}
+            onClose={() => setShowZapDialog(false)}
             event={event}
+            pubkey={event.pubkey}
             group={group}
-            relays={relays}
-            className="overflow-y-auto overflow-x-hidden max-h-32 rounded-b-none border-none pretty-scrollbar"
+            zapType={zapType}
           />
-        </ReplyDialog>
-      ) : null}
-    </div>
+        ) : null}
+        {showEmojiPicker && canSign ? (
+          <EmojiPicker
+            open={showEmojiPicker}
+            onOpenChange={setShowEmojiPicker}
+            onEmojiSelect={onEmojiSelect}
+          />
+        ) : null}
+        {showReplyDialog && canSign ? (
+          <ReplyDialog
+            group={group}
+            open={showReplyDialog}
+            onOpenChange={setShowReplyDialog}
+            onReply={onReply}
+          >
+            <Embed
+              canOpenDetails={false}
+              showReactions={false}
+              event={event}
+              group={group}
+              relays={relays}
+              className="overflow-y-auto overflow-x-hidden max-h-32 rounded-b-none border-none pretty-scrollbar"
+            />
+          </ReplyDialog>
+        ) : null}
+      </div>
+      {showThread && (
+        <Thread
+          root={root}
+          replies={[...comments, event]}
+          open={showThread}
+          onOpenChange={setShowThread}
+          group={group}
+        />
+      )}
+    </>
   );
 }
 
@@ -934,72 +1060,27 @@ export function FeedEmbed({
   const userRelays = useRelays();
   const canSign = useCanSign();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [showReplyDialog, setShowReplyDialog] = useState(false);
   const [zapType, setZapType] = useState<"nip-57" | "nip-61">("nip-61");
   const [showZapDialog, setShowZapDialog] = useState(false);
   const components = eventDetails[event.kind];
   const [isDeleted, setIsDeleted] = useState(false);
-  const relaySet = useRelaySet(group ? [group.relay] : userRelays);
+  // Use the shared hook for reply functionality
+  const { showReplyDialog, setShowReplyDialog, onReply, openReplyDialog } =
+    useReply(event, group);
   // NIP-31
   const alt = event.tags.find((t) => t[0] === "alt")?.[1];
   const { t } = useTranslation();
   const isRelayGroup = group?.id === "_";
   const { data: mintList } = useMintList(event.pubkey);
+  const relaySet = useRelaySet(group ? [group.relay] : userRelays);
 
   function openEmojiPicker() {
     setShowEmojiPicker(true);
   }
 
-  function openReplyDialog() {
-    setShowReplyDialog(true);
-  }
-
   function openZapDialog(type: "nip-61" | "nip-57") {
     setZapType(type);
     setShowZapDialog(true);
-  }
-
-  async function onReply(content: string, tags: string[][]) {
-    try {
-      // todo: reply to `a` or `i` tags
-      const ndkEvent = new NDKEvent(ndk, event);
-      const [t, ref] = ndkEvent.tagReference();
-      const root = event.tags.find(
-        (t) => t[0] === "E" || t[0] === "A" || t[0] === "I",
-      );
-      const rootTag = root?.[0] ?? t.toUpperCase();
-      const rootKind =
-        event.tags.find((t) => t[0] === "K")?.[1] ?? String(event.kind);
-      const rootRef = root ? root[1] : ref;
-      const rootRelay = root ? root[2] : (group?.relay ?? "");
-      const rootPubkey = root ? root[3] : event.pubkey;
-      const ev = new NDKEvent(ndk, {
-        kind: COMMENT,
-        content,
-        tags: [
-          ...(group ? [["h", group.id, group.relay]] : []),
-          ...(group && group.id === "_" ? [["-"]] : []),
-          // root marker
-          rootTag === "E"
-            ? [rootTag, rootRef, rootRelay, rootPubkey]
-            : [rootTag, rootRef, rootRelay],
-          ["K", rootKind],
-          // parent item
-          t === "e"
-            ? [t, ref, group ? group.relay : "", event.pubkey]
-            : [t, ref, group ? group.relay : ""],
-          ["k", String(event.kind)],
-          ...tags,
-        ],
-      } as NostrEvent);
-      ev.tag(ndkEvent);
-      await ev.publish(relaySet);
-    } catch (err) {
-      console.error(err);
-      toast.error(t("chat.message.reply.error"));
-    } finally {
-      setShowReplyDialog(false);
-    }
   }
 
   async function onEmojiSelect(e: PickerEmoji) {
@@ -1244,6 +1325,7 @@ export function Embed({
   asReply?: boolean;
   onClick?: (ev: NostrEvent) => void;
 }) {
+  // todo: if is detail, swipe to reply/react
   const { t } = useTranslation();
   const userRelays = useRelays();
   const components = eventDetails[event.kind];
@@ -1339,7 +1421,9 @@ export function EventDetail({
   group?: Group;
   relays: string[];
 }) {
-  const { eose, events: comments } = useDirectReplies(event, group);
+  const { eose, events } = useDirectReplies(event, group);
+  // The sorting is now handled in useDirectReplies by the sortComments function
+  const comments = events;
   const hasContent = eventDetails[event.kind]?.content;
   const { t } = useTranslation();
 
@@ -1397,11 +1481,11 @@ md:w-[calc(100vw-16rem)]
                 <Empty className="my-16" />
               ) : null}
               {comments.map((comment) => (
-                // todo: subthreads as chat on click
                 <ReplyEmbed
                   canOpenDetails
                   key={comment.id}
                   event={comment}
+                  root={event}
                   group={group}
                   className="rounded-none border-b border-l-none border-t-none border-r-none"
                   relays={relays}

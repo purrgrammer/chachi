@@ -20,13 +20,12 @@ function EventDetailPage({ group, nlink }: { group?: Group; nlink: string }) {
 
 export default function EventPage() {
   const { host, id, nlink } = useParams();
-  const group =
-    host && id
-      ? {
-          id: id || "_",
-          relay: `wss://${host}`,
-        }
-      : undefined;
+  const group = host
+    ? {
+        id: id || "_",
+        relay: `wss://${host}`,
+      }
+    : undefined;
   // todo: error handling
   return nlink ? (
     <EventDetailPage group={group} nlink={nlink} />

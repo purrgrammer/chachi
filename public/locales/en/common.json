@@ -684,6 +684,7 @@
   },
   "names": {
     "comma": ",",
-    "and": "and"
+    "and": "and",
+    "and-more": "and {{ more }} more"
   }
 }

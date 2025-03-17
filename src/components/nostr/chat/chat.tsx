@@ -183,10 +183,11 @@ export function ChatMessage({
   const author = event.pubkey;
   const content = event.content.trim();
   const legacyReply = event.tags.find((t) => t[3] === "reply")?.[1];
+  const eReply = event.tags.find((t) => t[0] === "e")?.[1];
   const quotedReply = event.tags.find(
     (t) => t[0] === "q" && t[1]?.length === 64,
   )?.[1];
-  const replyTo = legacyReply || quotedReply;
+  const replyTo = legacyReply || eReply || quotedReply;
   const replyRoot = event.tags.find((t) => t[3] === "root")?.[1];
   const isReplyingTo = replyTo || replyRoot;
   const isFocused = scrollTo?.id === event.id;
@@ -681,6 +682,7 @@ interface ChatProps extends MotionProps {
   setScrollTo?: (ev?: NostrEvent) => void;
   newMessage?: NostrEvent;
   showRootReply?: boolean;
+  showTimestamps?: boolean;
   lastSeen?: { ref: string };
   deleteEvents: NostrEvent[];
 }
@@ -697,6 +699,7 @@ export function Chat({
   style,
   newMessage,
   showRootReply = true,
+  showTimestamps = true,
   className,
   lastSeen,
   deleteEvents,
@@ -727,7 +730,7 @@ export function Chat({
     >
       {groupedMessages.map(({ day, messages }, groupIdx) => (
         <div className="flex flex-col w-full" key={groupIdx}>
-          {messages.length > 0 ? (
+          {showTimestamps && messages.length > 0 ? (
             <div className="flex justify-center my-2 w-full">
               <Badge variant="outline" className="self-center">
                 {formatDay(day)}
