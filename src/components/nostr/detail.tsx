@@ -1026,7 +1026,7 @@ export function ReplyEmbed({
       {showThread && (
         <Thread
           root={root}
-          replies={[...comments, event]}
+          replies={[event, ...comments]}
           open={showThread}
           onOpenChange={setShowThread}
           group={group}
