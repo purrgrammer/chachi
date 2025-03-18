@@ -716,7 +716,7 @@ function toFragments(
           image: matchResult[3],
         });
       } else {
-        const content = matchResult[4] || matchResult[2]; // Content is in different group for emoji vs. text formatting
+        const content = matchResult[4] || matchResult[2] || ""; // Content is in different group for emoji vs. text formatting
         if (tagType === "bold") {
           nodes.push({ type: "bold", text: content });
         } else if (tagType === "italic") {
