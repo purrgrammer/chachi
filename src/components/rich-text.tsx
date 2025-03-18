@@ -397,8 +397,9 @@ export function useRichText(
       text || "",
       options.syntax,
       options.codeBlock,
-      options.preserveNewlines !== false,
+      options.preserveNewlines,
       options,
+      tags,
     );
 
     // Processing other elements that aren't formatting-related
@@ -410,9 +411,6 @@ export function useRichText(
     }
     if (options.events) {
       result = extractNaddr(extractNevent(extractNote(result)));
-    }
-    if (options.emojis) {
-      result = extractCustomEmoji(result, tags);
     }
     if (options.hashtags) {
       result = extractHashtags(result);
@@ -485,8 +483,9 @@ export function RichText({
       children || "",
       opts.syntax,
       opts.codeBlock,
-      opts.preserveNewlines !== false,
+      opts.preserveNewlines,
       opts,
+      tags,
     );
 
     if (opts.urls) {
@@ -497,9 +496,6 @@ export function RichText({
     }
     if (opts.events) {
       result = extractNaddr(extractNevent(extractNote(result)));
-    }
-    if (opts.emojis) {
-      result = extractCustomEmoji(result, tags);
     }
     if (opts.hashtags) {
       result = extractHashtags(result);
@@ -560,32 +556,111 @@ function toFragments(
   enableCodeBlock: boolean = true,
   preserveNewlines: boolean = true,
   options?: RichTextOptions,
+  tags: string[][] = [],
 ): Fragment[] {
   if (!text) return [];
+
+  // Process custom emojis first if enabled
+  let processedText = text;
+  if (options?.emojis !== false && tags && tags.length > 0) {
+    processedText = processedText.replace(CUSTOM_EMOJI_REGEX, (match) => {
+      const code = match.slice(1, -1);
+      const image = tags.find((t) => t[0] === "emoji" && t[1] === code)?.[2];
+      if (image) {
+        return `<emoji data-name="${code}" data-image="${image}"></emoji>`;
+      }
+      return match;
+    });
+  }
 
   // If syntax highlighting is disabled, just return the text
   if (!enableSyntax) {
     // If preserveNewlines is enabled, split by newlines
     if (preserveNewlines) {
-      return text
+      return processedText
         .split(/\n/)
         .filter(Boolean)
         .map((line) => {
-          return { type: "block", nodes: [{ type: "text", text: line }] };
+          // Process emoji markers in text
+          const nodes: InlineFragment[] = [];
+          const emojiRegex =
+            /<emoji data-name="(.*?)" data-image="(.*?)"><\/emoji>/g;
+          let lastIndex = 0;
+          let match;
+
+          while ((match = emojiRegex.exec(line)) !== null) {
+            if (match.index > lastIndex) {
+              nodes.push({
+                type: "text",
+                text: line.substring(lastIndex, match.index),
+              });
+            }
+            nodes.push({
+              type: "emoji",
+              name: match[1],
+              image: match[2],
+            });
+            lastIndex = match.index + match[0].length;
+          }
+
+          if (lastIndex < line.length) {
+            nodes.push({
+              type: "text",
+              text: line.substring(lastIndex),
+            });
+          }
+
+          return {
+            type: "block",
+            nodes: nodes.length ? nodes : [{ type: "text", text: line }],
+          };
         });
     }
-    // Otherwise keep as a single block
-    return [{ type: "block", nodes: [{ type: "text", text }] }];
+
+    // Process emoji markers in the single block
+    const nodes: InlineFragment[] = [];
+    const emojiRegex = /<emoji data-name="(.*?)" data-image="(.*?)"><\/emoji>/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = emojiRegex.exec(processedText)) !== null) {
+      if (match.index > lastIndex) {
+        nodes.push({
+          type: "text",
+          text: processedText.substring(lastIndex, match.index),
+        });
+      }
+      nodes.push({
+        type: "emoji",
+        name: match[1],
+        image: match[2],
+      });
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < processedText.length) {
+      nodes.push({
+        type: "text",
+        text: processedText.substring(lastIndex),
+      });
+    }
+
+    return [
+      {
+        type: "block",
+        nodes: nodes.length ? nodes : [{ type: "text", text: processedText }],
+      },
+    ];
   }
 
   // If code blocks are disabled, process syntax on the entire text
   if (!enableCodeBlock) {
     // Process the text for formatting
-    let processedText = text;
+    let syntaxProcessedText = processedText;
 
     // Apply bold formatting if enabled
     if (options?.bold !== false) {
-      processedText = processedText.replace(boldRegex, (match) => {
+      syntaxProcessedText = syntaxProcessedText.replace(boldRegex, (match) => {
         const innerText = match.slice(1, -1);
         return `<bold>${innerText}</bold>`;
       });
@@ -593,28 +668,35 @@ function toFragments(
 
     // Apply italic formatting if enabled
     if (options?.italic !== false) {
-      processedText = processedText.replace(italicRegex, (match) => {
-        const innerText = match.slice(1, -1);
-        return `<italic>${innerText}</italic>`;
-      });
+      syntaxProcessedText = syntaxProcessedText.replace(
+        italicRegex,
+        (match) => {
+          const innerText = match.slice(1, -1);
+          return `<italic>${innerText}</italic>`;
+        },
+      );
     }
 
     // Apply monospace formatting if enabled
     if (options?.monospace !== false) {
-      processedText = processedText.replace(monospaceRegex, (match) => {
-        const innerText = match.slice(1, -1);
-        return `<monospace>${innerText}</monospace>`;
-      });
+      syntaxProcessedText = syntaxProcessedText.replace(
+        monospaceRegex,
+        (match) => {
+          const innerText = match.slice(1, -1);
+          return `<monospace>${innerText}</monospace>`;
+        },
+      );
     }
 
     // Parse the entire text for formatted elements
     const nodes: InlineFragment[] = [];
-    const processedContent = processedText;
+    const processedContent = syntaxProcessedText;
     let matchResult;
     let lastIndex = 0;
 
-    // Process all formatting tags in one pass
-    const formattingRegex = /<(bold|italic|monospace)>([\s\S]*?)<\/\1>/g;
+    // Process all formatting tags and emojis in one pass
+    const formattingRegex =
+      /<(bold|italic|monospace|emoji)(?: data-name="(.*?)" data-image="(.*?)")?>([\s\S]*?)<\/\1>/g;
     while ((matchResult = formattingRegex.exec(processedContent)) !== null) {
       // Add text before the match
       if (matchResult.index > lastIndex) {
@@ -626,14 +708,22 @@ function toFragments(
 
       // Add the formatted text based on tag type
       const tagType = matchResult[1];
-      const content = matchResult[2];
 
-      if (tagType === "bold") {
-        nodes.push({ type: "bold", text: content });
-      } else if (tagType === "italic") {
-        nodes.push({ type: "italic", text: content });
-      } else if (tagType === "monospace") {
-        nodes.push({ type: "monospace", text: content });
+      if (tagType === "emoji") {
+        nodes.push({
+          type: "emoji",
+          name: matchResult[2],
+          image: matchResult[3],
+        });
+      } else {
+        const content = matchResult[4] || matchResult[2]; // Content is in different group for emoji vs. text formatting
+        if (tagType === "bold") {
+          nodes.push({ type: "bold", text: content });
+        } else if (tagType === "italic") {
+          nodes.push({ type: "italic", text: content });
+        } else if (tagType === "monospace") {
+          nodes.push({ type: "monospace", text: content });
+        }
       }
 
       lastIndex = matchResult.index + matchResult[0].length;
@@ -703,7 +793,7 @@ function toFragments(
             lines[currentLine].push(node);
           }
         } else {
-          // For other node types, keep on current line
+          // For emoji and other node types, keep on current line
           lines[currentLine].push(node);
         }
       }
@@ -734,10 +824,10 @@ function toFragments(
   const regex = new RegExp(codeBlockRegex.source, codeBlockRegex.flags);
 
   // Process the entire text to find code blocks first
-  while ((match = regex.exec(text)) !== null) {
+  while ((match = regex.exec(processedText)) !== null) {
     // Process text before the code block with formatting
     if (match.index > lastIndex) {
-      const textBefore = text.substring(lastIndex, match.index);
+      const textBefore = processedText.substring(lastIndex, match.index);
 
       // Process the text for formatting (uses recursion to handle formatting)
       const formattedBlocks = toFragments(
@@ -746,6 +836,7 @@ function toFragments(
         false,
         preserveNewlines,
         options,
+        tags,
       );
       result.push(...formattedBlocks);
     }
@@ -774,8 +865,8 @@ function toFragments(
   }
 
   // Process remaining text after the last code block
-  if (lastIndex < text.length) {
-    const textAfter = text.substring(lastIndex);
+  if (lastIndex < processedText.length) {
+    const textAfter = processedText.substring(lastIndex);
 
     // Process the text for formatting (uses recursion to handle formatting)
     const formattedBlocks = toFragments(
@@ -784,6 +875,7 @@ function toFragments(
       false,
       preserveNewlines,
       options,
+      tags,
     );
     result.push(...formattedBlocks);
   }
@@ -942,20 +1034,6 @@ function extractURLs(
       return { type: "youtube", url };
     }
     return { type: "url", url } as Fragment;
-  });
-}
-
-function extractCustomEmoji(
-  fragments: Fragment[],
-  tags: string[][],
-): Fragment[] {
-  return extract(fragments, CUSTOM_EMOJI_REGEX, (name: string) => {
-    const code = name.slice(1, -1);
-    const image = tags.find((t) => t[0] === "emoji" && t[1] === code)?.[2];
-    if (image) {
-      return { type: "emoji", name: code, image } as Fragment;
-    }
-    return { type: "text", text: name } as Fragment;
   });
 }
 
