@@ -368,7 +368,7 @@
       "date": "Expiry date",
       "check": "Expiry date must be in the future"
     },
-    "options": "Options",
+    "options": "Opcje",
     "multiple-choices": "Multiple choices",
     "closed": "Poll closed",
     "ends": "Ends "
