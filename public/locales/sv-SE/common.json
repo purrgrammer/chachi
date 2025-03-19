@@ -418,7 +418,7 @@
     "loading": "Laddar event",
     "not-found": "Event inte hittat",
     "fetch-error": "Fel vid hämtning av event",
-    "replied": "replied"
+    "replied": "svarade"
   },
   "events": {
     "loading": "Laddar event",
@@ -674,7 +674,7 @@
   },
   "names": {
     "comma": ",",
-    "and": "and",
-    "and-more": "and {{ more }} more"
+    "and": "och",
+    "and-more": "och {{ more }} fler"
   }
 }
