@@ -1,6 +1,6 @@
-// @ts-nocheck
 import Dexie, { Table } from "dexie";
 import NDKCacheAdapterDexie from "@nostr-dev-kit/ndk-cache-dexie";
+import { NDKEvent } from "@nostr-dev-kit/ndk";
 //import { Transaction } from "@/lib/wallet";
 
 // todo: tweak cache sizes
@@ -64,3 +64,24 @@ class ChachiDatabase extends Dexie {
 const db = new ChachiDatabase("chachi");
 
 export default db;
+
+// Function to check if an event is unpublished
+export async function isEventUnpublished(eventId: string): Promise<boolean> {
+  try {
+    const unpublished = await getUnpublishedEvent(eventId);
+    if (unpublished) {
+      return unpublished.publishStatus !== "success";
+    }
+    return false;
+  } catch (error) {
+    console.error("Error checking unpublished events:", error);
+    return false;
+  }
+}
+
+export async function getUnpublishedEvent(
+  eventId: string,
+): Promise<NDKEvent | null> {
+  const unpublishedEvents = await cache.getUnpublishedEvents();
+  return unpublishedEvents.find((e) => e.event.id === eventId)?.event ?? null;
+}

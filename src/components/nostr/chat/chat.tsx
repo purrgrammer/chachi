@@ -10,6 +10,7 @@ import {
   Ban,
   ShieldBan,
   Bitcoin,
+  RotateCcw,
 } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,7 @@ import { usePubkey, useCanSign } from "@/lib/account";
 import { Emoji as EmojiType, EmojiPicker } from "@/components/emoji-picker";
 import { saveLastSeen, saveGroupEvent } from "@/lib/messages";
 import { useSettings } from "@/lib/settings";
+import { useIsUnpublished, useRetryUnpublishedEvent } from "@/lib/unpublished";
 import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import i18n from "i18next";
@@ -124,7 +126,8 @@ function Reply({
   );
 }
 
-export function ChatMessage({
+// Component for user's own messages that checks unpublished status
+function UserMessage({
   group,
   event,
   admins,
@@ -137,7 +140,6 @@ export function ChatMessage({
   deleteEvent,
   isNew,
   isDeleted,
-  isMine,
   showRootReply = true,
   canReact = true,
   richTextOptions,
@@ -158,7 +160,6 @@ export function ChatMessage({
   canDelete?: (ev: NostrEvent) => boolean;
   deleteEvent?: (event: NostrEvent) => void;
   isNew?: boolean;
-  isMine?: boolean;
   showRootReply?: boolean;
   canReact?: boolean;
   richTextOptions?: RichTextOptions;
@@ -166,6 +167,115 @@ export function ChatMessage({
   className?: string;
   scrollTo?: NostrEvent;
   setScrollTo?: (ev?: NostrEvent) => void;
+}) {
+  const { t } = useTranslation();
+  const isUnpublished = useIsUnpublished(event.id);
+  const { retryEvent } = useRetryUnpublishedEvent();
+  const [isRetrying, setIsRetrying] = useState(false);
+
+  const handleRetry = async () => {
+    if (isRetrying) return;
+
+    setIsRetrying(true);
+    try {
+      await retryEvent(event.id);
+    } finally {
+      setIsRetrying(false);
+    }
+  };
+
+  return (
+    <>
+      <MessageContent
+        group={group}
+        event={event}
+        admins={admins}
+        isChain={isChain}
+        isLastSeen={isLastSeen}
+        isFirstInChain={isFirstInChain}
+        isLast={isLast}
+        setReplyingTo={setReplyingTo}
+        canDelete={canDelete}
+        deleteEvent={deleteEvent}
+        isNew={isNew}
+        isDeleted={isDeleted}
+        isMine={true}
+        showRootReply={showRootReply}
+        canReact={canReact}
+        richTextOptions={richTextOptions}
+        richTextClassnames={richTextClassnames}
+        className={className}
+        scrollTo={scrollTo}
+        setScrollTo={setScrollTo}
+        isUnpublished={isUnpublished}
+        retryButton={
+          isUnpublished ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={handleRetry}
+              disabled={isRetrying}
+            >
+              <RotateCcw
+                className={`h-4 w-4 ${isRetrying ? "animate-spin" : ""}`}
+              />
+              <span className="sr-only">{t("chat.message.retry.action")}</span>
+            </Button>
+          ) : null
+        }
+      />
+    </>
+  );
+}
+
+// Core message component without unpublished status check
+function MessageContent({
+  group,
+  event,
+  admins,
+  isChain,
+  isLastSeen,
+  isFirstInChain,
+  isLast,
+  setReplyingTo,
+  canDelete,
+  deleteEvent,
+  isNew,
+  isDeleted,
+  isMine,
+  showRootReply = true,
+  canReact = true,
+  richTextOptions,
+  richTextClassnames = {},
+  className,
+  scrollTo,
+  setScrollTo,
+  isUnpublished = false,
+  retryButton,
+}: {
+  group?: Group;
+  event: NostrEvent;
+  admins: string[];
+  isChain?: boolean;
+  isLastSeen?: boolean;
+  isFirstInChain?: boolean;
+  isLast?: boolean;
+  isDeleted?: boolean;
+  setReplyingTo?: (event: NostrEvent | undefined) => void;
+  canDelete?: (ev: NostrEvent) => boolean;
+  deleteEvent?: (event: NostrEvent) => void;
+  isNew?: boolean;
+  isMine: boolean;
+  showRootReply?: boolean;
+  canReact?: boolean;
+  richTextOptions?: RichTextOptions;
+  richTextClassnames?: RichTextClassnames;
+  className?: string;
+  scrollTo?: NostrEvent;
+  setScrollTo?: (ev?: NostrEvent) => void;
+  isUnpublished?: boolean;
+  retryButton?: React.ReactNode;
 }) {
   const { t } = useTranslation();
   const [settings] = useSettings();
@@ -360,6 +470,9 @@ export function ChatMessage({
           `flex flex-row gap-2 items-end ${isLast ? "mb-0" : isChain ? "mb-0.5" : "mb-2"} ${isMine ? "ml-auto" : ""} transition-colors ${isFocused ? "bg-accent/30 rounded-lg" : ""}`,
           className,
         )}
+        style={{
+          opacity: isUnpublished ? 0.6 : 1,
+        }}
       >
         {isMine || isChain ? null : (
           <ProfileDrawer
@@ -370,129 +483,132 @@ export function ChatMessage({
         )}
         <ContextMenu>
           <ContextMenuTrigger asChild>
-            <motion.div
-              // Drag controls
-              drag={isMobile && !isMine && canSign ? "x" : false}
-              dragSnapToOrigin={true}
-              dragConstraints={{ left: 20, right: 20 }}
-              dragElastic={{ left: 0.2, right: 0.2 }}
-              onDragEnd={(_, info) => {
-                if (info.offset.x > 20) {
-                  setReplyingTo?.(event);
-                } else if (info.offset.x < -20) {
-                  setShowingEmojiPicker(true);
-                }
-              }}
-              className={`z-0 relative ${isChain ? "rounded-lg" : isMine ? "rounded-tl-lg rounded-tr-lg rounded-bl-lg" : "rounded-tl-lg rounded-tr-lg rounded-br-lg"} p-1 px-2 w-fit max-w-[18rem] sm:max-w-sm md:max-w-md ${isChain && !isMine ? "ml-9" : ""} ${shouldHaveTransparentBackground ? "bg-transparent p-0" : isMine ? "bg-primary/10 text-foreground dark:bg-primary dark:text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}
-            >
-              {isFirstInChain ? (
-                <div className="flex flex-row gap-1 items-center">
-                  <ProfileDrawer
+            <div className="flex flex-row gap-2 items-center">
+              {retryButton}
+              <motion.div
+                // Drag controls
+                drag={isMobile && !isMine && canSign ? "x" : false}
+                dragSnapToOrigin={true}
+                dragConstraints={{ left: 20, right: 20 }}
+                dragElastic={{ left: 0.2, right: 0.2 }}
+                onDragEnd={(_, info) => {
+                  if (info.offset.x > 20) {
+                    setReplyingTo?.(event);
+                  } else if (info.offset.x < -20) {
+                    setShowingEmojiPicker(true);
+                  }
+                }}
+                className={`z-0 relative ${isChain ? "rounded-lg" : isMine ? "rounded-tl-lg rounded-tr-lg rounded-bl-lg" : "rounded-tl-lg rounded-tr-lg rounded-br-lg"} p-1 px-2 w-fit max-w-[18rem] sm:max-w-sm md:max-w-md ${isChain && !isMine ? "ml-9" : ""} ${shouldHaveTransparentBackground ? "bg-transparent p-0" : isMine ? "bg-primary/10 text-foreground dark:bg-primary dark:text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}
+              >
+                {isFirstInChain ? (
+                  <div className="flex flex-row gap-1 items-center">
+                    <ProfileDrawer
+                      group={group}
+                      pubkey={author}
+                      trigger={
+                        <h3 className="text-sm font-semibold">
+                          <Name pubkey={author} />
+                        </h3>
+                      }
+                    />
+                    {isAdmin ? <Crown className="w-3 h-3" /> : null}
+                  </div>
+                ) : null}
+                {(replyTo || (replyRoot && showRootReply)) &&
+                isReplyingTo &&
+                showReply ? (
+                  <Reply
+                    setScrollTo={setScrollTo}
                     group={group}
-                    pubkey={author}
-                    trigger={
-                      <h3 className="text-sm font-semibold">
-                        <Name pubkey={author} />
-                      </h3>
+                    admins={admins}
+                    id={isReplyingTo}
+                    className={
+                      isMine
+                        ? "bg-secondary border-primary/40 text-secondary-foreground"
+                        : undefined
                     }
                   />
-                  {isAdmin ? <Crown className="w-3 h-3" /> : null}
-                </div>
-              ) : null}
-              {(replyTo || (replyRoot && showRootReply)) &&
-              isReplyingTo &&
-              showReply ? (
-                <Reply
-                  setScrollTo={setScrollTo}
-                  group={group}
-                  admins={admins}
-                  id={isReplyingTo}
-                  className={
-                    isMine
-                      ? "bg-secondary border-primary/40 text-secondary-foreground"
-                      : undefined
-                  }
-                />
-              ) : null}
-              {isDeleted ? (
-                <div
-                  className={`flex flex-row items-center gap-1 ${isMine ? "text-primary-foreground" : "text-muted-foreground"}`}
-                >
-                  <Ban className="size-3" />
-                  <span className="text-xs italic">
-                    {t("chat.message.deleted")}
-                  </span>
-                </div>
-              ) : isOnlyEmojis ? (
-                <div className={isMine ? "text-right" : ""}>
-                  <span className="text-7xl">{content}</span>
-                </div>
-              ) : isSingleCustomEmoji && singleCustomEmoji ? (
-                <div className={isMine ? "flex items-end justify-end" : ""}>
-                  <Emoji
-                    key={singleCustomEmoji.name}
-                    name={singleCustomEmoji.name}
-                    image={singleCustomEmoji.image}
-                    className={`w-32 h-32 aspect-auto rounded-md`}
-                  />
-                </div>
-              ) : (
-                <RichText
-                  group={group}
-                  tags={event.tags}
-                  options={{
-                    ...richTextOptions,
-                    syntax: true,
-                    codeBlock: true,
-                  }}
-                  classNames={{
-                    ...{
-                      singleEmoji: "w-32 h-32 aspect-auto rounded-md",
-                      image: "m-0",
-                    },
-                    ...richTextClassnames,
-                  }}
-                >
-                  {content}
-                </RichText>
-              )}
-              <Reactions
-                className="pt-1"
-                event={event}
-                relays={[...(relay ? [relay] : [])]}
-                kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
-                live={isInView}
-              />
-              {showingZapDialog && group ? (
-                <NewZapDialog
-                  open
-                  event={event}
-                  pubkey={event.pubkey}
-                  group={group}
-                  onClose={() => setShowingZapDialog(false)}
-                  onZap={() => setShowingZapDialog(false)}
-                  zapType={mintList?.pubkey ? "nip-61" : "nip-57"}
-                />
-              ) : null}
-              {showingEmojiPicker ? (
-                <EmojiPicker
-                  open={showingEmojiPicker}
-                  onOpenChange={(open) => setShowingEmojiPicker(open)}
-                  onEmojiSelect={react}
-                />
-              ) : null}
-              {showMessageActions && canReact ? (
-                <div className="flex absolute bottom-0 -right-7 flex-col gap-1">
-                  <Button
-                    variant="outline"
-                    size="smallIcon"
-                    onClick={() => setShowingEmojiPicker(true)}
+                ) : null}
+                {isDeleted ? (
+                  <div
+                    className={`flex flex-row items-center gap-1 ${isMine ? "text-primary-foreground" : "text-muted-foreground"}`}
                   >
-                    <SmilePlus />
-                  </Button>
-                </div>
-              ) : null}
-            </motion.div>
+                    <Ban className="size-3" />
+                    <span className="text-xs italic">
+                      {t("chat.message.deleted")}
+                    </span>
+                  </div>
+                ) : isOnlyEmojis ? (
+                  <div className={isMine ? "text-right" : ""}>
+                    <span className="text-7xl">{content}</span>
+                  </div>
+                ) : isSingleCustomEmoji && singleCustomEmoji ? (
+                  <div className={isMine ? "flex items-end justify-end" : ""}>
+                    <Emoji
+                      key={singleCustomEmoji.name}
+                      name={singleCustomEmoji.name}
+                      image={singleCustomEmoji.image}
+                      className={`w-32 h-32 aspect-auto rounded-md`}
+                    />
+                  </div>
+                ) : (
+                  <RichText
+                    group={group}
+                    tags={event.tags}
+                    options={{
+                      ...richTextOptions,
+                      syntax: true,
+                      codeBlock: true,
+                    }}
+                    classNames={{
+                      ...{
+                        singleEmoji: "w-32 h-32 aspect-auto rounded-md",
+                        image: "m-0",
+                      },
+                      ...richTextClassnames,
+                    }}
+                  >
+                    {content}
+                  </RichText>
+                )}
+                <Reactions
+                  className="pt-1"
+                  event={event}
+                  relays={[...(relay ? [relay] : [])]}
+                  kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
+                  live={isInView}
+                />
+                {showingZapDialog && group ? (
+                  <NewZapDialog
+                    open
+                    event={event}
+                    pubkey={event.pubkey}
+                    group={group}
+                    onClose={() => setShowingZapDialog(false)}
+                    onZap={() => setShowingZapDialog(false)}
+                    zapType={mintList?.pubkey ? "nip-61" : "nip-57"}
+                  />
+                ) : null}
+                {showingEmojiPicker ? (
+                  <EmojiPicker
+                    open={showingEmojiPicker}
+                    onOpenChange={(open) => setShowingEmojiPicker(open)}
+                    onEmojiSelect={react}
+                  />
+                ) : null}
+                {showMessageActions && canReact ? (
+                  <div className="flex absolute bottom-0 -right-7 flex-col gap-1">
+                    <Button
+                      variant="outline"
+                      size="smallIcon"
+                      onClick={() => setShowingEmojiPicker(true)}
+                    >
+                      <SmilePlus />
+                    </Button>
+                  </div>
+                ) : null}
+              </motion.div>
+            </div>
           </ContextMenuTrigger>
           <ContextMenuContent>
             <ContextMenuItem
@@ -604,6 +720,39 @@ export function ChatMessage({
       ) : null}
     </>
   );
+}
+
+// Main ChatMessage component that conditionally renders the appropriate message component
+export function ChatMessage(props: {
+  group?: Group;
+  event: NostrEvent;
+  admins: string[];
+  isChain?: boolean;
+  isLastSeen?: boolean;
+  isFirstInChain?: boolean;
+  isLast?: boolean;
+  isDeleted?: boolean;
+  setReplyingTo?: (event: NostrEvent | undefined) => void;
+  canDelete?: (ev: NostrEvent) => boolean;
+  deleteEvent?: (event: NostrEvent) => void;
+  isNew?: boolean;
+  isMine?: boolean;
+  showRootReply?: boolean;
+  canReact?: boolean;
+  richTextOptions?: RichTextOptions;
+  richTextClassnames?: RichTextClassnames;
+  className?: string;
+  scrollTo?: NostrEvent;
+  setScrollTo?: (ev?: NostrEvent) => void;
+}) {
+  const { event, isMine } = props;
+  const me = usePubkey();
+
+  if (me && event.pubkey === me) {
+    return <UserMessage {...props} />;
+  }
+
+  return <MessageContent {...props} isMine={!!isMine} />;
 }
 
 // todo

@@ -29,3 +29,24 @@ export function useHost(url: string) {
     }
   }, [url]);
 }
+
+export function useFavicon(server: string) {
+  const url = useMemo(() => {
+    try {
+      return new URL(server);
+    } catch {
+      return null;
+    }
+  }, [server]);
+  const hostname = url?.hostname || "";
+  const faviconUrl = useMemo(() => {
+    const parts = hostname.split(".");
+    const topLevelDomain =
+      parts.length >= 2 ? parts.slice(-2).join(".") : hostname;
+    if (topLevelDomain) {
+      return `https://${topLevelDomain}/favicon.ico`;
+    }
+    return null;
+  }, [hostname]);
+  return faviconUrl;
+}

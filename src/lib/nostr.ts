@@ -71,15 +71,15 @@ export function useEvent({
   relays: string[];
 }) {
   const ndk = useNDK();
-
-  // todo: try cache first
   return useQuery({
     enabled: Boolean(id),
     queryKey: [EVENT, id ? id : "empty"],
     queryFn: async () => {
       if (!id) throw new Error("No id");
+      console.log("USEEVENT.1", { id, pubkey });
 
       const cached = await fetchCachedEvent(ndk, id);
+      console.log("USEEVENT.2", { id, pubkey, cached });
       if (cached) {
         return cached;
       }
@@ -95,9 +95,10 @@ export function useEvent({
         ? NDKRelaySet.fromRelayUrls(relayList, ndk)
         : undefined;
 
+      console.log("USEEVENT", { id, pubkey, relayList });
       return ndk
         .fetchEvent(
-          { ids: [id] },
+          { ids: [id], ...(pubkey ? { authors: [pubkey] } : {}) },
           {
             closeOnEose: true,
             cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST,

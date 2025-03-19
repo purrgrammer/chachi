@@ -15,6 +15,7 @@ import { useBookmarkGroup } from "@/components/nostr/groups/bookmark";
 import { useRequestedToJoin, useJoinRequest } from "@/lib/nostr/groups";
 import type { Group, Emoji } from "@/lib/types";
 import { useTranslation } from "react-i18next";
+import { useAddUnpublishedEvent } from "@/lib/unpublished";
 
 function JoinRequest({ group, pubkey }: { group: Group; pubkey: string }) {
   const canSign = useCanSign();
@@ -110,6 +111,7 @@ export function ChatInput({
   const [message, setMessage] = useState("");
   const [customEmojis, setCustomEmojis] = useState<Emoji[]>([]);
   const { t } = useTranslation();
+  const addUnpublishedEvent = useAddUnpublishedEvent();
 
   async function sendMessage(msg: string) {
     setIsPosting(true);
@@ -199,9 +201,13 @@ export function ChatInput({
         });
       }
       try {
-        await event.publish(relaySet);
+        const result = await event.publish(relaySet);
+        if (result.size === 0) {
+          throw new Error("Failed to publish event");
+        }
       } catch (err) {
         console.error(err);
+        addUnpublishedEvent({ event, relays });
         toast.error(t("send.error"));
       } finally {
         setMessage("");
