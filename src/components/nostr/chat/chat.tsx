@@ -531,7 +531,7 @@ function MessageContent({
                 ) : null}
                 {isDeleted ? (
                   <div
-                    className={`flex flex-row items-center gap-1 ${isMine ? "text-primary-foreground" : "text-muted-foreground"}`}
+                    className={`flex flex-row items-center gap-1 ${isMine ? "text-foreground/80" : "text-muted-foreground"}`}
                   >
                     <Ban className="size-3" />
                     <span className="text-xs italic">
