@@ -418,7 +418,7 @@
     "loading": "Carregando evento",
     "not-found": "Evento não encontrado",
     "fetch-error": "Erro ao buscar evento",
-    "replied": "replied"
+    "replied": "respondeu"
   },
   "events": {
     "loading": "Carregando eventos",
@@ -674,7 +674,7 @@
   },
   "names": {
     "comma": ",",
-    "and": "and",
-    "and-more": "and {{ more }} more"
+    "and": "e",
+    "and-more": "e mais {{ more }}"
   }
 }
