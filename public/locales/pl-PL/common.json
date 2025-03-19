@@ -169,7 +169,7 @@
       "trigger": "Leave",
       "confirmation": {
         "title": "Are you sure you want to leave?",
-        "description": "This action cannot be undone. You will be removed from the group members list.",
+        "description": "Tej akcji nie można cofnąć. Zostaniesz usunięty z listy członków grupy.",
         "confirm": "Leave",
         "cancel": "Cancel"
       },
