@@ -418,7 +418,7 @@
     "loading": "Načítání události",
     "not-found": "Událost nenalezena",
     "fetch-error": "Chyba při načítání události",
-    "replied": "replied"
+    "replied": "odpověděl"
   },
   "events": {
     "loading": "Načítání událostí",
@@ -674,7 +674,7 @@
   },
   "names": {
     "comma": ",",
-    "and": "and",
-    "and-more": "and {{ more }} more"
+    "and": "a",
+    "and-more": "a {{ more }} dalších"
   }
 }
