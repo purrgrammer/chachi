@@ -279,7 +279,7 @@
     "request": {
       "send": {
         "success": "Join request sent",
-        "error": "Failed to send join request"
+        "error": "Nie udało się wysłać prośby o dodanie"
       },
       "accept": {
         "action": "Accept",
