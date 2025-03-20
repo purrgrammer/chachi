@@ -13,12 +13,18 @@ export function useReplies(event: NostrEvent, group?: Group, live = true) {
     (t) => t[0] === "h" && t[1] === group?.id,
   );
   const filters = [
-    {
-      kinds: [NDKKind.GenericReply],
-      ...(isFromGroup && group ? { "#h": [group.id] } : {}),
-      ...ev.filter(),
-      "#k": [String(ev.kind)],
-    },
+    event.kind === NDKKind.Text
+      ? {
+          kinds: [NDKKind.Text],
+          ...(isFromGroup && group ? { "#h": [group.id] } : {}),
+          ...ev.filter(),
+        }
+      : {
+          kinds: [NDKKind.GenericReply],
+          ...(isFromGroup && group ? { "#h": [group.id] } : {}),
+          ...ev.filter(),
+          "#k": [String(ev.kind)],
+        },
     {
       kinds: [NDKKind.Zap, NDKKind.Nutzap],
       ...(isFromGroup && group ? { "#h": [group.id] } : {}),
@@ -32,10 +38,7 @@ export function useReplies(event: NostrEvent, group?: Group, live = true) {
     true,
   );
 
-  return {
-    ...replies,
-    events: sortComments(replies.events),
-  };
+  return replies;
 }
 
 export function useDirectReplies(
@@ -50,13 +53,18 @@ export function useDirectReplies(
   const ev = new NDKEvent(ndk, event);
   const [t, v] = ev.tagReference();
   const filters = [
-    {
-      kinds: [NDKKind.GenericReply],
-      ...(isFromGroup && group ? { "#h": [group.id] } : {}),
-      "#K": [String(ev.kind)],
-      [`#${t.toUpperCase()}`]: [v],
-      [`#${t}`]: [v],
-    },
+    event.kind === NDKKind.Text
+      ? {
+          kinds: [NDKKind.Text],
+          ...(isFromGroup && group ? { "#h": [group.id] } : {}),
+          ...ev.filter(),
+        }
+      : {
+          kinds: [NDKKind.GenericReply],
+          ...(isFromGroup && group ? { "#h": [group.id] } : {}),
+          [`#${t.toUpperCase()}`]: [v],
+          "#k": [String(ev.kind)],
+        },
     {
       kinds: [NDKKind.Zap, NDKKind.Nutzap],
       ...(isFromGroup && group ? { "#h": [group.id] } : {}),
@@ -73,7 +81,7 @@ export function useDirectReplies(
   // Sort the replies using the sortComments function
   return {
     ...replies,
-    events: sortComments(replies.events),
+    events: sortComments(replies.events, event.pubkey),
   };
 }
 
@@ -84,8 +92,20 @@ export function useDirectReplies(
  * - zaps sorted by amount
  * - zaps without comments at the bottom, sorted by amount
  */
-export function sortComments(events: NostrEvent[]): NostrEvent[] {
+export function sortComments(
+  events: NostrEvent[],
+  authorPubkey: string,
+): NostrEvent[] {
   return [...events].sort((a, b) => {
+    // First, check if either event is a direct reply from the author
+    const aIsAuthorReply = a.pubkey === authorPubkey;
+    const bIsAuthorReply = b.pubkey === authorPubkey;
+
+    // If one is an author reply and the other isn't, prioritize the author reply
+    if (aIsAuthorReply && !bIsAuthorReply) return -1;
+    if (!aIsAuthorReply && bIsAuthorReply) return 1;
+
+    // If both are author replies or both aren't, proceed with the existing sorting logic
     // Check if events are zaps or nutzaps
     const aZapInfo =
       a.kind === NDKKind.Zap

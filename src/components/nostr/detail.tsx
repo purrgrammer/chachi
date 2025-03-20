@@ -389,6 +389,7 @@ function useReply(event: NostrEvent, group?: Group) {
           rootTag === "E"
             ? [rootTag, rootRef, rootRelay, rootPubkey]
             : [rootTag, rootRef, rootRelay],
+          ["P", rootPubkey],
           ["K", rootKind],
           // parent item
           t === "e"

@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { useMintList } from "@/lib/cashu";
 import { motion, useInView } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -80,7 +79,6 @@ export function ChatNutzap({
   const navigate = useNavigate();
   const [showingZapDialog, setShowingZapDialog] = useState(false);
   const [isRedeeming, setIsRedeeming] = useState(false);
-  const { data: mintList } = useMintList(event.pubkey);
   const nutzapStatus = useNutzapStatus(event.id);
   const redeemed = nutzapStatus === "redeemed" || nutzapStatus === "spent";
   const failed = nutzapStatus === "failed";
@@ -295,17 +293,15 @@ export function ChatNutzap({
               <SmilePlus className="w-4 h-4" />
             </ContextMenuShortcut>
           </ContextMenuItem>
-          {mintList?.pubkey ? (
-            <ContextMenuItem
-              className="cursor-pointer"
-              onClick={() => setShowingZapDialog(true)}
-            >
-              {t("chat.message.tip.action")}
-              <ContextMenuShortcut>
-                <Bitcoin className="w-4 h-4" />
-              </ContextMenuShortcut>
-            </ContextMenuItem>
-          ) : null}
+          <ContextMenuItem
+            className="cursor-pointer"
+            onClick={() => setShowingZapDialog(true)}
+          >
+            {t("chat.message.tip.action")}
+            <ContextMenuShortcut>
+              <Bitcoin className="w-4 h-4" />
+            </ContextMenuShortcut>
+          </ContextMenuItem>
           {isToMe ? (
             <ContextMenuItem
               className="cursor-pointer"

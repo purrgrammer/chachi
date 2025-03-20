@@ -53,13 +53,14 @@ const router = createBrowserRouter([
     path: "/",
     element: (
       <AnimatePresence>
-        <Suspense fallback={<LoadingScreen />}>
+        <Suspense name="layout" fallback={<LoadingScreen />}>
           <Layout />
         </Suspense>
       </AnimatePresence>
     ),
     loader: async () => {
       console.log("CONNECTING NDK instances");
+      // todo: connect to group relays and auth, then proceed
       await ndk.connect();
       return null;
     },

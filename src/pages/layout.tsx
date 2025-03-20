@@ -247,6 +247,7 @@ function useUserEvents() {
                 privateGroups,
               });
             } catch (err) {
+              console.error(err);
               setGroupList({
                 groups: userGroups,
                 content: event.content,
