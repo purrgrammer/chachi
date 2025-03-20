@@ -20,6 +20,7 @@ import NDK, {
   NDKRelaySet,
   NDKFilter,
   NDKSubscriptionCacheUsage,
+  NDKSubscription,
 } from "@nostr-dev-kit/ndk";
 import {
   NDKWallet,
@@ -35,6 +36,7 @@ import { useRelays } from "@/lib/nostr";
 import { fetchMintInfo, fetchMintKeys } from "@/lib/cashu";
 import { useNutzapMonitor } from "@/lib/nutzaps";
 import { isRelayURL } from "@/lib/relay";
+import { getTokenEvents, saveTokenEvent } from "@/lib/db";
 
 export type ChachiWallet =
   | { type: "nip60" }
@@ -53,6 +55,27 @@ export function useCashuWallet() {
   return useAtomValue(cashuWalletAtom);
 }
 
+async function addToken(
+  wallet: NDKCashuWallet,
+  tokenEvent: NDKEvent,
+): Promise<NDKCashuWallet> {
+  const token = await NDKCashuToken.from(tokenEvent);
+  if (!token || !token.id) {
+    return wallet;
+  }
+  await saveTokenEvent(token);
+
+  if (wallet.state.tokens.has(token.id)) {
+    return wallet;
+  }
+  for (const deletedTokenId of token.deletedTokens) {
+    wallet.state.removeTokenId(deletedTokenId);
+  }
+  wallet.state.addToken(token);
+
+  return wallet;
+}
+
 export function useChachiWallet() {
   const { t } = useTranslation();
   const ndk = useNDK();
@@ -61,6 +84,7 @@ export function useChachiWallet() {
   const mintList = useMintList();
   const [wallets] = useWallets();
   const [, setNDKWallets] = useAtom(ndkWalletsAtom);
+  const [eose, setEose] = useState(false);
   const [cashuWallet, setCashuWallet] = useAtom(cashuWalletAtom);
   const cashu = useAtomValue(cashuAtom);
 
@@ -112,49 +136,53 @@ export function useChachiWallet() {
   }, [cashu, cashuWallet, pubkey]);
 
   useEffect(() => {
-    async function syncWallet() {
+    let sub: NDKSubscription | undefined;
+
+    const sync = async () => {
       if (!cashuWallet || !pubkey) return;
+
+      const tokenEvents = await getTokenEvents();
+      await Promise.allSettled(
+        tokenEvents?.map((tokenEvent) => {
+          const ev = new NDKEvent(ndk, tokenEvent);
+          return addToken(cashuWallet, ev);
+        }) ?? [],
+      );
+      const lastSeen = tokenEvents?.at(-1);
 
       const filter = {
         kinds: [NDKKind.CashuToken],
         authors: [pubkey],
+        ...(lastSeen ? { since: lastSeen.created_at } : {}),
       };
-      const tokenEvents = Array.from(
-        await ndk.fetchEvents(
-          filter,
-          {
-            groupable: false,
-            closeOnEose: true,
-            subId: "cashu-wallet",
-          },
-          cashuWallet.relaySet,
-        ),
+      sub = ndk.subscribe(
+        filter,
+        {
+          groupable: false,
+          closeOnEose: false,
+          cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+          subId: "cashu-wallet",
+        },
+        cashuWallet.relaySet,
       );
-      const tokens = await Promise.all(
-        tokenEvents.map((e) => NDKCashuToken.from(e)),
-      );
-      const validTokens = tokens.filter((t) => t instanceof NDKCashuToken);
-      for (const token of validTokens) {
-        if (!token?.id) {
-          continue;
+      sub.on("event", (event) => {
+        if (event?.id) {
+          addToken(cashuWallet, event);
+          if (eose) {
+            cashuWallet.checkProofs();
+          }
         }
-        if (cashuWallet.state.tokens.has(token.id)) {
-          continue;
-        }
+      });
 
-        for (const deletedTokenId of token.deletedTokens) {
-          cashuWallet.state.removeTokenId(deletedTokenId);
-        }
+      sub.on("eose", () => {
+        setEose(true);
+        cashuWallet.checkProofs();
+      });
+    };
 
-        cashuWallet.state.addToken(token);
-      }
-      const now = Date.now();
-      cashuWallet.checkProofs();
-      cashuWallet.start({ since: now });
-      //cashuWallet.start();
-      //cashuWallet.checkProofs();
-    }
-    syncWallet();
+    sync();
+
+    return () => sub?.stop();
   }, [pubkey, cashuWallet]);
 }
 

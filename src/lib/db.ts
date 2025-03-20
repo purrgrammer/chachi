@@ -1,6 +1,6 @@
 import Dexie, { Table } from "dexie";
 import NDKCacheAdapterDexie from "@nostr-dev-kit/ndk-cache-dexie";
-import { NDKEvent } from "@nostr-dev-kit/ndk";
+import { NDKCashuToken, NDKEvent } from "@nostr-dev-kit/ndk";
 //import { Transaction } from "@/lib/wallet";
 
 // todo: tweak cache sizes
@@ -16,6 +16,16 @@ interface Event {
   content: string;
   pubkey: string;
   tags: string[][];
+}
+
+interface TokenEvent {
+  id: string;
+  kind: number;
+  created_at: number;
+  content: string;
+  pubkey: string;
+  tags: string[][];
+  sig: string;
 }
 
 export interface LastSeen {
@@ -49,21 +59,38 @@ export interface Nutzap {
 class ChachiDatabase extends Dexie {
   events!: Table<Event>;
   lastSeen!: Table<LastSeen>;
+  tokenEvents!: Table<TokenEvent>;
   //transactions!: Table<Transaction>;
   nutzaps!: Table<Nutzap>;
 
   constructor(name: string) {
     super(name);
-    this.version(2).stores({
+    this.version(3).stores({
       events: "&id,created_at,group,[group+kind]",
       lastSeen: "[group+kind]",
       nutzaps: "&id,status,txId",
+      tokenEvents: "&id,created_at",
     });
   }
 }
 const db = new ChachiDatabase("chachi");
 
 export default db;
+
+export function getUnpublishedEvents() {
+  return cache
+    .getUnpublishedEvents()
+    .then((events) => events.map((e) => e.event));
+}
+
+export function getTokenEvents() {
+  // todo: sort by created_at
+  return db.tokenEvents.toArray();
+}
+
+export function saveTokenEvent(token: NDKCashuToken) {
+  db.tokenEvents.put(token.rawEvent() as TokenEvent);
+}
 
 // Function to check if an event is unpublished
 export async function isEventUnpublished(eventId: string): Promise<boolean> {
