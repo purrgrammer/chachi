@@ -159,10 +159,6 @@ export function useGroups(groups: Group[]) {
       queryKey: [GROUP_METADATA, group.id, group.relay],
       queryFn: async () => {
         if (!group) throw new Error("Group not found");
-        const cached = await getGroupInfo(group);
-        if (cached) {
-          return cached;
-        }
         const metadata = await fetchGroupMetadata(ndk, group);
         if (metadata) {
           saveGroupInfo(group, metadata);
