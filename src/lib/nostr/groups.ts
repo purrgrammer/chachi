@@ -138,7 +138,7 @@ export function useGroup(group?: Group) {
     queryKey: [GROUP_METADATA, group?.id, group?.relay],
     queryFn: async () => {
       if (!group) throw new Error("Group not found");
-      const cached = getGroupInfo(group);
+      const cached = await getGroupInfo(group);
       if (cached) {
         return cached;
       }
@@ -159,7 +159,7 @@ export function useGroups(groups: Group[]) {
       queryKey: [GROUP_METADATA, group.id, group.relay],
       queryFn: async () => {
         if (!group) throw new Error("Group not found");
-        const cached = getGroupInfo(group);
+        const cached = await getGroupInfo(group);
         if (cached) {
           return cached;
         }
