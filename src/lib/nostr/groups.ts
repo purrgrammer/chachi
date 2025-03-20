@@ -24,6 +24,7 @@ import {
   GROUP_MEMBERS,
   GROUP_ADMINS,
 } from "@/lib/query";
+import { getGroupInfo, saveGroupInfo } from "../db";
 
 export function useUserGroups(pubkey: string) {
   const ndk = useNDK();
@@ -79,7 +80,7 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
   // todo: useRelayInfo
   if (group.id === "_") {
     return fetchRelayInfo(group.relay).then((info) => {
-      return {
+      const metadata = {
         id: group.id,
         relay: group.relay,
         pubkey: info.pubkey,
@@ -87,6 +88,7 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
         about: info.description,
         picture: info.icon,
       } as GroupMetadata;
+      return metadata;
     });
   }
   return ndk
@@ -97,7 +99,7 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
     )
     .then((ev: NDKEvent | null) => {
       if (!ev) throw new Error("Can't find group metadata");
-      return {
+      const metadata = {
         id: group.id,
         pubkey: ev.pubkey,
         relay: group.relay,
@@ -111,6 +113,7 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
         // @ts-expect-error: this is incorrectly typed
         nlink: ev.encode([group.relay]),
       } as GroupMetadata;
+      return metadata;
     });
 }
 
@@ -133,7 +136,18 @@ export function useGroup(group?: Group) {
   return useQuery({
     enabled: Boolean(group),
     queryKey: [GROUP_METADATA, group?.id, group?.relay],
-    queryFn: () => (group ? fetchGroupMetadata(ndk, group) : null),
+    queryFn: async () => {
+      if (!group) throw new Error("Group not found");
+      const cached = getGroupInfo(group);
+      if (cached) {
+        return cached;
+      }
+      const metadata = await fetchGroupMetadata(ndk, group);
+      if (metadata) {
+        saveGroupInfo(group, metadata);
+      }
+      return metadata;
+    },
     staleTime: Infinity,
   });
 }
@@ -143,7 +157,18 @@ export function useGroups(groups: Group[]) {
   return useQueries({
     queries: groups.map((group) => ({
       queryKey: [GROUP_METADATA, group.id, group.relay],
-      queryFn: () => fetchGroupMetadata(ndk, group),
+      queryFn: async () => {
+        if (!group) throw new Error("Group not found");
+        const cached = getGroupInfo(group);
+        if (cached) {
+          return cached;
+        }
+        const metadata = await fetchGroupMetadata(ndk, group);
+        if (metadata) {
+          saveGroupInfo(group, metadata);
+        }
+        return metadata;
+      },
       staleTime: Infinity,
     })),
   });

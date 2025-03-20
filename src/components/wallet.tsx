@@ -2462,6 +2462,7 @@ export function CashuWalletBalanceAmount({
   const balance = useCashuBalance(wallet);
   return (
     <Balance
+      key={balance}
       short={short}
       amount={balance}
       unit="sat"
