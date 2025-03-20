@@ -5,6 +5,7 @@ import { getEventHash, EventTemplate } from "nostr-tools";
 import { mediaServersAtom } from "@/app/store";
 import { useAccount } from "@/lib/account";
 import { useNDK } from "@/lib/ndk";
+import { useTranslation } from "react-i18next";
 
 export interface Nip94 {
   url: string;
@@ -77,9 +78,10 @@ export interface UploadedBlob extends BlobDescriptor {
 
 export function useUpload() {
   const ndk = useNDK();
-  const [mainServer] = useMediaServers();
+  const servers = useMediaServers();
   const account = useAccount();
   const pubkey = account?.pubkey;
+  const { t } = useTranslation();
 
   const signer = async (draft: EventTemplate) => {
     if (!pubkey) throw new Error("Not logged in");
@@ -94,11 +96,19 @@ export function useUpload() {
       signer,
       `Upload ${file.name}`,
     );
-    const blob = await BlossomClient.uploadBlob(mainServer, file, auth);
-    toast.success(`File uploaded to ${mainServer}`);
-    const type = blob.type?.replace("quicktime", "mov") || "";
-    const extension = type ? `${type.split("/")[1]}` : "";
-    return { ...blob, type, extension };
+    for (const server of servers) {
+      try {
+        const blob = await BlossomClient.uploadBlob(server, file, auth);
+        toast.success(t("media.upload-success", { server }));
+        const type = blob.type?.replace("quicktime", "mov") || "";
+        const extension = type ? `${type.split("/")[1]}` : "";
+        return { ...blob, type, extension };
+      } catch (err) {
+        console.error(err);
+        toast.error(t("media.upload-error", { server }));
+      }
+    }
+    throw new Error(t("media.upload-panic"));
   };
 
   return { upload, canSign: pubkey && !account.isReadOnly };
