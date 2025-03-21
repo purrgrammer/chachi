@@ -9,6 +9,7 @@ import deTranslations from "../public/locales/de-DE/common.json";
 import arTranslations from "../public/locales/ar-SA/common.json";
 import nlTranslations from "../public/locales/nl-NL/common.json";
 import csTranslations from "../public/locales/cs-CZ/common.json";
+import plTranslations from "../public/locales/pl-PL/common.json";
 
 export type Language =
   | "en"
@@ -19,7 +20,8 @@ export type Language =
   | "de-DE"
   | "ar-SA"
   | "nl-NL"
-  | "cs-CZ";
+  | "cs-CZ"
+  | "pl-PL";
 
 export const languages = [
   "en",
@@ -31,6 +33,7 @@ export const languages = [
   "ar-SA",
   "nl-NL",
   "cs-CZ",
+  "pl-PL",
 ] as const;
 
 export function getLanguage(): Language {
@@ -80,6 +83,9 @@ i18n.use(initReactI18next).init({
     },
     "cs-CZ": {
       translations: csTranslations,
+    },
+    "pl-PL": {
+      translations: plTranslations,
     },
   },
   ns: ["translations"],
