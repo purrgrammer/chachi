@@ -224,11 +224,6 @@
       "tip": {
         "action": "Zap"
       },
-      "retry": {
-        "action": "Retry",
-        "success": "Message sent",
-        "error": "Failed to send message"
-      },
       "copy": {
         "action": "Kopiera",
         "success": "Kopierat till urklipp",
@@ -496,23 +491,6 @@
     "add-mint": "Lägg till mint",
     "relays": "Reläer",
     "add-relay": "Lägg till relä",
-    "mints-description": "Mints är förvarare av medlen. Ta ut dina medel regelbundet till din plånbok.",
-    "relays-description": "Reläer där plånboksdata lagras.",
-    "name": "Namn",
-    "name-description": "Ett namn för din plånbok",
-    "ready": "Plånbok `{{ name }}` klar",
-    "dialog": {
-      "title": "Anslut plånbok",
-      "description": "Anslut din plånbok för att skicka dricks och stödja dina favoritkreatörer",
-      "connect-webln": "Anslut web-plånbok",
-      "webln-connected": "Ansluten till web-plånbok",
-      "webln-unavailable": "WebLN-plånbok inte tillgänglig",
-      "webln-error": "Misslyckades med att ansluta till WebLN-plånbok",
-      "connect-nip60": "Anslut fjärrplånbok",
-      "nwc-empty": "NWC-adress är tom",
-      "nwc-error": "Misslyckades med att ansluta till fjärrplånbok",
-      "nwc-connected": "Ansluten till fjärrplånbok"
-    },
     "deposit": {
       "title": "Ta emot",
       "cashu-description": "Sätt in pengar i en mint eller lös in ecash-tokens",
@@ -549,6 +527,23 @@
       "message": "Meddelande",
       "message-placeholder": "Skriv ett valfritt meddelande",
       "confirm-wallet": "Skicka"
+    },
+    "mints-description": "Mints är förvarare av medlen. Ta ut dina medel regelbundet till din plånbok.",
+    "relays-description": "Reläer där plånboksdata lagras.",
+    "name": "Namn",
+    "name-description": "Ett namn för din plånbok",
+    "ready": "Plånbok `{{ name }}` klar",
+    "dialog": {
+      "title": "Anslut plånbok",
+      "description": "Anslut din plånbok för att skicka dricks och stödja dina favoritkreatörer",
+      "connect-webln": "Anslut web-plånbok",
+      "webln-connected": "Ansluten till web-plånbok",
+      "webln-unavailable": "WebLN-plånbok inte tillgänglig",
+      "webln-error": "Misslyckades med att ansluta till WebLN-plånbok",
+      "connect-nip60": "Anslut fjärrplånbok",
+      "nwc-empty": "NWC-adress är tom",
+      "nwc-error": "Misslyckades med att ansluta till fjärrplånbok",
+      "nwc-connected": "Ansluten till fjärrplånbok"
     },
     "coins": "Cash",
     "transactions": {
@@ -633,17 +628,7 @@
       }
     },
     "media": {
-      "title": "Media",
-      "description": "Manage the Blossom servers used for media uploads",
-      "servers": "Servers",
-      "no-servers": "No Blossom servers found",
-      "add-server": "Add server",
-      "remove-server": "Remove server",
-      "server-url": "Enter Blossom server URL",
-      "invalid-url": "Please enter a valid URL",
-      "upload-success": "File uploaded to {{ server }}",
-      "upload-error": "Failed to upload file to {{ server }}",
-      "upload-panic": "Failed to upload file to any Blossom server"
+      "title": "Media"
     },
     "relays": {
       "title": "Reläer"
