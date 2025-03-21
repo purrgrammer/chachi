@@ -224,6 +224,11 @@
       "tip": {
         "action": "Zap"
       },
+      "retry": {
+        "action": "Retry",
+        "success": "Message sent",
+        "error": "Failed to send message"
+      },
       "copy": {
         "action": "Kopiuj",
         "success": "Skopiowano do schowka",
@@ -491,6 +496,23 @@
     "add-mint": "Dodaj mennicę",
     "relays": "Transmitery",
     "add-relay": "Dodaj transmiter",
+    "mints-description": "Mennice są depozytariuszami funduszy. Wypłacaj swoje środki na swój portfel.",
+    "relays-description": "Transmitery gdzie przechowywane są dane portfela.",
+    "name": "Nazwa",
+    "name-description": "Nazwa twojego portfela",
+    "ready": "Portfel `{{ name }}` gotowy",
+    "dialog": {
+      "title": "Podłącz portfel",
+      "description": "Podłącz swój portfel, aby wysłać napiwki i wesprzeć swoich ulubionych twórców",
+      "connect-webln": "Podłącz portfel internetowy",
+      "webln-connected": "Połączono z portfelem internetowym",
+      "webln-unavailable": "Portfel WebLN niedostępny",
+      "webln-error": "Nie udało się połączyć z portfelem WebLN",
+      "connect-nip60": "Podłącz zdalny portfel",
+      "nwc-empty": "Adres NWC jest pusty",
+      "nwc-error": "Nie udało się połączyć ze zdalnym portfelem",
+      "nwc-connected": "Połączono ze zdalnym portfelem"
+    },
     "deposit": {
       "title": "Odbierz",
       "cashu-description": "Wpłać środki do mennicy lub zrealizuj tokeny ecash",
@@ -527,23 +549,6 @@
       "message": "Wiadomość",
       "message-placeholder": "Napisz opcjonalną wiadomość",
       "confirm-wallet": "Wyślij"
-    },
-    "mints-description": "Mennice są depozytariuszami funduszy. Wypłacaj swoje środki na swój portfel.",
-    "relays-description": "Transmitery gdzie przechowywane są dane portfela.",
-    "name": "Nazwa",
-    "name-description": "Nazwa twojego portfela",
-    "ready": "Portfel `{{ name }}` gotowy",
-    "dialog": {
-      "title": "Podłącz portfel",
-      "description": "Podłącz swój portfel, aby wysłać napiwki i wesprzeć swoich ulubionych twórców",
-      "connect-webln": "Podłącz portfel internetowy",
-      "webln-connected": "Połączono z portfelem internetowym",
-      "webln-unavailable": "Portfel WebLN niedostępny",
-      "webln-error": "Nie udało się połączyć z portfelem WebLN",
-      "connect-nip60": "Podłącz zdalny portfel",
-      "nwc-empty": "Adres NWC jest pusty",
-      "nwc-error": "Nie udało się połączyć ze zdalnym portfelem",
-      "nwc-connected": "Połączono ze zdalnym portfelem"
     },
     "coins": "Gotówka",
     "transactions": {
@@ -628,7 +633,17 @@
       }
     },
     "media": {
-      "title": "Media"
+      "title": "Media",
+      "description": "Manage the Blossom servers used for media uploads",
+      "servers": "Servers",
+      "no-servers": "No Blossom servers found",
+      "add-server": "Add server",
+      "remove-server": "Remove server",
+      "server-url": "Enter Blossom server URL",
+      "invalid-url": "Please enter a valid URL",
+      "upload-success": "File uploaded to {{ server }}",
+      "upload-error": "Failed to upload file to {{ server }}",
+      "upload-panic": "Failed to upload file to any Blossom server"
     },
     "relays": {
       "title": "Transmitery"
