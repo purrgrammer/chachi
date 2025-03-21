@@ -224,6 +224,11 @@
       "tip": {
         "action": "Zap"
       },
+      "retry": {
+        "action": "Retry",
+        "success": "Message sent",
+        "error": "Failed to send message"
+      },
       "copy": {
         "action": "Copiar",
         "success": "Copiado para a área de transferência",
@@ -491,6 +496,23 @@
     "add-mint": "Adicionar mint",
     "relays": "Relays",
     "add-relay": "Adicionar relay",
+    "mints-description": "Mints são os custodiante dos fundos. Retire seus fundos para sua carteira regularmente.",
+    "relays-description": "Relays onde os dados da carteira são armazenados.",
+    "name": "Nome",
+    "name-description": "Um nome para sua carteira",
+    "ready": "Carteira `{{ name }}` pronta",
+    "dialog": {
+      "title": "Conectar carteira",
+      "description": "Conecte sua carteira para enviar gorjetas e apoiar seus criadores favoritos",
+      "connect-webln": "Conectar carteira web",
+      "webln-connected": "Conectado à carteira web",
+      "webln-unavailable": "Carteira WebLN não disponível",
+      "webln-error": "Falha ao conectar à carteira WebLN",
+      "connect-nip60": "Conectar carteira remota",
+      "nwc-empty": "Endereço NWC está vazio",
+      "nwc-error": "Falha ao conectar à carteira remota",
+      "nwc-connected": "Conectado à carteira remota"
+    },
     "deposit": {
       "title": "Receber",
       "cashu-description": "Deposite fundos em um mint ou resgate tokens de ecash",
@@ -527,23 +549,6 @@
       "message": "Mensagem",
       "message-placeholder": "Escreva uma mensagem opcional",
       "confirm-wallet": "Enviar"
-    },
-    "mints-description": "Mints são os custodiante dos fundos. Retire seus fundos para sua carteira regularmente.",
-    "relays-description": "Relays onde os dados da carteira são armazenados.",
-    "name": "Nome",
-    "name-description": "Um nome para sua carteira",
-    "ready": "Carteira `{{ name }}` pronta",
-    "dialog": {
-      "title": "Conectar carteira",
-      "description": "Conecte sua carteira para enviar gorjetas e apoiar seus criadores favoritos",
-      "connect-webln": "Conectar carteira web",
-      "webln-connected": "Conectado à carteira web",
-      "webln-unavailable": "Carteira WebLN não disponível",
-      "webln-error": "Falha ao conectar à carteira WebLN",
-      "connect-nip60": "Conectar carteira remota",
-      "nwc-empty": "Endereço NWC está vazio",
-      "nwc-error": "Falha ao conectar à carteira remota",
-      "nwc-connected": "Conectado à carteira remota"
     },
     "coins": "Dinheiro",
     "transactions": {
@@ -628,7 +633,17 @@
       }
     },
     "media": {
-      "title": "Mídia"
+      "title": "Mídia",
+      "description": "Manage the Blossom servers used for media uploads",
+      "servers": "Servers",
+      "no-servers": "No Blossom servers found",
+      "add-server": "Add server",
+      "remove-server": "Remove server",
+      "server-url": "Enter Blossom server URL",
+      "invalid-url": "Please enter a valid URL",
+      "upload-success": "File uploaded to {{ server }}",
+      "upload-error": "Failed to upload file to {{ server }}",
+      "upload-panic": "Failed to upload file to any Blossom server"
     },
     "relays": {
       "title": "Relays"
