@@ -224,6 +224,11 @@
       "tip": {
         "action": "Zap"
       },
+      "retry": {
+        "action": "Retry",
+        "success": "Message sent",
+        "error": "Failed to send message"
+      },
       "copy": {
         "action": "Copy",
         "success": "Copied to clipboard",
@@ -462,7 +467,7 @@
     "keys": "Keys",
     "sync": "Συγχρονισμός",
     "sync-success": "Ecash synced",
-    "sync-error": "Error syncing wallet",
+    "sync-error": "Error syncing ecash",
     "keys-description": "Your wallet keys, it's important to keep them safe and backed up",
     "debit": "Payment",
     "credit": "Payment",
@@ -491,6 +496,23 @@
     "add-mint": "Add mint",
     "relays": "Relays",
     "add-relay": "Add relay",
+    "mints-description": "Mints are the custodians of the funds. Withdraw your funds to your wallet regularly.",
+    "relays-description": "Relays where the wallet data is stored.",
+    "name": "Name",
+    "name-description": "A name for your wallet",
+    "ready": "Wallet `{{ name }}` ready",
+    "dialog": {
+      "title": "Connect wallet",
+      "description": "Connect your wallet to send tips and support your favorite creators",
+      "connect-webln": "Σύνδεση πορτοφολιού web",
+      "webln-connected": "Connected to web wallet",
+      "webln-unavailable": "WebLN wallet not available",
+      "webln-error": "Failed to connect to WebLN wallet",
+      "connect-nip60": "Connect remote wallet",
+      "nwc-empty": "NWC address is empty",
+      "nwc-error": "Failed to connect to remote wallet",
+      "nwc-connected": "Connected to remote wallet"
+    },
     "deposit": {
       "title": "Receive",
       "cashu-description": "Deposit funds into a mint or redeem ecash tokens",
@@ -527,23 +549,6 @@
       "message": "Message",
       "message-placeholder": "Write an optional message",
       "confirm-wallet": "Send"
-    },
-    "mints-description": "Mints are the custodians of the funds. Withdraw your funds to your wallet regularly.",
-    "relays-description": "Relays where the wallet data is stored.",
-    "name": "Name",
-    "name-description": "A name for your wallet",
-    "ready": "Wallet `{{ name }}` ready",
-    "dialog": {
-      "title": "Connect wallet",
-      "description": "Connect your wallet to send tips and support your favorite creators",
-      "connect-webln": "Σύνδεση πορτοφολιού web",
-      "webln-connected": "Connected to web wallet",
-      "webln-unavailable": "WebLN wallet not available",
-      "webln-error": "Failed to connect to WebLN wallet",
-      "connect-nip60": "Connect remote wallet",
-      "nwc-empty": "NWC address is empty",
-      "nwc-error": "Failed to connect to remote wallet",
-      "nwc-connected": "Connected to remote wallet"
     },
     "coins": "Cash",
     "transactions": {
@@ -628,7 +633,17 @@
       }
     },
     "media": {
-      "title": "Media"
+      "title": "Media",
+      "description": "Manage the Blossom servers used for media uploads",
+      "servers": "Servers",
+      "no-servers": "No Blossom servers found",
+      "add-server": "Add server",
+      "remove-server": "Remove server",
+      "server-url": "Enter Blossom server URL",
+      "invalid-url": "Please enter a valid URL",
+      "upload-success": "File uploaded to {{ server }}",
+      "upload-error": "Failed to upload file to {{ server }}",
+      "upload-panic": "Failed to upload file to any Blossom server"
     },
     "relays": {
       "title": "Relays"

@@ -224,6 +224,11 @@
       "tip": {
         "action": "打閃"
       },
+      "retry": {
+        "action": "Retry",
+        "success": "Message sent",
+        "error": "Failed to send message"
+      },
       "copy": {
         "action": "複製",
         "success": "已複製到剪貼板",
@@ -462,7 +467,7 @@
     "keys": "密鑰",
     "sync": "同步",
     "sync-success": "Ecash 已同步",
-    "sync-error": "同步錢包時出錯了",
+    "sync-error": "Error syncing ecash",
     "keys-description": "你的錢包密鑰至關重要，請務必安全保存並進行備份",
     "debit": "付款",
     "credit": "付款",
@@ -491,6 +496,23 @@
     "add-mint": "添加鑄幣廠",
     "relays": "中繼",
     "add-relay": "添加中繼",
+    "mints-description": "鑄幣廠是資金的保管人。請定期將你的資金提取到你自己的錢包。",
+    "relays-description": "儲存錢包資料的中繼。",
+    "name": "名稱",
+    "name-description": "為你的錢包取個名字",
+    "ready": "錢包 `{{ name }}` 已準備就緒",
+    "dialog": {
+      "title": "連接錢包",
+      "description": "連接你的錢包以打賞並支持你最喜歡的創作者",
+      "connect-webln": "連接網絡錢包",
+      "webln-connected": "已連接網絡錢包",
+      "webln-unavailable": "WebLN 錢包無法使用",
+      "webln-error": "無法連接 WebLN 錢包",
+      "connect-nip60": "連接遠程錢包",
+      "nwc-empty": "NWC 地址為空",
+      "nwc-error": "無法連接遠程錢包",
+      "nwc-connected": "已連接遠程錢包"
+    },
     "deposit": {
       "title": "接收",
       "cashu-description": "將資金存入鑄幣廠或兌換 ecash 代幣",
@@ -527,23 +549,6 @@
       "message": "消息",
       "message-placeholder": "填寫消息（可選）",
       "confirm-wallet": "發送"
-    },
-    "mints-description": "鑄幣廠是資金的保管人。請定期將你的資金提取到你自己的錢包。",
-    "relays-description": "儲存錢包資料的中繼。",
-    "name": "名稱",
-    "name-description": "為你的錢包取個名字",
-    "ready": "錢包 `{{ name }}` 已準備就緒",
-    "dialog": {
-      "title": "連接錢包",
-      "description": "連接你的錢包以打賞並支持你最喜歡的創作者",
-      "connect-webln": "連接網絡錢包",
-      "webln-connected": "已連接網絡錢包",
-      "webln-unavailable": "WebLN 錢包無法使用",
-      "webln-error": "無法連接 WebLN 錢包",
-      "connect-nip60": "連接遠程錢包",
-      "nwc-empty": "NWC 地址為空",
-      "nwc-error": "無法連接遠程錢包",
-      "nwc-connected": "已連接遠程錢包"
     },
     "coins": "資金",
     "transactions": {
@@ -628,7 +633,17 @@
       }
     },
     "media": {
-      "title": "多媒體"
+      "title": "多媒體",
+      "description": "Manage the Blossom servers used for media uploads",
+      "servers": "Servers",
+      "no-servers": "No Blossom servers found",
+      "add-server": "Add server",
+      "remove-server": "Remove server",
+      "server-url": "Enter Blossom server URL",
+      "invalid-url": "Please enter a valid URL",
+      "upload-success": "File uploaded to {{ server }}",
+      "upload-error": "Failed to upload file to {{ server }}",
+      "upload-panic": "Failed to upload file to any Blossom server"
     },
     "relays": {
       "title": "中繼"

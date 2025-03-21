@@ -224,6 +224,11 @@
       "tip": {
         "action": "Zapear"
       },
+      "retry": {
+        "action": "Retry",
+        "success": "Message sent",
+        "error": "Failed to send message"
+      },
       "copy": {
         "action": "Copiar",
         "success": "Copiado al portapapeles",
@@ -462,7 +467,7 @@
     "keys": "Claves",
     "sync": "Sincronizar",
     "sync-success": "Ecash sincronizado",
-    "sync-error": "Error al sincronizar la billetera",
+    "sync-error": "Error syncing ecash",
     "keys-description": "Tus claves de la billetera, es importante mantenerlas seguras y respaldadas",
     "debit": "Pago",
     "credit": "Pago",
@@ -491,6 +496,23 @@
     "add-mint": "Añadir mint",
     "relays": "Relés",
     "add-relay": "Añadir relé",
+    "mints-description": "Los mints son los custodios de los fondos. Retira tus fondos a tu billetera con regularidad.",
+    "relays-description": "Relés donde se almacenan los datos de la billetera.",
+    "name": "Nombre",
+    "name-description": "Un nombre para tu billetera",
+    "ready": "Billetera `{{ name }}` lista",
+    "dialog": {
+      "title": "Conectar billetera",
+      "description": "Conecta tu billetera para enviar propinas y apoyar a tus creadores favoritos",
+      "connect-webln": "Conectar billetera web",
+      "webln-connected": "Conectado a billetera web",
+      "webln-unavailable": "Billetera WebLN no disponible",
+      "webln-error": "Error al conectar a la billetera WebLN",
+      "connect-nip60": "Conectar billetera remota",
+      "nwc-empty": "La dirección NWC está vacía",
+      "nwc-error": "Error al conectar a la billetera remota",
+      "nwc-connected": "Conectado a billetera remota"
+    },
     "deposit": {
       "title": "Recibir",
       "cashu-description": "Depositar fondos en un mint o redimir tokens de ecash",
@@ -527,23 +549,6 @@
       "message": "Mensaje",
       "message-placeholder": "Escribe un mensaje opcional",
       "confirm-wallet": "Enviar"
-    },
-    "mints-description": "Los mints son los custodios de los fondos. Retira tus fondos a tu billetera con regularidad.",
-    "relays-description": "Relés donde se almacenan los datos de la billetera.",
-    "name": "Nombre",
-    "name-description": "Un nombre para tu billetera",
-    "ready": "Billetera `{{ name }}` lista",
-    "dialog": {
-      "title": "Conectar billetera",
-      "description": "Conecta tu billetera para enviar propinas y apoyar a tus creadores favoritos",
-      "connect-webln": "Conectar billetera web",
-      "webln-connected": "Conectado a billetera web",
-      "webln-unavailable": "Billetera WebLN no disponible",
-      "webln-error": "Error al conectar a la billetera WebLN",
-      "connect-nip60": "Conectar billetera remota",
-      "nwc-empty": "La dirección NWC está vacía",
-      "nwc-error": "Error al conectar a la billetera remota",
-      "nwc-connected": "Conectado a billetera remota"
     },
     "coins": "Efectivo",
     "transactions": {
@@ -628,7 +633,17 @@
       }
     },
     "media": {
-      "title": "Medios"
+      "title": "Medios",
+      "description": "Manage the Blossom servers used for media uploads",
+      "servers": "Servers",
+      "no-servers": "No Blossom servers found",
+      "add-server": "Add server",
+      "remove-server": "Remove server",
+      "server-url": "Enter Blossom server URL",
+      "invalid-url": "Please enter a valid URL",
+      "upload-success": "File uploaded to {{ server }}",
+      "upload-error": "Failed to upload file to {{ server }}",
+      "upload-panic": "Failed to upload file to any Blossom server"
     },
     "relays": {
       "title": "Relés"

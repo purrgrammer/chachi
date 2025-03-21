@@ -224,6 +224,11 @@
       "tip": {
         "action": "Zap"
       },
+      "retry": {
+        "action": "Retry",
+        "success": "Message sent",
+        "error": "Failed to send message"
+      },
       "copy": {
         "action": "Kopírovat",
         "success": "Zkopírováno do schránky",
@@ -491,6 +496,23 @@
     "add-mint": "Přidat mint",
     "relays": "Relaye",
     "add-relay": "Přidat relay",
+    "mints-description": "Minty jsou správci fondů. Pravidelně vybírejte své prostředky do peněženky.",
+    "relays-description": "Relaye, kde jsou uložena data peněženky.",
+    "name": "Název",
+    "name-description": "Název pro vaši peněženku",
+    "ready": "Peněženka `{{ name }}` připravena",
+    "dialog": {
+      "title": "Připojit peněženku",
+      "description": "Připojte svou peněženku pro posílání spropitného a podporu oblíbených tvůrců",
+      "connect-webln": "Připojit webovou peněženku",
+      "webln-connected": "Připojeno k webové peněžence",
+      "webln-unavailable": "WebLN peněženka není dostupná",
+      "webln-error": "Nepodařilo se připojit k WebLN peněžence",
+      "connect-nip60": "Připojit vzdálenou peněženku",
+      "nwc-empty": "Adresa NWC je prázdná",
+      "nwc-error": "Nepodařilo se připojit ke vzdálené peněžence",
+      "nwc-connected": "Připojeno ke vzdálené peněžence"
+    },
     "deposit": {
       "title": "Přijmout",
       "cashu-description": "Vložit prostředky do mintu nebo uplatnit ecash tokeny",
@@ -527,23 +549,6 @@
       "message": "Zpráva",
       "message-placeholder": "Napište volitelnou zprávu",
       "confirm-wallet": "Odeslat"
-    },
-    "mints-description": "Minty jsou správci fondů. Pravidelně vybírejte své prostředky do peněženky.",
-    "relays-description": "Relaye, kde jsou uložena data peněženky.",
-    "name": "Název",
-    "name-description": "Název pro vaši peněženku",
-    "ready": "Peněženka `{{ name }}` připravena",
-    "dialog": {
-      "title": "Připojit peněženku",
-      "description": "Připojte svou peněženku pro posílání spropitného a podporu oblíbených tvůrců",
-      "connect-webln": "Připojit webovou peněženku",
-      "webln-connected": "Připojeno k webové peněžence",
-      "webln-unavailable": "WebLN peněženka není dostupná",
-      "webln-error": "Nepodařilo se připojit k WebLN peněžence",
-      "connect-nip60": "Připojit vzdálenou peněženku",
-      "nwc-empty": "Adresa NWC je prázdná",
-      "nwc-error": "Nepodařilo se připojit ke vzdálené peněžence",
-      "nwc-connected": "Připojeno ke vzdálené peněžence"
     },
     "coins": "Hotovost",
     "transactions": {
@@ -628,7 +633,17 @@
       }
     },
     "media": {
-      "title": "Média"
+      "title": "Média",
+      "description": "Manage the Blossom servers used for media uploads",
+      "servers": "Servers",
+      "no-servers": "No Blossom servers found",
+      "add-server": "Add server",
+      "remove-server": "Remove server",
+      "server-url": "Enter Blossom server URL",
+      "invalid-url": "Please enter a valid URL",
+      "upload-success": "File uploaded to {{ server }}",
+      "upload-error": "Failed to upload file to {{ server }}",
+      "upload-panic": "Failed to upload file to any Blossom server"
     },
     "relays": {
       "title": "Relaye"

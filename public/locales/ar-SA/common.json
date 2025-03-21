@@ -224,6 +224,11 @@
       "tip": {
         "action": "حركة"
       },
+      "retry": {
+        "action": "Retry",
+        "success": "Message sent",
+        "error": "Failed to send message"
+      },
       "copy": {
         "action": "نسخ",
         "success": "تم النسخ إلى الحافظة",
@@ -462,7 +467,7 @@
     "keys": "المفاتيح",
     "sync": "المزامنة",
     "sync-success": "تم مزامنة النقود الإلكترونية",
-    "sync-error": "خطأ في مزامنة المحفظة",
+    "sync-error": "Error syncing ecash",
     "keys-description": "مفاتيح محفظتك، من الضروري الاحتفاظ بها بأمان وعمل نسخة احتياطية منها",
     "debit": "الدفع",
     "credit": "الدفع",
@@ -491,6 +496,23 @@
     "add-mint": "إضافة سك",
     "relays": "مُرحلات",
     "add-relay": "إضافة مُرحلات",
+    "mints-description": "السكّين هم الحُماة للأموال. يجب عليك سحب أموالك إلى محفظتك بانتظام.",
+    "relays-description": "المرحلات التي يتم تخزين بيانات المحفظة عليها.",
+    "name": "الاسم",
+    "name-description": "اسم للمحفظتك",
+    "ready": "المحفظة `{{ name }}` جاهزة",
+    "dialog": {
+      "title": "ربط المحفظة",
+      "description": "وصل محفظتك لإرسال الإكراميات ودعم المبدعين المفضلين لديك",
+      "connect-webln": "ربط محفظة الويب",
+      "webln-connected": "وصل محفظتك لإرسال الإكراميات ودعم المبدعين المفضلين لديك",
+      "webln-unavailable": "محفظة ويب إل إن غير متوفرة",
+      "webln-error": "فشل الاتصال بمحفظة ويب إل إن",
+      "connect-nip60": "وصل المحفظة عن بُعد",
+      "nwc-empty": "عنوان NWC فارغ",
+      "nwc-error": "فشل الاتصال بالمحفظة عن بُعد",
+      "nwc-connected": "تم الاتصال بالمحفظة عن بُعد"
+    },
     "deposit": {
       "title": "استلام",
       "cashu-description": "إيداع الأموال في دار السك أو استرداد رموز النقود الإلكترونية",
@@ -527,23 +549,6 @@
       "message": "الرسالة",
       "message-placeholder": "اكتب رسالة اختيارية",
       "confirm-wallet": "إرسال"
-    },
-    "mints-description": "السكّين هم الحُماة للأموال. يجب عليك سحب أموالك إلى محفظتك بانتظام.",
-    "relays-description": "المرحلات التي يتم تخزين بيانات المحفظة عليها.",
-    "name": "الاسم",
-    "name-description": "اسم للمحفظتك",
-    "ready": "المحفظة `{{ name }}` جاهزة",
-    "dialog": {
-      "title": "ربط المحفظة",
-      "description": "وصل محفظتك لإرسال الإكراميات ودعم المبدعين المفضلين لديك",
-      "connect-webln": "ربط محفظة الويب",
-      "webln-connected": "وصل محفظتك لإرسال الإكراميات ودعم المبدعين المفضلين لديك",
-      "webln-unavailable": "محفظة ويب إل إن غير متوفرة",
-      "webln-error": "فشل الاتصال بمحفظة ويب إل إن",
-      "connect-nip60": "وصل المحفظة عن بُعد",
-      "nwc-empty": "عنوان NWC فارغ",
-      "nwc-error": "فشل الاتصال بالمحفظة عن بُعد",
-      "nwc-connected": "تم الاتصال بالمحفظة عن بُعد"
     },
     "coins": "نقد",
     "transactions": {
@@ -628,7 +633,17 @@
       }
     },
     "media": {
-      "title": "الوسائط"
+      "title": "الوسائط",
+      "description": "Manage the Blossom servers used for media uploads",
+      "servers": "Servers",
+      "no-servers": "No Blossom servers found",
+      "add-server": "Add server",
+      "remove-server": "Remove server",
+      "server-url": "Enter Blossom server URL",
+      "invalid-url": "Please enter a valid URL",
+      "upload-success": "File uploaded to {{ server }}",
+      "upload-error": "Failed to upload file to {{ server }}",
+      "upload-panic": "Failed to upload file to any Blossom server"
     },
     "relays": {
       "title": "مُرحلات"
