@@ -224,6 +224,11 @@
       "tip": {
         "action": "Zap"
       },
+      "retry": {
+        "action": "Retry",
+        "success": "Message sent",
+        "error": "Failed to send message"
+      },
       "copy": {
         "action": "Kopieren",
         "success": "In die Zwischenablage kopiert",
@@ -491,6 +496,23 @@
     "add-mint": "Mint hinzufügen",
     "relays": "Relays",
     "add-relay": "Relay hinzufügen",
+    "mints-description": "Mints sind die Halter des Ecash. Ziehe dein Guthaben regelmäßig auf dein eigenes Wallet ab.",
+    "relays-description": "Relays, auf dem die Wallet-Daten gespeichert werden.",
+    "name": "Name",
+    "name-description": "Ein Name für deine Wallet",
+    "ready": "Wallet `{{ name }}` bereit",
+    "dialog": {
+      "title": "Wallet verbinden",
+      "description": "Verbinden dein Wallet, um deine Lieblingskünstler mit kleinen Spenden zu unterstützen",
+      "connect-webln": "Web-Wallet verbinden",
+      "webln-connected": "Mit Web-Wallet verbunden",
+      "webln-unavailable": "WebLN-Wallet nicht verfügbar",
+      "webln-error": "Verbindung zu WebLN-Wallet fehlgeschlagen",
+      "connect-nip60": "Remote-Wallet verbinden",
+      "nwc-empty": "NWC-Adresse ist leer",
+      "nwc-error": "Verbindung mit Remote-Wallet fehlgeschlagen",
+      "nwc-connected": "Mit Remote-Wallet verbunden"
+    },
     "deposit": {
       "title": "Empfangen",
       "cashu-description": "Guthaben in eine Mint einzahlen oder Ecash einlösen",
@@ -527,23 +549,6 @@
       "message": "Nachricht",
       "message-placeholder": "Optionale Nachricht schreiben",
       "confirm-wallet": "Senden"
-    },
-    "mints-description": "Mints sind die Halter des Ecash. Ziehe dein Guthaben regelmäßig auf dein eigenes Wallet ab.",
-    "relays-description": "Relays, auf dem die Wallet-Daten gespeichert werden.",
-    "name": "Name",
-    "name-description": "Ein Name für deine Wallet",
-    "ready": "Wallet `{{ name }}` bereit",
-    "dialog": {
-      "title": "Wallet verbinden",
-      "description": "Verbinden dein Wallet, um deine Lieblingskünstler mit kleinen Spenden zu unterstützen",
-      "connect-webln": "Web-Wallet verbinden",
-      "webln-connected": "Mit Web-Wallet verbunden",
-      "webln-unavailable": "WebLN-Wallet nicht verfügbar",
-      "webln-error": "Verbindung zu WebLN-Wallet fehlgeschlagen",
-      "connect-nip60": "Remote-Wallet verbinden",
-      "nwc-empty": "NWC-Adresse ist leer",
-      "nwc-error": "Verbindung mit Remote-Wallet fehlgeschlagen",
-      "nwc-connected": "Mit Remote-Wallet verbunden"
     },
     "coins": "Geld",
     "transactions": {
@@ -628,7 +633,17 @@
       }
     },
     "media": {
-      "title": "Medien"
+      "title": "Medien",
+      "description": "Manage the Blossom servers used for media uploads",
+      "servers": "Servers",
+      "no-servers": "No Blossom servers found",
+      "add-server": "Add server",
+      "remove-server": "Remove server",
+      "server-url": "Enter Blossom server URL",
+      "invalid-url": "Please enter a valid URL",
+      "upload-success": "File uploaded to {{ server }}",
+      "upload-error": "Failed to upload file to {{ server }}",
+      "upload-panic": "Failed to upload file to any Blossom server"
     },
     "relays": {
       "title": "Relays"
