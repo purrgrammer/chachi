@@ -224,6 +224,11 @@
       "tip": {
         "action": "打闪"
       },
+      "retry": {
+        "action": "Retry",
+        "success": "Message sent",
+        "error": "Failed to send message"
+      },
       "copy": {
         "action": "复制",
         "success": "已复制到剪贴板",
@@ -491,6 +496,23 @@
     "add-mint": "添加铸币厂",
     "relays": "中继",
     "add-relay": "添加中继",
+    "mints-description": "铸币厂是资金的保管人。请定期将你的资金提取到你自己的钱包。",
+    "relays-description": "储存钱包资料的中继。",
+    "name": "名称",
+    "name-description": "为你的钱包取个名字",
+    "ready": "钱包 `{{ name }}` 已准备就绪",
+    "dialog": {
+      "title": "连接钱包",
+      "description": "连接你的钱包以打赏并支持你最喜欢的创造者",
+      "connect-webln": "连接网络钱包",
+      "webln-connected": "已连接网络钱包",
+      "webln-unavailable": "WebLN 钱包不可用",
+      "webln-error": "无法连接 WebLN 钱包",
+      "connect-nip60": "连接远程钱包",
+      "nwc-empty": "NWC 地址为空",
+      "nwc-error": "无法连接远程钱包",
+      "nwc-connected": "已连接远程钱包"
+    },
     "deposit": {
       "title": "接收",
       "cashu-description": "将资金存入铸币厂或兑换代币",
@@ -527,23 +549,6 @@
       "message": "消息",
       "message-placeholder": "写一条消息（可选）",
       "confirm-wallet": "发送"
-    },
-    "mints-description": "铸币厂是资金的保管人。请定期将你的资金提取到你自己的钱包。",
-    "relays-description": "储存钱包资料的中继。",
-    "name": "名称",
-    "name-description": "为你的钱包取个名字",
-    "ready": "钱包 `{{ name }}` 已准备就绪",
-    "dialog": {
-      "title": "连接钱包",
-      "description": "连接你的钱包以打赏并支持你最喜欢的创造者",
-      "connect-webln": "连接网络钱包",
-      "webln-connected": "已连接网络钱包",
-      "webln-unavailable": "WebLN 钱包不可用",
-      "webln-error": "无法连接 WebLN 钱包",
-      "connect-nip60": "连接远程钱包",
-      "nwc-empty": "NWC 地址为空",
-      "nwc-error": "无法连接远程钱包",
-      "nwc-connected": "已连接远程钱包"
     },
     "coins": "资金",
     "transactions": {
@@ -628,7 +633,17 @@
       }
     },
     "media": {
-      "title": "多媒体"
+      "title": "多媒体",
+      "description": "Manage the Blossom servers used for media uploads",
+      "servers": "Servers",
+      "no-servers": "No Blossom servers found",
+      "add-server": "Add server",
+      "remove-server": "Remove server",
+      "server-url": "Enter Blossom server URL",
+      "invalid-url": "Please enter a valid URL",
+      "upload-success": "File uploaded to {{ server }}",
+      "upload-error": "Failed to upload file to {{ server }}",
+      "upload-panic": "Failed to upload file to any Blossom server"
     },
     "relays": {
       "title": "中继"
