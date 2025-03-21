@@ -224,6 +224,11 @@
       "tip": {
         "action": "Zappen"
       },
+      "retry": {
+        "action": "Retry",
+        "success": "Message sent",
+        "error": "Failed to send message"
+      },
       "copy": {
         "action": "Kopiëren",
         "success": "Gekopieerd naar klembord",
@@ -491,6 +496,23 @@
     "add-mint": "Mint toevoegen",
     "relays": "Relays",
     "add-relay": "Voeg relay toe",
+    "mints-description": "Mints beheren je geld. Trek je geld regelmatig op naar je wallet.",
+    "relays-description": "Relays waar de wallet data is opgeslagen.",
+    "name": "Naam",
+    "name-description": "Een naam voor je wallet",
+    "ready": "Wallet `{{ name }}` klaar",
+    "dialog": {
+      "title": "Wallet verbinden",
+      "description": "Verbind je wallet om tips te verzenden en je favoriete creators te steunen",
+      "connect-webln": "Webwallet verbinden",
+      "webln-connected": "Verbonden met webwallet",
+      "webln-unavailable": "WebLN wallet niet beschikbaar",
+      "webln-error": "Kan geen verbinding maken met WebLN wallet",
+      "connect-nip60": "Remote wallet verbinden",
+      "nwc-empty": "NWC-adres is leeg",
+      "nwc-error": "Kan geen verbinding maken met remote wallet",
+      "nwc-connected": "Remote wallet verbonden"
+    },
     "deposit": {
       "title": "Ontvangen",
       "cashu-description": "Geld toevoegen aan een mint of ecash tokens inwisselen",
@@ -527,23 +549,6 @@
       "message": "Bericht",
       "message-placeholder": "Schrijf een optioneel bericht",
       "confirm-wallet": "Verzenden"
-    },
-    "mints-description": "Mints beheren je geld. Trek je geld regelmatig op naar je wallet.",
-    "relays-description": "Relays waar de wallet data is opgeslagen.",
-    "name": "Naam",
-    "name-description": "Een naam voor je wallet",
-    "ready": "Wallet `{{ name }}` klaar",
-    "dialog": {
-      "title": "Wallet verbinden",
-      "description": "Verbind je wallet om tips te verzenden en je favoriete creators te steunen",
-      "connect-webln": "Webwallet verbinden",
-      "webln-connected": "Verbonden met webwallet",
-      "webln-unavailable": "WebLN wallet niet beschikbaar",
-      "webln-error": "Kan geen verbinding maken met WebLN wallet",
-      "connect-nip60": "Remote wallet verbinden",
-      "nwc-empty": "NWC-adres is leeg",
-      "nwc-error": "Kan geen verbinding maken met remote wallet",
-      "nwc-connected": "Remote wallet verbonden"
     },
     "coins": "Cash",
     "transactions": {
@@ -628,7 +633,17 @@
       }
     },
     "media": {
-      "title": "Media"
+      "title": "Media",
+      "description": "Manage the Blossom servers used for media uploads",
+      "servers": "Servers",
+      "no-servers": "No Blossom servers found",
+      "add-server": "Add server",
+      "remove-server": "Remove server",
+      "server-url": "Enter Blossom server URL",
+      "invalid-url": "Please enter a valid URL",
+      "upload-success": "File uploaded to {{ server }}",
+      "upload-error": "Failed to upload file to {{ server }}",
+      "upload-panic": "Failed to upload file to any Blossom server"
     },
     "relays": {
       "title": "Relays"
