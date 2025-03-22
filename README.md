@@ -41,6 +41,8 @@ chachi is a nostr group chat client. It is designed to be mobile-friendly, bandw
 ### Implemented
 
 - [x] NIP-01
+- [x] NIP-02 Follow List
+- [x] NIP-05 DNS-based identifiers
 - [x] NIP-07 window.nostr capability for web browsers
 - [x] NIP-09 Event Deletion Request
 - [x] NIP-11 Relay Information Document
@@ -54,31 +56,29 @@ chachi is a nostr group chat client. It is designed to be mobile-friendly, bandw
 - [x] NIP-31 alt tag
 - [x] NIP-84 Highlights
 - [x] NIP-42 Auth
+- [x] NIP-46 Nostr Remote Signing
+- [x] NIP-47 NWC
 - [x] NIP-51 (Group list, Emoji list)
+- [x] NIP-57 Zaps
+- [x] NIP-60 Cashu Wallet
+- [x] NIP-61 Nut Zaps
 - [x] NIP-65 Relay List Metadata
 - [x] NIP-70 Protected Events
 - [x] NIP-71 Video
 
 ### Planned
 
-- [ ] NIP-02 Follow List
-- [ ] NIP-05 DNS-based identifiers
 - [ ] NIP-17 Private Direct Messages
-- [.] NIP-34 git stuff
+- [ ] NIP-34 git stuff
 - [ ] NIP-38 User statuses
-- [ ] NIP-46 Nostr Remote Signing
-- [ ] NIP-47 NWC
 - [ ] NIP-52 Calendar events
 - [ ] NIP-53 Live activities
 - [ ] NIP-54 Wiki
 - [ ] NIP-55 Android Signer Application
-- [ ] NIP-57 Zaps
-- [ ] NIP-60 Cashu Wallet
-- [ ] NIP-61 Nut Zaps
 - [ ] NIP-75 Zap goals
+- [ ] NIP-86 Relay Management
 - [ ] NIP-89 Recommended app handlers
 - [ ] NIP-94 Files
-
 
 ## License
 
