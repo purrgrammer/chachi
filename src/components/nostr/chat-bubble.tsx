@@ -5,6 +5,7 @@ import { NostrEvent } from "nostr-tools";
 import { groupURL } from "@/lib/groups";
 import { ChatMessage } from "@/components/nostr/chat/chat";
 import { useGroup } from "@/lib/nostr/groups";
+import { usePubkey } from "@/lib/account";
 import { cn } from "@/lib/utils";
 import type { Group } from "@/lib/types";
 
@@ -35,17 +36,24 @@ interface ChatBubbleProps {
 
 export function ChatBubble({ event, group }: ChatBubbleProps) {
   const { t } = useTranslation();
+  const me = usePubkey();
+  const pubkey = event.pubkey;
   const groupTag = event.tags.find((t) => t[0] === "h");
   const [, id, relay] = groupTag ? groupTag : [];
   const chatGroup = { id, relay };
   const isForwarded =
     chatGroup.id &&
     chatGroup.relay &&
-    (group?.id !== chatGroup.id || group?.relay !== chatGroup.relay);
+    (!group || group.id !== chatGroup.id || group.relay !== chatGroup.relay);
   return (
     <div className="flex flex-col gap-0.5">
       {isForwarded ? (
-        <div className="flex flex-row gap-1 items-center text-muted-foreground ml-9">
+        <div
+          className={cn(
+            "flex flex-row gap-1 items-center text-muted-foreground",
+            me === pubkey ? "ml-auto" : "ml-9",
+          )}
+        >
           <Forward className="size-4" />
           <span className="text-xs">{t("chat.message.forward.forwarded")}</span>
           <GroupName group={chatGroup} className="text-xs" />
