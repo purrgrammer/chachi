@@ -1,26 +1,13 @@
-import { useMemo, useState } from "react";
-import { toast } from "sonner";
+import { useMemo } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { NutzapContent } from "@/components/nostr/nutzap";
 import {
-  X,
   Zap as ZapIcon,
   Bitcoin,
-  HandCoins,
   ArrowDownRight,
   ArrowUpRight,
-  MessagesSquare,
-  RotateCw,
-  Check,
-  SquareArrowOutUpRight,
-  MessageSquareOff,
 } from "lucide-react";
-import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { NDKEvent, NDKNutzap } from "@nostr-dev-kit/ndk";
-import { NDKCashuWallet } from "@nostr-dev-kit/ndk-wallet";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { HUGE_AMOUNT } from "@/lib/zap";
+import { NDKKind } from "@nostr-dev-kit/ndk";
 import { E, A } from "@/components/nostr/event";
 import { Header } from "@/components/header";
 import {
@@ -30,52 +17,40 @@ import {
   EmojiFragment,
 } from "@/components/rich-text";
 import { Emoji } from "@/components/emoji";
-import { Button } from "@/components/ui/button";
 import { User } from "@/components/nostr/user";
-import { formatRelativeTime } from "@/lib/time";
 import { formatShortNumber } from "@/lib/number";
 import { validateZap } from "@/lib/nip-57";
 import type { Zap as ZapType } from "@/lib/nip-57";
 import { validateNutzap } from "@/lib/nip-61";
-import { MintLink } from "@/components/mint";
-import { GroupName, GroupPicture } from "@/components/nostr/groups/metadata";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Pubkey } from "@/components/nostr/pubkey";
-import { groupURL } from "@/lib/groups";
-import { useNDK } from "@/lib/ndk";
-import { useCashuWallet } from "@/lib/wallet";
+import type { Nutzap as NutzapType } from "@/lib/nip-61";
 import { useSentZaps, useReceivedZaps } from "@/lib/zap";
 import { useNutzaps, useSentNutzaps } from "@/lib/cashu";
-import { Nutzap as NutzapEvent } from "@/lib/db";
 import { usePubkey } from "@/lib/account";
 import { useRelays } from "@/lib/nostr";
-import { saveNutzap } from "@/lib/nutzaps";
-import { cn } from "@/lib/utils";
-import { dedupeBy } from "@/lib/utils";
+import { cn, dedupeBy } from "@/lib/utils";
+import { HUGE_AMOUNT } from "@/lib/zap";
 
-export function ZapContent({
+function ZapContent({
   zap,
+  className,
   classNames,
 }: {
-  zap: ZapType;
+  zap: ZapType | NutzapType;
+  className?: string;
   classNames?: {
     singleCustomEmoji?: string;
     onlyEmojis?: string;
   };
 }) {
+  const content = zap.content.trim();
   const fragments = useRichText(
-    zap.content.trim(),
+    content,
     {
       emojis: true,
     },
     zap.tags,
   );
+  const { t } = useTranslation();
   const isSingleCustomEmoji =
     fragments.length === 1 &&
     fragments[0].type === "block" &&
@@ -85,9 +60,7 @@ export function ZapContent({
     ? ((fragments[0] as BlockFragment).nodes[0] as EmojiFragment)
     : null;
   const isOnlyEmojis =
-    /^\p{Emoji_Presentation}{1}\s*\p{Emoji_Presentation}{0,4}$/u.test(
-      zap.content.trim(),
-    );
+    /^\p{Emoji_Presentation}{1}\s*\p{Emoji_Presentation}{0,4}$/u.test(content);
   return isSingleCustomEmoji && singleCustomEmoji ? (
     <Emoji
       key={singleCustomEmoji.name}
@@ -99,327 +72,120 @@ export function ZapContent({
       )}
     />
   ) : isOnlyEmojis ? (
-    <span className={cn("text-7xl", classNames?.onlyEmojis)}>
-      {zap.content.trim()}
-    </span>
+    <span className={cn("text-7xl", classNames?.onlyEmojis)}>{content}</span>
+  ) : content ? (
+    <RichText className={className} tags={zap.tags}>
+      {content}
+    </RichText>
   ) : (
-    <RichText tags={zap.tags}>{zap.content.trim()}</RichText>
+    <span className="text-xs text-muted-foreground italic">
+      {t("nutzaps.no-message")}
+    </span>
   );
 }
 
-function Zap({ zap, showReceiver }: { zap: ZapType; showReceiver?: boolean }) {
-  const { t } = useTranslation();
-  const id = zap.tags.find((t) => t[0] === "h")?.[1];
-  const relay = zap.tags.find((t) => t[0] === "h")?.[2];
-  const group = id && relay ? { id, relay } : undefined;
-  const isHugeAmount = zap ? zap.amount >= HUGE_AMOUNT : false;
-  const relays = useRelays();
-  return (
-    <Card className="z-0 relative rounded-md bg-background/80">
-      <CardHeader className="bg-background/80">
-        <div className="flex flex-row items-center justify-between">
-          <CardTitle>
-            {showReceiver && zap.p ? (
-              <User
-                pubkey={zap.p}
-                classNames={{ avatar: "size-6", name: "font-normal" }}
-              />
-            ) : (
-              <User
-                pubkey={zap.pubkey}
-                classNames={{ avatar: "size-6", name: "font-normal" }}
-              />
-            )}
-          </CardTitle>
-          <div className="flex flex-row gap-2 items-center">
-            {group ? (
-              <Link
-                to={groupURL(group)}
-                className="text-sm hover:cursor-pointer hover:underline hover:decoration-dotted"
-              >
-                <div className="flex flex-row items-center gap-1.5">
-                  <MessagesSquare className="size-3 text-muted-foreground" />
-                  <div className="flex flex-row items-center gap-1">
-                    <GroupPicture group={group} className="size-3" />
-                    <GroupName group={group} className="text-xs" />
-                  </div>
-                </div>
-              </Link>
-            ) : null}
-            <span className="text-xs font-light text-muted-foreground">
-              {formatRelativeTime(zap.created_at)}
-            </span>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="bg-background/80">
-        <div
-          className={cn(
-            "flex flex-row gap-6 items-center justify-between border-gradient",
-            isHugeAmount ? "border-animated-gradient" : "",
-          )}
-        >
-          {zap.content.trim() ? (
-            <ZapContent
-              zap={zap}
-              classNames={{
-                singleCustomEmoji: "h-12 w-12",
-                onlyEmojis: "text-5xl",
-              }}
-            />
-          ) : (
-            <div className="flex flex-row items-center gap-1.5">
-              <MessageSquareOff className="size-3 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">
-                {t("nutzaps.no-message")}
-              </span>
-            </div>
-          )}
-          <div className="flex flex-col gap-3 items-center justify-center">
-            <div className="flex flex-col items-end gap-0.5">
-              <div className="flex flex-row items-center gap-1">
-                {/* todo: unit */}
-                <Bitcoin className="size-8 text-muted-foreground" />
-                <span className="font-mono text-5xl">
-                  {formatShortNumber(zap.amount)}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-      <CardFooter className="bg-background/80">
-        <div className="flex flex-col gap-2 w-full items-end">
-          {zap.e || zap.a ? (
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="tiny">
-                  <div className="flex flex-row items-center gap-1">
-                    <SquareArrowOutUpRight />
-                    {t("nutzaps.open")}
-                  </div>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-transparent border-none">
-                {zap.e ? (
-                  <E
-                    id={zap.e}
-                    pubkey={zap.p}
-                    group={group}
-                    relays={group ? [group.relay] : relays}
-                    showReactions={false}
-                  />
-                ) : zap.a ? (
-                  <A
-                    address={zap.a}
-                    group={group}
-                    relays={group ? [group.relay] : relays}
-                    showReactions={false}
-                  />
-                ) : null}
-              </DialogContent>
-            </Dialog>
-          ) : null}
-        </div>
-      </CardFooter>
-    </Card>
-  );
+function ZapTarget({ zap }: { zap: ZapType }) {
+  const myRelays = useRelays();
+  const e = zap.e;
+  const a = zap.a;
+  if (e) {
+    return <E id={e} pubkey={zap.p} relays={myRelays} showReactions={false} />;
+  }
+  if (a && !a.startsWith(`${NDKKind.GroupMetadata}:`)) {
+    return <A address={a} relays={myRelays} showReactions={false} />;
+  }
+  return zap.p ? (
+    <User
+      pubkey={zap.p}
+      classNames={{ avatar: "size-6", name: "font-normal" }}
+    />
+  ) : null;
 }
-function Nutzap({
+
+function NutzapTarget({ zap }: { zap: NutzapType }) {
+  const e = zap?.tags.find((t) => t[0] === "e")?.[1];
+  const a = zap?.tags.find((t) => t[0] === "a")?.[1];
+  const myRelays = useRelays();
+
+  if (e) {
+    return <E id={e} pubkey={zap.p} relays={myRelays} showReactions={false} />;
+  }
+
+  if (a) {
+    return <A address={a} relays={myRelays} showReactions={false} />;
+  }
+
+  return zap.p ? (
+    <User
+      pubkey={zap.p}
+      classNames={{ avatar: "size-7", name: "font-normal" }}
+    />
+  ) : null;
+}
+
+function ZapItem({
   event,
-  showReceiver,
+  isReceive,
 }: {
-  event: NutzapEvent;
-  showReceiver?: boolean;
+  event: BothZaps;
+  isReceive?: boolean;
 }) {
-  const zap = validateNutzap(event);
-  const [isRedeeming, setIsRedeeming] = useState(false);
-  const redeemed = event.status === "redeemed" || event.status === "spent";
-  const failed = event.status === "failed";
-  const wallet = useCashuWallet();
-  const { t } = useTranslation();
-  const ndk = useNDK();
-  const me = usePubkey();
-  const id = event.tags.find((t) => t[0] === "h")?.[1];
-  const relay = event.tags.find((t) => t[0] === "h")?.[2];
-  const group = id && relay ? { id, relay } : undefined;
-  const isHugeAmount = zap ? zap.amount >= HUGE_AMOUNT : false;
-  async function redeem() {
-    setIsRedeeming(true);
-    try {
-      if (wallet instanceof NDKCashuWallet) {
-        const nutzap = NDKNutzap.from(new NDKEvent(ndk, event));
-        if (nutzap) {
-          await wallet.redeemNutzap(nutzap, {
-            // todo: msat unit
-            onRedeemed: (proofs) => {
-              const amount = proofs.reduce(
-                (acc, proof) => acc + proof.amount,
-                0,
-              );
-              toast.success(
-                t("nutzaps.redeem-success", {
-                  amount: formatShortNumber(amount),
-                }),
-              );
-            },
-          });
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      saveNutzap(event, "failed");
-      toast.error(t("nutzaps.redeem-error"));
-    } finally {
-      setIsRedeeming(false);
-    }
-  }
-
-  if (!zap) {
-    return (
-      <span className="text-xs text-muted-foreground">
-        {t("nutzaps.invalid")}
-      </span>
-    );
-  }
-
+  const pubkey = usePubkey();
+  const isHuge = event.zap.amount >= HUGE_AMOUNT;
   return (
-    <Card className="z-0 relative rounded-md bg-background/80">
-      <CardHeader className="bg-background/80">
-        <div className="flex flex-row items-center justify-between">
-          <CardTitle>
-            {showReceiver && zap.p ? (
-              <User
-                pubkey={zap.p}
-                classNames={{ avatar: "size-6", name: "font-normal" }}
-              />
-            ) : (
-              <User
-                pubkey={zap.pubkey}
-                classNames={{ avatar: "size-6", name: "font-normal" }}
-              />
-            )}
-          </CardTitle>
-          <div className="flex flex-row gap-2 items-center">
-            {group ? (
-              <Link
-                to={groupURL(group)}
-                className="text-sm hover:cursor-pointer hover:underline hover:decoration-dotted"
-              >
-                <div className="flex flex-row items-center gap-1.5">
-                  <MessagesSquare className="size-3 text-muted-foreground" />
-                  <div className="flex flex-row items-center gap-1">
-                    <GroupPicture group={group} className="size-3" />
-                    <GroupName group={group} className="text-xs" />
-                  </div>
-                </div>
-              </Link>
-            ) : null}
-            <span className="text-xs font-light text-muted-foreground">
-              {formatRelativeTime(zap.created_at)}
-            </span>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="bg-background/80">
+    <div className="flex flex-row gap-2 items-end">
+      {isReceive ? (
+        <User
+          pubkey={event.zap.pubkey}
+          classNames={{ avatar: "size-6", name: "hidden" }}
+        />
+      ) : pubkey ? (
+        <User
+          pubkey={pubkey}
+          classNames={{ avatar: "size-6", name: "hidden" }}
+        />
+      ) : null}
+      <div className="z-0 w-full rounded-tl-lg rounded-tr-lg rounded-br-lg">
         <div
-          className={cn(
-            "flex flex-row gap-6 items-center justify-between border-gradient",
-            isHugeAmount ? "border-animated-gradient" : "",
-          )}
+          className="relative 
+
+	      rounded-tl-lg rounded-tr-lg rounded-br-lg
+	bg-background/80 w-full"
         >
-          {event.content.trim() ? (
-            <NutzapContent
-              event={event}
-              zap={zap}
-              classNames={{
-                singleCustomEmoji: "h-12 w-12",
-                onlyEmojis: "text-5xl",
-              }}
-            />
-          ) : (
-            <div className="flex flex-row items-center gap-1.5">
-              <MessageSquareOff className="size-3 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">
-                {t("nutzaps.no-message")}
-              </span>
-            </div>
-          )}
-          <div className="flex flex-col gap-3 items-center justify-center">
-            <div className="flex flex-col items-end gap-0.5">
-              <div className="flex flex-row items-center gap-1">
-                {/* todo: unit */}
-                <Bitcoin className="size-8 text-muted-foreground" />
-                <span className="font-mono text-5xl">
-                  {formatShortNumber(zap.amount)}
-                </span>
+          <div className="flex flex-col gap-2 p-2 pb-1 items-start w-full">
+            {event.type === "nip-61" ? (
+              <NutzapTarget key={event.zap.id} zap={event.zap as NutzapType} />
+            ) : (
+              <ZapTarget key={event.zap.id} zap={event.zap as ZapType} />
+            )}
+            <div
+              className={cn(
+                "flex flex-row gap-2 items-center justify-between w-full",
+                isHuge ? "border-animated-gradient" : "border-gradient",
+                "rounded-tl-lg rounded-tr-lg rounded-br-lg",
+              )}
+            >
+              <ZapContent
+                zap={event.zap}
+                className="line-clamp-1"
+                classNames={{
+                  singleCustomEmoji: "size-8",
+                  onlyEmojis: "text-3xl",
+                }}
+              />
+              <div className="flex flex-col gap-0">
+                <div className="flex flex-row items-center gap-0">
+                  <Bitcoin className="size-6 text-muted-foreground" />
+                  <span className="text-2xl font-mono">
+                    {formatShortNumber(event.zap.amount)}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </CardContent>
-      <CardFooter className="bg-background/80">
-        <div className="flex flex-col gap-2 w-full">
-          <div className="flex flex-row items-center justify-between">
-            <div className="">
-              {zap.p2pk ? (
-                <Pubkey isCashu pubkey={zap.p2pk} chunkSize={8} />
-              ) : null}
-              <MintLink
-                includeLandmark
-                url={zap.mint}
-                classNames={{ icon: "size-3", name: "text-xs text-foreground" }}
-              />
-            </div>
-            <div className="flex flex-row gap-1 items-center">
-              {zap.p === me ? (
-                <Button
-                  disabled={!wallet || failed || redeemed}
-                  variant="ghost"
-                  size="tiny"
-                  onClick={redeem}
-                >
-                  {failed ? (
-                    <X className="text-red-500" />
-                  ) : redeemed ? (
-                    <Check className="text-green-500" />
-                  ) : isRedeeming ? (
-                    <RotateCw className="animate-spin" />
-                  ) : (
-                    <HandCoins />
-                  )}
-                  {failed
-                    ? t("nutzaps.failed")
-                    : redeemed
-                      ? t("nutzaps.redeemed")
-                      : t("nutzaps.redeem")}
-                </Button>
-              ) : null}
-
-              {zap.e || zap.a ? (
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="ghost" size="tiny">
-                      <div className="flex flex-row items-center gap-1">
-                        <SquareArrowOutUpRight />
-                        {t("nutzaps.open")}
-                      </div>
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="bg-transparent border-none">
-                    {zap.e ? (
-                      <E id={zap.e} pubkey={zap.p} showReactions={false} />
-                    ) : zap.a ? (
-                      <A address={zap.a} showReactions={false} />
-                    ) : null}
-                  </DialogContent>
-                </Dialog>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -434,10 +200,12 @@ function Sent() {
       .map((zap) => ({ type: "nip-57" as ZapKind, zap: zap! as ZapType }));
   }, [sentZaps]);
   const nutzaps = useMemo(() => {
-    return dedupeBy(sentNutzaps, "id").map((zap) => ({
-      type: "nip-61" as ZapKind,
-      zap: zap! as NutzapEvent,
-    }));
+    return dedupeBy(sentNutzaps, "id")
+      .map((zap) => ({
+        type: "nip-61" as ZapKind,
+        zap: validateNutzap(zap)! as NutzapType,
+      }))
+      .filter((zap) => zap.zap);
   }, [sentNutzaps]);
   const sorted: AllZaps = useMemo(() => {
     const s = [...zaps, ...nutzaps];
@@ -454,17 +222,11 @@ function Sent() {
           </span>
         </div>
       ) : null}
-      {sorted.map((event) =>
-        event.type === "nip-61" ? (
-          <Nutzap
-            showReceiver
-            key={event.zap.id}
-            event={event.zap as NutzapEvent}
-          />
-        ) : (
-          <Zap showReceiver key={event.zap.id} zap={event.zap as ZapType} />
-        ),
-      )}
+      <div className="flex flex-col gap-2 w-full">
+        {sorted.map((event) => (
+          <ZapItem key={event.zap.id} event={event} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -472,14 +234,21 @@ function Sent() {
 type ZapKind = "nip-57" | "nip-61";
 // fixme: proper type
 type Nip57Zap = { type: ZapKind; zap: ZapType };
-type Nip61Zap = { type: ZapKind; zap: NutzapEvent };
+type Nip61Zap = { type: ZapKind; zap: NutzapType };
 type BothZaps = Nip57Zap | Nip61Zap;
 type AllZaps = BothZaps[];
 
 function Received() {
   const { t } = useTranslation();
-
-  const nutzaps = useNutzaps();
+  const nutzapEvents = useNutzaps();
+  const nutzaps = useMemo(() => {
+    return nutzapEvents
+      .map((zap) => ({
+        type: "nip-61" as ZapKind,
+        zap: validateZap(zap!) as NutzapType,
+      }))
+      .filter((zap) => zap.zap);
+  }, [nutzapEvents]);
   const { events: receivedZaps } = useReceivedZaps();
   const zaps = useMemo(() => {
     return dedupeBy(receivedZaps, "id")
@@ -489,13 +258,7 @@ function Received() {
   }, [receivedZaps]);
 
   const sorted: AllZaps = useMemo(() => {
-    const s = [
-      ...zaps,
-      ...nutzaps.map((zap) => ({
-        type: "nip-61" as ZapKind,
-        zap: zap! as NutzapEvent,
-      })),
-    ];
+    const s = [...zaps, ...nutzaps];
     s.sort((a, b) => b.zap.created_at - a.zap.created_at);
     return s;
   }, [zaps, nutzaps]);
@@ -509,13 +272,9 @@ function Received() {
           </span>
         </div>
       ) : null}
-      {sorted.map((event) =>
-        event.type === "nip-61" ? (
-          <Nutzap key={event.zap.id} event={event.zap as NutzapEvent} />
-        ) : (
-          <Zap key={event.zap.id} zap={event.zap as ZapType} />
-        ),
-      )}
+      {sorted.map((event) => (
+        <ZapItem key={event.zap.id} event={event} isReceive />
+      ))}
     </div>
   );
 }

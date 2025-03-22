@@ -213,15 +213,13 @@ const eventDetails: Record<
   },
   [NDKKind.Zap]: {
     noHeader: true,
-    className:
-      "relative rounded-md bg-background/80 border-none my-0.5 border-gradient",
+    className: "relative rounded-md bg-background/80 border-none my-0.5",
     preview: ZapPreview,
     detail: ZapDetail,
     reply: ZapReply,
   },
   [NDKKind.Nutzap]: {
     noHeader: true,
-    // todo: make this classname only apply to preview
     className: "relative rounded-md bg-background/80 border-none my-0.5",
     preview: NutzapPreview,
     detail: NutzapDetail,
@@ -1353,7 +1351,7 @@ export function Embed({
   return (
     <div
       className={cn(
-        "border bg-background text-foreground rounded-sm font-sans",
+        "border bg-background text-foreground rounded-sm font-sans w-full",
         components?.className,
         className,
       )}

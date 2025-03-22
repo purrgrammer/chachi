@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 function LoadingEvent() {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-row gap-3 items-center py-2 px-4 rounded-sm border text-muted-foreground bg-background">
+    <div className="flex flex-row gap-3 items-center py-2 px-4 rounded-sm border text-muted-foreground bg-background w-full">
       <Network className="animate-pulse size-4" />
       <span className="text-sm italic">{t("event.loading")}</span>
     </div>
@@ -18,7 +18,7 @@ function LoadingEvent() {
 function EventNotFound() {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-row gap-3 items-center py-2 px-4 rounded-sm border text-muted-foreground bg-background">
+    <div className="flex flex-row gap-3 items-center py-2 px-4 rounded-sm border text-muted-foreground bg-background w-full">
       <SearchSlash className="size-4" />
       <span className="text-sm italic">{t("event.not-found")}</span>
     </div>
@@ -28,7 +28,7 @@ function EventNotFound() {
 function EventFetchError() {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-row gap-3 items-center py-2 px-4 rounded-sm border text-muted-foreground bg-background">
+    <div className="flex flex-row gap-3 items-center py-2 px-4 rounded-sm border text-muted-foreground bg-background w-full">
       <Ban className="size-4" />
       <span className="text-sm italic">{t("event.fetch-error")}</span>
     </div>
