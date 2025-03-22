@@ -55,11 +55,33 @@ export function useCashuWallet() {
   return useAtomValue(cashuWalletAtom);
 }
 
+async function createCashuToken(
+  event: NDKEvent,
+): Promise<NDKCashuToken | undefined> {
+  const token = new NDKCashuToken(event.ndk, event);
+  // @ts-expect-error: i'm not supposed to do this
+  token.original = event;
+  try {
+    const content = JSON.parse(token.content);
+    token.proofs = content.proofs;
+    token.mint = content.mint ?? token.tagValue("mint");
+    token.deletedTokens = content.del ?? [];
+    if (!Array.isArray(token.proofs)) return;
+  } catch (e) {
+    return;
+  }
+
+  return token;
+}
+
 async function addToken(
   wallet: NDKCashuWallet,
   tokenEvent: NDKEvent,
+  decrypt = true,
 ): Promise<NDKCashuWallet> {
-  const token = await NDKCashuToken.from(tokenEvent);
+  const token = decrypt
+    ? await NDKCashuToken.from(tokenEvent)
+    : await createCashuToken(tokenEvent);
   if (!token || !token.id) {
     return wallet;
   }
@@ -139,14 +161,14 @@ export function useChachiWallet() {
   useEffect(() => {
     let sub: NDKSubscription | undefined;
 
-    const sync = async () => {
+    const syncWallet = async () => {
       if (!cashuWallet || !pubkey) return;
 
       const tokenEvents = await getTokenEvents();
       await Promise.allSettled(
         tokenEvents?.map((tokenEvent) => {
           const ev = new NDKEvent(ndk, tokenEvent);
-          return addToken(cashuWallet, ev);
+          return addToken(cashuWallet, ev, false);
         }) ?? [],
       );
       const lastSeen = tokenEvents?.at(-1);
@@ -183,7 +205,7 @@ export function useChachiWallet() {
       });
     };
 
-    sync();
+    syncWallet();
 
     return () => sub?.stop();
   }, [pubkey, cashuWallet]);
