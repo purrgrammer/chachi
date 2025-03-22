@@ -225,9 +225,9 @@
         "action": "حركة"
       },
       "retry": {
-        "action": "Retry",
+        "action": "إعادة المحاولة",
         "success": "تم إرسال الرسالة",
-        "error": "Failed to send message"
+        "error": "تعذر إرسال الرسالة"
       },
       "copy": {
         "action": "نسخ",
@@ -423,7 +423,7 @@
     "loading": "تحميل الحدث",
     "not-found": "لم يتم العثور على الحدث",
     "fetch-error": "خطأ في جلب الحدث",
-    "replied": "replied"
+    "replied": "رد"
   },
   "events": {
     "loading": "تحميل الأحداث",
@@ -467,7 +467,7 @@
     "keys": "المفاتيح",
     "sync": "المزامنة",
     "sync-success": "تم مزامنة النقود الإلكترونية",
-    "sync-error": "Error syncing ecash",
+    "sync-error": "خطأ في مزامنة النقود الإلكترونية",
     "keys-description": "مفاتيح محفظتك، من الضروري الاحتفاظ بها بأمان وعمل نسخة احتياطية منها",
     "debit": "الدفع",
     "credit": "الدفع",
@@ -634,16 +634,16 @@
     },
     "media": {
       "title": "الوسائط",
-      "description": "Manage the Blossom servers used for media uploads",
-      "servers": "Servers",
-      "no-servers": "No Blossom servers found",
-      "add-server": "Add server",
-      "remove-server": "Remove server",
-      "server-url": "Enter Blossom server URL",
-      "invalid-url": "Please enter a valid URL",
-      "upload-success": "File uploaded to {{ server }}",
-      "upload-error": "Failed to upload file to {{ server }}",
-      "upload-panic": "Failed to upload file to any Blossom server"
+      "description": "إدارة خوادم الزهرة المستخدمة لرفع الوسائط",
+      "servers": "الخوادم",
+      "no-servers": "لم يتم العثور على خوادم الزهرة",
+      "add-server": "أضف خادم",
+      "remove-server": "إزالة الخادم",
+      "server-url": "أدخل عنوان URL لخادم الزهرة",
+      "invalid-url": "الرجاء إدخال عنوان URL صالح",
+      "upload-success": "تم رفع المجلد إلى {{ server }}",
+      "upload-error": "فشل رفع المجلد إلى {{ server }}",
+      "upload-panic": "فشل رفع المجلد إلى أي خادم الزهرة"
     },
     "relays": {
       "title": "مُرحلات"
@@ -688,8 +688,8 @@
     "unknown": "رمز QR غير معروف"
   },
   "names": {
-    "comma": ",",
-    "and": "and",
-    "and-more": "and {{ more }} more"
+    "comma": "",
+    "and": "و",
+    "and-more": "و {{ more }} المزيد"
   }
 }
