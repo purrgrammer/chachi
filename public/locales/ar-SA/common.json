@@ -643,7 +643,7 @@
       "invalid-url": "الرجاء إدخال عنوان URL صالح",
       "upload-success": "تم رفع المجلد إلى {{ server }}",
       "upload-error": "فشل رفع المجلد إلى {{ server }}",
-      "upload-panic": "فشل رفع المجلد إلى أي خادم الزهرة"
+      "upload-panic": "فشل رفع المجلد إلى أي خادم زهرة"
     },
     "relays": {
       "title": "مُرحلات"
