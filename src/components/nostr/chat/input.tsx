@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Send, Check, RefreshCw } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
@@ -7,7 +7,7 @@ import { UploadFile } from "@/components/upload-file";
 import { GIFPicker } from "@/components/gif-picker";
 import { Button } from "@/components/ui/button";
 import { fetchRelayList } from "@/lib/nostr";
-import { NDKContext } from "@/lib/ndk";
+import { useNDK } from "@/lib/ndk";
 import { cn } from "@/lib/utils";
 import { usePubkey, useCanSign } from "@/lib/account";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
@@ -104,7 +104,7 @@ export function ChatInput({
   children?: React.ReactNode;
 }) {
   const [isPosting, setIsPosting] = useState(false);
-  const ndk = useContext(NDKContext);
+  const ndk = useNDK();
   const me = usePubkey();
   const canPoast = useCanSign();
   // message

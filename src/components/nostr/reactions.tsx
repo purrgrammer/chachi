@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { Bitcoin } from "lucide-react";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
@@ -7,7 +7,7 @@ import { RichText } from "@/components/rich-text";
 import { Button } from "@/components/ui/button";
 import { useRelaySet, useReactions } from "@/lib/nostr";
 import { formatShortNumber } from "@/lib/number";
-import { NDKContext } from "@/lib/ndk";
+import { useNDK } from "@/lib/ndk";
 import { usePubkey } from "@/lib/account";
 import {
   Tooltip,
@@ -87,7 +87,7 @@ function Reaction({
   reactions: NostrEvent[];
   isCompact: boolean;
 }) {
-  const ndk = useContext(NDKContext);
+  const ndk = useNDK();
   const relaySet = useRelaySet(relays);
   const [isReacting, setIsReacting] = useState(false);
   const isCustomEmoji = CUSTOM_EMOJI_CONTENT_REGEX.test(content);

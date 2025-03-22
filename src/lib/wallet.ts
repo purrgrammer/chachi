@@ -28,7 +28,7 @@ import {
   NDKWebLNWallet,
   NDKNWCWallet,
 } from "@nostr-dev-kit/ndk-wallet";
-import { useNDK } from "@/lib/ndk";
+import { useNDK, useNWCNDK } from "@/lib/ndk";
 import { Zap, validateZapRequest } from "@/lib/nip-57";
 import { usePubkey, useMintList } from "@/lib/account";
 import { cashuAtom } from "@/app/store";
@@ -79,6 +79,7 @@ async function addToken(
 export function useChachiWallet() {
   const { t } = useTranslation();
   const ndk = useNDK();
+  const nwcNDK = useNWCNDK();
   const pubkey = usePubkey();
   const relays = useRelays();
   const mintList = useMintList();
@@ -94,7 +95,7 @@ export function useChachiWallet() {
     Promise.allSettled(
       wallets.map(async (w) => {
         if (w.type === "nwc") {
-          return createNWCWallet(w.connection, ndk);
+          return createNWCWallet(w.connection, nwcNDK);
         } else if (w.type === "webln") {
           return createWebLNWallet();
         }
@@ -167,6 +168,8 @@ export function useChachiWallet() {
       );
       sub.on("event", (event) => {
         if (event?.id) {
+          const seen = tokenEvents?.find((e) => e.id === event.id);
+          if (seen) return;
           addToken(cashuWallet, event);
           if (eose) {
             cashuWallet.checkProofs();

@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import ndk, { NDKContext } from "@/lib/ndk";
+import ndk, { nwcNDK, NDKContext } from "@/lib/ndk";
 import { queryClient } from "@/lib/query";
 
 const Layout = lazy(() => import("@/pages/layout"));
@@ -152,7 +152,7 @@ const router = createBrowserRouter([
 export default function App() {
   return (
     <Provider>
-      <NDKContext.Provider value={ndk}>
+      <NDKContext.Provider value={{ main: ndk, nwc: nwcNDK }}>
         <QueryClientProvider client={queryClient}>
           <SidebarProvider>
             <ThemeProvider defaultTheme="dark" storageKey="chachi-theme">

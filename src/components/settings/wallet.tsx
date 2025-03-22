@@ -27,7 +27,7 @@ import {
 } from "@nostr-dev-kit/ndk-wallet";
 import { Button } from "@/components/ui/button";
 import { MintLink } from "@/components/mint";
-import { RelayIcon, RelayName } from "@/components/nostr/relay";
+import { RelayLink } from "@/components/nostr/relay";
 import {
   CreateWallet,
   CashuWalletSettings,
@@ -229,6 +229,12 @@ function WalletSummary({
                 className="flex-1"
               />
             ) : null}
+            {wallet instanceof NDKNWCWallet && wallet.relaySet ? (
+              <RelayList
+                relays={wallet.relaySet.relayUrls}
+                className="flex-1"
+              />
+            ) : null}
           </div>
         </div>
       </CardContent>
@@ -299,10 +305,10 @@ function RelayList({
       <div className="flex flex-col gap-0.5">
         {relays.map((t) => (
           <div key={t} className="flex flex-row items-center gap-1">
-            <RelayIcon relay={t} className="size-4" />
-            <span className="text-sm">
-              <RelayName relay={t} />
-            </span>
+            <RelayLink
+              relay={t}
+              classNames={{ icon: "size-4", name: "text-sm" }}
+            />
           </div>
         ))}
       </div>

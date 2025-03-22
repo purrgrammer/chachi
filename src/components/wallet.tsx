@@ -54,7 +54,7 @@ import { Input } from "@/components/ui/input";
 import { Event, A } from "@/components/nostr/event";
 import { Label } from "@/components/ui/label";
 import { Invoice } from "@/components/ln";
-import { useNDK } from "@/lib/ndk";
+import { useNDK, useNWCNDK } from "@/lib/ndk";
 import { useRelays, useEvent, useProfile } from "@/lib/nostr";
 import { formatShortNumber } from "@/lib/number";
 import {
@@ -526,7 +526,7 @@ export function CashuWalletSettings({
 
 export function ConnectWallet() {
   const { t } = useTranslation();
-  const ndk = useNDK();
+  const ndk = useNWCNDK();
   const [isOpen, setIsOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isLoadingWebln, setIsLoadingWebln] = useState(false);
@@ -800,14 +800,14 @@ function Tx({ tx }: { tx: Transaction }) {
           <Event
             id={e}
             pubkey={target}
-            relays={groupRelay ? [groupRelay] : []}
+            relays={groupRelay ? [groupRelay] : myRelays}
             showReactions={false}
           />
         ) : a ? (
           <A
             address={a}
             showReactions={false}
-            relays={groupRelay ? [groupRelay] : []}
+            relays={groupRelay ? [groupRelay] : myRelays}
           />
         ) : null}
       </DialogContent>
