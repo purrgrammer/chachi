@@ -226,7 +226,7 @@
       },
       "retry": {
         "action": "Retry",
-        "success": "Message sent",
+        "success": "تم إرسال الرسالة",
         "error": "Failed to send message"
       },
       "copy": {
