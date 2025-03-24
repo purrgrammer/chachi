@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { InputCopy } from "@/components/ui/input-copy";
 import { decode } from "light-bolt11-decoder";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -1637,6 +1637,10 @@ function SendEcash({
   const isAmountValid =
     amount && Number(amount) > 0 && Number(amount) <= mintBalance;
 
+  useEffect(() => {
+    wallet.checkProofs();
+  }, []);
+
   async function onWithdrawCash() {
     try {
       setIsWithdrawing(true);
@@ -1691,7 +1695,11 @@ function SendEcash({
                   <SelectItem key={m} value={m}>
                     <div className="flex flex-row items-center gap-2 justify-between">
                       <div className="flex flex-row items-center gap-4">
-                        <MintLink url={m} notClickable />
+                        <MintLink
+                          url={m}
+                          notClickable
+                          classNames={{ icon: "size-5", name: "text-md" }}
+                        />
                         <Balance amount={balances[m] ?? 0} unit="sat" />
                       </div>
                     </div>

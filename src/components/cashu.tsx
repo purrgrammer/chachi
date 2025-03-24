@@ -50,9 +50,7 @@ export function EcashToken({
           }
         />
       </div>
-      <code className="font-mono text-xs break-all">
-        {token}
-      </code>
+      <code className="font-mono text-xs break-all">{token}</code>
       <Button
         disabled={copied}
         variant="secondary"

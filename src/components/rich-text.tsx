@@ -619,7 +619,10 @@ function toFragments(
       for (const match of cashuMatches) {
         if (match.index! > lastCashuIndex) {
           // Process text before the cashu token, including any emojis
-          const textBefore = processedText.substring(lastCashuIndex, match.index);
+          const textBefore = processedText.substring(
+            lastCashuIndex,
+            match.index,
+          );
           fragments.push(...processEmojiNodes(textBefore));
         }
 
@@ -752,7 +755,10 @@ function toFragments(
       // Add text before the match
       if (matchResult.index > lastIndex) {
         // Process any text before this formatting
-        const textBefore = processedContent.substring(lastIndex, matchResult.index);
+        const textBefore = processedContent.substring(
+          lastIndex,
+          matchResult.index,
+        );
         // Since we're already handling emojis in the regex, we don't need to process them again
         nodes.push({
           type: "text",
