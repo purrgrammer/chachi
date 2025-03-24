@@ -225,7 +225,7 @@
         "action": "Zappen"
       },
       "retry": {
-        "action": "Retry",
+        "action": "Opnieuw proberen",
         "success": "Bericht verstuurd",
         "error": "Bericht versturen mislukt"
       },
@@ -634,16 +634,16 @@
     },
     "media": {
       "title": "Media",
-      "description": "Manage the Blossom servers used for media uploads",
+      "description": "Beheer de Blossom servers die worden gebruikt voor media uploads",
       "servers": "Servers",
       "no-servers": "Geen Blossom servers gevonden",
       "add-server": "Server toevoegen",
       "remove-server": "Server verwijderen",
-      "server-url": "Enter Blossom server URL",
-      "invalid-url": "Please enter a valid URL",
+      "server-url": "Voer Blossom server URL in",
+      "invalid-url": "Voer een geldige URL in",
       "upload-success": "Bestand geüpload naar {{ server }}",
       "upload-error": "Uploaden van bestand naar {{ server }} mislukt",
-      "upload-panic": "Failed to upload file to any Blossom server"
+      "upload-panic": "Bestand uploaden mislukt naar alle beschikbare Blossom-servers"
     },
     "relays": {
       "title": "Relays"
