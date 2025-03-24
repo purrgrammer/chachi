@@ -226,8 +226,8 @@
       },
       "retry": {
         "action": "Retry",
-        "success": "Message sent",
-        "error": "Failed to send message"
+        "success": "Bericht verstuurd",
+        "error": "Bericht versturen mislukt"
       },
       "copy": {
         "action": "Kopiëren",
@@ -467,7 +467,7 @@
     "keys": "Sleutels",
     "sync": "Synchroniseren",
     "sync-success": "Ecash gesynchroniseerd",
-    "sync-error": "Error syncing ecash",
+    "sync-error": "Fout bij synchroniseren ecash",
     "keys-description": "Je wallet-sleutels, het is belangrijk om ze veilig te bewaren en er een back-up van te maken",
     "debit": "Betaling",
     "credit": "Betaling",
@@ -636,13 +636,13 @@
       "title": "Media",
       "description": "Manage the Blossom servers used for media uploads",
       "servers": "Servers",
-      "no-servers": "No Blossom servers found",
-      "add-server": "Add server",
-      "remove-server": "Remove server",
+      "no-servers": "Geen Blossom servers gevonden",
+      "add-server": "Server toevoegen",
+      "remove-server": "Server verwijderen",
       "server-url": "Enter Blossom server URL",
       "invalid-url": "Please enter a valid URL",
-      "upload-success": "File uploaded to {{ server }}",
-      "upload-error": "Failed to upload file to {{ server }}",
+      "upload-success": "Bestand geüpload naar {{ server }}",
+      "upload-error": "Uploaden van bestand naar {{ server }} mislukt",
       "upload-panic": "Failed to upload file to any Blossom server"
     },
     "relays": {
@@ -689,7 +689,7 @@
   },
   "names": {
     "comma": ",",
-    "and": "and",
-    "and-more": "and {{ more }} more"
+    "and": "en",
+    "and-more": "en {{ more }} meer"
   }
 }
