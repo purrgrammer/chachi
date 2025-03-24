@@ -225,9 +225,9 @@
         "action": "Zapear"
       },
       "retry": {
-        "action": "Retry",
-        "success": "Message sent",
-        "error": "Failed to send message"
+        "action": "Reintentar",
+        "success": "Mensaje enviado",
+        "error": "No se pudo enviar el mensaje"
       },
       "copy": {
         "action": "Copiar",
@@ -467,7 +467,7 @@
     "keys": "Claves",
     "sync": "Sincronizar",
     "sync-success": "Ecash sincronizado",
-    "sync-error": "Error syncing ecash",
+    "sync-error": "Error al sincronizar ecash",
     "keys-description": "Tus claves de la billetera, es importante mantenerlas seguras y respaldadas",
     "debit": "Pago",
     "credit": "Pago",
@@ -634,16 +634,16 @@
     },
     "media": {
       "title": "Medios",
-      "description": "Manage the Blossom servers used for media uploads",
-      "servers": "Servers",
-      "no-servers": "No Blossom servers found",
-      "add-server": "Add server",
-      "remove-server": "Remove server",
-      "server-url": "Enter Blossom server URL",
-      "invalid-url": "Please enter a valid URL",
-      "upload-success": "File uploaded to {{ server }}",
-      "upload-error": "Failed to upload file to {{ server }}",
-      "upload-panic": "Failed to upload file to any Blossom server"
+      "description": "Administrar los servidores de Blossom utilizados para subir medios",
+      "servers": "Servidores",
+      "no-servers": "No se encontraron servidores Blossom",
+      "add-server": "Añadir servidor",
+      "remove-server": "Eliminar servidor",
+      "server-url": "Introduce la URL del servidor Blossom",
+      "invalid-url": "Por favor, introduce una URL válida",
+      "upload-success": "Archivo subido a {{ server }}",
+      "upload-error": "No se pudo subir el archivo a {{ server }}",
+      "upload-panic": "Error al subir el archivo a cualquier servidor Blossom"
     },
     "relays": {
       "title": "Relés"
@@ -689,7 +689,7 @@
   },
   "names": {
     "comma": ",",
-    "and": "and",
-    "and-more": "and {{ more }} more"
+    "and": "y",
+    "and-more": "y {{ more }} más"
   }
 }
