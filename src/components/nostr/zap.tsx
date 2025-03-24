@@ -352,6 +352,7 @@ export function ZapPreview({
 
 export function Zap({
   zap,
+  className,
   group,
   animateGradient,
   showAuthor = true,
@@ -361,6 +362,7 @@ export function Zap({
   showTarget = true,
 }: {
   zap: ZapType;
+  className?: string;
   group?: Group;
   animateGradient?: boolean;
   showAuthor?: boolean;
@@ -419,7 +421,10 @@ export function Zap({
   // todo: emoji, single custom emoji
   return (
     <div
-      className={`flex flex-col gap-1 ${animateGradient ? "rounded-md border-gradient" : ""} ${animateGradient && zap.amount >= HUGE_AMOUNT ? "border-animated-gradient" : ""}`}
+      className={cn(
+        `flex flex-col gap-1 ${animateGradient ? "rounded-md border-gradient" : ""} ${animateGradient && zap.amount >= HUGE_AMOUNT ? "border-animated-gradient" : ""}`,
+        className,
+      )}
     >
       <div className="flex flex-row gap-3 justify-between">
         {showAuthor ? (

@@ -773,5 +773,19 @@
     "blossom": {
       "title": "Media Servers"
     }
+  },
+  "relay": {
+    "new": {
+      "title": "New",
+      "description": "Create a new relay to host your content",
+      "service": "Service",
+      "select_service": "Select a service",
+      "name": "Name",
+      "name_placeholder": "Enter relay name",
+      "name_error": "Name cannot contain spaces",
+      "create": "Create Relay",
+      "order-success": "Order created successfully",
+      "error": "Failed to create relay"
+    }
   }
 }

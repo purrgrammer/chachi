@@ -63,6 +63,7 @@ import {
   isRelayURL,
   useRelayInfo,
 } from "@/lib/relay";
+//import { NewRelay } from "@/components/nostr/relay/new";
 import { useAccount, usePubkey } from "@/lib/account";
 import { useMyGroups } from "@/lib/groups";
 import { randomId } from "@/lib/id";
@@ -798,13 +799,16 @@ export function CreateGroup({
                     {t("group.create.community.form.relay.label")}
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      disabled={isLoading}
-                      placeholder={t(
-                        "group.create.community.form.relay.placeholder",
-                      )}
-                      {...field}
-                    />
+                    <div className="flex flex-row gap-1 items-center">
+                      <Input
+                        disabled={isLoading}
+                        placeholder={t(
+                          "group.create.community.form.relay.placeholder",
+                        )}
+                        {...field}
+                      />
+		      {/*<NewRelay onRelayCreated={field.onChange} />*/}
+                    </div>
                   </FormControl>
                   <FormDescription>
                     {t("group.create.community.form.relay.description")}

@@ -38,6 +38,7 @@ import {
   ContextMenuShortcut,
 } from "@/components/ui/context-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 interface ChatZapProps {
   event: NostrEvent;
@@ -181,9 +182,21 @@ export function ChatZap({
                       }
                     />
                   )}
-                  <div className="flex flex-col gap-1 relative p-1 px-2 bg-background/80 rounded-md">
+                  <div
+                    className={cn(
+                      "flex flex-col gap-1 relative p-1 px-2 bg-background/80 rounded-md",
+                      isMine
+                        ? "rounded-tl-md rounded-tr-md rounded-bl-md rounded-br-none"
+                        : "rounded-tl-md rounded-tr-md rounded-br-md rounded-bl-none",
+                    )}
+                  >
                     <Zap
                       zap={zap}
+                      className={
+                        isMine
+                          ? "rounded-tl-md rounded-tr-md rounded-bl-md rounded-br-none"
+                          : "rounded-tl-md rounded-tr-md rounded-br-md rounded-bl-none"
+                      }
                       group={group}
                       animateGradient
                       showAuthor={false}
