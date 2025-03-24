@@ -78,6 +78,61 @@
       "new": "New group",
       "title": "Create group",
       "description": "Create a new group to chat with your friends",
+      "type": {
+        "select": "What type of group do you want to create?",
+        "nip29": "Group",
+        "community": "Community",
+        "nip29_description": "Create a moderated group that starts with a clean slate. Hosted on NIP-29 compatible relays.",
+        "community_description": "Turn an existing pubkey into a community where all content from that pubkey is displayed. Can be hosted on any relay. Moderation is handled by the relay."
+      },
+      "community": {
+        "title": "Create Community",
+        "description": "Create a community based on a pubkey",
+        "coming_soon": "Community creation is coming soon!",
+        "explanation": "Communities are groups built around an existing pubkey, showing all their content. Unlike standard groups, communities don't start empty - they include all posts from the pubkey.",
+        "community_for": "Community for",
+        "form": {
+          "relay": {
+            "label": "Relay",
+            "placeholder": "wss://relay.example.com",
+            "description": "Main relay where this community will be hosted"
+          },
+          "backup_relays": {
+            "label": "Backup Relays",
+            "add": "Add",
+            "add_placeholder": "wss://backup.example.com",
+            "description": "Additional relays where content will be published",
+            "error_duplicate": "This relay is already in your backup list",
+            "error_duplicate_primary": "This relay is already set as your primary relay"
+          },
+          "use_blossom": {
+            "label": "Use Blossom Media Servers",
+            "description": "Enable integration with Blossom media servers for optimized media storage and delivery"
+          },
+          "primary_blossom": {
+            "label": "Blossom Server",
+            "placeholder": "https://blossom.example.com",
+            "description": "Blossom media server for this community"
+          },
+          "backup_blossom": {
+            "label": "Backup Blossom Servers",
+            "add": "Add",
+            "add_placeholder": "https://backup-blossom.example.com",
+            "description": "Additional Blossom media servers for redundancy",
+            "error_duplicate": "This server is already in your backup list",
+            "error_duplicate_primary": "This server is already set as your primary Blossom server"
+          },
+          "use_mint": {
+            "label": "Use Community Mint",
+            "description": "Enable a community-specific mint for rewards and transactions"
+          },
+          "mint": {
+            "label": "Community Mint",
+            "placeholder": "https://mint.example.com",
+            "description": "URL of the mint for this community"
+          }
+        }
+      },
       "form": {
         "name": {
           "label": "Name",
@@ -189,6 +244,7 @@
       }
     },
     "metadata": {
+      "community": "This is a profile based community",
       "visibility": {
         "private": {
           "trigger": "Members only",
@@ -226,7 +282,7 @@
       },
       "retry": {
         "action": "Retry",
-        "success": "Message sent",
+        "success": "Message sent successfully",
         "error": "Failed to send message"
       },
       "copy": {
@@ -259,7 +315,8 @@
         "action": "Delete"
       },
       "deleted": "Message deleted",
-      "save-as-last-seen": "Save as last seen"
+      "save-as-last-seen": "Save as last seen",
+      "sending": "sending..."
     },
     "new-messages": "New messages",
     "user": {
@@ -339,12 +396,14 @@
       "chat": "Chat",
       "post": "Post",
       "posts": "Posts",
+      "articles": "Articles",
       "poll": "Poll",
       "polls": "Polls",
       "video": "Video",
       "videos": "Videos",
       "image": "Image",
-      "images": "Images"
+      "images": "Images",
+      "community": "Community"
     }
   },
   "post": {
@@ -462,8 +521,17 @@
     "expired": "Goal expired",
     "leaderboard": "Πίνακας κατάταξης"
   },
+  "back": "Back",
   "wallet": {
     "title": "Incoming payment",
+    "ecash": {
+      "title": "Send ecash",
+      "description": "Create an ecash token and send it to whoever you want",
+      "message": "Message",
+      "message-placeholder": "Write an optional message",
+      "mint-error": "Error creating ecash token in {{ mint }}",
+      "copy": "Copy token"
+    },
     "keys": "Keys",
     "sync": "Συγχρονισμός",
     "sync-success": "Ecash synced",
@@ -691,5 +759,30 @@
     "comma": ",",
     "and": "and",
     "and-more": "and {{ more }} more"
+  },
+  "community": {
+    "relays": {
+      "title": "Relays"
+    },
+    "mint": {
+      "title": "Mint"
+    },
+    "blossom": {
+      "title": "Media Servers"
+    }
+  },
+  "relay": {
+    "new": {
+      "title": "New",
+      "description": "Create a new relay to host your content",
+      "service": "Service",
+      "select_service": "Select a service",
+      "name": "Name",
+      "name_placeholder": "Enter relay name",
+      "name_error": "Name cannot contain spaces",
+      "create": "Create Relay",
+      "order-success": "Order created successfully",
+      "error": "Failed to create relay"
+    }
   }
 }
