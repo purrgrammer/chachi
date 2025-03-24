@@ -540,7 +540,10 @@
       "message": "Message",
       "message-placeholder": "Write an optional message",
       "mint-error": "Error creating ecash token in {{ mint }}",
-      "copy": "Copy token"
+      "copy": "Copy token",
+      "redeem": "Redeem",
+      "redeem-error": "Failed to redeem ecash",
+      "redeem-success": "Ecash redeemed"
     },
     "keys": "Keys",
     "sync": "Sync",

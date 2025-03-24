@@ -107,6 +107,7 @@ import {
 } from "@/components/ui/select";
 import { EcashToken } from "@/components/cashu";
 import { cn, once } from "@/lib/utils";
+import { cashuRegex } from "@/lib/cashu";
 
 function Relay({
   url,
@@ -1004,12 +1005,6 @@ interface WalletActionsProps {
   canWithdraw?: boolean;
 }
 
-// todo: confirm step
-// target: pubkey, ln address, lnurl, invoice
-// - payment amount
-// - wallet
-// - confirm
-
 function WalletActions({
   wallet,
   onDeposit,
@@ -1023,6 +1018,7 @@ function WalletActions({
   const [pubkey, setPubkey] = useState("");
   const [lnAddress, setLnAddress] = useState("");
   const [lnurl, setLnurl] = useState("");
+  const [ecash, setEcash] = useState<string | null>(null);
   const [invoice, setInvoice] = useState("");
   const canPay = pubkey || lnAddress || lnurl || invoice;
 
@@ -1048,6 +1044,12 @@ function WalletActions({
           setLnurl(url);
         },
         onInvoice: setInvoice,
+        onEcash:
+          wallet instanceof NDKCashuWallet
+            ? (token) => {
+                setEcash(token);
+              }
+            : undefined,
       });
     } catch (err) {
       toast.error(t("qr.unknown"));
@@ -1117,6 +1119,8 @@ function WalletActions({
                 setIsWithdrawing={() => {}}
                 onOpenChange={onPayOpenChange}
               />
+            ) : ecash ? (
+              <ReceiveEcash token={ecash} onOpenChange={onPayOpenChange} />
             ) : null}
           </DialogContent>
         </Dialog>
@@ -1143,7 +1147,7 @@ interface AnalyzeTargetCallbacks {
   onLnAddress: (lnAddress: string) => void;
   onLnurl: (lnurl: string) => void;
   onInvoice: (invoice: string) => void;
-  //onEcash?: (ecash: Token) => void;
+  onEcash?: (ecash: string) => void;
   //onCashuRequest?: (request: CashuRequest) => void;
 }
 
@@ -1151,7 +1155,7 @@ async function _analyzeTarget(
   content: string,
   callbacks: AnalyzeTargetCallbacks,
 ) {
-  const { onPubkey, onLnAddress, onLnurl, onInvoice } = callbacks;
+  const { onPubkey, onLnAddress, onLnurl, onInvoice, onEcash } = callbacks;
   const isNostrProfile =
     content.startsWith("nostr:npub") ||
     content.startsWith("npub") ||
@@ -1160,7 +1164,7 @@ async function _analyzeTarget(
   const lnurl = isLnurl(content);
   const lnAddress = isLightningAddress(content);
   const invoice = isLnInvoice(content);
-  // todo: ecash
+  const isEcash = cashuRegex.test(content);
   // todo: cashu request
   if (isNostrProfile) {
     try {
@@ -1191,6 +1195,14 @@ async function _analyzeTarget(
       const decoded = decode(content);
       if (decoded) {
         onInvoice(content);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  } else if (isEcash && onEcash) {
+    try {
+      if (content) {
+        onEcash(content);
       }
     } catch (err) {
       console.error(err);
@@ -1610,6 +1622,49 @@ function SendToWallet({
         {isWithdrawing ? <RotateCw className="animate-spin" /> : <WalletIcon />}
         {t("wallet.withdraw.confirm")}
         {toWallet ? <WalletName wallet={toWallet} /> : null}
+      </Button>
+    </div>
+  );
+}
+
+interface ReceiveEcashProps {
+  token: string;
+  onOpenChange: (open: boolean) => void;
+}
+
+function ReceiveEcash({ token, onOpenChange }: ReceiveEcashProps) {
+  const { t } = useTranslation();
+  const cashuWallet = useCashuWallet();
+  const [ecash, setEcash] = useState<Token | null>(null);
+
+  useEffect(() => {
+    const decoded = getDecodedToken(token);
+    if (decoded) {
+      setEcash(decoded);
+    }
+  }, [token]);
+
+  async function redeemEcash() {
+    if (!cashuWallet || !ecash) {
+      return;
+    }
+    try {
+      const ev = await cashuWallet.receiveToken(token);
+      if (ev) {
+        toast.success(t("wallet.ecash.redeem-success"));
+      }
+      onOpenChange(false);
+    } catch (err) {
+      console.error(err);
+      toast.error(t("wallet.ecash.redeem-error"));
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      {token ? <EcashToken token={token} /> : null}
+      <Button disabled={!cashuWallet || !ecash} onClick={redeemEcash}>
+        {t("wallet.ecash.redeem")}
       </Button>
     </div>
   );

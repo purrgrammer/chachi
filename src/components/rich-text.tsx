@@ -18,6 +18,7 @@ import { isImageLink, isVideoLink, isAudioLink } from "@/lib/string";
 import type { Group } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { LazyCodeBlock } from "@/components/lazy-code-block";
+import { cashuRegex } from "@/lib/cashu";
 
 // todo: blossom link fallbacks
 
@@ -1104,8 +1105,6 @@ function extractHashtags(fragments: Fragment[]): Fragment[] {
     return { type: "hashtag", tag: tag.slice(1) } as Fragment;
   });
 }
-
-const cashuRegex = /(cashu[AB][A-Za-z0-9_-]{0,10000}={0,3})/g;
 
 //function extractEcash(fragments: Fragment[]): Fragment[] {
 //  return extract(fragments, cashuRegex, (token: string) => {
