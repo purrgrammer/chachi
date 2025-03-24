@@ -73,6 +73,7 @@ export interface Account {
 export interface Community {
   pubkey: string;
   relay: string;
+  backupRelays?: string[];
   blossom: string[];
   mint?: string;
 }

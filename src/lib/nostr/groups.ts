@@ -1,4 +1,5 @@
 import { useAtomValue } from "jotai";
+import { nip19 } from "nostr-tools";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import NDK, {
   NDKEvent,
@@ -122,6 +123,7 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
       .then(async (ev: NDKEvent | null) => {
         if (!ev) throw new Error("Can't find group metadata");
         const profile = await fetchProfile(ndk, group.id, []);
+        // todo: multiple relays in naddr
         return {
           id: group.id,
           pubkey: ev.pubkey,
@@ -130,8 +132,12 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
           about: profile?.about || "",
           picture: profile?.picture || "",
           isCommunity: true,
-          // @ts-expect-error: this is incorrectly typed
-          nlink: ev.encode([group.relay]),
+          nlink: nip19.naddrEncode({
+            kind: COMMUNIKEY,
+            pubkey: group.id,
+            relays: [group.relay],
+            identifier: "",
+          }),
         } as GroupMetadata;
       });
   } else {
@@ -157,8 +163,12 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
             ? "private"
             : "public",
           access: ev.tags.find((t) => t[0] === "closed") ? "closed" : "open",
-          // @ts-expect-error: this is incorrectly typed
-          nlink: ev.encode([group.relay]),
+          nlink: nip19.naddrEncode({
+            kind: NDKKind.GroupMetadata,
+            pubkey: ev.pubkey,
+            relays: [group.relay],
+            identifier: group.id,
+          }),
         } as GroupMetadata;
       });
   }

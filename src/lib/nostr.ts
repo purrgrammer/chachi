@@ -121,7 +121,11 @@ function fetchCachedAddress(
 ) {
   return ndk
     .fetchEvent(
-      { kinds: [kind], authors: [pubkey], "#d": [identifier] },
+      {
+        kinds: [kind],
+        authors: [pubkey],
+        ...(kind >= 30_0000 && kind <= 40_000 ? { "#d": [identifier] } : {}),
+      },
       {
         closeOnEose: true,
         cacheUsage: NDKSubscriptionCacheUsage.ONLY_CACHE,
@@ -165,10 +169,16 @@ export function useAddress({
       const relaySet = NDKRelaySet.fromRelayUrls(relayList, ndk);
       return ndk
         .fetchEvent(
-          { kinds: [kind], authors: [pubkey], "#d": [identifier] },
+          {
+            kinds: [kind],
+            authors: [pubkey],
+            ...(kind >= 30_0000 && kind <= 40_000
+              ? { "#d": [identifier] }
+              : {}),
+          },
           {
             closeOnEose: true,
-            cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST,
+            cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
           },
           relaySet,
         )

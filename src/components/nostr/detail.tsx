@@ -42,6 +42,7 @@ import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
 import { ArticleSummary, Article } from "@/components/nostr/article";
 import {
   GroupMetadata,
+  CommunityMetadata,
   GroupName,
   GroupPicture,
 } from "@/components/nostr/groups/metadata";
@@ -88,6 +89,7 @@ import {
   GIF_SET,
   BOOK,
   CASHU_MINT,
+  COMMUNIKEY,
 } from "@/lib/kinds";
 import {
   Dialog,
@@ -166,6 +168,11 @@ const eventDetails: Record<
     noHeader: true,
     preview: GroupMetadata,
     detail: GroupMetadata,
+  },
+  [COMMUNIKEY]: {
+    noHeader: true,
+    preview: CommunityMetadata,
+    detail: CommunityMetadata,
   },
   [NDKKind.Highlight]: {
     preview: Highlight,

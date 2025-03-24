@@ -1,7 +1,7 @@
 import Dexie, { Table } from "dexie";
 import NDKCacheAdapterDexie from "@nostr-dev-kit/ndk-cache-dexie";
 import { NDKCashuToken, NDKEvent } from "@nostr-dev-kit/ndk";
-import { Group, GroupMetadata } from "./types";
+import { Group, GroupMetadata, Community } from "./types";
 //import { Transaction } from "@/lib/wallet";
 
 // todo: tweak cache sizes
@@ -55,14 +55,6 @@ export interface GroupParticipants {
   relay: string;
   members: string[];
   admins: string[];
-}
-
-interface Community {
-  pubkey: string;
-  relay: string;
-  backupRelays?: string[];
-  blossom: string[];
-  mint?: string;
 }
 
 //interface TX extends Transaction {
