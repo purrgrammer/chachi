@@ -534,6 +534,14 @@
   "back": "Back",
   "wallet": {
     "title": "Incoming payment",
+    "ecash": {
+      "title": "Send ecash",
+      "description": "Create an ecash token and send it to whoever you want",
+      "message": "Message",
+      "message-placeholder": "Write an optional message",
+      "mint-error": "Error creating ecash token in {{ mint }}",
+      "copy": "Copy token"
+    },
     "keys": "Keys",
     "sync": "Sync",
     "sync-success": "Ecash synced",

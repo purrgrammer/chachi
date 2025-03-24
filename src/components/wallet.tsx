@@ -66,6 +66,7 @@ import {
 } from "@/lib/lnurl";
 import { useHost } from "@/lib/hooks";
 import {
+  mintEcash,
   useNDKWallet,
   useNDKWallets,
   useCashuWallet,
@@ -1624,28 +1625,31 @@ function SendEcash({
   setIsWithdrawing,
 }: SendEcashProps) {
   const { t } = useTranslation();
+  const [message, setMessage] = useState("");
   const [ecash, setEcash] = useState<Token | null>(null);
   const [token, setToken] = useState<string>("");
+  const [mint, setMint] = useState<string | undefined>(
+    wallet instanceof NDKCashuWallet ? wallet.mints[0] : undefined,
+  );
+  const balances = wallet.mintBalances;
+  const mintBalance = balances[mint ?? ""];
   const [amount, setAmount] = useState("21");
-  const isAmountValid = amount && Number(amount) > 0;
-
-  function mintEcash(w: NDKCashuWallet, amount: number) {
-    console.log("TODO", w, amount);
-    return null;
-  }
+  const isAmountValid =
+    amount && Number(amount) > 0 && Number(amount) <= mintBalance;
 
   async function onWithdrawCash() {
     try {
       setIsWithdrawing(true);
-      const ecash = await mintEcash(wallet, Number(amount));
-      if (ecash) {
-        setEcash(ecash);
-        const token = getEncodedToken(ecash);
-        setToken(token);
-      }
+      if (!mint) throw new Error("No mint selected");
+
+      const ecash = await mintEcash(wallet, mint, Number(amount), message);
+      if (!ecash) throw new Error("Failed to mint ecash");
+      const token = getEncodedToken(ecash);
+      setToken(token);
+      setEcash(ecash);
     } catch (err) {
       console.error(err);
-      toast.error(t("wallet.withdraw.error"));
+      toast.error(t("wallet.ecash.mint-error", { mint }));
     } finally {
       setIsWithdrawing(false);
     }
@@ -1656,13 +1660,48 @@ function SendEcash({
       {ecash && token ? (
         <EcashToken token={token} />
       ) : (
-        <>
+        <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <Label>{t("wallet.deposit.amount")}</Label>
-            <AmountInput amount={amount} setAmount={setAmount} />
+            <AmountInput
+              amount={amount}
+              max={mintBalance}
+              setAmount={setAmount}
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <Label>{t("wallet.ecash.message")}</Label>
+            <AutocompleteTextarea
+              message={message}
+              setMessage={setMessage}
+              placeholder={t("wallet.ecash.message-placeholder")}
+              minRows={3}
+              maxRows={6}
+              submitOnEnter={false}
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <Label>{t("wallet.deposit.mint")}</Label>
+            <Select value={mint} onValueChange={setMint}>
+              <SelectTrigger>
+                <SelectValue placeholder={t("wallet.deposit.mint")} />
+              </SelectTrigger>
+              <SelectContent>
+                {wallet.mints.map((m) => (
+                  <SelectItem key={m} value={m}>
+                    <div className="flex flex-row items-center gap-2 justify-between">
+                      <div className="flex flex-row items-center gap-4">
+                        <MintLink url={m} notClickable />
+                        <Balance amount={balances[m] ?? 0} unit="sat" />
+                      </div>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <Button
-            disabled={isWithdrawing || !isAmountValid}
+            disabled={isWithdrawing || !isAmountValid || !mint}
             onClick={onWithdrawCash}
             className="w-full flex-1"
             variant="outline"
@@ -1674,7 +1713,7 @@ function SendEcash({
             )}
             {t("wallet.withdraw.confirm-cash")}
           </Button>
-        </>
+        </div>
       )}
     </div>
   );
@@ -1698,10 +1737,6 @@ function Withdraw({
   const [invoice, setInvoice] = useState("");
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [lnurl, setLnurl] = useState<string | null>(null);
-  const [ndkWallets] = useNDKWallets();
-  const otherWallets = ndkWallets.filter(
-    (w) => walletId(w) !== walletId(wallet),
-  );
 
   function onClose(open?: boolean) {
     if (!open) {
@@ -1742,12 +1777,14 @@ function Withdraw({
         <DialogHeader>
           <DialogTitle>
             <div className="flex flex-row items-center gap-1">
-              {t("wallet.withdraw.title")}{" "}
+              {sendEcash ? t("wallet.ecash.title") : t("wallet.withdraw.title")}{" "}
               <ArrowUpRight className="text-muted-foreground" />
             </div>
           </DialogTitle>
           <DialogDescription>
-            {t("wallet.withdraw.description")}
+            {sendEcash
+              ? t("wallet.ecash.description")
+              : t("wallet.withdraw.description")}
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-2">
@@ -1812,7 +1849,7 @@ function Withdraw({
                   disableEmojiAutocomplete
                 />
               </div>
-              {otherWallets.length > 0 && !pubkey && !lnAddress && !invoice ? (
+              {!pubkey && !lnAddress && !invoice ? (
                 <>
                   <p className="mx-auto text-xs text-muted-foreground">
                     {t("user.login.or")}
@@ -1827,7 +1864,6 @@ function Withdraw({
                       <WalletIcon />
                       {t("wallet.withdraw.choose-wallet")}
                     </Button>
-                    {/*
                     {wallet instanceof NDKCashuWallet && (
                       <Button
                         disabled={isWithdrawing}
@@ -1839,7 +1875,6 @@ function Withdraw({
                         {t("wallet.withdraw.confirm-cash")}
                       </Button>
                     )}
-		    */}
                   </div>
                 </>
               ) : null}
@@ -1854,14 +1889,17 @@ function Withdraw({
 function AmountInput({
   amount,
   setAmount,
+  max,
 }: {
   amount: string;
   setAmount: (amount: string) => void;
+  max?: number;
 }) {
   return (
     <div className="flex flex-row gap-4 items-center mx-2">
       <Bitcoin className="size-14 text-muted-foreground" />
       <Input
+        max={max}
         type="number"
         className="w-full text-center font-mono text-6xl h-15"
         value={amount}

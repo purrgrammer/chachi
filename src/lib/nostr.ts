@@ -392,7 +392,7 @@ export function fetchProfile(ndk: NDK, pubkey: string, relays: string[]) {
         kinds: [NDKKind.Metadata],
         authors: [pubkey],
       },
-      { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
+      { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY },
       NDKRelaySet.fromRelayUrls(
         relays.length > 0 ? relays : profileRelays,
         ndk,

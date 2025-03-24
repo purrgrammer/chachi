@@ -414,9 +414,9 @@ export function useRichText(
     if (options.hashtags) {
       result = extractHashtags(result);
     }
-    if (options.ecash) {
-      result = extractEcash(result);
-    }
+    //if (options.ecash) {
+    //  result = extractEcash(result);
+    //}
 
     return result;
   }, [text, options, tags]);
@@ -499,9 +499,9 @@ export function RichText({
     if (opts.hashtags) {
       result = extractHashtags(result);
     }
-    if (opts.ecash) {
-      result = extractEcash(result);
-    }
+    //if (opts.ecash) {
+    //  result = extractEcash(result);
+    //}
 
     // flatten structure to avoid invalid DOM nesting
     return result.reduce((acc, f) => {
@@ -560,8 +560,9 @@ function toFragments(
   if (!text) return [];
 
   let processedText = text;
+
+  // Process emojis if enabled, converting :code: to emoji tags
   if (options?.emojis !== false && tags && tags.length > 0) {
-    // Create a regex that matches individual emojis, even when consecutive
     const emojiRegex = /:([^:\s]+):/g;
     processedText = processedText.replace(emojiRegex, (match, code) => {
       const image = tags.find((t) => t[0] === "emoji" && t[1] === code)?.[2];
@@ -572,7 +573,75 @@ function toFragments(
     });
   }
 
-  // If syntax highlighting is disabled, just return the text
+  // Simple function to handle emoji nodes
+  const processEmojiNodes = (text: string): InlineFragment[] => {
+    if (!text) return [];
+
+    const nodes: InlineFragment[] = [];
+    const emojiRegex = /<emoji data-name="(.*?)" data-image="(.*?)"><\/emoji>/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = emojiRegex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        nodes.push({
+          type: "text",
+          text: text.substring(lastIndex, match.index),
+        });
+      }
+
+      nodes.push({
+        type: "emoji",
+        name: match[1],
+        image: match[2],
+      });
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < text.length) {
+      nodes.push({
+        type: "text",
+        text: text.substring(lastIndex),
+      });
+    }
+
+    return nodes;
+  };
+
+  // First, look for cashu tokens if enabled
+  if (options?.ecash !== false) {
+    const cashuMatches = Array.from(processedText.matchAll(cashuRegex));
+    if (cashuMatches.length > 0) {
+      const fragments: InlineFragment[] = [];
+      let lastCashuIndex = 0;
+
+      for (const match of cashuMatches) {
+        if (match.index! > lastCashuIndex) {
+          // Process text before the cashu token, including any emojis
+          const textBefore = processedText.substring(lastCashuIndex, match.index);
+          fragments.push(...processEmojiNodes(textBefore));
+        }
+
+        fragments.push({
+          type: "ecash",
+          token: match[1],
+        });
+
+        lastCashuIndex = match.index! + match[0].length;
+      }
+
+      if (lastCashuIndex < processedText.length) {
+        // Process remaining text, including any emojis
+        const textAfter = processedText.substring(lastCashuIndex);
+        fragments.push(...processEmojiNodes(textAfter));
+      }
+
+      return [{ type: "block", nodes: fragments }];
+    }
+  }
+
+  // If syntax highlighting is disabled, just return the text with emojis processed
   if (!enableSyntax) {
     // If preserveNewlines is enabled, split by newlines
     if (preserveNewlines) {
@@ -580,35 +649,7 @@ function toFragments(
         .split(/\n/)
         .filter(Boolean)
         .map((line) => {
-          // Process emoji markers in text
-          const nodes: InlineFragment[] = [];
-          const emojiRegex =
-            /<emoji data-name="(.*?)" data-image="(.*?)"><\/emoji>/g;
-          let lastIndex = 0;
-          let match;
-
-          while ((match = emojiRegex.exec(line)) !== null) {
-            if (match.index > lastIndex) {
-              nodes.push({
-                type: "text",
-                text: line.substring(lastIndex, match.index),
-              });
-            }
-            nodes.push({
-              type: "emoji",
-              name: match[1],
-              image: match[2],
-            });
-            lastIndex = match.index + match[0].length;
-          }
-
-          if (lastIndex < line.length) {
-            nodes.push({
-              type: "text",
-              text: line.substring(lastIndex),
-            });
-          }
-
+          const nodes = processEmojiNodes(line);
           return {
             type: "block",
             nodes: nodes.length ? nodes : [{ type: "text", text: line }],
@@ -617,32 +658,7 @@ function toFragments(
     }
 
     // Process emoji markers in the single block
-    const nodes: InlineFragment[] = [];
-    const emojiRegex = /<emoji data-name="(.*?)" data-image="(.*?)"><\/emoji>/g;
-    let lastIndex = 0;
-    let match;
-
-    while ((match = emojiRegex.exec(processedText)) !== null) {
-      if (match.index > lastIndex) {
-        nodes.push({
-          type: "text",
-          text: processedText.substring(lastIndex, match.index),
-        });
-      }
-      nodes.push({
-        type: "emoji",
-        name: match[1],
-        image: match[2],
-      });
-      lastIndex = match.index + match[0].length;
-    }
-
-    if (lastIndex < processedText.length) {
-      nodes.push({
-        type: "text",
-        text: processedText.substring(lastIndex),
-      });
-    }
+    const nodes = processEmojiNodes(processedText);
 
     return [
       {
@@ -656,6 +672,42 @@ function toFragments(
   if (!enableCodeBlock) {
     // Process the text for formatting
     let syntaxProcessedText = processedText;
+
+    // First process cashu tokens
+    if (options?.ecash !== false) {
+      const cashuMatches = Array.from(syntaxProcessedText.matchAll(cashuRegex));
+      const fragments: InlineFragment[] = [];
+      let lastIndex = 0;
+
+      for (const match of cashuMatches) {
+        if (match.index! > lastIndex) {
+          // Use the processEmojiNodes helper to handle text before cashu token
+          fragments.push(
+            ...processEmojiNodes(
+              syntaxProcessedText.substring(lastIndex, match.index),
+            ),
+          );
+        }
+
+        fragments.push({
+          type: "ecash",
+          token: match[1],
+        });
+
+        lastIndex = match.index! + match[0].length;
+      }
+
+      if (lastIndex < syntaxProcessedText.length) {
+        // Use the processEmojiNodes helper to handle remaining text
+        fragments.push(
+          ...processEmojiNodes(syntaxProcessedText.substring(lastIndex)),
+        );
+      }
+
+      if (fragments.length > 0) {
+        return [{ type: "block", nodes: fragments }];
+      }
+    }
 
     // Apply bold formatting if enabled
     if (options?.bold !== false) {
@@ -699,9 +751,12 @@ function toFragments(
     while ((matchResult = formattingRegex.exec(processedContent)) !== null) {
       // Add text before the match
       if (matchResult.index > lastIndex) {
+        // Process any text before this formatting
+        const textBefore = processedContent.substring(lastIndex, matchResult.index);
+        // Since we're already handling emojis in the regex, we don't need to process them again
         nodes.push({
           type: "text",
-          text: processedContent.substring(lastIndex, matchResult.index),
+          text: textBefore,
         });
       }
 
@@ -715,7 +770,7 @@ function toFragments(
           image: matchResult[3],
         });
       } else {
-        const content = matchResult[4] || matchResult[2] || ""; // Content is in different group for emoji vs. text formatting
+        const content = matchResult[4] || ""; // Content is in group 4 for text formatting
         if (tagType === "bold") {
           nodes.push({ type: "bold", text: content });
         } else if (tagType === "italic") {
@@ -1044,13 +1099,13 @@ function extractHashtags(fragments: Fragment[]): Fragment[] {
   });
 }
 
-const cashuRegex = /(cashu[AB][A-Za-z0-9_-]{0,10000}={0,3})/gi;
+const cashuRegex = /(cashu[AB][A-Za-z0-9_-]{0,10000}={0,3})/g;
 
-function extractEcash(fragments: Fragment[]): Fragment[] {
-  return extract(fragments, cashuRegex, (token: string) => {
-    return { type: "ecash", token } as Fragment;
-  });
-}
+//function extractEcash(fragments: Fragment[]): Fragment[] {
+//  return extract(fragments, cashuRegex, (token: string) => {
+//    return { type: "ecash", token } as Fragment;
+//  });
+//}
 
 // Regex for code blocks - improved to handle GitHub-style language specifiers
 const codeBlockRegex = /```((?:[a-zA-Z0-9\-+]+)\n|)([\s\S]*?)```/g;
