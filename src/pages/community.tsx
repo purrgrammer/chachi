@@ -13,7 +13,6 @@ import {
 import { groupId } from "@/lib/groups";
 import { GroupChat } from "@/components/nostr/groups/chat";
 import { GroupPosts } from "@/components/nostr/posts/feed";
-import { GroupArticles } from "@/components/nostr/articles";
 import { GroupVideos } from "@/components/nostr/videos";
 import { GroupImages } from "@/components/nostr/images";
 import { GroupPolls } from "@/components/nostr/polls";
@@ -28,7 +27,7 @@ import {
 } from "@/components/ui/tooltip";
 import { BookmarkGroup } from "@/components/nostr/groups/bookmark";
 
-type GroupTab = "chat" | "posts" | "articles" | "videos" | "images" | "polls";
+type GroupTab = "chat" | "posts" | "videos" | "images" | "polls";
 
 function CommunityHeader({
   pubkey,
@@ -94,9 +93,6 @@ function CommunityContent({ pubkey, tab }: { pubkey: string; tab: GroupTab }) {
           <TabsList>
             <TabsTrigger value="chat">{t("content.type.chat")}</TabsTrigger>
             <TabsTrigger value="posts">{t("content.type.posts")}</TabsTrigger>
-            <TabsTrigger value="articles">
-              {t("content.type.articles")}
-            </TabsTrigger>
             <TabsTrigger value="videos">{t("content.type.videos")}</TabsTrigger>
             <TabsTrigger value="images">{t("content.type.images")}</TabsTrigger>
             <TabsTrigger value="polls">{t("content.type.polls")}</TabsTrigger>
@@ -106,9 +102,6 @@ function CommunityContent({ pubkey, tab }: { pubkey: string; tab: GroupTab }) {
           </TabsContent>
           <TabsContent asChild value="posts">
             <GroupPosts key={groupId(group)} group={group} />
-          </TabsContent>
-          <TabsContent asChild value="articles">
-            <GroupArticles key={groupId(group)} group={group} />
           </TabsContent>
           <TabsContent asChild value="videos">
             <GroupVideos key={groupId(group)} group={group} />
