@@ -144,12 +144,12 @@ function CommunityInfo({ group }: { group: Group }) {
             </h3>
           </div>
           <div className="flex flex-col gap-0">
-          <div className="flex flex-wrap gap-2">
-            <RelayLink
-              relay={community.relay}
-              classNames={{ icon: "size-4", name: "text-sm" }}
-            />
-              </div>
+            <div className="flex flex-wrap gap-2">
+              <RelayLink
+                relay={community.relay}
+                classNames={{ icon: "size-4", name: "text-sm" }}
+              />
+            </div>
             {community.backupRelays?.map((relay) => (
               <RelayLink
                 key={relay}
@@ -246,8 +246,11 @@ function GroupInfoContent({ group }: { group: Group }) {
             </Button>
           )}
 	  */}
-      {metadata?.isCommunity ? <CommunityInfo group={group} /> : null}
-      <GroupMembers group={group} />
+      {metadata?.isCommunity ? (
+        <CommunityInfo group={group} />
+      ) : (
+        <GroupMembers group={group} />
+      )}
     </div>
   );
 }
