@@ -43,7 +43,7 @@ function RelayItem({ group }: { group: Group }) {
           className={`size-10 rounded-full ${isActive ? "group-has-[[data-collapsible=icon]]/sidebar-wrapper:ring-2 ring-primary ring-offset-1 ring-offset-background" : ""} relative`}
         >
           <Avatar className="rounded-full size-10 shrink-0">
-            <AvatarImage src={relayInfo?.picture} className="object-cover" />
+            <AvatarImage src={relayInfo?.icon} className="object-cover" />
             <AvatarFallback>
               <img src={relayInfo?.icon} alt={relayInfo?.name} />
             </AvatarFallback>
@@ -117,7 +117,11 @@ function GroupItem({ group }: { group: Group }) {
   const isActive = host === getRelayHost(group.relay) && id === group.id;
 
   function openGroup() {
-    navigate(`/${getRelayHost(group.relay)}/${group.id}`);
+    if (metadata?.isCommunity) {
+      navigate(`/c/${group.id}`);
+    } else {
+      navigate(`/${getRelayHost(group.relay)}/${group.id}`);
+    }
   }
 
   return (

@@ -7,17 +7,31 @@ import Feed from "@/components/nostr/feed";
 import { NewPost } from "@/components/new-post";
 import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
+import { useGroup } from "@/lib/nostr/groups";
 
 export const GroupPosts = forwardRef(
   (
     { group, className }: { group: Group; className?: string },
     ref: ForwardedRef<HTMLDivElement | null>,
   ) => {
-    const filter = {
-      kinds: [NDKKind.GroupNote],
-      "#h": [group.id],
-      limit: 100,
-    };
+    const { data: metadata } = useGroup(group);
+    const includeOpPublications = metadata?.isCommunity;
+    const filter = [
+      {
+        kinds: [NDKKind.GroupNote],
+        "#h": [group.id],
+        limit: 50,
+      },
+      ...(includeOpPublications
+        ? [
+            {
+              kinds: [NDKKind.GroupNote],
+              authors: [group.id],
+              limit: 50,
+            },
+          ]
+        : []),
+    ];
     const { t } = useTranslation();
     return (
       <Feed

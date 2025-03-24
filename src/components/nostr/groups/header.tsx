@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BookLock, BookOpen, Shield, ShieldOff } from "lucide-react";
+import { BookLock, BookOpen, Castle, Shield, ShieldOff } from "lucide-react";
 import { useGroup, useGroupParticipants } from "@/lib/nostr/groups";
 import { GroupInfo } from "@/components/nostr/groups/info";
 import { BookmarkGroup } from "@/components/nostr/groups/bookmark";
@@ -59,6 +59,16 @@ export function GroupHeader({ group }: { group: Group }) {
           {isRelayGroup ? null : (
             <div className="flex flex-row gap-2 items-center">
               <div className="flex flex-row gap-1 items-center">
+                {metadata?.isCommunity ? (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Castle className="size-3 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {t("group.metadata.community")}
+                    </TooltipContent>
+                  </Tooltip>
+                ) : null}
                 {metadata?.visibility === "private" ? (
                   <Tooltip>
                     <TooltipTrigger>
@@ -73,7 +83,7 @@ export function GroupHeader({ group }: { group: Group }) {
                       {t("group.metadata.visibility.private.content")}
                     </TooltipContent>
                   </Tooltip>
-                ) : (
+                ) : metadata?.visibility === "public" ? (
                   <Tooltip>
                     <TooltipTrigger>
                       <div className="flex gap-1.5 items-center">
@@ -87,7 +97,7 @@ export function GroupHeader({ group }: { group: Group }) {
                       {t("group.metadata.visibility.public.content")}
                     </TooltipContent>
                   </Tooltip>
-                )}
+                ) : null}
               </div>
               <div className="flex flex-row gap-1 items-center">
                 {metadata?.access === "closed" ? (
@@ -104,7 +114,7 @@ export function GroupHeader({ group }: { group: Group }) {
                       {t("group.metadata.access.closed.content")}
                     </TooltipContent>
                   </Tooltip>
-                ) : (
+                ) : metadata?.access === "open" ? (
                   <Tooltip>
                     <TooltipTrigger>
                       <div className="flex gap-1.5 items-center">
@@ -118,7 +128,7 @@ export function GroupHeader({ group }: { group: Group }) {
                       {t("group.metadata.access.open.content")}
                     </TooltipContent>
                   </Tooltip>
-                )}
+                ) : null}
               </div>
             </div>
           )}

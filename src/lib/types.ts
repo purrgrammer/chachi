@@ -12,6 +12,7 @@ export interface GroupMetadata extends Group {
   picture?: string;
   visibility?: "public" | "private";
   access?: "open" | "closed";
+  isCommunity?: boolean;
   nlink?: string;
 }
 
@@ -67,4 +68,11 @@ export interface Account {
   bunker?: string;
   secret?: string;
   relays?: string[];
+}
+
+export interface Community {
+  pubkey: string;
+  relay: string;
+  blossom: string[];
+  mint?: string;
 }

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/drawer";
 import { DiamondPlus } from "lucide-react";
 import { NewPoll } from "@/components/nostr/new-poll";
-//import { CreateGroup } from "@/components/nostr/groups/create";
+import { CreateGroup } from "@/components/nostr/groups/create";
 import { NewPost } from "@/components/new-post";
 import { NewVideo } from "@/components/nostr/video";
 import { NewImage } from "@/components/nostr/image";
@@ -50,11 +50,11 @@ export function New({ group }: { group: Group }) {
     { icon: "🗳️", title: t("content.type.poll"), component: NewPoll },
     { icon: "📷", title: t("content.type.image"), component: NewImage },
     { icon: "🎥", title: t("content.type.video"), component: NewVideo },
-    //{
-    //  icon: "🏰",
-    //  title: "Community",
-    //  component: supportsNip29 ? CreateGroup : null,
-    //},
+    {
+      icon: "🏰",
+      title: t("content.type.community"),
+      component: CreateGroup,
+    },
     //{
     //  icon: "🛡️",
     //  title: "Private group",

@@ -76,10 +76,8 @@ export function useEvent({
     queryKey: [EVENT, id ? id : "empty"],
     queryFn: async () => {
       if (!id) throw new Error("No id");
-      console.log("USEEVENT.1", { id, pubkey });
 
       const cached = await fetchCachedEvent(ndk, id);
-      console.log("USEEVENT.2", { id, pubkey, cached });
       if (cached) {
         return cached;
       }
@@ -95,7 +93,6 @@ export function useEvent({
         ? NDKRelaySet.fromRelayUrls(relayList, ndk)
         : undefined;
 
-      console.log("USEEVENT", { id, pubkey, relayList });
       return ndk
         .fetchEvent(
           { ids: [id], ...(pubkey ? { authors: [pubkey] } : {}) },
@@ -438,7 +435,7 @@ export async function fetchRelayList(ndk: NDK, pubkey: string) {
         kinds: [NDKKind.RelayList],
         authors: [pubkey],
       },
-      { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.PARALLEL },
+      { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY },
       NDKRelaySet.fromRelayUrls(discoveryRelays, ndk),
     )
     .then((ev) => {

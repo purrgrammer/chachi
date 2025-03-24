@@ -191,6 +191,10 @@ function useUserEvents() {
     if (pubkey && relays.length > 0) {
       const filters = [
         {
+          kinds: [NDKKind.Metadata],
+          authors: [pubkey],
+        },
+        {
           kinds: [NDKKind.SimpleGroupList],
           authors: [pubkey],
           since: groupList.created_at,

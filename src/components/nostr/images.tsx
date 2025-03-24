@@ -7,17 +7,29 @@ import { NewImage } from "@/components/nostr/image";
 import Feed from "@/components/nostr/feed";
 import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
-
+import { useGroup } from "@/lib/nostr/groups";
 export const GroupImages = forwardRef(
   (
     { group, className }: { group: Group; className?: string },
     ref: ForwardedRef<HTMLDivElement | null>,
   ) => {
-    const filter = {
-      kinds: [NDKKind.Image],
-      "#h": [group.id],
-      limit: 30,
-    };
+    const { data: metadata } = useGroup(group);
+    const includeOpPublications = metadata?.isCommunity;
+    const filter = [
+      {
+        kinds: [NDKKind.Image],
+        "#h": [group.id],
+        limit: 30,
+      },
+      ...(includeOpPublications
+        ? [
+            {
+              kinds: [NDKKind.Image],
+              authors: [group.id],
+            },
+          ]
+        : []),
+    ];
     const { t } = useTranslation();
     return (
       <Feed

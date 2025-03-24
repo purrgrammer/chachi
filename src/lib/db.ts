@@ -47,6 +47,7 @@ export interface GroupInfo {
   nlink?: string;
   visibility?: "public" | "private";
   access?: "open" | "closed";
+  isCommunity?: boolean;
 }
 
 export interface GroupParticipants {
@@ -54,6 +55,14 @@ export interface GroupParticipants {
   relay: string;
   members: string[];
   admins: string[];
+}
+
+interface Community {
+  pubkey: string;
+  relay: string;
+  backupRelays?: string[];
+  blossom: string[];
+  mint?: string;
 }
 
 //interface TX extends Transaction {
@@ -83,15 +92,17 @@ class ChachiDatabase extends Dexie {
   groupInfo!: Table<GroupInfo>;
   //transactions!: Table<Transaction>;
   nutzaps!: Table<Nutzap>;
+  community!: Table<Community>;
 
   constructor(name: string) {
     super(name);
-    this.version(5).stores({
+    this.version(6).stores({
       events: "&id,created_at,group,[group+kind]",
       lastSeen: "[group+kind]",
       nutzaps: "&id,status,txId",
       tokenEvents: "&id,created_at",
       groupInfo: "[id+relay]",
+      community: "&pubkey",
     });
   }
 }
@@ -125,6 +136,7 @@ export function saveGroupInfo(group: Group, metadata: GroupMetadata) {
     nlink: metadata.nlink,
     visibility: metadata.visibility,
     access: metadata.access,
+    isCommunity: metadata.isCommunity,
   });
 }
 
@@ -154,4 +166,12 @@ export async function getUnpublishedEvent(
 ): Promise<NDKEvent | null> {
   const unpublishedEvents = await cache.getUnpublishedEvents();
   return unpublishedEvents.find((e) => e.event.id === eventId)?.event ?? null;
+}
+
+export function getCommunity(pubkey: string) {
+  return db.community.get(pubkey);
+}
+
+export function saveCommunity(community: Community) {
+  db.community.put(community);
 }

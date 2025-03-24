@@ -9,12 +9,24 @@ import NDK, {
 import { NostrEvent } from "nostr-tools";
 import { followsAtom } from "@/app/store";
 import { useNDK } from "@/lib/ndk";
-import { useRelays, useRelayList, useRelaySet, useStream } from "@/lib/nostr";
+import {
+  useRelays,
+  useRelayList,
+  useRelaySet,
+  useStream,
+  fetchProfile,
+  fetchRelayList,
+} from "@/lib/nostr";
 import { nip29Relays, isRelayURL } from "@/lib/relay";
 import { useAccount } from "@/lib/account";
 import { useRelayInfo, fetchRelayInfo } from "@/lib/relay";
-import { LEAVE_REQUEST } from "@/lib/kinds";
-import type { Group, GroupMembers, GroupMetadata } from "@/lib/types";
+import { LEAVE_REQUEST, COMMUNIKEY } from "@/lib/kinds";
+import type {
+  Group,
+  GroupMembers,
+  GroupMetadata,
+  Community,
+} from "@/lib/types";
 import {
   queryClient,
   GROUPS,
@@ -24,7 +36,12 @@ import {
   GROUP_MEMBERS,
   GROUP_ADMINS,
 } from "@/lib/query";
-import { getGroupInfo, saveGroupInfo } from "../db";
+import {
+  getGroupInfo,
+  saveGroupInfo,
+  getCommunity,
+  saveCommunity,
+} from "@/lib/db";
 
 export function useUserGroups(pubkey: string) {
   const ndk = useNDK();
@@ -90,31 +107,61 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
       } as GroupMetadata;
       return metadata;
     });
+  } else if (group.id.length === 64) {
+    // todo: check if group.id is a valid pubkey
+    // todo: fetch community metadata
+    // todo: return community metadata
+    return ndk
+      .fetchEvent(
+        { kinds: [COMMUNIKEY], authors: [group.id] },
+        {
+          closeOnEose: true,
+          cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
+        },
+      )
+      .then(async (ev: NDKEvent | null) => {
+        if (!ev) throw new Error("Can't find group metadata");
+        const profile = await fetchProfile(ndk, group.id, []);
+        return {
+          id: group.id,
+          pubkey: ev.pubkey,
+          relay: group.relay,
+          name: profile?.name || group.id,
+          about: profile?.about || "",
+          picture: profile?.picture || "",
+          isCommunity: true,
+          // @ts-expect-error: this is incorrectly typed
+          nlink: ev.encode([group.relay]),
+        } as GroupMetadata;
+      });
+  } else {
+    return ndk
+      .fetchEvent(
+        { kinds: [NDKKind.GroupMetadata], "#d": [group.id] },
+        {
+          closeOnEose: true,
+          cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST,
+        },
+        NDKRelaySet.fromRelayUrls([group.relay], ndk),
+      )
+      .then((ev: NDKEvent | null) => {
+        if (!ev) throw new Error("Can't find group metadata");
+        return {
+          id: group.id,
+          pubkey: ev.pubkey,
+          relay: group.relay,
+          name: ev.tagValue("name") || "",
+          about: ev.tagValue("about"),
+          picture: ev.tagValue("picture"),
+          visibility: ev.tags.find((t) => t[0] === "private")
+            ? "private"
+            : "public",
+          access: ev.tags.find((t) => t[0] === "closed") ? "closed" : "open",
+          // @ts-expect-error: this is incorrectly typed
+          nlink: ev.encode([group.relay]),
+        } as GroupMetadata;
+      });
   }
-  return ndk
-    .fetchEvent(
-      { kinds: [NDKKind.GroupMetadata], "#d": [group.id] },
-      { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
-      NDKRelaySet.fromRelayUrls([group.relay], ndk),
-    )
-    .then((ev: NDKEvent | null) => {
-      if (!ev) throw new Error("Can't find group metadata");
-      const metadata = {
-        id: group.id,
-        pubkey: ev.pubkey,
-        relay: group.relay,
-        name: ev.tagValue("name") || "",
-        about: ev.tagValue("about"),
-        picture: ev.tagValue("picture"),
-        visibility: ev.tags.find((t) => t[0] === "private")
-          ? "private"
-          : "public",
-        access: ev.tags.find((t) => t[0] === "closed") ? "closed" : "open",
-        // @ts-expect-error: this is incorrectly typed
-        nlink: ev.encode([group.relay]),
-      } as GroupMetadata;
-      return metadata;
-    });
 }
 
 async function fetchGroups(ndk: NDK, relay: string) {
@@ -278,11 +325,17 @@ export function useGroupAdmins(group: Group) {
 }
 
 export function useGroupParticipants(group: Group) {
+  const { data: metadata } = useGroup(group);
   const { data: members, isSuccess: membersFetched } = useGroupMembers(group);
   const { data: admins, isSuccess: adminsFetched } = useGroupAdmins(group);
   return {
     isSuccess: membersFetched && adminsFetched,
-    admins: admins?.pubkeys || [],
+    admins:
+      metadata?.isCommunity && metadata.pubkey
+        ? [metadata.pubkey]
+        : admins?.pubkeys
+          ? admins.pubkeys
+          : [],
     members: members || [],
     roles: admins?.roles || {},
   };
@@ -505,4 +558,44 @@ export function useGroupDescription(group: Group) {
   const { data: relayInfo } = useRelayInfo(relay);
   const isRelayGroup = id === "_";
   return isRelayGroup ? relayInfo?.description : metadata?.about;
+}
+
+export function useCommunity(pubkey: string) {
+  const ndk = useNDK();
+  return useQuery({
+    queryKey: ["COMMUNITY", pubkey],
+    queryFn: async () => {
+      const cached = await getCommunity(pubkey);
+      if (cached) {
+        return cached;
+      }
+      const relays = await fetchRelayList(ndk, pubkey);
+      const info = await ndk.fetchEvent(
+        {
+          kinds: [COMMUNIKEY],
+          authors: [pubkey],
+        },
+        {
+          closeOnEose: true,
+          cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+        },
+        NDKRelaySet.fromRelayUrls(relays, ndk),
+      );
+      if (!info) throw new Error("Can't find community metadata");
+      const communityRelays = info.tags
+        .filter((t) => t[0] === "r")
+        .map((t) => t[1]);
+      const [firstRelay, ...backupRelays] = communityRelays;
+      if (!firstRelay) throw new Error("Invalid community metadata");
+      const c = {
+        pubkey,
+        relay: firstRelay!,
+        backupRelays,
+        blossom: info.tags.filter((t) => t[0] === "blossom").map((t) => t[1]),
+        mint: info.tags.find((t) => t[0] === "mint")?.[1],
+      } as Community;
+      saveCommunity(c);
+      return c;
+    },
+  });
 }

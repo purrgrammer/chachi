@@ -17,7 +17,6 @@ import { youtubeUrlRegex, YoutubeEmbed } from "@/components/youtube";
 import { isImageLink, isVideoLink, isAudioLink } from "@/lib/string";
 import type { Group } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { CUSTOM_EMOJI_REGEX } from "@/lib/emoji";
 import { LazyCodeBlock } from "@/components/lazy-code-block";
 
 // todo: blossom link fallbacks
@@ -476,7 +475,7 @@ export function RichText({
   classNames?: RichTextClassnames;
   group?: Group;
 }) {
-  const opts = { ...defaultOptions, ...options };
+  const opts = useMemo(() => ({ ...defaultOptions, ...options }), [options]);
   const fragments = useMemo(() => {
     // Process text with all formatting in one go
     let result = toFragments(
@@ -560,11 +559,11 @@ function toFragments(
 ): Fragment[] {
   if (!text) return [];
 
-  // Process custom emojis first if enabled
   let processedText = text;
   if (options?.emojis !== false && tags && tags.length > 0) {
-    processedText = processedText.replace(CUSTOM_EMOJI_REGEX, (match) => {
-      const code = match.slice(1, -1);
+    // Create a regex that matches individual emojis, even when consecutive
+    const emojiRegex = /:([^:\s]+):/g;
+    processedText = processedText.replace(emojiRegex, (match, code) => {
       const image = tags.find((t) => t[0] === "emoji" && t[1] === code)?.[2];
       if (image) {
         return `<emoji data-name="${code}" data-image="${image}"></emoji>`;
