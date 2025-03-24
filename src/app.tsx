@@ -82,10 +82,10 @@ const router = createBrowserRouter([
         path: "/c/:pubkey/posts",
         element: <Community tab="posts" />,
       },
-      {
-        path: "/c/:pubkey/articles",
-        element: <Community tab="articles" />,
-      },
+      //{
+      //  path: "/c/:pubkey/articles",
+      //  element: <Community tab="articles" />,
+      //},
       {
         path: "/c/:pubkey/videos",
         element: <Community tab="videos" />,
