@@ -79,21 +79,21 @@
       "title": "إنشاء مجموعة",
       "description": "أنشئ مجموعة جديدة للدردشة مع أصدقائك",
       "type": {
-        "select": "What type of group do you want to create?",
-        "nip29": "Group",
-        "community": "Community",
-        "nip29_description": "Create a moderated group that starts with a clean slate. Hosted on NIP-29 compatible relays.",
-        "community_description": "Turn an existing pubkey into a community where all content from that pubkey is displayed. Can be hosted on any relay. Moderation is handled by the relay."
+        "select": "ما نوع المجموعة التي تريد إنشاءها؟",
+        "nip29": "مجموعة",
+        "community": "مجتمع",
+        "nip29_description": "أنشئ مجموعة مُدارة تبدأ من الصفر. مُستضافة على مُرحِّلات متوافقة مع معيار NIP-29.",
+        "community_description": "حوّل مفتاحًا عامًا موجودًا إلى مجتمع يُعرض فيه جميع محتوياته. يُمكن استضافته على أي مُرحِّل. يتولى المُرحِّل إدارةَ هذا المُرحِّل."
       },
       "community": {
-        "title": "Create Community",
-        "description": "Create a community based on a pubkey",
-        "coming_soon": "Community creation is coming soon!",
-        "explanation": "Communities are groups built around an existing pubkey, showing all their content. Unlike standard groups, communities don't start empty - they include all posts from the pubkey.",
-        "community_for": "Community for",
+        "title": "إنشاء مجتمع",
+        "description": "إنشاء مجتمع يعتمد على مفتاح عام",
+        "coming_soon": "إنشاء المجتمع قريبًا!",
+        "explanation": "المجتمعات هي مجموعات مُنشأة حول مفتاح عام موجود مسبقًا، حيث تعرض كل محتواها. على عكس المجموعات القياسية، لا تبدأ المجتمعات فارغة — فهي تتضمن جميع المنشورات المرتبطة بالمفتاح العام من البداية.",
+        "community_for": "مجتمع من أجل",
         "form": {
           "relay": {
-            "label": "Relay",
+            "label": "مُرحِّل",
             "placeholder": "wss://relay.example.com",
             "description": "Main relay where this community will be hosted"
           },
