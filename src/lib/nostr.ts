@@ -110,6 +110,7 @@ export function useEvent({
         });
     },
     staleTime: Infinity,
+    gcTime: 0,
   });
 }
 
@@ -190,6 +191,7 @@ export function useAddress({
         });
     },
     staleTime: Infinity,
+    gcTime: 0,
   });
 }
 
