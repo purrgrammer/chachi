@@ -477,6 +477,7 @@ export function useNWCInfo(wallet: NDKNWCWallet) {
       return wallet.getInfo();
     },
     staleTime: Infinity,
+    gcTime: 0,
   });
 }
 
@@ -488,6 +489,7 @@ export function useWebLNInfo(wallet: NDKWebLNWallet) {
       return wallet.provider?.getInfo();
     },
     staleTime: Infinity,
+    gcTime: 0,
   });
 }
 

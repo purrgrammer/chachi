@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useQuery } from "@tanstack/react-query";
-import { NDKEvent, NDKKind, NDKRelaySet } from "@nostr-dev-kit/ndk";
+import { NDKEvent, NDKKind, NDKRelaySet, NDKSubscriptionCacheUsage } from "@nostr-dev-kit/ndk";
 import { useNDK } from "@/lib/ndk";
 import { CashuMint, MintKeys, GetInfoResponse } from "@cashu/cashu-ts";
 import { useRelays, useRelayList, useRequest } from "@/lib/nostr";
@@ -16,7 +16,8 @@ export function useMintInfo(url: string) {
   return useQuery({
     queryKey: [MINT_INFO, url],
     queryFn: () => CashuMint.getInfo(url),
-    staleTime: 1000 * 60 * 60 * 24 * 7,
+    staleTime: Infinity,
+    gcTime: 0,
   });
 }
 
@@ -25,7 +26,8 @@ export async function fetchMintInfo(url: string): Promise<GetInfoResponse> {
   return queryClient.fetchQuery({
     queryKey: [MINT_INFO, url],
     queryFn: () => CashuMint.getInfo(url),
-    staleTime: 1000 * 60 * 60 * 24 * 7,
+    staleTime: Infinity,
+    gcTime: 0,
   });
 }
 
@@ -36,7 +38,8 @@ export function useMintKeys(url: string) {
       const keys = await CashuMint.getKeys(url);
       return keys.keysets;
     },
-    staleTime: 1000 * 60 * 60 * 24 * 7,
+    staleTime: Infinity,
+    gcTime: 0,
   });
 }
 
@@ -48,7 +51,8 @@ export function fetchMintKeys(url: string): Promise<Array<MintKeys>> {
       const keys = await CashuMint.getKeys(url);
       return keys.keysets;
     },
-    staleTime: 1000 * 60 * 60 * 24 * 7,
+    staleTime: Infinity,
+    gcTime: 0,
   });
 }
 
@@ -67,6 +71,7 @@ export function useMintList(pubkey: string) {
           },
           {
             closeOnEose: true,
+            cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
           },
           NDKRelaySet.fromRelayUrls(relayList || [], ndk),
         )

@@ -15,6 +15,7 @@ export function useIsUnpublished(eventId: string) {
     queryKey: [UNPUBLISHED, eventId],
     queryFn: async () => isEventUnpublished(eventId),
     staleTime: Infinity,
+    gcTime: 0,
   });
 
   return isUnpublished;
@@ -62,7 +63,6 @@ export function useAddUnpublishedEvent() {
   const queryClient = useQueryClient();
   return useCallback(
     async ({ event, relays }: { event: NDKEvent; relays: string[] }) => {
-      console.log("UNPUB", { event: event.rawEvent(), relays });
       try {
         await cache.addUnpublishedEvent(event, relays);
         queryClient.invalidateQueries({ queryKey: [UNPUBLISHED, event.id] });

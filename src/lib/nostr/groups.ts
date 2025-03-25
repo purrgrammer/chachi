@@ -77,7 +77,7 @@ export function useUserGroups(pubkey: string) {
       );
     },
     staleTime: Infinity,
-    gcTime: 1 * 60 * 1000,
+    gcTime: 0,
   });
 }
 
@@ -213,6 +213,7 @@ export function useGroup(group?: Group) {
       return metadata;
     },
     staleTime: Infinity,
+    gcTime: 0,
   });
 }
 
@@ -230,6 +231,7 @@ export function useGroups(groups: Group[]) {
         return metadata;
       },
       staleTime: Infinity,
+      gcTime: 0,
     })),
   });
 }
@@ -241,6 +243,7 @@ export function useAllGroups(relays: string[]) {
       queryKey: [GROUPS, relay],
       queryFn: () => fetchGroups(ndk, relay),
       staleTime: Infinity,
+      gcTime: 0,
     })),
   });
 }
@@ -389,7 +392,7 @@ export function useCloseGroups() {
       return closeGroups.filter((g: GroupMembers) => g.members.length > 0);
     },
     staleTime: Infinity,
-    gcTime: 1 * 60 * 1000,
+    gcTime: 0,
   });
 }
 
