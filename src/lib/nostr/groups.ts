@@ -108,45 +108,6 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
       } as GroupMetadata;
       return metadata;
     });
-  } else if (group.id.length === 64) {
-    // todo: check if group.id is a valid pubkey
-    // todo: fetch community metadata
-    // todo: return community metadata
-    const relays = await fetchRelayList(ndk, group.id);
-    return ndk
-      .fetchEvent(
-        { kinds: [COMMUNIKEY], authors: [group.id] },
-        {
-          closeOnEose: true,
-          cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
-        },
-        relays ? NDKRelaySet.fromRelayUrls(relays, ndk) : undefined,
-      )
-      .then(async (ev: NDKEvent | null) => {
-        if (!ev) throw new Error("Can't find group metadata");
-        const profile = await fetchProfile(ndk, group.id, []);
-        const relay = ev.tags.find((t) => t[0] === "r")?.[1];
-        if (!relay) throw new Error("Can't find community relay");
-        const backupRelays = ev.tags
-          .filter((t) => t[0] === "r")
-          .map((t) => t[1])
-          .slice(1);
-        return {
-          id: group.id,
-          pubkey: ev.pubkey,
-          relay,
-          name: profile?.name || group.id,
-          about: profile?.about || "",
-          picture: profile?.picture || "",
-          isCommunity: true,
-          nlink: nip19.naddrEncode({
-            kind: COMMUNIKEY,
-            pubkey: group.id,
-            relays: [relay, ...backupRelays],
-            identifier: "",
-          }),
-        } as GroupMetadata;
-      });
   } else {
     return ndk
       .fetchEvent(
@@ -157,8 +118,48 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
         },
         NDKRelaySet.fromRelayUrls([group.relay], ndk),
       )
-      .then((ev: NDKEvent | null) => {
-        if (!ev) throw new Error("Can't find group metadata");
+      .then(async (ev: NDKEvent | null) => {
+        if (!ev) {
+          if (group.id.length === 64) {
+            const relays = await fetchRelayList(ndk, group.id);
+            return ndk
+              .fetchEvent(
+                { kinds: [COMMUNIKEY], authors: [group.id] },
+                {
+                  closeOnEose: true,
+                  cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+                },
+                relays ? NDKRelaySet.fromRelayUrls(relays, ndk) : undefined,
+              )
+              .then(async (ev: NDKEvent | null) => {
+                if (!ev) throw new Error("Can't find group metadata");
+                const profile = await fetchProfile(ndk, group.id, []);
+                const relay = ev.tags.find((t) => t[0] === "r")?.[1];
+                if (!relay) throw new Error("Can't find community relay");
+                const backupRelays = ev.tags
+                  .filter((t) => t[0] === "r")
+                  .map((t) => t[1])
+                  .slice(1);
+                return {
+                  id: group.id,
+                  pubkey: ev.pubkey,
+                  relay,
+                  name: profile?.name || group.id,
+                  about: profile?.about || "",
+                  picture: profile?.picture || "",
+                  isCommunity: true,
+                  nlink: nip19.naddrEncode({
+                    kind: COMMUNIKEY,
+                    pubkey: group.id,
+                    relays: [relay, ...backupRelays],
+                    identifier: "",
+                  }),
+                } as GroupMetadata;
+              });
+          } else {
+            throw new Error("Can't find group metadata");
+          }
+        }
         return {
           id: group.id,
           pubkey: ev.pubkey,
