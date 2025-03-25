@@ -110,11 +110,13 @@ function RelayItem({ group }: { group: Group }) {
 function GroupItem({ group }: { group: Group }) {
   const lastMessage = useLastMessage(group);
   const navigate = useNavigate();
-  const { host, id } = useParams();
+  const { host, id, pubkey } = useParams();
   const { data: metadata } = useGroup(group);
   const unreadMessages = useUnreadMessages(group);
   //const unreadMentions = useUnreadMentions(group);
-  const isActive = host === getRelayHost(group.relay) && id === group.id;
+  const isActive = host
+    ? host === getRelayHost(group.relay) && id === group.id
+    : pubkey === group.id;
 
   function openGroup() {
     if (metadata?.isCommunity) {
