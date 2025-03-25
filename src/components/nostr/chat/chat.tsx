@@ -245,6 +245,7 @@ function MessageContent({
   isDeleted,
   isMine,
   showRootReply = true,
+  showReply = true,
   canReact = true,
   richTextOptions,
   richTextClassnames = {},
@@ -268,6 +269,7 @@ function MessageContent({
   isNew?: boolean;
   isMine: boolean;
   showRootReply?: boolean;
+  showReply?: boolean;
   canReact?: boolean;
   richTextOptions?: RichTextOptions;
   richTextClassnames?: RichTextClassnames;
@@ -334,7 +336,8 @@ function MessageContent({
       }
     });
   }, [fragments]);
-  const showReply = replyTo && !eventFragmentIds.includes(replyTo);
+  const shouldShowReply =
+    showReply && replyTo && !eventFragmentIds.includes(replyTo);
   const isSingleCustomEmoji =
     fragments.length === 1 &&
     fragments[0].type === "block" &&
@@ -374,7 +377,7 @@ function MessageContent({
       isOnlyVideo ||
       isOnlyAudio ||
       isSingleEmbed) &&
-    (!isReplyingTo || !showReply) &&
+    (!isReplyingTo || !shouldShowReply) &&
     !isDeleted;
   const [, copy] = useCopy();
 
@@ -516,7 +519,7 @@ function MessageContent({
                 ) : null}
                 {(replyTo || (replyRoot && showRootReply)) &&
                 isReplyingTo &&
-                showReply ? (
+                shouldShowReply ? (
                   <Reply
                     setScrollTo={setScrollTo}
                     group={group}
@@ -738,6 +741,7 @@ export function ChatMessage(props: {
   isNew?: boolean;
   isMine?: boolean;
   showRootReply?: boolean;
+  showReply?: boolean;
   canReact?: boolean;
   richTextOptions?: RichTextOptions;
   richTextClassnames?: RichTextClassnames;

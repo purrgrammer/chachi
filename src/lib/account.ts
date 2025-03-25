@@ -1,4 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
+import { nip19 } from "nostr-tools";
 import { toast } from "sonner";
 import NDK, {
   NDKUser,
@@ -131,6 +132,37 @@ export function useNip46Login() {
     } catch (err) {
       console.error(err);
       toast.error("Error logging in with NIP-46");
+    }
+  };
+}
+export function useNsecLogin() {
+  const ndk = useNDK();
+  const [, setAccount] = useAtom(accountAtom);
+  const [accounts, setAccounts] = useAtom(accountsAtom);
+  const [, setLoginMethod] = useAtom(methodAtom);
+  return async (privateKey: string) => {
+    try {
+      const decoded = privateKey.startsWith("nsec1")
+        ? nip19.decode(privateKey)
+        : null;
+      let privkey = privateKey;
+      if (decoded && decoded.type === "nsec") {
+        privkey = Buffer.from(decoded.data).toString("hex");
+      }
+      const signer = new NDKPrivateKeySigner(privkey);
+      const user = await signer.blockUntilReady();
+      ndk.signer = signer;
+      const account = {
+        method: "nsec" as LoginMethod,
+        pubkey: user.pubkey,
+        privkey,
+      };
+      setAccount(account);
+      setAccounts([account, ...accounts]);
+      setLoginMethod("nsec");
+    } catch (err) {
+      console.error(err);
+      toast.error("Error logging in with NSEC");
     }
   };
 }

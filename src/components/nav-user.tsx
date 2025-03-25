@@ -31,10 +31,7 @@ import {
   NDKWebLNWallet,
 } from "@nostr-dev-kit/ndk-wallet";
 import { useNDKWallets } from "@/lib/wallet";
-
-const CHACHI_PUBKEY =
-  "46fc871c1aedb295a8325abcf7663467d297b0a852733ceb06b0957d1c14bff4";
-const CHACHI_GROUP = { id: "chachi", relay: "wss://groups.0xchat.com/" };
+import { CHACHI_PUBKEY, CHACHI_GROUP } from "@/constants";
 
 function UserInfo({ pubkey }: { pubkey: string }) {
   return (

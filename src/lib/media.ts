@@ -99,16 +99,16 @@ export function useUpload() {
     for (const server of servers) {
       try {
         const blob = await BlossomClient.uploadBlob(server, file, auth);
-        toast.success(t("media.upload-success", { server }));
+        toast.success(t("settings.media.upload-success", { server }));
         const type = blob.type?.replace("quicktime", "mov") || "";
         const extension = type ? `${type.split("/")[1]}` : "";
         return { ...blob, type, extension };
       } catch (err) {
         console.error(err);
-        toast.error(t("media.upload-error", { server }));
+        toast.error(t("settings.media.upload-error", { server }));
       }
     }
-    throw new Error(t("media.upload-panic"));
+    throw new Error(t("settings.media.upload-panic"));
   };
 
   return { upload, canSign: pubkey && !account.isReadOnly };

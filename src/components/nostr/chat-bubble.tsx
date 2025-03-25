@@ -32,9 +32,16 @@ function GroupName({ group, className }: { group: Group; className?: string }) {
 interface ChatBubbleProps {
   event: NostrEvent;
   group?: Group;
+  showReply?: boolean;
+  showRootReply?: boolean;
 }
 
-export function ChatBubble({ event, group }: ChatBubbleProps) {
+export function ChatBubble({
+  event,
+  group,
+  showReply = true,
+  showRootReply = true,
+}: ChatBubbleProps) {
   const { t } = useTranslation();
   const me = usePubkey();
   const pubkey = event.pubkey;
@@ -59,7 +66,13 @@ export function ChatBubble({ event, group }: ChatBubbleProps) {
           <GroupName group={chatGroup} className="text-xs" />
         </div>
       ) : null}
-      <ChatMessage event={event} group={group} admins={[]} className="" />
+      <ChatMessage
+        event={event}
+        group={group}
+        admins={[]}
+        showReply={showReply}
+        showRootReply={showRootReply}
+      />
     </div>
   );
 }
