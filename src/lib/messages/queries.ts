@@ -24,7 +24,7 @@ export async function getGroupChat(group: Group) {
   const id = groupId(group);
   return db.events
     .orderBy("created_at")
-    .filter(e => e.group === id)
+    .filter((e) => e.group === id)
     .reverse()
     .limit(50)
     .toArray();
@@ -55,7 +55,11 @@ export async function getLastGroupMessage(group: Group) {
   const id = groupId(group);
   const msgs = await db.events
     .orderBy("created_at")
-    .filter(e => e.group === id && (e.kind === NDKKind.GroupChat || e.kind === NDKKind.Nutzap))
+    .filter(
+      (e) =>
+        e.group === id &&
+        (e.kind === NDKKind.GroupChat || e.kind === NDKKind.Nutzap),
+    )
     .reverse()
     .limit(1)
     .toArray();
@@ -66,7 +70,10 @@ export async function getGroupMessagesAfter(group: Group, timestamp = 0) {
   const id = groupId(group);
   return db.events
     .where("[group+kind+created_at]")
-    .between([id, NDKKind.GroupChat, timestamp+1], [id, NDKKind.GroupChat, Dexie.maxKey])
+    .between(
+      [id, NDKKind.GroupChat, timestamp + 1],
+      [id, NDKKind.GroupChat, Dexie.maxKey],
+    )
     .count();
 }
 
@@ -102,7 +109,10 @@ export async function getGroupMentionsAfter(
   const id = groupId(group);
   return db.events
     .where("[group+kind+created_at]")
-    .between([id, NDKKind.GroupChat, timestamp+1], [id, NDKKind.GroupChat, Dexie.maxKey])
+    .between(
+      [id, NDKKind.GroupChat, timestamp + 1],
+      [id, NDKKind.GroupChat, Dexie.maxKey],
+    )
     .and((ev) => ev.tags.some((t) => t[0] === "p" && t[1] === pubkey))
     .count();
 }

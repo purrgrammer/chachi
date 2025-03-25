@@ -1,7 +1,12 @@
 import { useMemo } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useQuery } from "@tanstack/react-query";
-import { NDKEvent, NDKKind, NDKRelaySet, NDKSubscriptionCacheUsage } from "@nostr-dev-kit/ndk";
+import {
+  NDKEvent,
+  NDKKind,
+  NDKRelaySet,
+  NDKSubscriptionCacheUsage,
+} from "@nostr-dev-kit/ndk";
 import { useNDK } from "@/lib/ndk";
 import { CashuMint, MintKeys, GetInfoResponse } from "@cashu/cashu-ts";
 import { useRelays, useRelayList, useRequest } from "@/lib/nostr";
