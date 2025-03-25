@@ -92,9 +92,10 @@ export async function getGroupsSortedByLastMessage(groups: Group[]) {
 }
 
 export async function getLastSeen(group: Group) {
+  const id = groupId(group);
   const results = await db.lastSeen
-    .where("group")
-    .equals(groupId(group))
+    .orderBy("created_at")
+    .filter((e) => e.group === id)
     .reverse()
     .limit(1)
     .toArray();

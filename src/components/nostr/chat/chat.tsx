@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { Button } from "@/components/ui/button";
-import { useMintList } from "@/lib/cashu";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { cn } from "@/lib/utils";
 import { ProfileDrawer } from "@/components/nostr/profile";
@@ -281,7 +280,6 @@ function MessageContent({
 }) {
   const { t } = useTranslation();
   const [settings] = useSettings();
-  const { data: mintList } = useMintList(event.pubkey);
   const relay = group?.relay;
   const ndk = useNDK();
   const relaySet = useRelaySet(group ? [group.relay] : []);
@@ -589,7 +587,7 @@ function MessageContent({
                     group={group}
                     onClose={() => setShowingZapDialog(false)}
                     onZap={() => setShowingZapDialog(false)}
-                    zapType={mintList?.pubkey ? "nip-61" : "nip-57"}
+                    zapType="nip-57"
                   />
                 ) : null}
                 {showingEmojiPicker ? (

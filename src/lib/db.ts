@@ -88,9 +88,9 @@ class ChachiDatabase extends Dexie {
 
   constructor(name: string) {
     super(name);
-    this.version(7).stores({
+    this.version(8).stores({
       events: "&id,created_at,group,[group+kind],[group+kind+created_at]",
-      lastSeen: "[group+kind]",
+      lastSeen: "[group+kind],created_at",
       nutzaps: "&id,status,txId",
       tokenEvents: "&id,created_at",
       groupInfo: "[id+relay]",
@@ -109,8 +109,7 @@ export function getUnpublishedEvents() {
 }
 
 export function getTokenEvents() {
-  // todo: sort by created_at
-  return db.tokenEvents.toArray();
+  return db.tokenEvents.orderBy("created_at").toArray();
 }
 
 export function saveTokenEvent(token: NDKCashuToken) {
