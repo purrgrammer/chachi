@@ -88,8 +88,8 @@ class ChachiDatabase extends Dexie {
 
   constructor(name: string) {
     super(name);
-    this.version(6).stores({
-      events: "&id,created_at,group,[group+kind]",
+    this.version(7).stores({
+      events: "&id,created_at,group,[group+kind],[group+kind+created_at]",
       lastSeen: "[group+kind]",
       nutzaps: "&id,status,txId",
       tokenEvents: "&id,created_at",

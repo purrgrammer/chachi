@@ -418,6 +418,7 @@ export function useProfiles(pubkeys: string[]) {
         queryKey: [PROFILE, pubkey],
         queryFn: () => fetchProfile(ndk, pubkey, profileRelays),
         staleTime: Infinity,
+        gcTime: 0,
       };
     }),
   });
@@ -434,7 +435,7 @@ export function useProfile(pubkey?: string, relays: string[] = []) {
       return pubkey ? fetchProfile(ndk, pubkey, relays) : null;
     },
     staleTime: Infinity,
-    gcTime: 1 * 60 * 1000,
+    gcTime: 0,
   });
 }
 
@@ -462,7 +463,7 @@ export function useRelayList(pubkey: string) {
     queryKey: [RELAY_LIST, pubkey],
     queryFn: () => fetchRelayList(ndk, pubkey),
     staleTime: Infinity,
-    gcTime: 5 * 60 * 1000,
+    gcTime: 0,
   });
 }
 

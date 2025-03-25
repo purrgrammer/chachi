@@ -558,16 +558,6 @@ export function useNWCTransactions(wallet: NDKNWCWallet) {
   });
 }
 
-//todo
-//export function useWebLNTransactions(wallet: NDKWebLNWallet) {
-//  return useQuery({
-//    enabled: Boolean(wallet.provider),
-//    queryKey: [WALLET_TXS, walletId(wallet)],
-//    queryFn: () => wallet.provider?.getTransactions(),
-//    staleTime: Infinity,
-//  });
-//}
-
 export function useCashu() {
   return useAtomValue(cashuAtom);
 }
