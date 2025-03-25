@@ -95,41 +95,41 @@
           "relay": {
             "label": "مُرحِّل",
             "placeholder": "wss://relay.example.com",
-            "description": "Main relay where this community will be hosted"
+            "description": "المُرحِّل الرئيسي الذي سيَستضيف هذا المجتمع"
           },
           "backup_relays": {
-            "label": "Backup Relays",
-            "add": "Add",
+            "label": "المُرحِّلات الاحتياطية",
+            "add": "إضافة",
             "add_placeholder": "wss://backup.example.com",
-            "description": "Additional relays where content will be published",
-            "error_duplicate": "This relay is already in your backup list",
-            "error_duplicate_primary": "This relay is already set as your primary relay"
+            "description": "المُرَحِّلات الإضافية التي سيُنشَر بواسطتها المحتوى",
+            "error_duplicate": "هذا المُرحِّل مضاف سابقًا إلى قائمتك الاحتياطية",
+            "error_duplicate_primary": "هذا المُرحِّل مُعيّن مُسبقًا كمُرحِّل رئيسي لك"
           },
           "use_blossom": {
-            "label": "Use Blossom Media Servers",
-            "description": "Enable integration with Blossom media servers for optimized media storage and delivery"
+            "label": "استخدم خوادم الوسائط الخاصة بالزهرة",
+            "description": "تمكين التكامل مع خوادم الوسائط الخاصة بالزهرة لتحسين تخزين الوسائط وتسليمها"
           },
           "primary_blossom": {
-            "label": "Blossom Server",
+            "label": "خادم الزهرة",
             "placeholder": "https://blossom.example.com",
-            "description": "Blossom media server for this community"
+            "description": "خادم وسائط الزهرة لهذا المجتمع"
           },
           "backup_blossom": {
-            "label": "Backup Blossom Servers",
-            "add": "Add",
+            "label": "استخدِم خوادم الزهرة للوسائط",
+            "add": "إضافة",
             "add_placeholder": "https://backup-blossom.example.com",
-            "description": "Additional Blossom media servers for redundancy",
-            "error_duplicate": "This server is already in your backup list",
-            "error_duplicate_primary": "This server is already set as your primary Blossom server"
+            "description": "خوادم الزهرة الإضافية للوسائط لضمان التكرار",
+            "error_duplicate": "هذا الخادم مُضاف مسبقًا إلى قائمتك الاحتياطية",
+            "error_duplicate_primary": "هذا الخادم مُعيّن مُسبقًا كخادم زهرة رئيسي لك"
           },
           "use_mint": {
-            "label": "Use Community Mint",
-            "description": "Enable a community-specific mint for rewards and transactions"
+            "label": "استخدِم منصة سك المجتمعات",
+            "description": "فعِّل سكًا مخصصًا للمجتمع لإدارة المكافآت والمعاملات"
           },
           "mint": {
-            "label": "Community Mint",
+            "label": "منصة سك المجتمعات",
             "placeholder": "https://mint.example.com",
-            "description": "URL of the mint for this community"
+            "description": "رابط URL لمنصة السك الخاصّة بهذا المجتمع"
           }
         }
       },
@@ -244,7 +244,7 @@
       }
     },
     "metadata": {
-      "community": "This is a profile based community",
+      "community": "هذا مُجتمع قائم على الملفات الشخصية",
       "visibility": {
         "private": {
           "trigger": "الأعضاء فقط",
@@ -282,7 +282,7 @@
       },
       "retry": {
         "action": "إعادة المحاولة",
-        "success": "Message sent successfully",
+        "success": "تم إرسال الرسالة بنجاح",
         "error": "تعذر إرسال الرسالة"
       },
       "copy": {
@@ -316,7 +316,7 @@
       },
       "deleted": "تم حذف الرسالة",
       "save-as-last-seen": "حفظ كما شوهدت آخر مرة",
-      "sending": "sending..."
+      "sending": "جاري الإرسال..."
     },
     "new-messages": "رسائل جديدة",
     "user": {
@@ -396,14 +396,14 @@
       "chat": "الدردشة",
       "post": "نشر",
       "posts": "منشورات",
-      "articles": "Articles",
+      "articles": "مقالات",
       "poll": "استطلاع",
       "polls": "استطلاعات",
       "video": "فيديو",
       "videos": "فيديوهات",
       "image": "صورة",
       "images": "صور",
-      "community": "Community"
+      "community": "مجتمع"
     }
   },
   "post": {
@@ -521,16 +521,16 @@
     "expired": "تم انتهاء الهدف",
     "leaderboard": "لائحة المتصدرين"
   },
-  "back": "Back",
+  "back": "رجوع",
   "wallet": {
     "title": "دفع وارد",
     "ecash": {
-      "title": "Send ecash",
-      "description": "Create an ecash token and send it to whoever you want",
-      "message": "Message",
-      "message-placeholder": "Write an optional message",
-      "mint-error": "Error creating ecash token in {{ mint }}",
-      "copy": "Copy token"
+      "title": "إرسال نقود إلكترونية",
+      "description": "أنشئ نقود إلكترونية وأرسلها إلى من تريد",
+      "message": "رسالة",
+      "message-placeholder": "اكتب رسالة اختيارية",
+      "mint-error": "حدث خطأ عند إنشاء نقود إلكترونية في {{ mint }}",
+      "copy": "نسخ الرمز المميز"
     },
     "keys": "المفاتيح",
     "sync": "المزامنة",
@@ -762,27 +762,27 @@
   },
   "community": {
     "relays": {
-      "title": "Relays"
+      "title": "مُرحّلات"
     },
     "mint": {
-      "title": "Mint"
+      "title": "سك"
     },
     "blossom": {
-      "title": "Media Servers"
+      "title": "خوادم الوسائط"
     }
   },
   "relay": {
     "new": {
-      "title": "New",
-      "description": "Create a new relay to host your content",
-      "service": "Service",
-      "select_service": "Select a service",
-      "name": "Name",
-      "name_placeholder": "Enter relay name",
-      "name_error": "Name cannot contain spaces",
-      "create": "Create Relay",
-      "order-success": "Order created successfully",
-      "error": "Failed to create relay"
+      "title": "جديد",
+      "description": "إنشاء مرحل جديد لاستضافة المحتوى الخاص بك",
+      "service": "خدمة",
+      "select_service": "اختر الخدمة",
+      "name": "اسم",
+      "name_placeholder": "أدخل اسم المرحل",
+      "name_error": "لا يمكن أن يحتوي الاسم على مسافات",
+      "create": "إنشاء مرحل",
+      "order-success": "تم إنشاء الطلب بنجاح",
+      "error": "تعذر إنشاء المرحل"
     }
   }
 }
