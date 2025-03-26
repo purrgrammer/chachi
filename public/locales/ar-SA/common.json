@@ -14,13 +14,13 @@
     "login": {
       "start": "ابدأ",
       "title": "ابدأ الآن",
-      "description": "Use your existing identity or create a new one.",
+      "description": "استخدم هويتك الحالية أو ابدأ بإنشاء هوية جديدة.",
       "connect": "اتصال",
-      "new-account": "Are you new here?",
-      "new-account-description": "Don't worry, we'll help you get started in a minute.",
-      "new-account-button": "Let's get started!",
-      "options": "Are you already on nostr?",
-      "options-description": "Choose the login method you prefer.",
+      "new-account": "هل أنت جديد هنا؟",
+      "new-account-description": "لا تقلق، سنساعدك على البِدء خلال دقيقة واحدة.",
+      "new-account-button": "دعنا نبدأ!",
+      "options": "هل أنت بالفعل على نوستر؟",
+      "options-description": "اختر طريقة تسجيل الدخول التي تفضلها.",
       "extension": {
         "label": "إضافة المتصفح",
         "error": "تعذر التسجيل بواسطة إضافة المتصفح"
@@ -30,9 +30,9 @@
         "error": "فشل تسجيل الدخول باستخدام الموقّع عن بُعد"
       },
       "nsec": {
-        "label": "Private Key",
-        "error": "Failed to log in with private key",
-        "or": "or",
+        "label": "المفتاح الخاص",
+        "error": "فشل تسجيل الدخول باستخدام المفتاح الخاص",
+        "or": "أو",
         "connect": "Connect"
       }
     },
@@ -541,9 +541,9 @@
       "message-placeholder": "اكتب رسالة اختيارية",
       "mint-error": "حدث خطأ عند إنشاء نقود إلكترونية في {{ mint }}",
       "copy": "نسخ الرمز المميز",
-      "redeem": "Redeem",
-      "redeem-error": "Failed to redeem ecash",
-      "redeem-success": "Ecash redeemed"
+      "redeem": "استرداد",
+      "redeem-error": "تعذر استرداد النقود الإلكترونية",
+      "redeem-success": "تم استرداد النقود الإلكترونية"
     },
     "keys": "المفاتيح",
     "sync": "المزامنة",
@@ -821,7 +821,7 @@
     "communities": "Communities",
     "communities-desc": "Find or create a community to chat with your friends",
     "source-code": "Open source",
-    "source-code-desc": "Chachi is a free and open source project, anyone can contribute by submiting feedback, bug reports, feature requests, participating in the community chat and sending pull requests",
+    "source-code-desc": "Chachi هو مشروع مجاني ومفتوح المصدر، يمكن لأي شخص المساهمة فيه عبر إرسال ملاحظات أو اقتراحات أو الإبلاغ عن أخطاء برمجية أو طلب إضافة وظائف جديدة أو المشاركة في نقاشات المجتمع أو إرسال طلبات دمج التعديلات البرمجية",
     "source-code-link": "View source code",
     "source-code-chat": "Join the community chat"
   }
