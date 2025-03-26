@@ -137,23 +137,32 @@ function MyGroupList({
   groups: PrivateGroup[];
   showPublicGroups?: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <SidebarMenu className="gap-0">
       {showPublicGroups ? <PublicGroups /> : null}
-      <Reorder.Group
-        axis="y"
-        layoutScroll
+      {groups.length > 0 ? (
+        <Reorder.Group
+          axis="y"
+          layoutScroll
         values={groups}
         onReorder={() => console.log("reorder")}
       >
         {groups.map((group) => (
           <Reorder.Item dragListener={false} key={group.id} value={group}>
             <SidebarMenuItem>
-              <GroupItem group={group} />
+                <GroupItem group={group} />
             </SidebarMenuItem>
-          </Reorder.Item>
-        ))}
-      </Reorder.Group>
+            </Reorder.Item>
+          ))}
+        </Reorder.Group>
+      ) : (
+        <div className="flex justify-center items-center">
+          <span className="text-sm text-muted-foreground">
+            {t("nav.no-private-groups")}
+          </span>
+        </div>
+      )}
     </SidebarMenu>
   );
 }
@@ -187,18 +196,11 @@ function MyGroupRequests({ groups }: { groups: PrivateGroup[] }) {
 export function NavPrivateGroups() {
   const myGroups = useSortedGroups();
   const myGroupRequests = useSortedGroupRequests();
-  const { t } = useTranslation();
-  return myGroups.length > 0 ? (
+  return (
     <>
       <MyGroupList groups={myGroups} />
       <CreateGroup />
       <MyGroupRequests groups={myGroupRequests || []} />
     </>
-  ) : (
-    <div className="flex justify-center items-center">
-      <span className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden text-sm text-muted-foreground">
-        {t("nav.no-private-groups")}
-      </span>
-    </div>
   );
 }
