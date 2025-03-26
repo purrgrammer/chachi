@@ -14,12 +14,12 @@
     "login": {
       "start": "ابدأ",
       "title": "ابدأ الآن",
-      "description": "استخدم هويتك الحالية أو ابدأ بإنشاء هوية جديدة.",
+      "description": "استخدم هويتك الحالية أو أنشئ هوية جديدة.",
       "connect": "اتصال",
       "new-account": "هل أنت جديد هنا؟",
       "new-account-description": "لا تقلق، سنساعدك على البِدء خلال دقيقة واحدة.",
       "new-account-button": "دعنا نبدأ!",
-      "options": "هل أنت بالفعل على نوستر؟",
+      "options": "هل أنت مُنضم بالفعل إلى شبكة نوستر؟",
       "options-description": "اختر طريقة تسجيل الدخول التي تفضلها.",
       "extension": {
         "label": "إضافة المتصفح",
@@ -33,7 +33,7 @@
         "label": "المفتاح الخاص",
         "error": "فشل تسجيل الدخول باستخدام المفتاح الخاص",
         "or": "أو",
-        "connect": "Connect"
+        "connect": "اتصل"
       }
     },
     "logout": "تسجيل الخروج",
@@ -802,27 +802,27 @@
     "features": {
       "title": "حيل سحرية",
       "description": "تواصل، دردش، ارسل فورًا، حمل الملفات، شارك صور متحركة وملصقات، واكتشف المزيد من الميزات!",
-      "connect": "Connect",
+      "connect": "اتصل",
       "connect-desc": "اتصل بمُرحِّل لبدء الدردشة",
       "chat": "دردشة",
-      "chat-desc": "Chat with friends and communities",
+      "chat-desc": "دردش مع الأصدقاء والمجتمعات",
       "payments": "مدفوعات",
-      "payments-desc": "إرسال واستقبال المدفوعات بسلاسة",
+      "payments-desc": "أرسل واستلم المدفوعات بسلاسة",
       "files": "ملفات",
       "files-desc": "رفع الملفات ومشاركتها",
-      "selfhost": "Own your data",
-      "selfhost-desc": "Self-host your messages and files"
+      "selfhost": "امتلك بياناتك",
+      "selfhost-desc": "استضف رسائلك وملفاتك على خوادمك الخاصة"
     },
-    "testimonials": "Testimonials",
-    "testimonials-desc": "What people are saying about us",
-    "supporters": "Supporters",
-    "supporters-desc": "Thank you to everyone who has supported the project with a donation",
-    "get-started": "Get started",
-    "communities": "Communities",
-    "communities-desc": "Find or create a community to chat with your friends",
-    "source-code": "Open source",
+    "testimonials": "شهادات المستخدمين",
+    "testimonials-desc": "ما يقوله المستخدمون عنا",
+    "supporters": "الداعمون",
+    "supporters-desc": "شكرًا لكل من دعم المشروع بالتبرع",
+    "get-started": "ابدأ الآن",
+    "communities": "المجتمعات",
+    "communities-desc": "ابحث عن مجتمع أو أنشئ مجتمعًا للدردشة مع أصدقائك",
+    "source-code": "مفتوح المصدر",
     "source-code-desc": "Chachi هو مشروع مجاني ومفتوح المصدر، يمكن لأي شخص المساهمة فيه عبر إرسال ملاحظات أو اقتراحات أو الإبلاغ عن أخطاء برمجية أو طلب إضافة وظائف جديدة أو المشاركة في نقاشات المجتمع أو إرسال طلبات دمج التعديلات البرمجية",
-    "source-code-link": "View source code",
-    "source-code-chat": "Join the community chat"
+    "source-code-link": "عرض الكود المصدر",
+    "source-code-chat": "انضم إلى الدردشة المجتمعية"
   }
 }
