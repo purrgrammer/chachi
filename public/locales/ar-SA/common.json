@@ -14,7 +14,13 @@
     "login": {
       "start": "ابدأ",
       "title": "ابدأ الآن",
-      "description": "اختر طريقة تسجيل الدخول المناسبة.",
+      "description": "Use your existing identity or create a new one.",
+      "connect": "اتصال",
+      "new-account": "Are you new here?",
+      "new-account-description": "Don't worry, we'll help you get started in a minute.",
+      "new-account-button": "Let's get started!",
+      "options": "Are you already on nostr?",
+      "options-description": "Choose the login method you prefer.",
       "extension": {
         "label": "إضافة المتصفح",
         "error": "تعذر التسجيل بواسطة إضافة المتصفح"
@@ -23,8 +29,12 @@
         "label": "الموقّع عن بُعد",
         "error": "فشل تسجيل الدخول باستخدام الموقّع عن بُعد"
       },
-      "or": "أو",
-      "connect": "اتصال"
+      "nsec": {
+        "label": "Private Key",
+        "error": "Failed to log in with private key",
+        "or": "or",
+        "connect": "Connect"
+      }
     },
     "logout": "تسجيل الخروج",
     "zaps": "التحويلات",
@@ -78,6 +88,61 @@
       "new": "مجموعة جديدة",
       "title": "إنشاء مجموعة",
       "description": "أنشئ مجموعة جديدة للدردشة مع أصدقائك",
+      "type": {
+        "select": "ما نوع المجموعة التي تريد إنشاءها؟",
+        "nip29": "مجموعة",
+        "community": "مجتمع",
+        "nip29_description": "أنشئ مجموعة مُدارة تبدأ من الصفر. مُستضافة على مُرحِّلات متوافقة مع معيار NIP-29.",
+        "community_description": "حوّل مفتاحًا عامًا موجودًا إلى مجتمع يُعرض فيه جميع محتوياته. يُمكن استضافته على أي مُرحِّل. يتولى المُرحِّل إدارةَ هذا المُرحِّل."
+      },
+      "community": {
+        "title": "إنشاء مجتمع",
+        "description": "إنشاء مجتمع يعتمد على مفتاح عام",
+        "coming_soon": "إنشاء المجتمع قريبًا!",
+        "explanation": "المجتمعات هي مجموعات مُنشأة حول مفتاح عام موجود مسبقًا، حيث تعرض كل محتواها. على عكس المجموعات القياسية، لا تبدأ المجتمعات فارغة — فهي تتضمن جميع المنشورات المرتبطة بالمفتاح العام من البداية.",
+        "community_for": "مجتمع من أجل",
+        "form": {
+          "relay": {
+            "label": "مُرحِّل",
+            "placeholder": "wss://relay.example.com",
+            "description": "المُرحِّل الرئيسي الذي سيَستضيف هذا المجتمع"
+          },
+          "backup_relays": {
+            "label": "المُرحِّلات الاحتياطية",
+            "add": "إضافة",
+            "add_placeholder": "wss://backup.example.com",
+            "description": "المُرحِّلات الإضافية التي سيُنشَر بواسطتها المحتوى",
+            "error_duplicate": "هذا المُرحِّل مضاف سابقًا إلى قائمتك الاحتياطية",
+            "error_duplicate_primary": "هذا المُرحِّل مُعيّن مُسبقًا كمُرحِّل رئيسي لك"
+          },
+          "use_blossom": {
+            "label": "استخدم خوادم الوسائط الخاصة بالزهرة",
+            "description": "تمكين التكامل مع خوادم الوسائط الخاصة بالزهرة لتحسين تخزين الوسائط وتسليمها"
+          },
+          "primary_blossom": {
+            "label": "خادم الزهرة",
+            "placeholder": "https://blossom.example.com",
+            "description": "خادم وسائط الزهرة لهذا المجتمع"
+          },
+          "backup_blossom": {
+            "label": "استخدِم خوادم الزهرة للوسائط",
+            "add": "إضافة",
+            "add_placeholder": "https://backup-blossom.example.com",
+            "description": "خوادم الزهرة الإضافية للوسائط لضمان التكرار",
+            "error_duplicate": "هذا الخادم مُضاف مسبقًا إلى قائمتك الاحتياطية",
+            "error_duplicate_primary": "هذا الخادم مُعيّن مُسبقًا كخادم زهرة رئيسي لك"
+          },
+          "use_mint": {
+            "label": "استخدِم منصة سك المجتمعات",
+            "description": "فعِّل سكًا مخصصًا للمجتمع لإدارة المكافآت والمعاملات"
+          },
+          "mint": {
+            "label": "منصة سك المجتمعات",
+            "placeholder": "https://mint.example.com",
+            "description": "رابط URL لمنصة السك الخاصّة بهذا المجتمع"
+          }
+        }
+      },
       "form": {
         "name": {
           "label": "الاسم",
@@ -89,7 +154,7 @@
           "placeholder": "هذا هو وصف المجموعة."
         },
         "relay": {
-          "label": "مرحلات",
+          "label": "مُرحِّل",
           "placeholder": "اختر المرحل.",
           "description": "هذا هو الخادم الذي ستُخزن فيه المنشورات.",
           "required": "يرجى اختيار مرحل"
@@ -189,6 +254,7 @@
       }
     },
     "metadata": {
+      "community": "هذا مُجتمع قائم على الملفات الشخصية",
       "visibility": {
         "private": {
           "trigger": "الأعضاء فقط",
@@ -226,7 +292,7 @@
       },
       "retry": {
         "action": "إعادة المحاولة",
-        "success": "تم إرسال الرسالة",
+        "success": "تم إرسال الرسالة بنجاح",
         "error": "تعذر إرسال الرسالة"
       },
       "copy": {
@@ -259,7 +325,8 @@
         "action": "حذف"
       },
       "deleted": "تم حذف الرسالة",
-      "save-as-last-seen": "حفظ كما شوهدت آخر مرة"
+      "save-as-last-seen": "حفظ كما شوهدت آخر مرة",
+      "sending": "جاري الإرسال..."
     },
     "new-messages": "رسائل جديدة",
     "user": {
@@ -339,12 +406,14 @@
       "chat": "الدردشة",
       "post": "نشر",
       "posts": "منشورات",
+      "articles": "مقالات",
       "poll": "استطلاع",
       "polls": "استطلاعات",
       "video": "فيديو",
       "videos": "فيديوهات",
       "image": "صورة",
-      "images": "صور"
+      "images": "صور",
+      "community": "مجتمع"
     }
   },
   "post": {
@@ -462,8 +531,20 @@
     "expired": "تم انتهاء الهدف",
     "leaderboard": "لائحة المتصدرين"
   },
+  "back": "رجوع",
   "wallet": {
     "title": "دفع وارد",
+    "ecash": {
+      "title": "إرسال نقود إلكترونية",
+      "description": "أنشئ نقود إلكترونية وأرسلها إلى من تريد",
+      "message": "رسالة",
+      "message-placeholder": "اكتب رسالة اختيارية",
+      "mint-error": "حدث خطأ عند إنشاء نقود إلكترونية في {{ mint }}",
+      "copy": "نسخ الرمز المميز",
+      "redeem": "Redeem",
+      "redeem-error": "Failed to redeem ecash",
+      "redeem-success": "Ecash redeemed"
+    },
     "keys": "المفاتيح",
     "sync": "المزامنة",
     "sync-success": "تم مزامنة النقود الإلكترونية",
@@ -691,5 +772,57 @@
     "comma": "",
     "and": "و",
     "and-more": "و {{ more }} المزيد"
+  },
+  "community": {
+    "relays": {
+      "title": "مُرحِّلات"
+    },
+    "mint": {
+      "title": "سك"
+    },
+    "blossom": {
+      "title": "خوادم الوسائط"
+    }
+  },
+  "relay": {
+    "new": {
+      "title": "جديد",
+      "description": "إنشاء مُرحِّل جديد لاستضافة المحتوى الخاص بك",
+      "service": "خدمة",
+      "select_service": "اختر الخدمة",
+      "name": "اسم",
+      "name_placeholder": "أدخل اسم المُرحِّل",
+      "name_error": "لا يمكن أن يحتوي الاسم على مسافات",
+      "create": "إنشاء مُرحِّل",
+      "order-success": "تم إنشاء الطلب بنجاح",
+      "error": "تعذر إنشاء المُرحِّل"
+    }
+  },
+  "landing": {
+    "features": {
+      "title": "Magic tricks",
+      "description": "Connect, chat, zap, upload files, send gifs, stickers and much more!",
+      "connect": "Connect",
+      "connect-desc": "Connect to a relay to start chatting",
+      "chat": "Chat",
+      "chat-desc": "Chat with friends and communities",
+      "payments": "Payments",
+      "payments-desc": "Send and receive payments seamlessly",
+      "files": "Files",
+      "files-desc": "Upload and share files",
+      "selfhost": "Own your data",
+      "selfhost-desc": "Self-host your messages and files"
+    },
+    "testimonials": "Testimonials",
+    "testimonials-desc": "What people are saying about us",
+    "supporters": "Supporters",
+    "supporters-desc": "Thank you to everyone who has supported the project with a donation",
+    "get-started": "Get started",
+    "communities": "Communities",
+    "communities-desc": "Find or create a community to chat with your friends",
+    "source-code": "Open source",
+    "source-code-desc": "Chachi is a free and open source project, anyone can contribute by submiting feedback, bug reports, feature requests, participating in the community chat and sending pull requests",
+    "source-code-link": "View source code",
+    "source-code-chat": "Join the community chat"
   }
 }

@@ -14,7 +14,13 @@
     "login": {
       "start": "Começar",
       "title": "Começar",
-      "description": "Selecione o método de login abaixo.",
+      "description": "Use your existing identity or create a new one.",
+      "connect": "Conectar",
+      "new-account": "Are you new here?",
+      "new-account-description": "Don't worry, we'll help you get started in a minute.",
+      "new-account-button": "Let's get started!",
+      "options": "Are you already on nostr?",
+      "options-description": "Choose the login method you prefer.",
       "extension": {
         "label": "Extensão do navegador",
         "error": "Falha ao fazer login com a extensão"
@@ -23,8 +29,12 @@
         "label": "Assinador remoto",
         "error": "Falha ao fazer login com o assinador remoto"
       },
-      "or": "OU",
-      "connect": "Conectar"
+      "nsec": {
+        "label": "Private Key",
+        "error": "Failed to log in with private key",
+        "or": "or",
+        "connect": "Connect"
+      }
     },
     "logout": "Fazer logout",
     "zaps": "Zaps",
@@ -78,6 +88,61 @@
       "new": "Novo grupo",
       "title": "Criar grupo",
       "description": "Crie um novo grupo para conversar com seus amigos",
+      "type": {
+        "select": "What type of group do you want to create?",
+        "nip29": "Group",
+        "community": "Community",
+        "nip29_description": "Create a moderated group that starts with a clean slate. Hosted on NIP-29 compatible relays.",
+        "community_description": "Turn an existing pubkey into a community where all content from that pubkey is displayed. Can be hosted on any relay. Moderation is handled by the relay."
+      },
+      "community": {
+        "title": "Create Community",
+        "description": "Create a community based on a pubkey",
+        "coming_soon": "Community creation is coming soon!",
+        "explanation": "Communities are groups built around an existing pubkey, showing all their content. Unlike standard groups, communities don't start empty - they include all posts from the pubkey.",
+        "community_for": "Community for",
+        "form": {
+          "relay": {
+            "label": "Relay",
+            "placeholder": "wss://relay.example.com",
+            "description": "Main relay where this community will be hosted"
+          },
+          "backup_relays": {
+            "label": "Backup Relays",
+            "add": "Add",
+            "add_placeholder": "wss://backup.example.com",
+            "description": "Additional relays where content will be published",
+            "error_duplicate": "This relay is already in your backup list",
+            "error_duplicate_primary": "This relay is already set as your primary relay"
+          },
+          "use_blossom": {
+            "label": "Use Blossom Media Servers",
+            "description": "Enable integration with Blossom media servers for optimized media storage and delivery"
+          },
+          "primary_blossom": {
+            "label": "Blossom Server",
+            "placeholder": "https://blossom.example.com",
+            "description": "Blossom media server for this community"
+          },
+          "backup_blossom": {
+            "label": "Backup Blossom Servers",
+            "add": "Add",
+            "add_placeholder": "https://backup-blossom.example.com",
+            "description": "Additional Blossom media servers for redundancy",
+            "error_duplicate": "This server is already in your backup list",
+            "error_duplicate_primary": "This server is already set as your primary Blossom server"
+          },
+          "use_mint": {
+            "label": "Use Community Mint",
+            "description": "Enable a community-specific mint for rewards and transactions"
+          },
+          "mint": {
+            "label": "Community Mint",
+            "placeholder": "https://mint.example.com",
+            "description": "URL of the mint for this community"
+          }
+        }
+      },
       "form": {
         "name": {
           "label": "Nome",
@@ -189,6 +254,7 @@
       }
     },
     "metadata": {
+      "community": "This is a profile based community",
       "visibility": {
         "private": {
           "trigger": "Somente membros",
@@ -226,7 +292,7 @@
       },
       "retry": {
         "action": "Retry",
-        "success": "Message sent",
+        "success": "Message sent successfully",
         "error": "Failed to send message"
       },
       "copy": {
@@ -259,7 +325,8 @@
         "action": "Excluir"
       },
       "deleted": "Mensagem excluída",
-      "save-as-last-seen": "Salvar como última visualização"
+      "save-as-last-seen": "Salvar como última visualização",
+      "sending": "sending..."
     },
     "new-messages": "Novas mensagens",
     "user": {
@@ -339,12 +406,14 @@
       "chat": "Chat",
       "post": "Post",
       "posts": "Posts",
+      "articles": "Articles",
       "poll": "Enquete",
       "polls": "Enquetes",
       "video": "Vídeo",
       "videos": "Vídeos",
       "image": "Imagem",
-      "images": "Imagens"
+      "images": "Imagens",
+      "community": "Community"
     }
   },
   "post": {
@@ -462,8 +531,20 @@
     "expired": "Meta expirada",
     "leaderboard": "Ranking"
   },
+  "back": "Back",
   "wallet": {
     "title": "Pagamento recebido",
+    "ecash": {
+      "title": "Send ecash",
+      "description": "Create an ecash token and send it to whoever you want",
+      "message": "Message",
+      "message-placeholder": "Write an optional message",
+      "mint-error": "Error creating ecash token in {{ mint }}",
+      "copy": "Copy token",
+      "redeem": "Redeem",
+      "redeem-error": "Failed to redeem ecash",
+      "redeem-success": "Ecash redeemed"
+    },
     "keys": "Chaves",
     "sync": "Sincronizar",
     "sync-success": "Ecash sincronizado",
@@ -691,5 +772,57 @@
     "comma": ",",
     "and": "e",
     "and-more": "e mais {{ more }}"
+  },
+  "community": {
+    "relays": {
+      "title": "Relays"
+    },
+    "mint": {
+      "title": "Mint"
+    },
+    "blossom": {
+      "title": "Media Servers"
+    }
+  },
+  "relay": {
+    "new": {
+      "title": "New",
+      "description": "Create a new relay to host your content",
+      "service": "Service",
+      "select_service": "Select a service",
+      "name": "Name",
+      "name_placeholder": "Enter relay name",
+      "name_error": "Name cannot contain spaces",
+      "create": "Create Relay",
+      "order-success": "Order created successfully",
+      "error": "Failed to create relay"
+    }
+  },
+  "landing": {
+    "features": {
+      "title": "Magic tricks",
+      "description": "Connect, chat, zap, upload files, send gifs, stickers and much more!",
+      "connect": "Connect",
+      "connect-desc": "Connect to a relay to start chatting",
+      "chat": "Chat",
+      "chat-desc": "Chat with friends and communities",
+      "payments": "Payments",
+      "payments-desc": "Send and receive payments seamlessly",
+      "files": "Files",
+      "files-desc": "Upload and share files",
+      "selfhost": "Own your data",
+      "selfhost-desc": "Self-host your messages and files"
+    },
+    "testimonials": "Testimonials",
+    "testimonials-desc": "What people are saying about us",
+    "supporters": "Supporters",
+    "supporters-desc": "Thank you to everyone who has supported the project with a donation",
+    "get-started": "Get started",
+    "communities": "Communities",
+    "communities-desc": "Find or create a community to chat with your friends",
+    "source-code": "Open source",
+    "source-code-desc": "Chachi is a free and open source project, anyone can contribute by submiting feedback, bug reports, feature requests, participating in the community chat and sending pull requests",
+    "source-code-link": "View source code",
+    "source-code-chat": "Join the community chat"
   }
 }
