@@ -38,8 +38,8 @@ export function GroupHeader({ group }: { group: Group }) {
                 className="size-6 sm:size-8 rounded-full"
               />
             ) : null}
-            <div className="dis">
-              <h2 className="text-lg line-clamp-1">
+            <div className="flex flex-col gap-0">
+              <h2 className="text-lg line-clamp-1 leading-none">
                 {isRelayGroup ? (
                   <RelayName relay={group.relay} />
                 ) : (

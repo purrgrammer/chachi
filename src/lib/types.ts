@@ -89,3 +89,8 @@ export interface Community {
   mint?: string;
   sections?: ContentSection[];
 }
+
+export type PrivateGroup = {
+  id: string;
+  pubkeys: string[];
+};
