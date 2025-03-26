@@ -12,6 +12,7 @@ export interface GroupMetadata extends Group {
   picture?: string;
   visibility?: "public" | "private";
   access?: "open" | "closed";
+  isCommunity?: boolean;
   nlink?: string;
 }
 
@@ -58,13 +59,22 @@ export interface EmojiSet {
   emojis: CustomEmoji[];
 }
 
-export type LoginMethod = "nip07" | "nip46"; // | 'npub' | 'nsec';
+export type LoginMethod = "nip07" | "nip46" | "nsec";
 
 export interface Account {
   method: LoginMethod;
   pubkey: string;
+  privkey?: string;
   isReadOnly?: boolean;
   bunker?: string;
   secret?: string;
   relays?: string[];
+}
+
+export interface Community {
+  pubkey: string;
+  relay: string;
+  backupRelays?: string[];
+  blossom: string[];
+  mint?: string;
 }

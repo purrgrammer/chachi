@@ -91,7 +91,7 @@ export function Thread({
         <div className="flex flex-col h-full overflow-hidden">
           <div className="flex-grow overflow-hidden relative">
             <Chat
-              events={[...replies, root]}
+              events={[...replies.reverse(), root]}
               group={isFromGroup ? group : undefined}
               admins={admins}
               messageKinds={[

@@ -3,6 +3,7 @@ import { NDKKind } from "@nostr-dev-kit/ndk";
 import { groupId } from "@/lib/groups";
 import { Group } from "@/lib/types";
 import db from "@/lib/db";
+import Dexie from "dexie";
 
 // todo: can i use first() or last() instead of materializing array
 
@@ -21,19 +22,12 @@ export function saveGroupEvent(event: NostrEvent, group: Group) {
 
 export async function getGroupChat(group: Group) {
   const id = groupId(group);
-  const events = await db.events
-    .where("[group+kind]")
-    .anyOf([
-      [id, NDKKind.GroupChat],
-      [id, NDKKind.Zap],
-      [id, NDKKind.Nutzap],
-      [id, NDKKind.GroupAdminAddUser],
-      [id, NDKKind.GroupAdminRemoveUser],
-    ])
+  return db.events
+    .orderBy("created_at")
+    .filter((e) => e.group === id)
     .reverse()
-    .sortBy("created_at");
-  // todo: pagination
-  return events.slice(0, 100);
+    .limit(50)
+    .toArray();
 }
 
 export async function getGroupChatParticipants(
@@ -60,21 +54,26 @@ export async function getGroupChatParticipants(
 export async function getLastGroupMessage(group: Group) {
   const id = groupId(group);
   const msgs = await db.events
-    .where("[group+kind]")
-    .anyOf([
-      [id, NDKKind.GroupChat],
-      [id, NDKKind.Nutzap],
-    ])
-    .sortBy("created_at");
-  return msgs?.at(-1);
+    .orderBy("created_at")
+    .filter(
+      (e) =>
+        e.group === id &&
+        (e.kind === NDKKind.GroupChat || e.kind === NDKKind.Nutzap),
+    )
+    .reverse()
+    .limit(1)
+    .toArray();
+  return msgs[0];
 }
 
 export async function getGroupMessagesAfter(group: Group, timestamp = 0) {
   const id = groupId(group);
   return db.events
-    .where("[group+kind]")
-    .equals([id, NDKKind.GroupChat])
-    .and((ev) => ev.created_at > timestamp)
+    .where("[group+kind+created_at]")
+    .between(
+      [id, NDKKind.GroupChat, timestamp + 1],
+      [id, NDKKind.GroupChat, Dexie.maxKey],
+    )
     .count();
 }
 
@@ -93,14 +92,14 @@ export async function getGroupsSortedByLastMessage(groups: Group[]) {
 }
 
 export async function getLastSeen(group: Group) {
+  const id = groupId(group);
   const results = await db.lastSeen
-    .where("[group+kind]")
-    .anyOf([
-      [groupId(group), NDKKind.GroupChat],
-      [groupId(group), NDKKind.Nutzap],
-    ])
-    .sortBy("created_at");
-  return results.at(-1);
+    .orderBy("created_at")
+    .filter((e) => e.group === id)
+    .reverse()
+    .limit(1)
+    .toArray();
+  return results[0];
 }
 
 export async function getGroupMentionsAfter(
@@ -110,13 +109,12 @@ export async function getGroupMentionsAfter(
 ) {
   const id = groupId(group);
   return db.events
-    .where("[group+kind]")
-    .equals([id, NDKKind.GroupChat])
-    .and(
-      (ev) =>
-        ev.created_at > timestamp &&
-        ev.tags.some((t) => t[0] === "p" && t[1] === pubkey),
+    .where("[group+kind+created_at]")
+    .between(
+      [id, NDKKind.GroupChat, timestamp + 1],
+      [id, NDKKind.GroupChat, Dexie.maxKey],
     )
+    .and((ev) => ev.tags.some((t) => t[0] === "p" && t[1] === pubkey))
     .count();
 }
 

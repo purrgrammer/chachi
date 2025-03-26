@@ -21,6 +21,7 @@ import NDK, {
   NDKFilter,
   NDKSubscriptionCacheUsage,
   NDKSubscription,
+  NDKCashuWalletTx,
 } from "@nostr-dev-kit/ndk";
 import {
   NDKWallet,
@@ -37,6 +38,7 @@ import { fetchMintInfo, fetchMintKeys } from "@/lib/cashu";
 import { useNutzapMonitor } from "@/lib/nutzaps";
 import { isRelayURL } from "@/lib/relay";
 import { getTokenEvents, saveTokenEvent } from "@/lib/db";
+import { Token } from "@cashu/cashu-ts";
 
 export type ChachiWallet =
   | { type: "nip60" }
@@ -67,7 +69,8 @@ async function createCashuToken(
     token.mint = content.mint ?? token.tagValue("mint");
     token.deletedTokens = content.del ?? [];
     if (!Array.isArray(token.proofs)) return;
-  } catch (e) {
+  } catch (err) {
+    console.error(err);
     return;
   }
 
@@ -107,7 +110,6 @@ export function useChachiWallet() {
   const mintList = useMintList();
   const [wallets] = useWallets();
   const [, setNDKWallets] = useAtom(ndkWalletsAtom);
-  const [eose, setEose] = useState(false);
   const [cashuWallet, setCashuWallet] = useAtom(cashuWalletAtom);
   const cashu = useAtomValue(cashuAtom);
 
@@ -193,14 +195,10 @@ export function useChachiWallet() {
           const seen = tokenEvents?.find((e) => e.id === event.id);
           if (seen) return;
           addToken(cashuWallet, event);
-          if (eose) {
-            cashuWallet.checkProofs();
-          }
         }
       });
 
       sub.on("eose", () => {
-        setEose(true);
         cashuWallet.checkProofs();
       });
     };
@@ -479,6 +477,7 @@ export function useNWCInfo(wallet: NDKNWCWallet) {
       return wallet.getInfo();
     },
     staleTime: Infinity,
+    gcTime: 0,
   });
 }
 
@@ -490,6 +489,7 @@ export function useWebLNInfo(wallet: NDKWebLNWallet) {
       return wallet.provider?.getInfo();
     },
     staleTime: Infinity,
+    gcTime: 0,
   });
 }
 
@@ -559,16 +559,6 @@ export function useNWCTransactions(wallet: NDKNWCWallet) {
     queryFn: () => fetchNWCTransactions(wallet),
   });
 }
-
-//todo
-//export function useWebLNTransactions(wallet: NDKWebLNWallet) {
-//  return useQuery({
-//    enabled: Boolean(wallet.provider),
-//    queryKey: [WALLET_TXS, walletId(wallet)],
-//    queryFn: () => wallet.provider?.getTransactions(),
-//    staleTime: Infinity,
-//  });
-//}
 
 export function useCashu() {
   return useAtomValue(cashuAtom);
@@ -650,4 +640,76 @@ export function walletId(w: NDKWallet): string {
     return `nwc:${w.pairingCode}`;
   }
   return w.walletId;
+}
+
+export async function createOutTxEvent(
+  ndk: NDK,
+  paymentRequest: { amount: number; description: string },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  paymentResult: any,
+  relaySet?: NDKRelaySet,
+): Promise<NDKCashuWalletTx> {
+  const { description, amount } = paymentRequest;
+  const txEvent = new NDKCashuWalletTx(ndk);
+
+  txEvent.direction = "out";
+  txEvent.amount = amount ?? 0;
+  txEvent.mint = paymentResult.mint;
+  txEvent.description = description;
+  if (paymentResult.fee) txEvent.fee = paymentResult.fee;
+
+  if (paymentResult.stateUpdate?.created)
+    txEvent.createdTokens = [paymentResult.stateUpdate.created];
+  if (paymentResult.stateUpdate?.deleted)
+    txEvent.destroyedTokenIds = paymentResult.stateUpdate.deleted;
+  if (paymentResult.stateUpdate?.reserved)
+    txEvent.reservedTokens = [paymentResult.stateUpdate.reserved];
+
+  await txEvent.sign();
+  txEvent.publish(relaySet);
+
+  return txEvent;
+}
+
+export async function mintEcash(
+  wallet: NDKCashuWallet,
+  mint: string,
+  amount: number,
+  description = "",
+): Promise<Token | undefined> {
+  const cashuWallet = await wallet.cashuWallet(mint);
+  const mintProofs = await wallet.state.getProofs({ mint });
+  const result = await cashuWallet.send(amount, mintProofs, {
+    proofsWeHave: mintProofs,
+    includeFees: true,
+    outputAmounts: {
+      sendAmounts: [amount],
+    },
+  });
+
+  if (result?.send.length > 0) {
+    const destroy = result.send.filter((p) => wallet.state.proofs.get(p.C));
+    const change = { store: result?.keep ?? [], destroy, mint };
+    const updateRes = await wallet.state.update(change);
+
+    // create a change event
+    createOutTxEvent(
+      wallet.ndk,
+      {
+        description,
+        amount,
+      },
+      {
+        result: { proofs: result.send, mint },
+        proofsChange: change,
+        stateUpdate: updateRes,
+        mint,
+        fee: 0,
+      },
+      wallet.relaySet,
+    );
+    wallet.emit("balance_updated");
+
+    return { mint, proofs: result.send, memo: description, unit: "sat" };
+  }
 }

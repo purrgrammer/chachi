@@ -76,10 +76,8 @@ export function useEvent({
     queryKey: [EVENT, id ? id : "empty"],
     queryFn: async () => {
       if (!id) throw new Error("No id");
-      console.log("USEEVENT.1", { id, pubkey });
 
       const cached = await fetchCachedEvent(ndk, id);
-      console.log("USEEVENT.2", { id, pubkey, cached });
       if (cached) {
         return cached;
       }
@@ -95,7 +93,6 @@ export function useEvent({
         ? NDKRelaySet.fromRelayUrls(relayList, ndk)
         : undefined;
 
-      console.log("USEEVENT", { id, pubkey, relayList });
       return ndk
         .fetchEvent(
           { ids: [id], ...(pubkey ? { authors: [pubkey] } : {}) },
@@ -113,6 +110,7 @@ export function useEvent({
         });
     },
     staleTime: Infinity,
+    gcTime: 0,
   });
 }
 
@@ -124,7 +122,11 @@ function fetchCachedAddress(
 ) {
   return ndk
     .fetchEvent(
-      { kinds: [kind], authors: [pubkey], "#d": [identifier] },
+      {
+        kinds: [kind],
+        authors: [pubkey],
+        ...(kind >= 30_0000 && kind <= 40_000 ? { "#d": [identifier] } : {}),
+      },
       {
         closeOnEose: true,
         cacheUsage: NDKSubscriptionCacheUsage.ONLY_CACHE,
@@ -168,10 +170,16 @@ export function useAddress({
       const relaySet = NDKRelaySet.fromRelayUrls(relayList, ndk);
       return ndk
         .fetchEvent(
-          { kinds: [kind], authors: [pubkey], "#d": [identifier] },
+          {
+            kinds: [kind],
+            authors: [pubkey],
+            ...(kind >= 30_0000 && kind <= 40_000
+              ? { "#d": [identifier] }
+              : {}),
+          },
           {
             closeOnEose: true,
-            cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST,
+            cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
           },
           relaySet,
         )
@@ -183,6 +191,7 @@ export function useAddress({
         });
     },
     staleTime: Infinity,
+    gcTime: 0,
   });
 }
 
@@ -385,7 +394,7 @@ export function fetchProfile(ndk: NDK, pubkey: string, relays: string[]) {
         kinds: [NDKKind.Metadata],
         authors: [pubkey],
       },
-      { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
+      { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY },
       NDKRelaySet.fromRelayUrls(
         relays.length > 0 ? relays : profileRelays,
         ndk,
@@ -411,6 +420,7 @@ export function useProfiles(pubkeys: string[]) {
         queryKey: [PROFILE, pubkey],
         queryFn: () => fetchProfile(ndk, pubkey, profileRelays),
         staleTime: Infinity,
+        gcTime: 0,
       };
     }),
   });
@@ -427,7 +437,7 @@ export function useProfile(pubkey?: string, relays: string[] = []) {
       return pubkey ? fetchProfile(ndk, pubkey, relays) : null;
     },
     staleTime: Infinity,
-    gcTime: 1 * 60 * 1000,
+    gcTime: 0,
   });
 }
 
@@ -438,7 +448,7 @@ export async function fetchRelayList(ndk: NDK, pubkey: string) {
         kinds: [NDKKind.RelayList],
         authors: [pubkey],
       },
-      { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.PARALLEL },
+      { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY },
       NDKRelaySet.fromRelayUrls(discoveryRelays, ndk),
     )
     .then((ev) => {
@@ -455,7 +465,7 @@ export function useRelayList(pubkey: string) {
     queryKey: [RELAY_LIST, pubkey],
     queryFn: () => fetchRelayList(ndk, pubkey),
     staleTime: Infinity,
-    gcTime: 5 * 60 * 1000,
+    gcTime: 0,
   });
 }
 

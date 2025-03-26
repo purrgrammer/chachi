@@ -1,7 +1,7 @@
 import Dexie, { Table } from "dexie";
 import NDKCacheAdapterDexie from "@nostr-dev-kit/ndk-cache-dexie";
 import { NDKCashuToken, NDKEvent } from "@nostr-dev-kit/ndk";
-import { Group, GroupMetadata } from "./types";
+import { Group, GroupMetadata, Community } from "./types";
 //import { Transaction } from "@/lib/wallet";
 
 // todo: tweak cache sizes
@@ -47,6 +47,7 @@ export interface GroupInfo {
   nlink?: string;
   visibility?: "public" | "private";
   access?: "open" | "closed";
+  isCommunity?: boolean;
 }
 
 export interface GroupParticipants {
@@ -83,15 +84,17 @@ class ChachiDatabase extends Dexie {
   groupInfo!: Table<GroupInfo>;
   //transactions!: Table<Transaction>;
   nutzaps!: Table<Nutzap>;
+  community!: Table<Community>;
 
   constructor(name: string) {
     super(name);
-    this.version(5).stores({
-      events: "&id,created_at,group,[group+kind]",
-      lastSeen: "[group+kind]",
+    this.version(8).stores({
+      events: "&id,created_at,group,[group+kind],[group+kind+created_at]",
+      lastSeen: "[group+kind],created_at",
       nutzaps: "&id,status,txId",
       tokenEvents: "&id,created_at",
       groupInfo: "[id+relay]",
+      community: "&pubkey",
     });
   }
 }
@@ -106,8 +109,7 @@ export function getUnpublishedEvents() {
 }
 
 export function getTokenEvents() {
-  // todo: sort by created_at
-  return db.tokenEvents.toArray();
+  return db.tokenEvents.orderBy("created_at").toArray();
 }
 
 export function saveTokenEvent(token: NDKCashuToken) {
@@ -125,6 +127,7 @@ export function saveGroupInfo(group: Group, metadata: GroupMetadata) {
     nlink: metadata.nlink,
     visibility: metadata.visibility,
     access: metadata.access,
+    isCommunity: metadata.isCommunity,
   });
 }
 
@@ -154,4 +157,12 @@ export async function getUnpublishedEvent(
 ): Promise<NDKEvent | null> {
   const unpublishedEvents = await cache.getUnpublishedEvents();
   return unpublishedEvents.find((e) => e.event.id === eventId)?.event ?? null;
+}
+
+export function getCommunity(pubkey: string) {
+  return db.community.get(pubkey);
+}
+
+export function saveCommunity(community: Community) {
+  db.community.put(community);
 }

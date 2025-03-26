@@ -1,4 +1,5 @@
 import { useAtomValue } from "jotai";
+import { nip19 } from "nostr-tools";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import NDK, {
   NDKEvent,
@@ -9,12 +10,24 @@ import NDK, {
 import { NostrEvent } from "nostr-tools";
 import { followsAtom } from "@/app/store";
 import { useNDK } from "@/lib/ndk";
-import { useRelays, useRelayList, useRelaySet, useStream } from "@/lib/nostr";
+import {
+  useRelays,
+  useRelayList,
+  useRelaySet,
+  useStream,
+  fetchProfile,
+  fetchRelayList,
+} from "@/lib/nostr";
 import { nip29Relays, isRelayURL } from "@/lib/relay";
 import { useAccount } from "@/lib/account";
 import { useRelayInfo, fetchRelayInfo } from "@/lib/relay";
-import { LEAVE_REQUEST } from "@/lib/kinds";
-import type { Group, GroupMembers, GroupMetadata } from "@/lib/types";
+import { LEAVE_REQUEST, COMMUNIKEY } from "@/lib/kinds";
+import type {
+  Group,
+  GroupMembers,
+  GroupMetadata,
+  Community,
+} from "@/lib/types";
 import {
   queryClient,
   GROUPS,
@@ -24,7 +37,12 @@ import {
   GROUP_MEMBERS,
   GROUP_ADMINS,
 } from "@/lib/query";
-import { getGroupInfo, saveGroupInfo } from "../db";
+import {
+  getGroupInfo,
+  saveGroupInfo,
+  getCommunity,
+  saveCommunity,
+} from "@/lib/db";
 
 export function useUserGroups(pubkey: string) {
   const ndk = useNDK();
@@ -59,7 +77,7 @@ export function useUserGroups(pubkey: string) {
       );
     },
     staleTime: Infinity,
-    gcTime: 1 * 60 * 1000,
+    gcTime: 0,
   });
 }
 
@@ -90,31 +108,78 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
       } as GroupMetadata;
       return metadata;
     });
+  } else {
+    return ndk
+      .fetchEvent(
+        { kinds: [NDKKind.GroupMetadata], "#d": [group.id] },
+        {
+          closeOnEose: true,
+          cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST,
+        },
+        NDKRelaySet.fromRelayUrls([group.relay], ndk),
+      )
+      .then(async (ev: NDKEvent | null) => {
+        if (!ev) {
+          if (group.id.length === 64) {
+            const relays = await fetchRelayList(ndk, group.id);
+            return ndk
+              .fetchEvent(
+                { kinds: [COMMUNIKEY], authors: [group.id] },
+                {
+                  closeOnEose: true,
+                  cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+                },
+                relays ? NDKRelaySet.fromRelayUrls(relays, ndk) : undefined,
+              )
+              .then(async (ev: NDKEvent | null) => {
+                if (!ev) throw new Error("Can't find group metadata");
+                const profile = await fetchProfile(ndk, group.id, []);
+                const relay = ev.tags.find((t) => t[0] === "r")?.[1];
+                if (!relay) throw new Error("Can't find community relay");
+                const backupRelays = ev.tags
+                  .filter((t) => t[0] === "r")
+                  .map((t) => t[1])
+                  .slice(1);
+                return {
+                  id: group.id,
+                  pubkey: ev.pubkey,
+                  relay,
+                  name: profile?.name || group.id,
+                  about: profile?.about || "",
+                  picture: profile?.picture || "",
+                  isCommunity: true,
+                  nlink: nip19.naddrEncode({
+                    kind: COMMUNIKEY,
+                    pubkey: group.id,
+                    relays: [relay, ...backupRelays],
+                    identifier: "",
+                  }),
+                } as GroupMetadata;
+              });
+          } else {
+            throw new Error("Can't find group metadata");
+          }
+        }
+        return {
+          id: group.id,
+          pubkey: ev.pubkey,
+          relay: group.relay,
+          name: ev.tagValue("name") || "",
+          about: ev.tagValue("about"),
+          picture: ev.tagValue("picture"),
+          visibility: ev.tags.find((t) => t[0] === "private")
+            ? "private"
+            : "public",
+          access: ev.tags.find((t) => t[0] === "closed") ? "closed" : "open",
+          nlink: nip19.naddrEncode({
+            kind: NDKKind.GroupMetadata,
+            pubkey: ev.pubkey,
+            relays: [group.relay],
+            identifier: group.id,
+          }),
+        } as GroupMetadata;
+      });
   }
-  return ndk
-    .fetchEvent(
-      { kinds: [NDKKind.GroupMetadata], "#d": [group.id] },
-      { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
-      NDKRelaySet.fromRelayUrls([group.relay], ndk),
-    )
-    .then((ev: NDKEvent | null) => {
-      if (!ev) throw new Error("Can't find group metadata");
-      const metadata = {
-        id: group.id,
-        pubkey: ev.pubkey,
-        relay: group.relay,
-        name: ev.tagValue("name") || "",
-        about: ev.tagValue("about"),
-        picture: ev.tagValue("picture"),
-        visibility: ev.tags.find((t) => t[0] === "private")
-          ? "private"
-          : "public",
-        access: ev.tags.find((t) => t[0] === "closed") ? "closed" : "open",
-        // @ts-expect-error: this is incorrectly typed
-        nlink: ev.encode([group.relay]),
-      } as GroupMetadata;
-      return metadata;
-    });
 }
 
 async function fetchGroups(ndk: NDK, relay: string) {
@@ -149,6 +214,7 @@ export function useGroup(group?: Group) {
       return metadata;
     },
     staleTime: Infinity,
+    gcTime: 0,
   });
 }
 
@@ -166,6 +232,7 @@ export function useGroups(groups: Group[]) {
         return metadata;
       },
       staleTime: Infinity,
+      gcTime: 0,
     })),
   });
 }
@@ -177,6 +244,7 @@ export function useAllGroups(relays: string[]) {
       queryKey: [GROUPS, relay],
       queryFn: () => fetchGroups(ndk, relay),
       staleTime: Infinity,
+      gcTime: 0,
     })),
   });
 }
@@ -278,11 +346,17 @@ export function useGroupAdmins(group: Group) {
 }
 
 export function useGroupParticipants(group: Group) {
+  const { data: metadata } = useGroup(group);
   const { data: members, isSuccess: membersFetched } = useGroupMembers(group);
   const { data: admins, isSuccess: adminsFetched } = useGroupAdmins(group);
   return {
     isSuccess: membersFetched && adminsFetched,
-    admins: admins?.pubkeys || [],
+    admins:
+      metadata?.isCommunity && metadata.pubkey
+        ? [metadata.pubkey]
+        : admins?.pubkeys
+          ? admins.pubkeys
+          : [],
     members: members || [],
     roles: admins?.roles || {},
   };
@@ -319,7 +393,7 @@ export function useCloseGroups() {
       return closeGroups.filter((g: GroupMembers) => g.members.length > 0);
     },
     staleTime: Infinity,
-    gcTime: 1 * 60 * 1000,
+    gcTime: 0,
   });
 }
 
@@ -505,4 +579,44 @@ export function useGroupDescription(group: Group) {
   const { data: relayInfo } = useRelayInfo(relay);
   const isRelayGroup = id === "_";
   return isRelayGroup ? relayInfo?.description : metadata?.about;
+}
+
+export function useCommunity(pubkey: string) {
+  const ndk = useNDK();
+  return useQuery({
+    queryKey: ["COMMUNITY", pubkey],
+    queryFn: async () => {
+      const cached = await getCommunity(pubkey);
+      if (cached) {
+        return cached;
+      }
+      const relays = await fetchRelayList(ndk, pubkey);
+      const info = await ndk.fetchEvent(
+        {
+          kinds: [COMMUNIKEY],
+          authors: [pubkey],
+        },
+        {
+          closeOnEose: true,
+          cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+        },
+        NDKRelaySet.fromRelayUrls(relays, ndk),
+      );
+      if (!info) throw new Error("Can't find community metadata");
+      const communityRelays = info.tags
+        .filter((t) => t[0] === "r")
+        .map((t) => t[1]);
+      const [firstRelay, ...backupRelays] = communityRelays;
+      if (!firstRelay) throw new Error("Invalid community metadata");
+      const c = {
+        pubkey,
+        relay: firstRelay!,
+        backupRelays,
+        blossom: info.tags.filter((t) => t[0] === "blossom").map((t) => t[1]),
+        mint: info.tags.find((t) => t[0] === "mint")?.[1],
+      } as Community;
+      saveCommunity(c);
+      return c;
+    },
+  });
 }

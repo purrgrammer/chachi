@@ -22,7 +22,7 @@ import {
   getUnreadMentions,
   getGroupChatParticipants,
 } from "@/lib/messages/queries";
-import db from "@/lib/db";
+import db, { cache } from "@/lib/db";
 import { Group } from "@/lib/types";
 import { DELETE_GROUP } from "@/lib/kinds";
 import { LastSeen } from "@/lib/db";
@@ -38,6 +38,7 @@ export function saveGroupEvent(event: NostrEvent, group: Group) {
     group: groupId(group),
   };
   db.events.put(record);
+  cache.discardUnpublishedEvent(event.id);
 }
 
 export function saveLastSeen(ev: NostrEvent, group: Group) {

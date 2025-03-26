@@ -42,6 +42,7 @@ export function Markdown({
           <h1 className="text-xs font-semibold my-3 first:mt-0">{children}</h1>
         ),
         p: ({ children }) => (
+          // todo: nlink embeds
           // todo: split blocks into multiple paragraphs
           <p className="font-serif text-md my-2 first:mt-0 leading-normal break-words">
             {typeof children === "string" ? (

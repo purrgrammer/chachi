@@ -276,13 +276,35 @@ export function MintLink({
   className,
   classNames,
   includeLandmark,
+  notClickable,
 }: {
   url: string;
   className?: string;
   classNames?: Record<string, string>;
   includeLandmark?: boolean;
+  notClickable?: boolean;
 }) {
-  return (
+  const content = (
+    <div className="flex flex-row items-center gap-1.5">
+      {includeLandmark ? (
+        <Landmark
+          className={cn("size-3 text-muted-foreground", classNames?.icon)}
+        />
+      ) : null}
+      <div className="flex flex-row items-center gap-1">
+        <MintIcon url={url} className={cn("size-3", classNames?.icon)} />
+        <MintName
+          url={url}
+          className={cn("text-foreground", classNames?.name)}
+        />
+      </div>
+    </div>
+  );
+  return notClickable ? (
+    <div className={cn("text-sm text-muted-foreground", className)}>
+      {content}
+    </div>
+  ) : (
     <Link
       to={`/mint/${encodeURIComponent(url)}`}
       className={cn(
@@ -290,20 +312,7 @@ export function MintLink({
         className,
       )}
     >
-      <div className="flex flex-row items-center gap-1.5">
-        {includeLandmark ? (
-          <Landmark
-            className={cn("size-3 text-muted-foreground", classNames?.icon)}
-          />
-        ) : null}
-        <div className="flex flex-row items-center gap-1">
-          <MintIcon url={url} className={cn("size-3", classNames?.icon)} />
-          <MintName
-            url={url}
-            className={cn("text-foreground", classNames?.name)}
-          />
-        </div>
-      </div>
+      {content}
     </Link>
   );
 }

@@ -125,6 +125,7 @@ export function Nutzap({
   animateGradient,
   showAuthor = true,
   onReplyClick,
+  className,
   classNames,
   showRef = true,
   showTarget = true,
@@ -137,12 +138,16 @@ export function Nutzap({
   classNames?: NutzapClassnames;
   showRef?: boolean;
   showTarget?: boolean;
+  className?: string;
 }) {
   const zap = validateNutzap(event);
   const groupRelay = event.tags.find((t) => t[0] === "h")?.[2];
   return zap ? (
     <div
-      className={`flex flex-col gap-1 ${animateGradient ? "rounded-md border-gradient" : ""} ${animateGradient && zap.amount >= HUGE_AMOUNT ? "border-animated-gradient" : ""}`}
+      className={cn(
+        `flex flex-col gap-1 ${animateGradient ? "rounded-md border-gradient" : ""} ${animateGradient && zap.amount >= HUGE_AMOUNT ? "border-animated-gradient" : ""}`,
+        className,
+      )}
     >
       <div className="flex flex-row gap-10 items-center justify-between">
         {showAuthor ? (

@@ -212,6 +212,23 @@
     background-size: 300% 300%;
     border-radius: inherit;
   }
+  .text-gradient {
+    background: linear-gradient(
+      60deg,
+      hsl(var(--gradient-light-blue)),
+      hsl(var(--gradient-purple)),
+      hsl(var(--gradient-pink)),
+      hsl(var(--gradient-red)),
+      hsl(var(--gradient-orange)),
+      hsl(var(--gradient-yellow))
+    );
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: animatedgradient 6s ease-in-out alternate infinite;
+    background-size: 300% 300%;
+  }
   .bg-animated-gradient {
     background: linear-gradient(
       60deg,

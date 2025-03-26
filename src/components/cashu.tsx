@@ -50,13 +50,14 @@ export function EcashToken({
           }
         />
       </div>
+      <code className="font-mono text-xs break-all">{token}</code>
       <Button
         disabled={copied}
         variant="secondary"
         className="w-[256px] transition-colors"
         onClick={() => copy(token)}
       >
-        {copied ? <Check /> : <Copy />} {t("zap.dialog.copy")}
+        {copied ? <Check /> : <Copy />} {t("wallet.ecash.copy")}
       </Button>
     </div>
   );

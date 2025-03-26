@@ -48,6 +48,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { eventLink } from "@/lib/links";
 import { Nutzap } from "../nutzap";
+import { cn } from "@/lib/utils";
 
 interface ChatZapProps {
   event: NostrEvent;
@@ -249,8 +250,20 @@ export function ChatNutzap({
                       <User pubkey={target} classNames={{ avatar: "size-7" }} />
                     </>
                   ) : (
-                    <div className="flex flex-col gap-1 relative p-1 px-2 bg-background/80 rounded-md">
+                    <div
+                      className={cn(
+                        "flex flex-col gap-1 relative p-1 px-2 bg-background/80",
+                        isMine
+                          ? "rounded-tl-md rounded-tr-md rounded-bl-md rounded-br-none"
+                          : "rounded-tl-md rounded-tr-md rounded-br-md rounded-bl-none",
+                      )}
+                    >
                       <Nutzap
+                        className={
+                          isMine
+                            ? "rounded-tl-md rounded-tr-md rounded-bl-md rounded-br-none"
+                            : "rounded-tl-md rounded-tr-md rounded-br-md rounded-bl-none"
+                        }
                         event={event}
                         group={group}
                         showAuthor={false}

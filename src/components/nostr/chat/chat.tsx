@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { Button } from "@/components/ui/button";
-import { useMintList } from "@/lib/cashu";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { cn } from "@/lib/utils";
 import { ProfileDrawer } from "@/components/nostr/profile";
@@ -245,6 +244,7 @@ function MessageContent({
   isDeleted,
   isMine,
   showRootReply = true,
+  showReply = true,
   canReact = true,
   richTextOptions,
   richTextClassnames = {},
@@ -268,6 +268,7 @@ function MessageContent({
   isNew?: boolean;
   isMine: boolean;
   showRootReply?: boolean;
+  showReply?: boolean;
   canReact?: boolean;
   richTextOptions?: RichTextOptions;
   richTextClassnames?: RichTextClassnames;
@@ -279,7 +280,6 @@ function MessageContent({
 }) {
   const { t } = useTranslation();
   const [settings] = useSettings();
-  const { data: mintList } = useMintList(event.pubkey);
   const relay = group?.relay;
   const ndk = useNDK();
   const relaySet = useRelaySet(group ? [group.relay] : []);
@@ -334,7 +334,8 @@ function MessageContent({
       }
     });
   }, [fragments]);
-  const showReply = replyTo && !eventFragmentIds.includes(replyTo);
+  const shouldShowReply =
+    showReply && replyTo && !eventFragmentIds.includes(replyTo);
   const isSingleCustomEmoji =
     fragments.length === 1 &&
     fragments[0].type === "block" &&
@@ -374,7 +375,7 @@ function MessageContent({
       isOnlyVideo ||
       isOnlyAudio ||
       isSingleEmbed) &&
-    (!isReplyingTo || !showReply) &&
+    (!isReplyingTo || !shouldShowReply) &&
     !isDeleted;
   const [, copy] = useCopy();
 
@@ -516,7 +517,7 @@ function MessageContent({
                 ) : null}
                 {(replyTo || (replyRoot && showRootReply)) &&
                 isReplyingTo &&
-                showReply ? (
+                shouldShowReply ? (
                   <Reply
                     setScrollTo={setScrollTo}
                     group={group}
@@ -531,7 +532,7 @@ function MessageContent({
                 ) : null}
                 {isDeleted ? (
                   <div
-                    className={`flex flex-row items-center gap-1 ${isMine ? "text-foreground/80" : "text-muted-foreground"}`}
+                    className={`flex flex-row items-center gap-1 ${isMine ? "text-primary-foreground" : "text-muted-foreground"}`}
                   >
                     <Ban className="size-3" />
                     <span className="text-xs italic">
@@ -586,7 +587,7 @@ function MessageContent({
                     group={group}
                     onClose={() => setShowingZapDialog(false)}
                     onZap={() => setShowingZapDialog(false)}
-                    zapType={mintList?.pubkey ? "nip-61" : "nip-57"}
+                    zapType="nip-57"
                   />
                 ) : null}
                 {showingEmojiPicker ? (
@@ -738,6 +739,7 @@ export function ChatMessage(props: {
   isNew?: boolean;
   isMine?: boolean;
   showRootReply?: boolean;
+  showReply?: boolean;
   canReact?: boolean;
   richTextOptions?: RichTextOptions;
   richTextClassnames?: RichTextClassnames;

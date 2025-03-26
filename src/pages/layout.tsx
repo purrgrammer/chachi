@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue } from "jotai";
 import { NostrEvent } from "nostr-tools";
 import { ReactNode, useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import NDK, {
   NDKUser,
   NDKKind,
@@ -33,6 +33,8 @@ import { useGroups } from "@/lib/nostr/groups";
 import { useGroupMessages } from "@/lib/nostr/chat";
 import { fetchCustomEmojis } from "@/lib/nostr/emojis";
 import { useChachiWallet } from "@/lib/wallet";
+import { usePubkey } from "@/lib/account";
+import Landing from "@/components/landing";
 
 function useUserEvents() {
   const ndk = useNDK();
@@ -88,6 +90,17 @@ function useUserEvents() {
           .catch((err) => {
             console.error(err);
           });
+      }
+    } else if (loginMethod === '"nsec"') {
+      const nsecAccount = accounts.find((a) => a.method === "nsec");
+      if (nsecAccount && nsecAccount.privkey) {
+        const signer = new NDKPrivateKeySigner(nsecAccount.privkey);
+        ndk.signer = signer;
+        setAccount({
+          method: "nsec",
+          pubkey: nsecAccount.pubkey,
+          privkey: nsecAccount.privkey,
+        });
       }
     }
   }, []);
@@ -190,6 +203,10 @@ function useUserEvents() {
   useEffect(() => {
     if (pubkey && relays.length > 0) {
       const filters = [
+        {
+          kinds: [NDKKind.Metadata],
+          authors: [pubkey],
+        },
         {
           kinds: [NDKKind.SimpleGroupList],
           authors: [pubkey],
@@ -331,12 +348,21 @@ function NostrSync({ children }: { children: ReactNode }) {
 }
 
 export default function Layout() {
+  const pubkey = usePubkey();
+  const location = useLocation();
+  const isApp = pubkey || location.pathname !== "/";
   return (
     <NostrSync>
-      <AppSidebar />
-      <SidebarInset>
-        <Outlet />
-      </SidebarInset>
+      {isApp ? (
+        <>
+          <AppSidebar />
+          <SidebarInset>
+            <Outlet />
+          </SidebarInset>
+        </>
+      ) : (
+        <Landing />
+      )}
     </NostrSync>
   );
 }

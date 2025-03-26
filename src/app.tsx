@@ -21,6 +21,7 @@ const WebLNWallet = lazy(() => import("@/pages/wallet/webln"));
 const Settings = lazy(() => import("@/pages/settings"));
 const Mint = lazy(() => import("@/pages/mint"));
 const Nutzaps = lazy(() => import("@/pages/nutzaps"));
+const Community = lazy(() => import("@/pages/community"));
 
 const LoadingScreen = () => {
   return (
@@ -72,6 +73,30 @@ const router = createBrowserRouter([
       {
         path: ":host",
         element: <Group />,
+      },
+      {
+        path: "/c/:pubkey",
+        element: <Community />,
+      },
+      {
+        path: "/c/:pubkey/posts",
+        element: <Community tab="posts" />,
+      },
+      //{
+      //  path: "/c/:pubkey/articles",
+      //  element: <Community tab="articles" />,
+      //},
+      {
+        path: "/c/:pubkey/videos",
+        element: <Community tab="videos" />,
+      },
+      {
+        path: "/c/:pubkey/images",
+        element: <Community tab="images" />,
+      },
+      {
+        path: "/c/:pubkey/polls",
+        element: <Community tab="polls" />,
       },
       {
         path: "/posts/:host",
