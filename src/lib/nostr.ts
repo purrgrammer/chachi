@@ -125,7 +125,7 @@ function fetchCachedAddress(
       {
         kinds: [kind],
         authors: [pubkey],
-        ...(kind >= 30_0000 && kind <= 40_000 ? { "#d": [identifier] } : {}),
+        ...(kind >= 30_000 && kind <= 40_000 ? { "#d": [identifier] } : {}),
       },
       {
         closeOnEose: true,
