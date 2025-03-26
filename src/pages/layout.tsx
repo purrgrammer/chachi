@@ -117,7 +117,7 @@ function useUserEvents() {
         },
       ],
       {
-        cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
+        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
         closeOnEose: false,
       },
       NDKRelaySet.fromRelayUrls(discoveryRelays, ndk),
