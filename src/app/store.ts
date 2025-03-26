@@ -72,6 +72,19 @@ export const relaysAtom = atom<Relay[]>((get) => {
   return get(relayListAtom).relays;
 });
 
+export const dmRelayListAtom = atomWithStorage<RelayList>(
+  "dm-relay-list",
+  {
+    created_at: 0,
+    relays: [],
+  },
+  createJSONStorage<RelayList>(() => localStorage),
+  { getOnInit: true },
+);
+export const dmRelaysAtom = atom<Relay[]>((get) => {
+  return get(dmRelayListAtom).relays;
+});
+
 // Cashu mints
 interface MintList {
   created_at: number;
@@ -159,12 +172,7 @@ export const emojiListAtom = atomWithStorage<EmojiList>(
   createJSONStorage<EmojiList>(() => localStorage),
   { getOnInit: true },
 );
-export const emojiSetsAtom = atomWithStorage<EmojiSet[]>(
-  "emoji-sets",
-  [],
-  createJSONStorage<EmojiSet[]>(() => localStorage),
-  { getOnInit: true },
-);
+export const emojiSetsAtom = atom<EmojiSet[]>([]);
 
 export function useResetState() {
   const [, setAccount] = useAtom(accountAtom);

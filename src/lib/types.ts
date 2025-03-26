@@ -78,3 +78,8 @@ export interface Community {
   blossom: string[];
   mint?: string;
 }
+
+export type PrivateGroup = {
+  id: string;
+  pubkeys: string[];
+};

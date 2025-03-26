@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue } from "jotai";
 import { NostrEvent } from "nostr-tools";
 import { ReactNode, useEffect } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import NDK, {
   NDKUser,
   NDKKind,
@@ -12,11 +12,11 @@ import NDK, {
   NDKPrivateKeySigner,
 } from "@nostr-dev-kit/ndk";
 import { useNDK } from "@/lib/ndk";
-import { discoveryRelays } from "@/lib/relay";
 import {
   accountAtom,
   accountsAtom,
   relayListAtom,
+  dmRelayListAtom,
   relaysAtom,
   mintListAtom,
   cashuAtom,
@@ -33,8 +33,7 @@ import { useGroups } from "@/lib/nostr/groups";
 import { useGroupMessages } from "@/lib/nostr/chat";
 import { fetchCustomEmojis } from "@/lib/nostr/emojis";
 import { useChachiWallet } from "@/lib/wallet";
-import { usePubkey } from "@/lib/account";
-import Landing from "@/components/landing";
+import { discoveryRelays } from "@/lib/relay";
 
 function useUserEvents() {
   const ndk = useNDK();
@@ -46,6 +45,7 @@ function useUserEvents() {
   const [cashu, setCashu] = useAtom(cashuAtom);
   const [groupList, setGroupList] = useAtom(groupListAtom);
   const [relayList, setRelayList] = useAtom(relayListAtom);
+  const [dmRelayList, setDmRelayList] = useAtom(dmRelayListAtom);
   const [contactList, setContactList] = useAtom(contactListAtom);
   const [mediaServerList, setMediaServerList] = useAtom(mediaServerListAtom);
   const [emojiList, setEmojiList] = useAtom(emojiListAtom);
@@ -91,17 +91,6 @@ function useUserEvents() {
             console.error(err);
           });
       }
-    } else if (loginMethod === '"nsec"') {
-      const nsecAccount = accounts.find((a) => a.method === "nsec");
-      if (nsecAccount && nsecAccount.privkey) {
-        const signer = new NDKPrivateKeySigner(nsecAccount.privkey);
-        ndk.signer = signer;
-        setAccount({
-          method: "nsec",
-          pubkey: nsecAccount.pubkey,
-          privkey: nsecAccount.privkey,
-        });
-      }
     }
   }, []);
 
@@ -110,24 +99,44 @@ function useUserEvents() {
     if (!pubkey) return;
 
     const sub = ndk.subscribe(
+      [
+        {
+          kinds: [NDKKind.RelayList],
+          authors: [pubkey],
+          since: relayList.created_at,
+        },
+        {
+          kinds: [NDKKind.DirectMessageReceiveRelayList],
+          authors: [pubkey],
+          since: dmRelayList.created_at,
+        },
+      ],
       {
-        kinds: [NDKKind.RelayList],
-        authors: [pubkey],
-        since: relayList.created_at,
-      },
-      {
-        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+        cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
         closeOnEose: false,
       },
       NDKRelaySet.fromRelayUrls(discoveryRelays, ndk),
     );
 
     sub.on("event", (event) => {
-      if (event.created_at && event.created_at > (relayList.created_at || 0)) {
+      if (
+        event.kind === NDKKind.RelayList &&
+        event.created_at &&
+        event.created_at > (relayList.created_at || 0)
+      ) {
         const userRelays = event.tags
           .filter((t) => t[0] === "r" && t[1] && isRelayURL(t[1]))
           .map((t) => ({ url: t[1] }));
         setRelayList({ relays: userRelays, created_at: event.created_at });
+      } else if (
+        event.kind === NDKKind.DirectMessageReceiveRelayList &&
+        event.created_at &&
+        event.created_at > (dmRelayList.created_at || 0)
+      ) {
+        const dmRelays = event.tags
+          .filter((t) => t[0] === "relay" && t[1] && isRelayURL(t[1]))
+          .map((t) => ({ url: t[1] }));
+        setDmRelayList({ relays: dmRelays, created_at: event.created_at });
       }
     });
 
@@ -204,10 +213,6 @@ function useUserEvents() {
     if (pubkey && relays.length > 0) {
       const filters = [
         {
-          kinds: [NDKKind.Metadata],
-          authors: [pubkey],
-        },
-        {
           kinds: [NDKKind.SimpleGroupList],
           authors: [pubkey],
           since: groupList.created_at,
@@ -264,7 +269,6 @@ function useUserEvents() {
                 privateGroups,
               });
             } catch (err) {
-              console.error(err);
               setGroupList({
                 groups: userGroups,
                 content: event.content,
@@ -348,21 +352,12 @@ function NostrSync({ children }: { children: ReactNode }) {
 }
 
 export default function Layout() {
-  const pubkey = usePubkey();
-  const location = useLocation();
-  const isApp = pubkey || location.pathname !== "/";
   return (
     <NostrSync>
-      {isApp ? (
-        <>
-          <AppSidebar />
-          <SidebarInset>
-            <Outlet />
-          </SidebarInset>
-        </>
-      ) : (
-        <Landing />
-      )}
+      <AppSidebar />
+      <SidebarInset>
+        <Outlet />
+      </SidebarInset>
     </NostrSync>
   );
 }

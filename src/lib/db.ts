@@ -77,6 +77,17 @@ export interface Nutzap {
   claimedAt?: number;
 }
 
+export interface PrivateEvent {
+  id: string;
+  gift: string;
+  group: string;
+  kind: number;
+  created_at: number;
+  content: string;
+  pubkey: string;
+  tags: string[][];
+}
+
 class ChachiDatabase extends Dexie {
   events!: Table<Event>;
   lastSeen!: Table<LastSeen>;
@@ -85,6 +96,7 @@ class ChachiDatabase extends Dexie {
   //transactions!: Table<Transaction>;
   nutzaps!: Table<Nutzap>;
   community!: Table<Community>;
+  dms!: Table<PrivateEvent>;
 
   constructor(name: string) {
     super(name);
@@ -95,6 +107,7 @@ class ChachiDatabase extends Dexie {
       tokenEvents: "&id,created_at",
       groupInfo: "[id+relay]",
       community: "&pubkey",
+      dms: "&id,gift,created_at,group,[group+kind]",
     });
   }
 }

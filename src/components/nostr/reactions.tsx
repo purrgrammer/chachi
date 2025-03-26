@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Bitcoin } from "lucide-react";
-import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
+import { NDKRelaySet, NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { Avatar } from "@/components/nostr/avatar";
 import { RichText } from "@/components/rich-text";
 import { Button } from "@/components/ui/button";
-import { useRelaySet, useReactions } from "@/lib/nostr";
+import { useReactions } from "@/lib/nostr";
 import { formatShortNumber } from "@/lib/number";
 import { useNDK } from "@/lib/ndk";
 import { usePubkey } from "@/lib/account";
@@ -20,22 +20,6 @@ import { cn, groupBy } from "@/lib/utils";
 import { CUSTOM_EMOJI_CONTENT_REGEX } from "@/lib/emoji";
 import { HUGE_AMOUNT } from "@/lib/zap";
 import { useMintList } from "@/lib/cashu";
-
-const richTextClassname = "max-w-16 text-xs break-all line-clamp-1";
-const richTextOptions = {
-  inline: true,
-  events: false,
-  ecash: false,
-  video: false,
-  images: true,
-  audio: false,
-  emojis: true,
-  syntax: false,
-};
-
-const richTextclassNames = {
-  image: "w-4 h-4 rounded-sm",
-};
 
 function Reacters({
   reactions,
@@ -88,7 +72,6 @@ function Reaction({
   isCompact: boolean;
 }) {
   const ndk = useNDK();
-  const relaySet = useRelaySet(relays);
   const [isReacting, setIsReacting] = useState(false);
   const isCustomEmoji = CUSTOM_EMOJI_CONTENT_REGEX.test(content);
   const emojiName = content.slice(1, -1);
@@ -100,6 +83,7 @@ function Reaction({
 
   async function react(content: string) {
     try {
+      const relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
       setIsReacting(true);
       if (ndk) {
         const e = new NDKEvent(ndk, {
@@ -120,6 +104,7 @@ function Reaction({
     try {
       setIsReacting(true);
       if (ndk) {
+        const relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
         const e = new NDKEvent(ndk, {
           kind: NDKKind.Reaction,
           content: `:${emoji}:`,
@@ -174,9 +159,15 @@ function NutzapReaction({ nutzap }: { nutzap: Nutzap }) {
           <Tooltip>
             <TooltipTrigger asChild>
               <RichText
-                className={richTextClassname}
-                options={richTextOptions}
-                classNames={richTextclassNames}
+                className="max-w-16 text-xs break-all line-clamp-1"
+                options={{
+                  inline: true,
+                  events: false,
+                  ecash: false,
+                  video: false,
+                  images: false,
+                  audio: false,
+                }}
                 tags={nutzap.tags}
               >
                 {nutzap.content.trim()}
@@ -184,9 +175,15 @@ function NutzapReaction({ nutzap }: { nutzap: Nutzap }) {
             </TooltipTrigger>
             <TooltipContent>
               <RichText
-                className={richTextClassname}
-                options={richTextOptions}
-                classNames={richTextclassNames}
+                className="text-xs break-all"
+                options={{
+                  inline: true,
+                  events: false,
+                  ecash: false,
+                  video: false,
+                  images: false,
+                  audio: false,
+                }}
                 tags={nutzap.tags}
               >
                 {nutzap.content.trim()}
@@ -218,20 +215,32 @@ function ZapReaction({ zap }: { zap: Zap }) {
           <Tooltip>
             <TooltipTrigger asChild>
               <RichText
-                className={richTextClassname}
-                options={richTextOptions}
-                classNames={richTextclassNames}
+                className="text-xs line-clamp-1"
                 tags={zap.tags}
+                options={{
+                  inline: true,
+                  events: false,
+                  ecash: false,
+                  video: false,
+                  images: false,
+                  audio: false,
+                }}
               >
                 {zap.content.trim()}
               </RichText>
             </TooltipTrigger>
             <TooltipContent>
               <RichText
-                className={richTextClassname}
-                options={richTextOptions}
-                classNames={richTextclassNames}
+                className="text-xs"
                 tags={zap.tags}
+                options={{
+                  inline: true,
+                  events: false,
+                  ecash: false,
+                  video: false,
+                  images: false,
+                  audio: false,
+                }}
               >
                 {zap.content.trim()}
               </RichText>
@@ -260,23 +269,17 @@ function getOldestReaction(reactions: NostrEvent[]): NostrEvent | null {
   );
 }
 
-// todo: configurable sizes, bg
-// todo: implement lazy reactions
-export function Reactions({
+export function ReactionsList({
   event,
-  relays = [],
-  kinds = [NDKKind.Reaction],
+  events,
+  relays,
   className,
-  live,
 }: {
   event: NostrEvent;
+  events: NostrEvent[];
   relays?: string[];
-  kinds?: NDKKind[];
   className?: string;
-  live?: boolean;
 }) {
-  const { events } = useReactions(event, kinds, relays, live);
-
   const zaps = events
     .filter((r) => r.kind === NDKKind.Zap)
     .map(validateZap)
@@ -320,7 +323,7 @@ export function Reactions({
           <Reaction
             key={`reaction-${idx}`}
             event={event}
-            relays={relays}
+            relays={relays || []}
             content={content}
             reactions={(reactions as NostrEvent[]).reverse()}
             isCompact={isCompact}
@@ -328,6 +331,25 @@ export function Reactions({
         ))}
     </div>
   ) : null;
+}
+
+// todo: configurable sizes, bg
+// todo: implement lazy reactions
+export function Reactions({
+  event,
+  relays = [],
+  kinds = [NDKKind.Reaction],
+  className,
+  live,
+}: {
+  event: NostrEvent;
+  relays?: string[];
+  kinds?: NDKKind[];
+  className?: string;
+  live?: boolean;
+}) {
+  const { events } = useReactions(event, kinds, relays, live);
+  return <ReactionsList event={event} events={events} className={className} />;
 }
 
 export function Zaps({

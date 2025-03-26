@@ -8,11 +8,13 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import ndk, { nwcNDK, NDKContext } from "@/lib/ndk";
+import ndk, { nwcNdk, NDKContext } from "@/lib/ndk";
 import { queryClient } from "@/lib/query";
 
 const Layout = lazy(() => import("@/pages/layout"));
 const Home = lazy(() => import("@/pages/home"));
+const DirectMessages = lazy(() => import("@/pages/dms"));
+const DirectMessageGroup = lazy(() => import("@/pages/dm-group"));
 const Group = lazy(() => import("@/pages/group"));
 const Event = lazy(() => import("@/pages/event"));
 const Wallet = lazy(() => import("@/pages/wallet"));
@@ -21,7 +23,7 @@ const WebLNWallet = lazy(() => import("@/pages/wallet/webln"));
 const Settings = lazy(() => import("@/pages/settings"));
 const Mint = lazy(() => import("@/pages/mint"));
 const Nutzaps = lazy(() => import("@/pages/nutzaps"));
-const Community = lazy(() => import("@/pages/community"));
+const Relay = lazy(() => import("@/pages/relay"));
 
 const LoadingScreen = () => {
   return (
@@ -54,14 +56,13 @@ const router = createBrowserRouter([
     path: "/",
     element: (
       <AnimatePresence>
-        <Suspense name="layout" fallback={<LoadingScreen />}>
+        <Suspense fallback={<LoadingScreen />}>
           <Layout />
         </Suspense>
       </AnimatePresence>
     ),
     loader: async () => {
       console.log("CONNECTING NDK instances");
-      // todo: connect to group relays and auth, then proceed
       await ndk.connect();
       return null;
     },
@@ -71,32 +72,16 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
+        path: "/dm",
+        element: <DirectMessages />,
+      },
+      {
+        path: "/dm/:id",
+        element: <DirectMessageGroup />,
+      },
+      {
         path: ":host",
         element: <Group />,
-      },
-      {
-        path: "/c/:pubkey",
-        element: <Community />,
-      },
-      {
-        path: "/c/:pubkey/posts",
-        element: <Community tab="posts" />,
-      },
-      //{
-      //  path: "/c/:pubkey/articles",
-      //  element: <Community tab="articles" />,
-      //},
-      {
-        path: "/c/:pubkey/videos",
-        element: <Community tab="videos" />,
-      },
-      {
-        path: "/c/:pubkey/images",
-        element: <Community tab="images" />,
-      },
-      {
-        path: "/c/:pubkey/polls",
-        element: <Community tab="polls" />,
       },
       {
         path: "/posts/:host",
@@ -170,6 +155,10 @@ const router = createBrowserRouter([
         path: "/zaps",
         element: <Nutzaps />,
       },
+      {
+        path: "/relay/:relay",
+        element: <Relay />,
+      },
     ],
   },
 ]);
@@ -177,7 +166,7 @@ const router = createBrowserRouter([
 export default function App() {
   return (
     <Provider>
-      <NDKContext.Provider value={{ main: ndk, nwc: nwcNDK }}>
+      <NDKContext.Provider value={{ main: ndk, nwc: nwcNdk }}>
         <QueryClientProvider client={queryClient}>
           <SidebarProvider>
             <ThemeProvider defaultTheme="dark" storageKey="chachi-theme">

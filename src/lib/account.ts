@@ -16,7 +16,9 @@ import {
   accountsAtom,
   followsAtom,
   mintListAtom,
+  dmRelaysAtom,
 } from "@/app/store";
+import { useRelays } from "@/lib/nostr";
 
 export function useAccount(): Account | null {
   const account = useAtomValue(accountAtom);
@@ -169,4 +171,15 @@ export function useNsecLogin() {
 
 export function useMintList() {
   return useAtomValue(mintListAtom);
+}
+
+export function useDMRelays() {
+  const outboxRelays = useRelays();
+  const dmRelays = useAtomValue(dmRelaysAtom);
+  if (dmRelays.length > 0) {
+    const dm = dmRelays.map((relay) => relay.url);
+    return { dm, fallback: [] };
+  } else {
+    return { dm: [], fallback: outboxRelays };
+  }
 }

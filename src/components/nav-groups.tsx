@@ -19,6 +19,7 @@ import {
   //useUnreadMentions,
 } from "@/lib/messages";
 import type { Group } from "@/lib/types";
+import { VenetianMask } from "lucide-react";
 
 function RelayItem({ group }: { group: Group }) {
   const { host } = useParams();
@@ -198,10 +199,32 @@ function GroupItem({ group }: { group: Group }) {
   );
 }
 
+function PrivateGroups() {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  // todo: unread messages count
+  return (
+    <div
+      className={`flex flex-row gap-2 items-center p-1 py-2 cursor-pointer transition-colors hover:bg-accent/80 overflow-hidden group-has-[[data-collapsible=icon]]/sidebar-wrapper:bg-transparent group-has-[[data-collapsible=icon]]/sidebar-wrapper:py-1 transition-all`}
+      onClick={() => navigate("/dm")}
+    >
+      <div className={`size-10 rounded-full relative`}>
+        <VenetianMask className="size-10 text-muted-foreground" />
+      </div>
+      <div className="flex flex-row gap-2 items-center">
+        <div className="flex flex-col">
+          <h3 className="line-clamp-1">{t("private-group.private-groups")}</h3>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function MyGroupList() {
   const sortedGroups = useSortedGroups();
   return (
     <SidebarMenu className="gap-0">
+      <PrivateGroups />
       <Reorder.Group
         axis="y"
         layoutScroll

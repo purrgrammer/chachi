@@ -4,9 +4,12 @@
   },
   "home": "Home",
   "nav": {
-    "no-groups": "No groups"
+    "no-groups": "No groups",
+    "no-private-groups": "No private groups"
   },
   "user": {
+    "dms": "Private messages",
+    "groups": "Groups",
     "donate": "Donate",
     "thank-you": "Thank you for your donation 💜",
     "support-chachi": "Donate to Chachi",
@@ -835,5 +838,29 @@
     "source-code-desc": "Chachi is a free and open source project, anyone can contribute by submiting feedback, bug reports, feature requests, participating in the community chat and sending pull requests",
     "source-code-link": "View source code",
     "source-code-chat": "Join the community chat"
+  },
+  "private-group": {
+    "private-groups": "Private groups",
+    "dm-relays": "Private message relays",
+    "auth": "Auth",
+    "type": {
+      "trigger": "Private messages",
+      "trigger-many": "Private group",
+      "content": "Encrypted messages, only you and the recipient can read the content",
+      "content-many": "Encrypted group messages, only members can read content"
+    },
+    "relays": "Relays",
+    "no-relays": "No relays found",
+    "searching-relays": "Searching relays",
+    "compliant": "User has set up private message relays",
+    "non-compliant": "User has not set up private message relays, falling back to outbox relays",
+    "requests": "Requests",
+    "create": {
+      "new": "New private group",
+      "title": "Create private group",
+      "description": "Create a new private group to chat with your friends"
+    },
+    "no-dm-relays": "No private message relays found",
+    "groups": "Groups"
   }
 }
