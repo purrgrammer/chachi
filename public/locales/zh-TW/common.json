@@ -14,7 +14,13 @@
     "login": {
       "start": "開始",
       "title": "開始",
-      "description": "請選擇以下登錄方式。",
+      "description": "Use your existing identity or create a new one.",
+      "connect": "連接",
+      "new-account": "Are you new here?",
+      "new-account-description": "Don't worry, we'll help you get started in a minute.",
+      "new-account-button": "Let's get started!",
+      "options": "Are you already on nostr?",
+      "options-description": "Choose the login method you prefer.",
       "extension": {
         "label": "擴充套件",
         "error": "無法使用擴充套件登錄"
@@ -23,8 +29,12 @@
         "label": "遠程簽名器",
         "error": "无法使用遠程簽名器登录"
       },
-      "or": "或者",
-      "connect": "連接"
+      "nsec": {
+        "label": "Private Key",
+        "error": "Failed to log in with private key",
+        "or": "or",
+        "connect": "Connect"
+      }
     },
     "logout": "登出",
     "zaps": "打閃",
@@ -530,7 +540,10 @@
       "message": "Message",
       "message-placeholder": "Write an optional message",
       "mint-error": "Error creating ecash token in {{ mint }}",
-      "copy": "Copy token"
+      "copy": "Copy token",
+      "redeem": "Redeem",
+      "redeem-error": "Failed to redeem ecash",
+      "redeem-success": "Ecash redeemed"
     },
     "keys": "密鑰",
     "sync": "同步",
@@ -784,5 +797,32 @@
       "order-success": "Order created successfully",
       "error": "Failed to create relay"
     }
+  },
+  "landing": {
+    "features": {
+      "title": "Magic tricks",
+      "description": "Connect, chat, zap, upload files, send gifs, stickers and much more!",
+      "connect": "Connect",
+      "connect-desc": "Connect to a relay to start chatting",
+      "chat": "Chat",
+      "chat-desc": "Chat with friends and communities",
+      "payments": "Payments",
+      "payments-desc": "Send and receive payments seamlessly",
+      "files": "Files",
+      "files-desc": "Upload and share files",
+      "selfhost": "Own your data",
+      "selfhost-desc": "Self-host your messages and files"
+    },
+    "testimonials": "Testimonials",
+    "testimonials-desc": "What people are saying about us",
+    "supporters": "Supporters",
+    "supporters-desc": "Thank you to everyone who has supported the project with a donation",
+    "get-started": "Get started",
+    "communities": "Communities",
+    "communities-desc": "Find or create a community to chat with your friends",
+    "source-code": "Open source",
+    "source-code-desc": "Chachi is a free and open source project, anyone can contribute by submiting feedback, bug reports, feature requests, participating in the community chat and sending pull requests",
+    "source-code-link": "View source code",
+    "source-code-chat": "Join the community chat"
   }
 }
