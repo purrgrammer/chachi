@@ -90,13 +90,13 @@
       "description": "Crea un nuevo grupo para chatear con tus amigos",
       "type": {
         "select": "What type of group do you want to create?",
-        "nip29": "Group",
-        "community": "Community",
+        "nip29": "Grupo",
+        "community": "Comunidad",
         "nip29_description": "Create a moderated group that starts with a clean slate. Hosted on NIP-29 compatible relays.",
         "community_description": "Turn an existing pubkey into a community where all content from that pubkey is displayed. Can be hosted on any relay. Moderation is handled by the relay."
       },
       "community": {
-        "title": "Create Community",
+        "title": "Crear comunidad",
         "description": "Create a community based on a pubkey",
         "coming_soon": "Community creation is coming soon!",
         "explanation": "Communities are groups built around an existing pubkey, showing all their content. Unlike standard groups, communities don't start empty - they include all posts from the pubkey.",
@@ -109,7 +109,7 @@
           },
           "backup_relays": {
             "label": "Backup Relays",
-            "add": "Add",
+            "add": "Añadir",
             "add_placeholder": "wss://backup.example.com",
             "description": "Additional relays where content will be published",
             "error_duplicate": "This relay is already in your backup list",
@@ -126,14 +126,14 @@
           },
           "backup_blossom": {
             "label": "Backup Blossom Servers",
-            "add": "Add",
+            "add": "Añadir",
             "add_placeholder": "https://backup-blossom.example.com",
             "description": "Additional Blossom media servers for redundancy",
             "error_duplicate": "This server is already in your backup list",
             "error_duplicate_primary": "This server is already set as your primary Blossom server"
           },
           "use_mint": {
-            "label": "Use Community Mint",
+            "label": "Usar mint de comunidad",
             "description": "Enable a community-specific mint for rewards and transactions"
           },
           "mint": {
