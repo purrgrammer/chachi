@@ -16,7 +16,7 @@
     "support-chachi": "Donate to Chachi",
     "support-chachi-description": "Chachi is a free and open source project. Your donation helps keep the project alive and supports the development of new features.",
     "login": {
-      "or": "Or",
+      "or": "or",
       "start": "Get started",
       "title": "Get started",
       "description": "Use your existing identity or create a new one.",
@@ -985,6 +985,27 @@
     "supported_kinds": "Content Types"
   },
   "private-group": {
+    "create": {
+      "new": "New private group",
+      "title": "Create private group",
+      "description": "Create a new private group to chat with your friends",
+      "selected": "Selected",
+      "no-matches": "No matches found",
+      "trigger": "Create",
+      "success": "Private group created",
+      "error": "Failed to create private group",
+      "follows": "Follows",
+      "add-some-participants": "Start typing to search and add participants",
+      "group-members": "Group members",
+      "search-follows": "Start typing to search your follows",
+      "form": {
+        "submit": {
+          "trigger": "Create",
+          "success": "Private group created",
+          "error": "Failed to create private group"
+        }
+      }
+    },
     "private-groups": "Private groups",
     "dm-relays": "Private message relays",
     "auth": "Auth",
@@ -1000,12 +1021,8 @@
     "compliant": "User has set up private message relays",
     "non-compliant": "User has not set up private message relays, falling back to outbox relays",
     "requests": "Requests",
-    "create": {
-      "new": "New private group",
-      "title": "Create private group",
-      "description": "Create a new private group to chat with your friends"
-    },
     "no-dm-relays": "No private message relays found",
-    "groups": "Groups"
+    "groups": "Groups",
+    "saved-messages": "Saved messages"
   }
 }

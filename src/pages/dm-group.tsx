@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RelayIcon } from "@/components/nostr/relay";
-import { RichText } from "@/components/rich-text";
+import { User } from "@/components/nostr/user";
+import { NameList } from "@/components/nostr/name-list";
 import { Route, RouteOff, MessageSquareLock } from "lucide-react";
 import { NDKKind, NostrEvent } from "@nostr-dev-kit/ndk";
 import { useParams } from "react-router-dom";
 import { Avatar } from "@/components/nostr/avatar";
-import { Name } from "@/components/nostr/name";
 import { Header } from "@/components/header";
 import {
   useGroupMessages,
@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/tooltip";
 import { PrivateGroup } from "@/lib/types";
 import { usePubkey, useDMRelays } from "@/lib/account";
-import { useUserStatus } from "@/lib/nostr/user";
 
 function GroupChat({ id, group }: { id: string; group: PrivateGroup }) {
   const messages = useGroupMessages(id);
@@ -95,10 +94,59 @@ function GroupChat({ id, group }: { id: string; group: PrivateGroup }) {
   );
 }
 
+function DirectMessageGroupPubkey({ pubkey }: { pubkey: string }) {
+  const { data: relayList } = useDirectMessageRelays(pubkey);
+  return (
+    <UserRelays
+      pubkey={pubkey}
+      relays={
+        relayList?.dm && relayList.dm.length > 0
+          ? relayList.dm
+          : relayList
+            ? relayList.fallback
+            : []
+      }
+      isCompliant={relayList?.dm && relayList.dm.length > 0}
+    />
+  );
+}
+
 function DirectMessageMultiGroup({ group }: { group: PrivateGroup }) {
   // todo: multi groups
-  console.log("TODO", group);
-  return <>TODO</>;
+  const { id } = group;
+  const { t } = useTranslation();
+  return (
+    <>
+      <Header>
+        <div className="flex items-center justify-between w-full">
+          <div className="flex flex-row items-center gap-2">
+            <div className="flex flex-col gap-0">
+              <span className="font-normal text-md line-clamp-1 leading-tight">
+                <NameList pubkeys={group.pubkeys} />
+              </span>
+            </div>
+          </div>
+          <Tooltip>
+            <TooltipTrigger>
+              <div className="flex gap-1.5 items-center">
+                <MessageSquareLock className="size-3 text-muted-foreground" />
+                <span className="hidden text-xs line-clamp-1 sm:block">
+                  {t("private-group.type.trigger")}
+                </span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>{t("private-group.type.content")}</TooltipContent>
+          </Tooltip>
+        </div>
+      </Header>
+      <div className="flex flex-row items-center gap-1.5 p-1 pl-4 border-b overflow-hidden">
+        {group.pubkeys.map((p) => (
+          <DirectMessageGroupPubkey key={p} pubkey={p} />
+        ))}
+      </div>
+      <GroupChat id={id} group={group} />
+    </>
+  );
 }
 
 function UserRelays({
@@ -144,28 +192,17 @@ function SingleGroup({ group, peer }: { group: PrivateGroup; peer: string }) {
   const { t } = useTranslation();
   const pubkey = usePubkey();
   const { data: relayList } = useDirectMessageRelays(peer);
-  const { data: status } = useUserStatus(peer);
   return (
     <>
       <Header>
         <div className="flex items-center justify-between w-full">
-          <div className="flex flex-row items-center gap-2">
-            <Avatar pubkey={peer} className="size-8" />
-            <div className="flex flex-col gap-0">
-              <span className="font-normal text-md line-clamp-1 leading-tight">
-                <Name pubkey={peer} />
-              </span>
-              {status ? (
-                <RichText
-                  className="text-muted-foreground text-xs line-clamp-1"
-                  options={{ inline: true, urls: true }}
-                  tags={status.tags}
-                >
-                  {status.content.trim()}
-                </RichText>
-              ) : null}
-            </div>
-          </div>
+          <User
+            pubkey={peer}
+            classNames={{
+              avatar: "size-8",
+              name: "font-normal text-md line-clamp-1 leading-tight",
+            }}
+          />
           <Tooltip>
             <TooltipTrigger>
               <div className="flex gap-1.5 items-center">

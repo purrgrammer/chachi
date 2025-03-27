@@ -91,6 +91,7 @@ interface AutocompleteTextareaProps extends TextareaProps {
   setMessage: (msg: string) => void;
   onFinish?: (msg: string, emojis: Emoji[]) => void;
   onCustomEmojisChange?: (emojis: Emoji[]) => void;
+  onProfileAutocomplete?: (profile: Profile) => void;
   reply?: NostrEvent;
   setReplyingTo?: (event: NostrEvent | undefined) => void;
   submitOnEnter?: boolean;
@@ -107,6 +108,7 @@ export function AutocompleteTextarea({
   setMessage,
   onFinish,
   onCustomEmojisChange,
+  onProfileAutocomplete,
   reply,
   setReplyingTo,
   submitOnEnter,
@@ -205,6 +207,7 @@ export function AutocompleteTextarea({
     setMessage(
       message.replace(autocompleteRegex, `nostr:${npubEncode(p.pubkey)} `),
     );
+    onProfileAutocomplete?.(p);
     setIsAutocompleting(false);
     setIsAutocompletingEmoji(false);
     setAutocompleteTerm("");

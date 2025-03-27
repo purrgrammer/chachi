@@ -10,8 +10,13 @@ export function Highlight({
 }) {
   const parts = useMemo(() => {
     let result: ReactNode[] = [];
+    if (!highlight || !text) {
+      return [text];
+    }
+
     const termRegex = new RegExp(highlight, "ig");
     const matches = text.match(termRegex);
+
     if (highlight && matches) {
       const { indexes } = (matches || []).reduce(
         (acc, m) => {
@@ -27,9 +32,11 @@ export function Highlight({
 
       result = indexes.reduce((acc: ReactNode[], i: number, idx: number) => {
         const lastI = indexes[idx - 1] ?? -1;
-        const prefix = text.slice(lastI + 1, i);
-        if (i !== 0) {
+        const prefix = text.slice(lastI + highlight.length, i);
+        if (idx !== 0) {
           acc.push(prefix);
+        } else if (i > 0) {
+          acc.push(text.slice(0, i));
         }
 
         const term = text.slice(i, i + highlight.length);

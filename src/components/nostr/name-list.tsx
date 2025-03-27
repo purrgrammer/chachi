@@ -12,6 +12,7 @@ export function NameList({
   avatarClassName,
   textClassName,
   max = 3,
+  notClickable = false,
 }: {
   pubkeys: string[];
   suffix?: string;
@@ -19,6 +20,7 @@ export function NameList({
   avatarClassName?: string;
   textClassName?: string;
   max?: number;
+  notClickable?: boolean;
 }) {
   const q = useProfiles(pubkeys);
   const { t } = useTranslation();
@@ -31,6 +33,7 @@ export function NameList({
         ? deduped.slice(0, max).map((pubkey, idx) => (
             <div key={pubkey} className="flex items-center gap-0">
               <User
+                notClickable={notClickable}
                 key={pubkey}
                 pubkey={pubkey}
                 classNames={{
@@ -51,6 +54,7 @@ export function NameList({
         : deduped.map((pubkey, idx) => (
             <div key={pubkey} className="flex items-center gap-0">
               <User
+                notClickable={notClickable}
                 key={pubkey}
                 pubkey={pubkey}
                 classNames={{

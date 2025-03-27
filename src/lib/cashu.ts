@@ -16,6 +16,7 @@ import { queryClient, MINT_INFO, MINT_KEYS, MINT_LIST } from "@/lib/query";
 import { getNutzaps } from "@/lib/nutzaps";
 
 export const cashuRegex = /(cashu[AB][A-Za-z0-9_-]{0,10000}={0,3})/g;
+export const cashuRequestRegex = /(creqA[A-Za-z0-9_-]{0,10000}={0,3})/g;
 
 export function useMintInfo(url: string) {
   return useQuery({

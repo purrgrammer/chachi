@@ -1106,12 +1106,6 @@ function extractHashtags(fragments: Fragment[]): Fragment[] {
   });
 }
 
-//function extractEcash(fragments: Fragment[]): Fragment[] {
-//  return extract(fragments, cashuRegex, (token: string) => {
-//    return { type: "ecash", token } as Fragment;
-//  });
-//}
-
 // Regex for code blocks - improved to handle GitHub-style language specifiers
 const codeBlockRegex = /```((?:[a-zA-Z0-9\-+]+)\n|)([\s\S]*?)```/g;
 
