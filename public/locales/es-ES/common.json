@@ -14,13 +14,13 @@
     "login": {
       "start": "Empezar",
       "title": "Empezar",
-      "description": "Use your existing identity or create a new one.",
+      "description": "Utiliza tu identidad existente o crea una nueva.",
       "connect": "Conectarse",
-      "new-account": "Are you new here?",
-      "new-account-description": "Don't worry, we'll help you get started in a minute.",
-      "new-account-button": "Let's get started!",
-      "options": "Are you already on nostr?",
-      "options-description": "Choose the login method you prefer.",
+      "new-account": "¿Eres nuevo aquí?",
+      "new-account-description": "No te preocupes, te ayudaremos a empezar en un momento.",
+      "new-account-button": "¡Empecemos!",
+      "options": "¿Ya estás en nostr?",
+      "options-description": "Elige el método de inicio de sesión que prefieras.",
       "extension": {
         "label": "Extensión del navegador",
         "error": "No se pudo iniciar sesión con la extensión del navegador"
@@ -30,10 +30,10 @@
         "error": "No se pudo iniciar sesión con el firmante remoto"
       },
       "nsec": {
-        "label": "Private Key",
-        "error": "Failed to log in with private key",
-        "or": "or",
-        "connect": "Connect"
+        "label": "Clave Privada",
+        "error": "No se pudo iniciar sesión con la clave privada",
+        "or": "o",
+        "connect": "Conectarse"
       }
     },
     "logout": "Cerrar sesión",
@@ -89,57 +89,57 @@
       "title": "Crear grupo",
       "description": "Crea un nuevo grupo para chatear con tus amigos",
       "type": {
-        "select": "What type of group do you want to create?",
-        "nip29": "Group",
-        "community": "Community",
-        "nip29_description": "Create a moderated group that starts with a clean slate. Hosted on NIP-29 compatible relays.",
-        "community_description": "Turn an existing pubkey into a community where all content from that pubkey is displayed. Can be hosted on any relay. Moderation is handled by the relay."
+        "select": "¿Qué tipo de grupo quieres crear?",
+        "nip29": "Grupo",
+        "community": "Comunidad",
+        "nip29_description": "Crear un grupo moderado que comience con una tabla limpia. Alojado en relés compatibles NIP-29.",
+        "community_description": "Convertir un pubkey existente en una comunidad donde se muestre todo el contenido de ese pubkey. Se puede alojar en cualquier relé. La moderación es manejada por el relé."
       },
       "community": {
-        "title": "Create Community",
-        "description": "Create a community based on a pubkey",
-        "coming_soon": "Community creation is coming soon!",
-        "explanation": "Communities are groups built around an existing pubkey, showing all their content. Unlike standard groups, communities don't start empty - they include all posts from the pubkey.",
-        "community_for": "Community for",
+        "title": "Crear comunidad",
+        "description": "Crear una comunidad basada en un pubkey",
+        "coming_soon": "¡La creación de la comunidad llegará pronto!",
+        "explanation": "Las comunidades son grupos construidos alrededor de un pubkey existente, mostrando todo su contenido. A diferencia de los grupos estándar, las comunidades no empiezan vacías - incluyen todas las publicaciones del pubkey.",
+        "community_for": "Comunidad para",
         "form": {
           "relay": {
-            "label": "Relay",
+            "label": "Relé",
             "placeholder": "wss://relay.example.com",
-            "description": "Main relay where this community will be hosted"
+            "description": "Relé principal donde se alojará esta comunidad"
           },
           "backup_relays": {
-            "label": "Backup Relays",
-            "add": "Add",
+            "label": "Relés de respaldo",
+            "add": "Añadir",
             "add_placeholder": "wss://backup.example.com",
-            "description": "Additional relays where content will be published",
-            "error_duplicate": "This relay is already in your backup list",
-            "error_duplicate_primary": "This relay is already set as your primary relay"
+            "description": "Relés adicionales donde se publicará el contenido",
+            "error_duplicate": "Este relé ya está en tu lista de respaldo",
+            "error_duplicate_primary": "Este relé ya está establecido como tu relé principal"
           },
           "use_blossom": {
-            "label": "Use Blossom Media Servers",
-            "description": "Enable integration with Blossom media servers for optimized media storage and delivery"
+            "label": "Usar servidores de medios Blossom",
+            "description": "Habilitar la integración con servidores de medios Blossom para almacenamiento y entrega de medios optimizados"
           },
           "primary_blossom": {
-            "label": "Blossom Server",
+            "label": "Servidor Blossom",
             "placeholder": "https://blossom.example.com",
-            "description": "Blossom media server for this community"
+            "description": "Servidor de medios Blossom para esta comunidad"
           },
           "backup_blossom": {
-            "label": "Backup Blossom Servers",
-            "add": "Add",
+            "label": "Servidores Blossom de respaldo",
+            "add": "Añadir",
             "add_placeholder": "https://backup-blossom.example.com",
-            "description": "Additional Blossom media servers for redundancy",
-            "error_duplicate": "This server is already in your backup list",
-            "error_duplicate_primary": "This server is already set as your primary Blossom server"
+            "description": "Servidores de medios Blossom adicionales para redundancia",
+            "error_duplicate": "Este servidor ya está en tu lista de respaldo",
+            "error_duplicate_primary": "Este servidor ya está configurado como tu servidor Blossom principal"
           },
           "use_mint": {
-            "label": "Use Community Mint",
-            "description": "Enable a community-specific mint for rewards and transactions"
+            "label": "Usar mint de comunidad",
+            "description": "Habilitar un mint específico de la comunidad para recompensas y transacciones"
           },
           "mint": {
-            "label": "Community Mint",
+            "label": "Mind de comunidad",
             "placeholder": "https://mint.example.com",
-            "description": "URL of the mint for this community"
+            "description": "URL del mint para esta comunidad"
           }
         }
       },
@@ -254,7 +254,7 @@
       }
     },
     "metadata": {
-      "community": "This is a profile based community",
+      "community": "Esta es una comunidad basada en un perfil",
       "visibility": {
         "private": {
           "trigger": "Solo miembros",
@@ -292,7 +292,7 @@
       },
       "retry": {
         "action": "Reintentar",
-        "success": "Message sent successfully",
+        "success": "Mensaje enviado con éxito",
         "error": "No se pudo enviar el mensaje"
       },
       "copy": {
@@ -326,7 +326,7 @@
       },
       "deleted": "Mensaje borrado",
       "save-as-last-seen": "Guardar como visto por última vez",
-      "sending": "sending..."
+      "sending": "enviando..."
     },
     "new-messages": "Nuevos mensajes",
     "user": {
@@ -406,14 +406,14 @@
       "chat": "Chat",
       "post": "Publicación",
       "posts": "Publicaciones",
-      "articles": "Articles",
+      "articles": "Artículos",
       "poll": "Encuesta",
       "polls": "Encuestas",
       "video": "Video",
       "videos": "Videos",
       "image": "Imagen",
       "images": "Imagenes",
-      "community": "Community"
+      "community": "Comunidad"
     }
   },
   "post": {
@@ -492,7 +492,7 @@
     "loading": "Cargando evento",
     "not-found": "Evento no encontrado",
     "fetch-error": "Error al obtener el evento",
-    "replied": "replied"
+    "replied": "respondió"
   },
   "events": {
     "loading": "Cargando eventos",
@@ -531,19 +531,19 @@
     "expired": "Meta caducada",
     "leaderboard": "Marcador"
   },
-  "back": "Back",
+  "back": "Atrás",
   "wallet": {
     "title": "Pago entrante",
     "ecash": {
-      "title": "Send ecash",
-      "description": "Create an ecash token and send it to whoever you want",
-      "message": "Message",
-      "message-placeholder": "Write an optional message",
-      "mint-error": "Error creating ecash token in {{ mint }}",
-      "copy": "Copy token",
-      "redeem": "Redeem",
-      "redeem-error": "Failed to redeem ecash",
-      "redeem-success": "Ecash redeemed"
+      "title": "Enviar ecash",
+      "description": "Crea un token de ecash y envíalo a quien quieras",
+      "message": "Mensaje",
+      "message-placeholder": "Escribe un mensaje opcional",
+      "mint-error": "Error al crear el token de ecash en {{ mint }}",
+      "copy": "Copiar token",
+      "redeem": "Redimir",
+      "redeem-error": "Error al redimir ecash",
+      "redeem-success": "Ecash redimido"
     },
     "keys": "Claves",
     "sync": "Sincronizar",
@@ -775,54 +775,54 @@
   },
   "community": {
     "relays": {
-      "title": "Relays"
+      "title": "Relés"
     },
     "mint": {
       "title": "Mint"
     },
     "blossom": {
-      "title": "Media Servers"
+      "title": "Servidores de medios"
     }
   },
   "relay": {
     "new": {
-      "title": "New",
-      "description": "Create a new relay to host your content",
-      "service": "Service",
-      "select_service": "Select a service",
-      "name": "Name",
-      "name_placeholder": "Enter relay name",
-      "name_error": "Name cannot contain spaces",
-      "create": "Create Relay",
-      "order-success": "Order created successfully",
-      "error": "Failed to create relay"
+      "title": "Nuevo",
+      "description": "Crea un nuevo relé para alojar tu contenido",
+      "service": "Servicio",
+      "select_service": "Selecciona un servicio",
+      "name": "Nombre",
+      "name_placeholder": "Introduce nombre del relé",
+      "name_error": "El nombre no puede contener espacios",
+      "create": "Crear relé",
+      "order-success": "Orden creada con éxito",
+      "error": "Error al crear relé"
     }
   },
   "landing": {
     "features": {
-      "title": "Magic tricks",
-      "description": "Connect, chat, zap, upload files, send gifs, stickers and much more!",
-      "connect": "Connect",
-      "connect-desc": "Connect to a relay to start chatting",
+      "title": "Trucos mágicos",
+      "description": "¡Conectar, chatear, zapear, subir archivos, enviar gifs, stickers y mucho más!",
+      "connect": "Conectarse",
+      "connect-desc": "Conéctate a un relé para empezar a chatear",
       "chat": "Chat",
-      "chat-desc": "Chat with friends and communities",
-      "payments": "Payments",
-      "payments-desc": "Send and receive payments seamlessly",
-      "files": "Files",
-      "files-desc": "Upload and share files",
-      "selfhost": "Own your data",
-      "selfhost-desc": "Self-host your messages and files"
+      "chat-desc": "Chatear con amigos y comunidades",
+      "payments": "Pagos",
+      "payments-desc": "Enviar y recibir pagos sin problemas",
+      "files": "Archivos",
+      "files-desc": "Subir y compartir archivos",
+      "selfhost": "Toma el control de tus datos",
+      "selfhost-desc": "Autoalojar tus mensajes y archivos"
     },
-    "testimonials": "Testimonials",
-    "testimonials-desc": "What people are saying about us",
-    "supporters": "Supporters",
-    "supporters-desc": "Thank you to everyone who has supported the project with a donation",
-    "get-started": "Get started",
-    "communities": "Communities",
-    "communities-desc": "Find or create a community to chat with your friends",
-    "source-code": "Open source",
-    "source-code-desc": "Chachi is a free and open source project, anyone can contribute by submiting feedback, bug reports, feature requests, participating in the community chat and sending pull requests",
-    "source-code-link": "View source code",
-    "source-code-chat": "Join the community chat"
+    "testimonials": "Testimonios",
+    "testimonials-desc": "Lo que la gente dice sobre nosotros",
+    "supporters": "Partidarios",
+    "supporters-desc": "Gracias a todos los que han apoyado al proyecto con una donación",
+    "get-started": "Empezar",
+    "communities": "Comunidades",
+    "communities-desc": "Encontrar o crear una comunidad para chatear con tus amigos",
+    "source-code": "Código abierto",
+    "source-code-desc": "Chachi es un proyecto libre y de código abierto, cualquiera puede contribuir enviando comentarios, informes de errores, solicitudes de funciones, participando en el chat de la comunidad y enviando pull requests",
+    "source-code-link": "Ver el código fuente",
+    "source-code-chat": "Unirse al chat de la comunidad"
   }
 }

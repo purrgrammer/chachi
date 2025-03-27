@@ -14,13 +14,13 @@
     "login": {
       "start": "ابدأ",
       "title": "ابدأ الآن",
-      "description": "Use your existing identity or create a new one.",
+      "description": "استخدم هويتك الحالية أو أنشئ هوية جديدة.",
       "connect": "اتصال",
-      "new-account": "Are you new here?",
-      "new-account-description": "Don't worry, we'll help you get started in a minute.",
-      "new-account-button": "Let's get started!",
-      "options": "Are you already on nostr?",
-      "options-description": "Choose the login method you prefer.",
+      "new-account": "هل أنت جديد هنا؟",
+      "new-account-description": "لا تقلق، سنساعدك على البِدء خلال دقيقة واحدة.",
+      "new-account-button": "دعنا نبدأ!",
+      "options": "هل أنت مُنضم بالفعل إلى شبكة نوستر؟",
+      "options-description": "اختر طريقة تسجيل الدخول التي تفضلها.",
       "extension": {
         "label": "إضافة المتصفح",
         "error": "تعذر التسجيل بواسطة إضافة المتصفح"
@@ -30,10 +30,10 @@
         "error": "فشل تسجيل الدخول باستخدام الموقّع عن بُعد"
       },
       "nsec": {
-        "label": "Private Key",
-        "error": "Failed to log in with private key",
-        "or": "or",
-        "connect": "Connect"
+        "label": "المفتاح الخاص",
+        "error": "فشل تسجيل الدخول باستخدام المفتاح الخاص",
+        "or": "أو",
+        "connect": "اتصل"
       }
     },
     "logout": "تسجيل الخروج",
@@ -541,9 +541,9 @@
       "message-placeholder": "اكتب رسالة اختيارية",
       "mint-error": "حدث خطأ عند إنشاء نقود إلكترونية في {{ mint }}",
       "copy": "نسخ الرمز المميز",
-      "redeem": "Redeem",
-      "redeem-error": "Failed to redeem ecash",
-      "redeem-success": "Ecash redeemed"
+      "redeem": "استرداد",
+      "redeem-error": "تعذر استرداد النقود الإلكترونية",
+      "redeem-success": "تم استرداد النقود الإلكترونية"
     },
     "keys": "المفاتيح",
     "sync": "المزامنة",
@@ -800,29 +800,29 @@
   },
   "landing": {
     "features": {
-      "title": "Magic tricks",
-      "description": "Connect, chat, zap, upload files, send gifs, stickers and much more!",
-      "connect": "Connect",
-      "connect-desc": "Connect to a relay to start chatting",
-      "chat": "Chat",
-      "chat-desc": "Chat with friends and communities",
-      "payments": "Payments",
-      "payments-desc": "Send and receive payments seamlessly",
-      "files": "Files",
-      "files-desc": "Upload and share files",
-      "selfhost": "Own your data",
-      "selfhost-desc": "Self-host your messages and files"
+      "title": "حيل سحرية",
+      "description": "تواصل، دردش، ارسل فورًا، حمل الملفات، شارك صور متحركة وملصقات، واكتشف المزيد من الميزات!",
+      "connect": "اتصل",
+      "connect-desc": "اتصل بمُرحِّل لبدء الدردشة",
+      "chat": "دردشة",
+      "chat-desc": "دردش مع الأصدقاء والمجتمعات",
+      "payments": "مدفوعات",
+      "payments-desc": "أرسل واستلم المدفوعات بسلاسة",
+      "files": "ملفات",
+      "files-desc": "رفع الملفات ومشاركتها",
+      "selfhost": "امتلك بياناتك",
+      "selfhost-desc": "استضف رسائلك وملفاتك على خوادمك الخاصة"
     },
-    "testimonials": "Testimonials",
-    "testimonials-desc": "What people are saying about us",
-    "supporters": "Supporters",
-    "supporters-desc": "Thank you to everyone who has supported the project with a donation",
-    "get-started": "Get started",
-    "communities": "Communities",
-    "communities-desc": "Find or create a community to chat with your friends",
-    "source-code": "Open source",
-    "source-code-desc": "Chachi is a free and open source project, anyone can contribute by submiting feedback, bug reports, feature requests, participating in the community chat and sending pull requests",
-    "source-code-link": "View source code",
-    "source-code-chat": "Join the community chat"
+    "testimonials": "شهادات المستخدمين",
+    "testimonials-desc": "ما يقوله المستخدمون عنا",
+    "supporters": "الداعمون",
+    "supporters-desc": "شكرًا لكل من دعم المشروع بالتبرع",
+    "get-started": "ابدأ الآن",
+    "communities": "المجتمعات",
+    "communities-desc": "ابحث عن مجتمع أو أنشئ مجتمعًا للدردشة مع أصدقائك",
+    "source-code": "مفتوح المصدر",
+    "source-code-desc": "Chachi هو مشروع مجاني ومفتوح المصدر، يمكن لأي شخص المساهمة فيه عبر إرسال ملاحظات أو اقتراحات أو الإبلاغ عن أخطاء برمجية أو طلب إضافة وظائف جديدة أو المشاركة في نقاشات المجتمع أو إرسال طلبات دمج التعديلات البرمجية",
+    "source-code-link": "عرض الكود المصدر",
+    "source-code-chat": "انضم إلى الدردشة المجتمعية"
   }
 }

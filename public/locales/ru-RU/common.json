@@ -1,36 +1,36 @@
 {
   "locale": {
-    "today": "Today"
+    "today": "Сегодня"
   },
-  "home": "Home",
+  "home": "Домой",
   "nav": {
-    "no-groups": "No groups"
+    "no-groups": "Нет групп"
   },
   "user": {
-    "donate": "Donate",
-    "thank-you": "Thank you for your donation 💜",
-    "support-chachi": "Donate to Chachi",
-    "support-chachi-description": "Chachi is a free and open source project. Your donation helps keep the project alive and supports the development of new features.",
+    "donate": "Пожертвовать",
+    "thank-you": "Спасибо за ваше пожертвование! 💜",
+    "support-chachi": "Пожертвовать Chachi",
+    "support-chachi-description": "Chachi - это бесплатный проект с открытым исходным кодом. Ваше пожертвование поможет проекту остаться в разработке.",
     "login": {
-      "start": "Get started",
-      "title": "Get started",
+      "start": "Начать",
+      "title": "Начать",
       "description": "Use your existing identity or create a new one.",
-      "connect": "Connect",
-      "new-account": "Are you new here?",
-      "new-account-description": "Don't worry, we'll help you get started in a minute.",
-      "new-account-button": "Let's get started!",
-      "options": "Are you already on nostr?",
-      "options-description": "Choose the login method you prefer.",
+      "connect": "Подключиться",
+      "new-account": "Впервые здесь?",
+      "new-account-description": "Не волнуйтесь, мы поможем вам начать через минуту.",
+      "new-account-button": "Давайте начнём!",
+      "options": "У вас уже есть nostr?",
+      "options-description": "Выберите предпочтительный метод авторизации.",
       "extension": {
-        "label": "Browser extension",
+        "label": "Расширения браузера",
         "error": "Failed to log in with extension"
       },
       "remote": {
-        "label": "Remote signer",
-        "error": "Failed to log in with remote signer"
+        "label": "Удаленный вход",
+        "error": "Ошибка при попытке удаленного входа"
       },
       "nsec": {
-        "label": "Private Key",
+        "label": "Закрытый ключ",
         "error": "Failed to log in with private key",
         "or": "or",
         "connect": "Connect"
