@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import CodeSnippet from "@/components/nostr/code-snippet";
 import {
   Maximize,
   Bitcoin,
@@ -90,6 +91,7 @@ import {
   BOOK,
   CASHU_MINT,
   COMMUNIKEY,
+  CODE_SNIPPET,
 } from "@/lib/kinds";
 import {
   Dialog,
@@ -263,6 +265,10 @@ const eventDetails: Record<
     noHeader: true,
     preview: MintEventPreview,
     detail: MintEventDetail,
+  },
+  [CODE_SNIPPET]: {
+    preview: CodeSnippet,
+    detail: CodeSnippet,
   },
 };
 
