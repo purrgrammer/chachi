@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { decode } from "light-bolt11-decoder";
+import { generateSecretKey, getPublicKey } from "nostr-tools";
 import { useQuery } from "@tanstack/react-query";
 import {
   queryClient,
@@ -408,12 +409,21 @@ export function useDeposit(wallet: NDKWallet) {
 
 export function useCreateWallet() {
   const ndk = useNDK();
+  const myRelays = useRelays();
   const [, setWallets] = useAtom(walletsAtom);
   return async (mints: string[], relays: string[]) => {
     const wallet = new NDKCashuWallet(ndk);
     wallet.mints = mints;
     wallet.relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
-    const p2pk = await wallet.getP2pk();
+    let p2pk = wallet.p2pks[0];
+    if (!p2pk) {
+      const secret = generateSecretKey();
+      p2pk = getPublicKey(secret);
+      await wallet.addPrivkey(Buffer.from(secret).toString("hex"));
+    }
+    if (!p2pk) {
+      throw new Error("Failed to create wallet");
+    }
     const ev = new NDKEvent(ndk, {
       kind: NDKKind.CashuMintList,
       tags: [
@@ -422,10 +432,13 @@ export function useCreateWallet() {
         ["pubkey", p2pk],
       ],
     } as NostrEvent);
-    await ev.publish();
+    const allRelays = Array.from(new Set([...relays, ...myRelays]));
+    await ev.publish(NDKRelaySet.fromRelayUrls(allRelays, ndk));
     await wallet.publish();
     if (wallet.event) {
       setWallets((wallets) => [...wallets, { type: "nip60" }]);
+    } else {
+      throw new Error("Failed to create wallet");
     }
   };
 }
