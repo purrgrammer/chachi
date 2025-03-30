@@ -3,7 +3,7 @@ import { User } from "@/components/nostr/user";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Plus, X, Search } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -133,7 +133,7 @@ export function CreateGroup({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const groupId = [...values.pubkeys, me].sort().join("");
+      const groupId = [...values.pubkeys, me].join("");
       navigate(`/dm/${groupId}`);
       setShowDialog(false);
       resetForm();
@@ -192,9 +192,8 @@ export function CreateGroup({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="mb-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Search className="size-3 text-muted-foreground" />
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
                 <Input
                   placeholder={t("private-group.create.search-follows")}
                   value={searchQuery}
@@ -202,112 +201,107 @@ export function CreateGroup({
                   className="flex-1"
                 />
               </div>
-
               {/* Available profiles list */}
               {searchQuery.trim() !== "" && availableProfiles.length > 0 && (
-                <div className="mt-4">
-                  <div className="max-h-[200px] overflow-y-auto space-y-2">
-                    {availableProfiles
-                      .filter((p) => p.pubkey !== me)
-                      .slice(0, 3)
-                      .map((profile) => (
-                        <div
-                          key={profile.pubkey}
-                          className="flex items-center justify-between rounded-lg border p-2 cursor-pointer hover:bg-accent"
-                          onClick={() => addParticipant(profile)}
-                        >
-                          <div className="flex items-center gap-2 overflow-hidden">
-                            <User
-                              pubkey={profile.pubkey}
-                              notClickable
-                              classNames={{ avatar: "size-6", name: "hidden" }}
+                <div className="max-h-[200px] overflow-y-auto flex flex-col gap-0.5">
+                  {availableProfiles
+                    .filter((p) => p.pubkey !== me)
+                    .slice(0, 3)
+                    .map((profile) => (
+                      <div
+                        key={profile.pubkey}
+                        className="flex items-center justify-between rounded-lg border cursor-pointer hover:bg-accent p-1 px-2"
+                        onClick={() => addParticipant(profile)}
+                      >
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          <User
+                            pubkey={profile.pubkey}
+                            notClickable
+                            classNames={{ avatar: "size-6", name: "hidden" }}
+                          />
+                          <span className="font-medium truncate">
+                            <Highlight
+                              text={getDisplayName(profile)}
+                              highlight={searchQuery}
                             />
-                            <span className="font-medium truncate">
-                              <Highlight
-                                text={getDisplayName(profile)}
-                                highlight={searchQuery}
-                              />
-                            </span>
-                          </div>
-                          <Button variant="ghost" size="icon" type="button">
-                            <Plus className="size-4" />
-                          </Button>
+                          </span>
                         </div>
-                      ))}
-                  </div>
+                        <Button variant="ghost" size="smallIcon" type="button">
+                          <Plus className="size-4" />
+                        </Button>
+                      </div>
+                    ))}
                 </div>
               )}
 
               {/* Selected participants */}
-              <div className="flex flex-col gap-2 p-2">
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium">
-                    {t("private-group.create.group-members")}
-                  </h3>
+              <div className="flex flex-col gap-1 mt-4">
+                <h3 className="text-sm font-medium">
+                  {t("private-group.create.group-members")}
+                </h3>
 
-                  {selectedPubkeys.length === 0 && (
-                    <p className="mt-4 text-xs text-muted-foreground">
-                      {t("private-group.create.add-some-participants")}
-                    </p>
-                  )}
+                {selectedPubkeys.length === 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    {t("private-group.create.add-some-participants")}
+                  </p>
+                )}
 
-                  {/* Group preview when there are selected pubkeys */}
-                  {selectedPubkeys.length > 0 && (
-                    <div className="flex items-center gap-3 p-3 border rounded-lg mb-4 bg-muted/30">
-                      {selectedPubkeys.length === 1 ? (
-                        <Avatar
-                          pubkey={selectedPubkeys[0]}
-                          className="size-12"
-                        />
-                      ) : (
-                        <div className="size-12">
-                          <GroupAvatar pubkeys={selectedPubkeys} />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium">
-                          {selectedPubkeys.length === 1
-                            ? t("private-group.create.private-message")
-                            : t("private-group.create.group-chat")}
-                        </p>
-                        <p className="text-sm text-muted-foreground truncate">
-                          {selectedPubkeys.length}{" "}
-                          {t("private-group.create.participants")}
-                        </p>
-                      </div>
-                    </div>
-                  )}
+                {/* Show message when no matches */}
+                {searchQuery && availableProfiles.length === 0 && (
+                  <div className="text-center text-xs text-muted-foreground">
+                    {t("private-group.create.no-matches")}
+                  </div>
+                )}
+              </div>
+            </div>
 
-                  {/* List of selected participants with remove option */}
-                  {selectedPubkeys.map((pubkey) => (
-                    <div
-                      key={pubkey}
-                      className="flex items-center justify-between rounded-lg border p-2"
-                    >
-                      <User
-                        pubkey={pubkey}
-                        notClickable
-                        classNames={{ avatar: "size-6" }}
-                      />
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeParticipant(pubkey)}
-                        type="button"
-                      >
-                        <X className="size-4" />
-                      </Button>
-                    </div>
-                  ))}
+            {/* Group preview when there are selected pubkeys */}
+            {selectedPubkeys.length > 0 && (
+              <div className="flex items-center gap-3 p-3 border rounded-lg mb-4 bg-muted/30">
+                {selectedPubkeys.length === 1 ? (
+                  <Avatar pubkey={selectedPubkeys[0]} className="size-12" />
+                ) : (
+                  <div className="size-12">
+                    <GroupAvatar pubkeys={selectedPubkeys} />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium">
+                    {selectedPubkeys.length === 1
+                      ? t("private-group.create.private-message")
+                      : t("private-group.create.group-chat")}
+                  </p>
+                  <p className="text-sm text-muted-foreground truncate">
+                    {t("private-group.create.participants", {
+                      n: selectedPubkeys.length,
+                    })}
+                  </p>
                 </div>
               </div>
+            )}
 
-              {/* Show message when no matches */}
-              {searchQuery && availableProfiles.length === 0 && (
-                <div className="mt-4 text-center text-muted-foreground">
-                  {t("private-group.create.no-matches")}
+            <div className="flex flex-col gap-1 mt-1">
+              {/* List of selected participants with remove option */}
+              {selectedPubkeys.map((pubkey) => (
+                <div
+                  key={pubkey}
+                  className="flex items-center justify-between rounded-lg border p-1"
+                >
+                  <User
+                    pubkey={pubkey}
+                    notClickable
+                    classNames={{ avatar: "size-6" }}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeParticipant(pubkey)}
+                    type="button"
+                  >
+                    <X className="size-4" />
+                  </Button>
                 </div>
-              )}
+              ))}
             </div>
 
             <div className="flex justify-end">

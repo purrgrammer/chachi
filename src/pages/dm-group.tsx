@@ -3,11 +3,7 @@ import { useTranslation } from "react-i18next";
 import { RelayIcon } from "@/components/nostr/relay";
 import { User } from "@/components/nostr/user";
 import { NameList } from "@/components/nostr/name-list";
-import {
-  Route,
-  RouteOff,
-  MessageSquareLock,
-} from "lucide-react";
+import { Route, RouteOff, MessageSquareLock } from "lucide-react";
 import { NDKKind, NostrEvent } from "@nostr-dev-kit/ndk";
 import { useParams } from "react-router-dom";
 import { Avatar } from "@/components/nostr/avatar";
@@ -32,12 +28,16 @@ import EncryptedFile from "@/components/nostr/encrypted-file";
 import { Name } from "@/components/nostr/name";
 import { ProfileDrawer } from "@/components/nostr/profile";
 import { useSaveLastSeen } from "@/lib/nostr/dm";
+import type { Event } from "@/lib/db";
+
+// todo: save lastSeen if a msg is sent
 
 function GroupChat({ id, group }: { id: string; group: PrivateGroup }) {
+  const [sentMessage, setSentMessage] = useState<Event | undefined>(undefined);
   const messages = useGroupMessages(id);
   const me = usePubkey();
   const [replyingTo, setReplyingTo] = useState<NostrEvent | undefined>(
-    undefined
+    undefined,
   );
   const [inputHeight, setInputHeight] = useState(34);
   const headerHeight = 100;
@@ -46,22 +46,32 @@ function GroupChat({ id, group }: { id: string; group: PrivateGroup }) {
   const lastSeen = useLastSeen(group);
 
   useEffect(() => {
-    return () => saveLastSeen();
+    return () => {
+      saveLastSeen();
+      setSentMessage(undefined);
+      setReplyingTo(undefined);
+      setInputHeight(34);
+    };
   }, [group.id]);
+
+  function onNewMessage(event: NostrEvent) {
+    setSentMessage(event as Event);
+    // @ts-expect-error: types don't match but it's ok
+    saveLastSeen(event as Event);
+  }
 
   return (
     <div className={`grid grid-col-[1fr_${inputHeight}px]"`}>
       <Chat
         group={group}
-        //admins={admins}
         style={
           {
             height: `calc(100vh - ${nonChatHeight}px)`,
           } as React.CSSProperties
         }
-        //newMessage={sentMessage}
-        lastSeen={lastSeen ? lastSeen : undefined}
-        //deleteEvents={deleteEvents}
+        // @ts-expect-error: types don't match but it's ok
+        newMessage={sentMessage}
+        lastSeen={lastSeen?.ref !== messages.at(0)?.id ? lastSeen : undefined}
         replyingTo={replyingTo}
         setReplyingTo={setReplyingTo}
         //scrollTo={scrollTo}
@@ -75,17 +85,18 @@ function GroupChat({ id, group }: { id: string; group: PrivateGroup }) {
           //[WEBRTC_SIGNAL]: ({ event, ...props }) => (
           //  <WebRTCEvent key={event.id} event={event} {...props} />
           //),
-          [15 as NDKKind]: ({
-            event,
-            isChain,
-            isFirstInChain,
-          }) => {
+          [15 as NDKKind]: ({ event, isChain, isFirstInChain }) => {
             const isMine = event.pubkey === me;
             return (
               <div
                 className={`flex flex-col gap-0 max-w-md ${isChain && !isMine ? "ml-9" : "ml-auto"}`}
               >
-                {!isChain && !isMine ? <User pubkey={event.pubkey} classNames={{ avatar: "size-7", name: "hidden" }} /> : null}
+                {!isChain && !isMine ? (
+                  <User
+                    pubkey={event.pubkey}
+                    classNames={{ avatar: "size-7", name: "hidden" }}
+                  />
+                ) : null}
                 {isChain && isFirstInChain && !isMine && (
                   <div className="flex flex-row gap-1 items-center">
                     <ProfileDrawer
@@ -135,7 +146,7 @@ function GroupChat({ id, group }: { id: string; group: PrivateGroup }) {
         }}
         kind={NDKKind.PrivateDirectMessage}
         replyKind={NDKKind.PrivateDirectMessage}
-        //onNewMessage={onNewMessage}
+        onNewMessage={onNewMessage}
         // @ts-expect-error: these events are unsigned since they come from DB
         replyingTo={replyingTo}
         setReplyingTo={setReplyingTo}

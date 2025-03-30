@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Send, Bitcoin } from "lucide-react";
+import { Send } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { NDKRelaySet, NDKEvent, NDKKind, NDKUser } from "@nostr-dev-kit/ndk";
 //import { UploadEncryptedFile } from "@/components/upload-file";
@@ -155,6 +155,7 @@ export function ChatInput({
           }
         />
 	*/}
+        {/*
         <Button
           tabIndex={1}
           aria-label="Payment"
@@ -165,6 +166,7 @@ export function ChatInput({
         >
           <Bitcoin />
         </Button>
+        */}
         <Button
           tabIndex={2}
           aria-label="Send"

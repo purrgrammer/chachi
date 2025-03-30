@@ -111,7 +111,10 @@ function GroupItem({ group }: { group: PrivateGroup }) {
         {isSavedMessages ? (
           <Bookmark className="size-10 text-muted-foreground" />
         ) : isSingle ? (
-          <Avatar pubkey={firstPubkey ? firstPubkey : group.pubkeys[0]} className="size-10" />
+          <Avatar
+            pubkey={firstPubkey ? firstPubkey : group.pubkeys[0]}
+            className="size-10"
+          />
         ) : (
           <GroupAvatar pubkeys={group.pubkeys} />
         )}
@@ -254,7 +257,7 @@ function MyGroupRequests({ groups }: { groups: PrivateGroup[] }) {
   return (
     <>
       {groups.length > 0 ? (
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5 group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden">
           <div className="flex flex-row items-center justify-between mx-1">
             <div className="flex flex-row gap-1 ml-2 items-center text-muted-foreground">
               <MessageSquarePlus className="size-3" />
@@ -281,7 +284,7 @@ export function NavPrivateGroups() {
   return (
     <>
       <MyGroupList groups={myGroups} />
-      <CreateGroup />
+      <CreateGroup className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden" />
       <MyGroupRequests groups={myGroupRequests || []} />
     </>
   );

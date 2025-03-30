@@ -995,9 +995,11 @@
       "success": "Private group created",
       "error": "Failed to create private group",
       "follows": "Follows",
-      "add-some-participants": "Start typing to search and add participants",
+      "participants": "{{ n }} participants",
+      "add-some-participants": "Add one or more participants to the group",
       "group-members": "Group members",
       "search-follows": "Start typing to search your follows",
+      "group-chat": "Group chat",
       "form": {
         "submit": {
           "trigger": "Create",
@@ -1024,6 +1026,7 @@
     "no-dm-relays": "No private message relays found",
     "groups": "Groups",
     "saved-messages": "Saved messages",
+
     "webrtc": {
       "incoming-call": "Incoming call",
       "decline": "Decline",

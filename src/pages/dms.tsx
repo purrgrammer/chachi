@@ -47,7 +47,10 @@ function GroupMessages({ group }: { group: PrivateGroup }) {
       >
         <div className="flex flex-col gap-1 items-center">
           {isSingle ? (
-            <Avatar pubkey={firstPubkey ? firstPubkey : group.pubkeys[0]} className="size-10" />
+            <Avatar
+              pubkey={firstPubkey ? firstPubkey : group.pubkeys[0]}
+              className="size-10"
+            />
           ) : null}
           <h3 className="text-lg">
             {isSingle ? (

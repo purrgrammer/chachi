@@ -9,7 +9,7 @@ import {
   getLastSeen,
   getUnreadMessages,
 } from "@/lib/dms/queries";
-import db, { LastSeen } from "@/lib/db";
+import db from "@/lib/db";
 import { NostrEvent } from "nostr-tools";
 import NDK, {
   NDKRelaySet,
@@ -83,7 +83,7 @@ function useStreamMap(
         skipOptimisticPublishEvent: true,
         groupable: false,
       },
-      relaySet
+      relaySet,
     );
 
     sub.on("event", (event) => {
@@ -109,15 +109,15 @@ export async function fetchDirectMessageRelays(ndk: NDK, pubkey: string) {
   const dmRelayList = await ndk.fetchEvent(
     dmFilter,
     { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
-    relaySet
+    relaySet,
   );
   if (dmRelayList) {
     const dm = Array.from(
       new Set(
         dmRelayList.tags
           .filter((tag) => tag[0] === "relay")
-          .map((tag) => tag[1])
-      )
+          .map((tag) => tag[1]),
+      ),
     );
     return { pubkey, dm, fallback: [] };
   } else {
@@ -127,13 +127,13 @@ export async function fetchDirectMessageRelays(ndk: NDK, pubkey: string) {
         authors: [pubkey],
       },
       { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
-      relaySet
+      relaySet,
     );
     if (readRelays) {
       const relays = Array.from(
         new Set(
-          readRelays.tags.filter((tag) => tag[0] === "r").map((tag) => tag[1])
-        )
+          readRelays.tags.filter((tag) => tag[0] === "r").map((tag) => tag[1]),
+        ),
       );
       return { pubkey, dm: [], fallback: relays };
     }
@@ -154,8 +154,8 @@ export function useGroupRelays(group: Group) {
       q
         .map((q) => q.data)
         .filter(Boolean)
-        .flat()
-    )
+        .flat(),
+    ),
   );
 }
 
@@ -174,7 +174,7 @@ export function useDirectMessages() {
   const onWebRTCSignal = useOnWebRTCSignal();
   const relays = useRelays();
   const allRelays = Array.from(
-    new Set(relays.concat(dmRelays.dm || dmRelays.fallback))
+    new Set(relays.concat(dmRelays.dm || dmRelays.fallback)),
   );
   const relaySet = useRelaySet(allRelays);
   // todo: sync from latest - 2 weeks
@@ -182,32 +182,37 @@ export function useDirectMessages() {
     kinds: [NDKKind.GiftWrap],
     "#p": [pubkey!],
   };
-  useStreamMap(filter, relaySet!, async (event) => {
-    if (await db.dms.get({ gift: event.id })) return null;
+  useStreamMap(
+    filter,
+    relaySet!,
+    async (event) => {
+      if (await db.dms.get({ gift: event.id })) return null;
 
-    try {
-      const unwrapped = await giftUnwrap(
-        event,
-        new NDKUser({ pubkey: event.pubkey }),
-        ndk.signer
-      );
-      if (unwrapped) {
-        const raw = unwrapped.rawEvent() as unknown as NostrEvent;
-        savePrivateEvent(raw, event.rawEvent() as unknown as NostrEvent);
-        if (raw.kind === WEBRTC_SIGNAL) {
-          try {
-            onWebRTCSignal(raw);
-          } catch (err) {
-            console.error(err);
+      try {
+        const unwrapped = await giftUnwrap(
+          event,
+          new NDKUser({ pubkey: event.pubkey }),
+          ndk.signer,
+        );
+        if (unwrapped) {
+          const raw = unwrapped.rawEvent() as unknown as NostrEvent;
+          savePrivateEvent(raw, event.rawEvent() as unknown as NostrEvent);
+          if (raw.kind === WEBRTC_SIGNAL) {
+            try {
+              onWebRTCSignal(raw);
+            } catch (err) {
+              console.error(err);
+            }
           }
+          return raw;
         }
-        return raw;
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
-    return null;
-  }, pubkey);
+      return null;
+    },
+    pubkey,
+  );
   return null;
 }
 
@@ -235,7 +240,7 @@ export function useGroups() {
             dms.some(
               (dm) =>
                 dm.group === id &&
-                (dm.pubkey === pubkey || follows.includes(dm.pubkey))
+                (dm.pubkey === pubkey || follows.includes(dm.pubkey)),
             )
           );
         })
@@ -251,7 +256,7 @@ export function useGroups() {
         .filter((g) => g.pubkeys.length > 0) as Group[];
     },
     [pubkey, follows],
-    []
+    [],
   );
 }
 
@@ -266,7 +271,7 @@ export function useGroupRequests() {
           return !dms.some(
             (dm) =>
               dm.group === id &&
-              (dm.pubkey === pubkey || follows.includes(dm.pubkey))
+              (dm.pubkey === pubkey || follows.includes(dm.pubkey)),
           );
         })
         .map((id) => {
@@ -278,7 +283,7 @@ export function useGroupRequests() {
         .filter((g) => g.pubkeys.length > 0);
     },
     [pubkey, follows],
-    []
+    [],
   );
 }
 
@@ -292,7 +297,7 @@ export function useGroupMessages(id: string) {
       return messages.reverse();
     },
     [id],
-    []
+    [],
   );
 }
 
@@ -301,7 +306,7 @@ export function useSortedGroups() {
   return useLiveQuery(
     () => getGroupsSortedByLastMessage(groups),
     [groups],
-    groups
+    groups,
   );
 }
 
@@ -310,7 +315,7 @@ export function useSortedGroupRequests() {
   return useLiveQuery(
     () => getGroupsSortedByLastMessage(groups),
     [groups],
-    groups
+    groups,
   );
 }
 
@@ -323,15 +328,7 @@ export function useGroupReactions(group: Group) {
 }
 
 export function useLastSeen(group: Group) {
-  const [memoized, setMemoized] = useState<LastSeen | null>(null);
-  useEffect(() => {
-    getLastSeen(group).then((lastSeen) => {
-      if (lastSeen) {
-        setMemoized(lastSeen);
-      }
-    });
-  }, [group.id]);
-  return memoized;
+  return useLiveQuery(() => getLastSeen(group), [group.id]);
 }
 
 export function useUnreads() {
@@ -340,33 +337,32 @@ export function useUnreads() {
     async () => {
       if (!pubkey) return 0;
 
-      const groups = (await db.dms.orderBy("group").uniqueKeys()).map(id => idToGroup(String(id), pubkey!))
-      const unreads = await Promise.all(
-        groups.map((g) => getUnreadMessages(g))
+      const groups = (await db.dms.orderBy("group").uniqueKeys()).map((id) =>
+        idToGroup(String(id), pubkey!),
       );
-      return unreads.reduce((acc, curr) => acc + curr, 0)
+      const unreads = await Promise.all(
+        groups.map((g) => getUnreadMessages(g)),
+      );
+      return unreads.reduce((acc, curr) => acc + curr, 0);
     },
     [pubkey],
-    []
+    [],
   );
 }
 
 export function useUnreadMessages(group: Group) {
-  return useLiveQuery(
-    () => getUnreadMessages(group),
-    [group.id]
-  );
+  return useLiveQuery(() => getUnreadMessages(group), [group.id]);
 }
 
 export function usePrivateUnreadMessages() {
   const groups = useGroups();
   return useLiveQuery(
     async () => {
-      const unreads = await Promise.all(groups.map(getUnreadMessages))
-      return unreads.reduce((acc, curr) => acc + curr, 0)
+      const unreads = await Promise.all(groups.map(getUnreadMessages));
+      return unreads.reduce((acc, curr) => acc + curr, 0);
     },
     [groups],
-    0
+    0,
   );
 }
 
@@ -383,12 +379,16 @@ export function saveLastSeen(ev: NostrEvent, group: PrivateGroup) {
 }
 
 export function useSaveLastSeen(group: Group) {
-  return () => {
-    getLastGroupMessage(group).then((ev) => {
-      if (ev) {
-        // @ts-expect-error db events are unsigned
-        saveLastSeen(ev, group);
-      }
-    });
+  return (ev?: NostrEvent) => {
+    if (ev) {
+      saveLastSeen(ev, group);
+    } else {
+      getLastGroupMessage(group).then((ev) => {
+        if (ev) {
+          // @ts-expect-error db events are unsigned
+          saveLastSeen(ev, group);
+        }
+      });
+    }
   };
 }
