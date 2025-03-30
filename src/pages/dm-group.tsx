@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RelayIcon } from "@/components/nostr/relay";
 import { User } from "@/components/nostr/user";
 import { NameList } from "@/components/nostr/name-list";
-import { Route, RouteOff, MessageSquareLock } from "lucide-react";
+import {
+  Route,
+  RouteOff,
+  MessageSquareLock,
+} from "lucide-react";
 import { NDKKind, NostrEvent } from "@nostr-dev-kit/ndk";
 import { useParams } from "react-router-dom";
 import { Avatar } from "@/components/nostr/avatar";
@@ -11,9 +15,9 @@ import { Header } from "@/components/header";
 import {
   useGroupMessages,
   useDirectMessages,
-  useGroupDirectMessages,
   useDirectMessageRelays,
   idToGroup,
+  useLastSeen,
 } from "@/lib/nostr/dm";
 import { ChatInput } from "@/components/nostr/chat/input-private";
 import { Chat } from "@/components/nostr/chat/private";
@@ -24,15 +28,27 @@ import {
 } from "@/components/ui/tooltip";
 import { PrivateGroup } from "@/lib/types";
 import { usePubkey, useDMRelays } from "@/lib/account";
+import EncryptedFile from "@/components/nostr/encrypted-file";
+import { Name } from "@/components/nostr/name";
+import { ProfileDrawer } from "@/components/nostr/profile";
+import { useSaveLastSeen } from "@/lib/nostr/dm";
 
 function GroupChat({ id, group }: { id: string; group: PrivateGroup }) {
   const messages = useGroupMessages(id);
+  const me = usePubkey();
   const [replyingTo, setReplyingTo] = useState<NostrEvent | undefined>(
-    undefined,
+    undefined
   );
   const [inputHeight, setInputHeight] = useState(34);
   const headerHeight = 100;
   const nonChatHeight = inputHeight + headerHeight;
+  const saveLastSeen = useSaveLastSeen(group);
+  const lastSeen = useLastSeen(group);
+
+  useEffect(() => {
+    return () => saveLastSeen();
+  }, [group.id]);
+
   return (
     <div className={`grid grid-col-[1fr_${inputHeight}px]"`}>
       <Chat
@@ -44,7 +60,7 @@ function GroupChat({ id, group }: { id: string; group: PrivateGroup }) {
           } as React.CSSProperties
         }
         //newMessage={sentMessage}
-        //lastSeen={lastSeen ? lastSeen : undefined}
+        lastSeen={lastSeen ? lastSeen : undefined}
         //deleteEvents={deleteEvents}
         replyingTo={replyingTo}
         setReplyingTo={setReplyingTo}
@@ -55,26 +71,60 @@ function GroupChat({ id, group }: { id: string; group: PrivateGroup }) {
         //canDelete={canDelete}
         //deleteEvent={deleteEvent}
         messageKinds={[NDKKind.PrivateDirectMessage]}
-        components={
-          {
-            //[NDKKind.Nutzap]: ({ event, ...props }) => (
-            //  <ChatNutzap
-            //    key={event.id}
-            //    event={event}
-            //    group={group}
-            //    canDelete={canDelete}
-            //    deleteEvent={deleteEvent}
-            //    {...props}
-            //  />
-            //),
-            //[NDKKind.GroupAdminAddUser]: (props) => (
-            //  <UserActivity {...props} action="join" />
-            //),
-            //[NDKKind.GroupAdminRemoveUser]: (props) => (
-            //  <UserActivity {...props} action="leave" />
-            //),
-          }
-        }
+        components={{
+          //[WEBRTC_SIGNAL]: ({ event, ...props }) => (
+          //  <WebRTCEvent key={event.id} event={event} {...props} />
+          //),
+          [15 as NDKKind]: ({
+            event,
+            isChain,
+            isFirstInChain,
+          }) => {
+            const isMine = event.pubkey === me;
+            return (
+              <div
+                className={`flex flex-col gap-0 max-w-md ${isChain && !isMine ? "ml-9" : "ml-auto"}`}
+              >
+                {!isChain && !isMine ? <User pubkey={event.pubkey} classNames={{ avatar: "size-7", name: "hidden" }} /> : null}
+                {isChain && isFirstInChain && !isMine && (
+                  <div className="flex flex-row gap-1 items-center">
+                    <ProfileDrawer
+                      pubkey={event.pubkey}
+                      trigger={
+                        <h3 className="text-sm font-semibold">
+                          <Name pubkey={event.pubkey} />
+                        </h3>
+                      }
+                    />
+                  </div>
+                )}
+                <div className="mb-0.5">
+                  <EncryptedFile
+                    key={event.id}
+                    event={event}
+                    className={`${isChain ? "rounded-lg" : isMine ? "rounded-tl-lg rounded-tr-lg rounded-bl-lg" : "rounded-tl-lg rounded-tr-lg rounded-br-lg"}`}
+                  />
+                </div>
+              </div>
+            );
+          },
+          //[NDKKind.Nutzap]: ({ event, ...props }) => (
+          //  <ChatNutzap
+          //    key={event.id}
+          //    event={event}
+          //    group={group}
+          //    canDelete={canDelete}
+          //    deleteEvent={deleteEvent}
+          //    {...props}
+          //  />
+          //),
+          //[NDKKind.GroupAdminAddUser]: (props) => (
+          //  <UserActivity {...props} action="join" />
+          //),
+          //[NDKKind.GroupAdminRemoveUser]: (props) => (
+          //  <UserActivity {...props} action="leave" />
+          //),
+        }}
         //setReplyingTo={setReplyingTo}
       />
       <ChatInput
@@ -216,6 +266,7 @@ function SingleGroup({ group, peer }: { group: PrivateGroup; peer: string }) {
           </Tooltip>
         </div>
       </Header>
+      {/* <WebRTC /> */}
       <div className="flex flex-row items-center gap-1.5 p-1 pl-4 border-b overflow-hidden">
         {pubkey ? (
           <UserRelays
@@ -255,22 +306,16 @@ function SingleGroup({ group, peer }: { group: PrivateGroup; peer: string }) {
 }
 
 function DirectMessageGroupId({ id, pubkey }: { id: string; pubkey: string }) {
-  const { t } = useTranslation();
   const group = idToGroup(id, pubkey);
-  useGroupDirectMessages(group);
-  const isMultiGroup = group.pubkeys.filter((p) => p != pubkey).length > 1;
-  const peer = group.pubkeys.find((p) => p != pubkey);
-  const singleTarget = peer || pubkey;
+  const peers = group.pubkeys.filter((p) => p !== pubkey);
+  const isMultiGroup = peers.length > 1;
+  const peer = peers.length === 1 ? peers[0] : null;
   if (isMultiGroup) {
     return <DirectMessageMultiGroup group={group} />;
-  } else if (singleTarget) {
-    return <SingleGroup group={group} peer={singleTarget} />;
+  } else if (peer) {
+    return <SingleGroup group={group} peer={peer} />;
   } else {
-    return (
-      <p className="text-muted-foreground">
-        {t("private-group.invalid-group")}
-      </p>
-    );
+    return <SingleGroup group={group} peer={pubkey} />;
   }
 }
 

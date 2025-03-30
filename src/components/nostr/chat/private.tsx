@@ -597,6 +597,8 @@ interface ChatProps extends MotionProps {
       setReplyingTo?: (event: NostrEvent) => void;
       deleteEvent?: (event: NostrEvent) => void;
       canDelete?: (event: NostrEvent) => boolean;
+      isChain?: boolean;
+      isFirstInChain?: boolean;
     }>
   >;
   setReplyingTo?: (event: NostrEvent | undefined) => void;
@@ -691,6 +693,8 @@ export function Chat({
                 setReplyingTo={setReplyingTo}
                 scrollTo={scrollTo}
                 setScrollTo={setScrollTo}
+                isChain={messages[idx + 1]?.pubkey === event.pubkey}
+                isFirstInChain={messages[idx - 1]?.pubkey !== event.pubkey}
               />
             ) : null;
           })}

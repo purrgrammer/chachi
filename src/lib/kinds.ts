@@ -17,6 +17,7 @@ export const CASHU_MINT = 38172 as NDKKind;
 export const CODE_SNIPPET = 1337 as NDKKind;
 export const WORKOUT = 1301 as NDKKind;
 export const WORKOUT_TEMPLATE = 33401 as NDKKind;
+export const WEBRTC_SIGNAL = 25050 as NDKKind;
 // Communikeys
 export const COMMUNIKEY = 10_222 as NDKKind;
 export const RELATIONSHIP = 30_382 as NDKKind;

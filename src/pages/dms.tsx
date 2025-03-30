@@ -5,7 +5,7 @@ import {
 } from "@/lib/nostr/dm";
 import { Link } from "react-router-dom";
 import { RelayIcon } from "@/components/nostr/relay";
-import { useDMRelays } from "@/lib/account";
+import { useDMRelays, usePubkey } from "@/lib/account";
 import { Server, Lock, Activity } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { Avatar } from "@/components/nostr/avatar";
 import { Name } from "@/components/nostr/name";
 import { NameList } from "@/components/nostr/name-list";
+import { WebRTC } from "@/components/webrtc";
 
 function Heading({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
@@ -34,7 +35,8 @@ function GroupMessages({ group }: { group: PrivateGroup }) {
   const unread = useUnreadMessages(group);
   const { t } = useTranslation();
   const isSingle = group.pubkeys.length === 1;
-  const firstPubkey = group.pubkeys[0];
+  const me = usePubkey();
+  const firstPubkey = group.pubkeys.filter((p) => p !== me)[0];
   const navigate = useNavigate();
   return unread && unread > 0 ? (
     <Reorder.Item dragListener={false} key={group.id} value={group}>
@@ -45,11 +47,11 @@ function GroupMessages({ group }: { group: PrivateGroup }) {
       >
         <div className="flex flex-col gap-1 items-center">
           {isSingle ? (
-            <Avatar pubkey={firstPubkey} className="size-10" />
+            <Avatar pubkey={firstPubkey ? firstPubkey : group.pubkeys[0]} className="size-10" />
           ) : null}
           <h3 className="text-lg">
             {isSingle ? (
-              <Name pubkey={firstPubkey} />
+              <Name pubkey={firstPubkey ? firstPubkey : group.pubkeys[0]} />
             ) : (
               <NameList pubkeys={group.pubkeys} />
             )}
@@ -145,6 +147,7 @@ export default function DirectMessages() {
         <h2 className="text-lg">{t("private-group.private-groups")}</h2>
       </Header>
       <div className="flex flex-col p-2 px-4 space-y-4">
+        <WebRTC />
         <GroupsActivity />
         {hasNoDMRelays ? (
           <p className="text-lg font-bold">{t("private-group.no-dm-relays")}</p>

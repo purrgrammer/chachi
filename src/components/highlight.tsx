@@ -14,7 +14,10 @@ export function Highlight({
       return [text];
     }
 
-    const termRegex = new RegExp(highlight, "ig");
+    const termRegex = new RegExp(
+      highlight.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+      "ig",
+    );
     const matches = text.match(termRegex);
 
     if (highlight && matches) {

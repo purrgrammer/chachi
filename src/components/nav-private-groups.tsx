@@ -87,15 +87,14 @@ function GroupItem({ group }: { group: PrivateGroup }) {
   const lastMessage = useLastMessage(group);
   const navigate = useNavigate();
   const { id } = useParams();
-  //const { data: metadata } = useGroup(group);
   const unreadMessages = useUnreadMessages(group);
-  //const unreadMentions = useUnreadMentions(group);
   const isActive = id === group.id;
   const isSingle = group.pubkeys.length === 1;
-  const firstPubkey = group.pubkeys[0];
   const me = usePubkey();
+  const recipients = group.pubkeys.filter((p) => p !== me);
+  const firstPubkey = recipients[0];
   const { t } = useTranslation();
-  const isSavedMessages = isSingle && firstPubkey === me;
+  const isSavedMessages = isSingle && group.pubkeys[0] === me;
 
   function openGroup() {
     navigate(`/dm/${group.id}`);
@@ -112,7 +111,7 @@ function GroupItem({ group }: { group: PrivateGroup }) {
         {isSavedMessages ? (
           <Bookmark className="size-10 text-muted-foreground" />
         ) : isSingle ? (
-          <Avatar pubkey={firstPubkey} className="size-10" />
+          <Avatar pubkey={firstPubkey ? firstPubkey : group.pubkeys[0]} className="size-10" />
         ) : (
           <GroupAvatar pubkeys={group.pubkeys} />
         )}
@@ -136,7 +135,7 @@ function GroupItem({ group }: { group: PrivateGroup }) {
                 {t("private-group.saved-messages")}
               </span>
             ) : isSingle ? (
-              <Name pubkey={firstPubkey} />
+              <Name pubkey={firstPubkey ? firstPubkey : group.pubkeys[0]} />
             ) : (
               <NameList
                 notClickable

@@ -1023,6 +1023,12 @@
     "requests": "Requests",
     "no-dm-relays": "No private message relays found",
     "groups": "Groups",
-    "saved-messages": "Saved messages"
+    "saved-messages": "Saved messages",
+    "webrtc": {
+      "incoming-call": "Incoming call",
+      "decline": "Decline",
+      "accept": "Accept",
+      "incoming-call-description": "is calling you"
+    }
   }
 }

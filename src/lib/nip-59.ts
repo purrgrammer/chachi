@@ -66,8 +66,10 @@ export async function giftUnwrap(
     ) as NostrEvent;
     if (!seal) throw new Error("Failed to decrypt wrapper");
 
-    if (!new NDKEvent(undefined, seal).verifySignature(false))
+    if (!new NDKEvent(undefined, seal).verifySignature(false)) {
+      console.log("giftUnwrap seal error", seal);
       throw new Error("GiftSeal signature verification failed!");
+    }
 
     const rumorSender = new NDKUser({ pubkey: seal.pubkey });
     const rumor = JSON.parse(

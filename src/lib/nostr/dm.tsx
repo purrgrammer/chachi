@@ -23,8 +23,10 @@ import { useRelaySet } from "@/lib/nostr";
 import { useNDK } from "@/lib/ndk";
 import { useRelays } from "@/lib/nostr";
 import { discoveryRelays } from "@/lib/relay";
-import { usePubkey, useFollows } from "@/lib/account";
-import { PrivateGroup as Group } from "@/lib/types";
+import { usePubkey, useFollows, useDMRelays } from "@/lib/account";
+import { PrivateGroup as Group, PrivateGroup } from "@/lib/types";
+import { useOnWebRTCSignal } from "@/components/webrtc";
+import { WEBRTC_SIGNAL } from "@/lib/kinds";
 
 export function groupId(event: NostrEvent) {
   const p = event.tags
@@ -65,19 +67,23 @@ function useStreamMap(
   filter: NDKFilter | NDKFilter[],
   relaySet: NDKRelaySet,
   transform: (ev: NDKEvent) => Promise<NostrEvent | null>,
+  pubkey?: string,
 ) {
   const ndk = useNDK();
   const [events, setEvents] = useState<NostrEvent[]>([]);
 
   useEffect(() => {
+    console.log("REQ.GIFT", filter, relaySet.relays);
+    if (!pubkey) return;
     const sub = ndk.subscribe(
       filter,
       {
         cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
         closeOnEose: false,
         skipOptimisticPublishEvent: true,
+        groupable: false,
       },
-      relaySet,
+      relaySet
     );
 
     sub.on("event", (event) => {
@@ -89,12 +95,12 @@ function useStreamMap(
     });
 
     return () => sub.stop();
-  }, []);
+  }, [pubkey]);
 
   return events;
 }
 
-async function fetchDirectMessageRelays(ndk: NDK, pubkey: string) {
+export async function fetchDirectMessageRelays(ndk: NDK, pubkey: string) {
   const relaySet = NDKRelaySet.fromRelayUrls(discoveryRelays, ndk);
   const dmFilter = {
     kinds: [NDKKind.DirectMessageReceiveRelayList],
@@ -103,15 +109,15 @@ async function fetchDirectMessageRelays(ndk: NDK, pubkey: string) {
   const dmRelayList = await ndk.fetchEvent(
     dmFilter,
     { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
-    relaySet,
+    relaySet
   );
   if (dmRelayList) {
     const dm = Array.from(
       new Set(
         dmRelayList.tags
           .filter((tag) => tag[0] === "relay")
-          .map((tag) => tag[1]),
-      ),
+          .map((tag) => tag[1])
+      )
     );
     return { pubkey, dm, fallback: [] };
   } else {
@@ -121,13 +127,13 @@ async function fetchDirectMessageRelays(ndk: NDK, pubkey: string) {
         authors: [pubkey],
       },
       { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
-      relaySet,
+      relaySet
     );
     if (readRelays) {
       const relays = Array.from(
         new Set(
-          readRelays.tags.filter((tag) => tag[0] === "r").map((tag) => tag[1]),
-        ),
+          readRelays.tags.filter((tag) => tag[0] === "r").map((tag) => tag[1])
+        )
       );
       return { pubkey, dm: [], fallback: relays };
     }
@@ -148,8 +154,8 @@ export function useGroupRelays(group: Group) {
       q
         .map((q) => q.data)
         .filter(Boolean)
-        .flat(),
-    ),
+        .flat()
+    )
   );
 }
 
@@ -162,64 +168,47 @@ export function useDirectMessageRelays(pubkey: string) {
 }
 
 export function useDirectMessages() {
-  const pubkey = usePubkey();
-  //const dmRelays = useDMRelays();
-  const relays = useRelays();
-  const relaySet = useRelaySet(relays);
   const ndk = useNDK();
+  const pubkey = usePubkey();
+  const dmRelays = useDMRelays();
+  const onWebRTCSignal = useOnWebRTCSignal();
+  const relays = useRelays();
+  const allRelays = Array.from(
+    new Set(relays.concat(dmRelays.dm || dmRelays.fallback))
+  );
+  const relaySet = useRelaySet(allRelays);
+  // todo: sync from latest - 2 weeks
   const filter = {
     kinds: [NDKKind.GiftWrap],
     "#p": [pubkey!],
   };
-  // todo: incremental sync
   useStreamMap(filter, relaySet!, async (event) => {
     if (await db.dms.get({ gift: event.id })) return null;
 
-    const unwrapped = await giftUnwrap(
-      event,
-      new NDKUser({ pubkey: event.pubkey }),
-      ndk.signer,
-    );
-    if (unwrapped) {
-      savePrivateEvent(
-        unwrapped.rawEvent() as unknown as NostrEvent,
-        event.rawEvent() as unknown as NostrEvent,
+    try {
+      const unwrapped = await giftUnwrap(
+        event,
+        new NDKUser({ pubkey: event.pubkey }),
+        ndk.signer
       );
-      return unwrapped?.rawEvent() as unknown as NostrEvent;
+      if (unwrapped) {
+        const raw = unwrapped.rawEvent() as unknown as NostrEvent;
+        savePrivateEvent(raw, event.rawEvent() as unknown as NostrEvent);
+        if (raw.kind === WEBRTC_SIGNAL) {
+          try {
+            onWebRTCSignal(raw);
+          } catch (err) {
+            console.error(err);
+          }
+        }
+        return raw;
+      }
+    } catch (err) {
+      console.error(err);
     }
-
     return null;
-  });
-  return useLiveQuery(() => db.dms.toArray(), [], []);
-}
-
-export function useGroupDirectMessages(group: Group) {
-  const pubkey = usePubkey();
-  const groupRelays = useGroupRelays(group);
-  const myGroupRelays = groupRelays
-    .filter((r) => r)
-    .find((r) => r!.pubkey === pubkey);
-  const ndk = useNDK();
-  useEffect(() => {
-    if (groupRelays) {
-      console.log("forcing connect and auth420", groupRelays);
-      const filter = {
-        kinds: [NDKKind.GiftWrap],
-        "#p": [pubkey!],
-        limit: 1,
-      };
-      ndk
-        .fetchEvent(
-          filter,
-          { groupable: false, closeOnEose: true },
-          NDKRelaySet.fromRelayUrls(
-            myGroupRelays?.dm || myGroupRelays?.fallback || [],
-            ndk,
-          ),
-        )
-        .then(() => console.log("connected and auth420"));
-    }
-  }, [groupRelays]);
+  }, pubkey);
+  return null;
 }
 
 function splitIntoChunks(arr: string, chunkSize: number): string[] {
@@ -233,17 +222,20 @@ function splitIntoChunks(arr: string, chunkSize: number): string[] {
 export function useGroups() {
   const pubkey = usePubkey();
   const follows = useFollows();
+  // todo: return all groups and do the split in the component
+  // todo: use something more efficient than dm.dms.toArray to check for existing messages
   return useLiveQuery(
     async () => {
+      const groups = await db.dms.orderBy("group").uniqueKeys();
       const dms = await db.dms.toArray();
-      return Array.from(new Set(dms.map((dm) => dm.group)))
+      return groups
         .filter((id) => {
           return (
             id === pubkey ||
             dms.some(
               (dm) =>
                 dm.group === id &&
-                (dm.pubkey === pubkey || follows.includes(dm.pubkey)),
+                (dm.pubkey === pubkey || follows.includes(dm.pubkey))
             )
           );
         })
@@ -253,13 +245,13 @@ export function useGroups() {
             pubkeys:
               id === pubkey
                 ? [pubkey]
-                : splitIntoChunks(id, 64).filter((p) => p !== pubkey),
+                : splitIntoChunks(String(id), 64).filter((p) => p !== pubkey),
           };
         })
-        .filter((g) => g.pubkeys.length > 0);
+        .filter((g) => g.pubkeys.length > 0) as Group[];
     },
     [pubkey, follows],
-    [],
+    []
   );
 }
 
@@ -274,7 +266,7 @@ export function useGroupRequests() {
           return !dms.some(
             (dm) =>
               dm.group === id &&
-              (dm.pubkey === pubkey || follows.includes(dm.pubkey)),
+              (dm.pubkey === pubkey || follows.includes(dm.pubkey))
           );
         })
         .map((id) => {
@@ -286,7 +278,7 @@ export function useGroupRequests() {
         .filter((g) => g.pubkeys.length > 0);
     },
     [pubkey, follows],
-    [],
+    []
   );
 }
 
@@ -300,7 +292,7 @@ export function useGroupMessages(id: string) {
       return messages.reverse();
     },
     [id],
-    [],
+    []
   );
 }
 
@@ -309,7 +301,7 @@ export function useSortedGroups() {
   return useLiveQuery(
     () => getGroupsSortedByLastMessage(groups),
     [groups],
-    groups,
+    groups
   );
 }
 
@@ -318,7 +310,7 @@ export function useSortedGroupRequests() {
   return useLiveQuery(
     () => getGroupsSortedByLastMessage(groups),
     [groups],
-    groups,
+    groups
   );
 }
 
@@ -342,21 +334,61 @@ export function useLastSeen(group: Group) {
   return memoized;
 }
 
-export function useUnreads(groups: Group[]) {
+export function useUnreads() {
+  const pubkey = usePubkey();
   return useLiveQuery(
     async () => {
+      if (!pubkey) return 0;
+
+      const groups = (await db.dms.orderBy("group").uniqueKeys()).map(id => idToGroup(String(id), pubkey!))
       const unreads = await Promise.all(
-        groups.map((g) => getUnreadMessages(g)),
+        groups.map((g) => getUnreadMessages(g))
       );
-      return groups
-        .map((g, idx) => ({ group: g, count: unreads[idx] }))
-        .filter((u) => u.count > 0);
+      return unreads.reduce((acc, curr) => acc + curr, 0)
     },
-    [],
-    [],
+    [pubkey],
+    []
   );
 }
 
 export function useUnreadMessages(group: Group) {
-  return useLiveQuery(() => getUnreadMessages(group), [group.id]);
+  return useLiveQuery(
+    () => getUnreadMessages(group),
+    [group.id]
+  );
+}
+
+export function usePrivateUnreadMessages() {
+  const groups = useGroups();
+  return useLiveQuery(
+    async () => {
+      const unreads = await Promise.all(groups.map(getUnreadMessages))
+      return unreads.reduce((acc, curr) => acc + curr, 0)
+    },
+    [groups],
+    0
+  );
+}
+
+export function saveLastSeen(ev: NostrEvent, group: PrivateGroup) {
+  const ndkEvent = new NDKEvent(undefined, ev);
+  const [tag, ref] = ndkEvent.tagReference();
+  db.lastSeen.put({
+    group: group.id,
+    kind: ev.kind,
+    created_at: ev.created_at,
+    tag,
+    ref,
+  });
+}
+
+export function useSaveLastSeen(group: Group) {
+  return () => {
+    getLastGroupMessage(group).then((ev) => {
+      if (ev) {
+        // @ts-expect-error db events are unsigned
+        saveLastSeen(ev, group);
+      }
+    });
+  };
 }
