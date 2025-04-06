@@ -9,7 +9,7 @@ import { Event, Address } from "@/components/nostr/event";
 import { Image } from "@/components/image";
 import { Audio } from "@/components/audio";
 import { Video } from "@/components/video";
-import { CashuToken } from "@/components/cashu";
+import { CashuRequest, CashuToken } from "@/components/cashu";
 import { Mention } from "@/components/nostr/mention";
 import { Emoji } from "@/components/emoji";
 import { Hashtag } from "@/components/hashtag";
@@ -18,7 +18,7 @@ import { isImageLink, isVideoLink, isAudioLink } from "@/lib/string";
 import type { Group } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { LazyCodeBlock } from "@/components/lazy-code-block";
-import { cashuRegex } from "@/lib/cashu";
+import { cashuRegex, cashuRequestRegex } from "@/lib/cashu";
 
 // todo: blossom link fallbacks
 
@@ -97,6 +97,11 @@ export type EcashFragment = {
   token: string;
 };
 
+export type CashuRequestFragment = {
+  type: "cashu-request";
+  token: string;
+};
+
 export type CodeBlockFragment = {
   type: "codeBlock";
   code: string;
@@ -133,6 +138,7 @@ export type InlineFragment =
   | EmojiFragment
   | HashtagFragment
   | EcashFragment
+  | CashuRequestFragment
   | BoldFragment
   | ItalicFragment
   | MonospaceFragment;
@@ -312,6 +318,10 @@ function toNode(
     );
   }
 
+  if (fragment.type === "cashu-request") {
+    return <CashuRequest token={fragment.token} className={classNames.ecash} />;
+  }
+
   if (fragment.type === "text") {
     return (
       <span
@@ -415,9 +425,9 @@ export function useRichText(
     if (options.hashtags) {
       result = extractHashtags(result);
     }
-    //if (options.ecash) {
-    //  result = extractEcash(result);
-    //}
+    if (options.ecash) {
+      result = extractEcash(result);
+    }
 
     return result;
   }, [text, options, tags]);
@@ -441,6 +451,14 @@ export function Fragments({
     <div className={cn("flex flex-col gap-3", className)}>
       {...fragments.map((f, idx) => toNode(f, idx, classNames, group, options))}
     </div>
+  );
+}
+
+function extractEcash(fragments: Fragment[]): Fragment[] {
+  return extract(
+    fragments,
+    cashuRequestRegex,
+    (s) => ({ type: "cashu-request", token: s }),
   );
 }
 
@@ -500,9 +518,9 @@ export function RichText({
     if (opts.hashtags) {
       result = extractHashtags(result);
     }
-    //if (opts.ecash) {
-    //  result = extractEcash(result);
-    //}
+    if (opts.ecash) {
+      result = extractEcash(result);
+    }
 
     // flatten structure to avoid invalid DOM nesting
     return result.reduce((acc, f) => {

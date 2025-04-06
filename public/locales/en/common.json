@@ -309,11 +309,6 @@
       "tip": {
         "action": "Zap"
       },
-      "retry": {
-        "action": "Retry",
-        "success": "Message sent",
-        "error": "Failed to send message"
-      },
       "copy": {
         "action": "Copy",
         "success": "Copied to clipboard",
@@ -403,11 +398,6 @@
       "error": "Couldn't upload file"
     }
   },
-  "image": {
-    "upload": {
-      "error": "Couldn't upload image"
-    }
-  },
   "copy": {
     "success": "Copied",
     "error": "Couldn't copy"
@@ -481,6 +471,9 @@
     "description": {
       "label": "Description",
       "placeholder": "Add a description"
+    },
+    "upload": {
+      "error": "Couldn't upload image"
     }
   },
   "video": {
@@ -590,11 +583,10 @@
     "no-coins": "No coins found",
     "make-default": "Make default",
     "choose-wallet": "Choose wallet",
-    "choose-wallet-placeholder": "Choose a wallet to pay with",
+    "choose-wallet-placeholder": "Choose a wallet",
     "make-default-error": "Failed to set wallet as default",
     "make-default-success": "Wallet set as default",
     "create": "Create wallet",
-    "settings": "Wallet settings",
     "save": "Save changes",
     "saved": "Changes saved",
     "save-error": "Failed to save changes",
@@ -692,7 +684,10 @@
   },
   "ecash": {
     "redeem": "Redeem",
-    "fee": "fee:"
+    "fee": "fee:",
+    "request": "Payment Request",
+    "pay-request": "Pay",
+    "paid-request": "Paid"
   },
   "settings": {
     "title": "Settings",
@@ -1026,7 +1021,6 @@
     "no-dm-relays": "No private message relays found",
     "groups": "Groups",
     "saved-messages": "Saved messages",
-
     "webrtc": {
       "incoming-call": "Incoming call",
       "decline": "Decline",

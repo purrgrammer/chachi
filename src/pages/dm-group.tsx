@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { NostrEvent } from "nostr-tools";
 import { RelayIcon } from "@/components/nostr/relay";
 import { User } from "@/components/nostr/user";
 import { NameList } from "@/components/nostr/name-list";
 import { Route, RouteOff, MessageSquareLock } from "lucide-react";
-import { NDKKind, NostrEvent } from "@nostr-dev-kit/ndk";
+import { NDKKind } from "@nostr-dev-kit/ndk";
 import { useParams } from "react-router-dom";
 import { Avatar } from "@/components/nostr/avatar";
 import { Header } from "@/components/header";
@@ -28,12 +29,10 @@ import EncryptedFile from "@/components/nostr/encrypted-file";
 import { Name } from "@/components/nostr/name";
 import { ProfileDrawer } from "@/components/nostr/profile";
 import { useSaveLastSeen } from "@/lib/nostr/dm";
-import type { Event } from "@/lib/db";
-
-// todo: save lastSeen if a msg is sent
 
 function GroupChat({ id, group }: { id: string; group: PrivateGroup }) {
-  const [sentMessage, setSentMessage] = useState<Event | undefined>(undefined);
+  const [sentMessage, setSentMessage] = useState<NostrEvent | undefined>(undefined);
+  const [scrollTo, setScrollTo] = useState<NostrEvent | undefined>(undefined);
   const messages = useGroupMessages(id);
   const me = usePubkey();
   const [replyingTo, setReplyingTo] = useState<NostrEvent | undefined>(
@@ -55,9 +54,8 @@ function GroupChat({ id, group }: { id: string; group: PrivateGroup }) {
   }, [group.id]);
 
   function onNewMessage(event: NostrEvent) {
-    setSentMessage(event as Event);
-    // @ts-expect-error: types don't match but it's ok
-    saveLastSeen(event as Event);
+    setSentMessage(event);
+    saveLastSeen(event);
   }
 
   return (
@@ -69,13 +67,12 @@ function GroupChat({ id, group }: { id: string; group: PrivateGroup }) {
             height: `calc(100vh - ${nonChatHeight}px)`,
           } as React.CSSProperties
         }
-        // @ts-expect-error: types don't match but it's ok
         newMessage={sentMessage}
         lastSeen={lastSeen?.ref !== messages.at(0)?.id ? lastSeen : undefined}
         replyingTo={replyingTo}
         setReplyingTo={setReplyingTo}
-        //scrollTo={scrollTo}
-        //setScrollTo={setScrollTo}
+        scrollTo={scrollTo}
+        setScrollTo={setScrollTo}
         // @ts-expect-error: these events are unsigned since they come from DB
         events={messages}
         //canDelete={canDelete}
@@ -147,7 +144,6 @@ function GroupChat({ id, group }: { id: string; group: PrivateGroup }) {
         kind={NDKKind.PrivateDirectMessage}
         replyKind={NDKKind.PrivateDirectMessage}
         onNewMessage={onNewMessage}
-        // @ts-expect-error: these events are unsigned since they come from DB
         replyingTo={replyingTo}
         setReplyingTo={setReplyingTo}
       />
