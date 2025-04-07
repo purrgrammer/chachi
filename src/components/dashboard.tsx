@@ -65,7 +65,7 @@ function Communities() {
       kinds: [COMMUNIKEY],
       authors: follows,
     },
-    relays
+    relays,
   );
   const communities = useMemo(() => {
     const byPubkey = Object.groupBy(events, (e: NostrEvent) => e.pubkey);
@@ -397,13 +397,13 @@ function GroupSearch() {
       acc.result.push(g);
       return acc;
     },
-    { result: [] as GroupMetadata[], seen: new Set<string>() }
+    { result: [] as GroupMetadata[], seen: new Set<string>() },
   );
   const minChars = 2;
   const filteredGroups = deduped.filter(
     (g) =>
       g.name.toLowerCase().includes(search.toLowerCase()) ||
-      g.about?.toLowerCase().includes(search.toLowerCase())
+      g.about?.toLowerCase().includes(search.toLowerCase()),
   );
   const n = filteredGroups.length;
   const hasNoResults =

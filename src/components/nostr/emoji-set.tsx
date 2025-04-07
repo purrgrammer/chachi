@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { NostrEvent } from "nostr-tools";
-import { RotateCw, Star, Check } from "lucide-react";
+import { SmilePlus, RotateCw, Star, Check } from "lucide-react";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import {
   Tooltip,
@@ -14,7 +14,7 @@ import { useCustomEmojis } from "@/lib/nostr/emojis";
 import { useRelays, useRelaySet } from "@/lib/nostr";
 import { useTranslation } from "react-i18next";
 
-export function EmojiSet({ event }: { event: NostrEvent }) {
+export default function EmojiSet({ event }: { event: NostrEvent }) {
   const { data: myEmojis } = useCustomEmojis();
   const relays = useRelays();
   const relaySet = useRelaySet(relays);
@@ -60,32 +60,40 @@ export function EmojiSet({ event }: { event: NostrEvent }) {
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-row gap-1 justify-between items-center">
-        <h4 className="text-xl font-semibold">{title || identifier}</h4>
-        <Button
-          disabled={isSaving}
-          variant={inCollection ? "default" : "ghost"}
-          size="smallIcon"
-          onClick={toggleFavorite}
-        >
-          {isSaving ? (
-            <RotateCw className="animate-spin" />
-          ) : inCollection ? (
-            <Check />
-          ) : (
-            <Star />
-          )}
-        </Button>
+    <div className="flex flex-col gap-3 w-full">
+      <div className="flex flex-row gap-1 justify-between items-center w-full">
+        <div className="flex flex-row gap-2 items-center justify-between w-full">
+          <h4 className="text-xl font-semibold">{title || identifier}</h4>
+          <div className="flex flex-row items-center gap-2">
+            <div className="flex flex-row items-center gap-1 text-muted-foreground">
+              <SmilePlus className="size-4" />
+              <span className="text-xs font-mono">{emojis.length}</span>
+            </div>
+            <Button
+              disabled={isSaving}
+              variant={inCollection ? "default" : "ghost"}
+              size="smallIcon"
+              onClick={toggleFavorite}
+            >
+              {isSaving ? (
+                <RotateCw className="animate-spin" />
+              ) : inCollection ? (
+                <Check />
+              ) : (
+                <Star />
+              )}
+            </Button>
+          </div>
+        </div>
       </div>
       <div className="">
-        <div className="grid grid-cols-6 gap-2 sm:grid-cols-8">
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
           {emojis.map((emoji) => (
             <Tooltip key={emoji[1]}>
               <TooltipTrigger asChild>
                 <div className="flex justify-center items-center">
                   <img
-                    className="size-8"
+                    className="w-24 h-24"
                     src={emoji[2]}
                     alt={emoji[1]}
                     key={emoji[1]}

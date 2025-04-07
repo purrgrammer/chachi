@@ -58,7 +58,7 @@ import { Repo, Issues } from "@/components/nostr/repo";
 import { Highlight } from "@/components/nostr/highlight";
 import { Stream } from "@/components/nostr/stream";
 import People from "@/components/nostr/people";
-import { EmojiSet } from "@/components/nostr/emoji-set";
+import EmojiSet from "@/components/nostr/emoji-set";
 import { GIFSet } from "@/components/nostr/gif-set";
 import Reaction from "@/components/nostr/reaction";
 import { Thread } from "@/components/nostr/thread";
@@ -1411,7 +1411,7 @@ export function Embed({
             />
           </div>
         )}
-        {showReactions ? (
+        {showReactions && !isDetail ? (
           <Reactions
             event={event}
             relays={group ? [group.relay] : [...relays, ...userRelays]}
