@@ -26,6 +26,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { BookmarkGroup } from "@/components/nostr/groups/bookmark";
+import { CommunityEdit } from "@/components/nostr/groups/community-edit";
+import { usePubkey } from "@/lib/account";
 
 type GroupTab = "chat" | "posts" | "videos" | "images" | "polls";
 
@@ -43,6 +45,9 @@ function CommunityHeader({
       }
     : null;
   const { t } = useTranslation();
+  const userPubkey = usePubkey();
+  const isOwner = userPubkey === pubkey;
+
   return (
     <Header>
       <div className="flex items-center w-full justify-between">
@@ -62,6 +67,7 @@ function CommunityHeader({
             <TooltipContent>{t("group.metadata.community")}</TooltipContent>
           </Tooltip>
           <Separator orientation="vertical" className="ml-3 h-4" />
+          {isOwner && <CommunityEdit pubkey={pubkey} />}
           {group ? <BookmarkGroup group={group} /> : null}
           {group ? <GroupInfo group={group} /> : null}
         </div>

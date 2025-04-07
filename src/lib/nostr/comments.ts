@@ -37,8 +37,15 @@ export function useReplies(event: NostrEvent, group?: Group, live = true) {
     live,
     true,
   );
+  const sortedReplies = [...replies.events];
+  if (event.kind === NDKKind.Text) {
+    sortedReplies.sort((a, b) => a.created_at - b.created_at);
+  }
 
-  return replies;
+  return {
+    ...replies,
+    events: sortedReplies,
+  };
 }
 
 export function useDirectReplies(

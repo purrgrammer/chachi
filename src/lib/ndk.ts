@@ -3,7 +3,7 @@ import NDK, { NDKRelayAuthPolicies } from "@nostr-dev-kit/ndk";
 import { cache } from "@/lib/db";
 import { bootstrapRelays, discoveryRelays } from "@/lib/relay";
 
-const ndk = new NDK({
+export const ndk = new NDK({
   explicitRelayUrls: bootstrapRelays,
   outboxRelayUrls: discoveryRelays,
   enableOutboxModel: false,

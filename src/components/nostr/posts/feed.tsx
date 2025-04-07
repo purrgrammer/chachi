@@ -25,7 +25,7 @@ export const GroupPosts = forwardRef(
       ...(includeOpPublications
         ? [
             {
-              kinds: [NDKKind.GroupNote],
+              kinds: [NDKKind.Text, NDKKind.GroupNote],
               authors: [group.id],
               limit: 50,
             },

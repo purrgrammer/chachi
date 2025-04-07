@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import CodeSnippet from "@/components/nostr/code-snippet";
@@ -36,7 +37,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/nav-tabs";
-import { Post } from "@/components/nostr/post";
+import { Post, PostDetail } from "@/components/nostr/post";
 import { HorizontalVideo, VerticalVideo } from "@/components/nostr/video";
 import { Image } from "@/components/nostr/image";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
@@ -73,7 +74,7 @@ import { Poll, PollResults } from "@/components/nostr/poll";
 import { CalendarEvent } from "@/components/nostr/calendar";
 import { ReplyDialog } from "@/components/nostr/reply";
 import { useMintList } from "@/lib/cashu";
-import { getRelayHost } from "@/lib/relay";
+import { eventLink } from "@/lib/links";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet, useRelays } from "@/lib/nostr";
 import { useDirectReplies, useReplies } from "@/lib/nostr/comments";
@@ -145,15 +146,15 @@ const eventDetails: Record<
 > = {
   [NDKKind.Text]: {
     preview: Post,
-    detail: Post,
+    detail: PostDetail,
   },
   [COMMENT]: {
     preview: Post,
-    detail: Post,
+    detail: PostDetail,
   },
   [NDKKind.GroupNote]: {
     preview: Post,
-    detail: Post,
+    detail: PostDetail,
   },
   [NDKKind.GroupChat]: {
     noHeader: true,
@@ -164,7 +165,7 @@ const eventDetails: Record<
   },
   [NDKKind.GroupReply]: {
     preview: Post,
-    detail: Post,
+    detail: PostDetail,
   },
   [NDKKind.GroupMetadata]: {
     noHeader: true,
@@ -206,7 +207,7 @@ const eventDetails: Record<
   },
   [ISSUE]: {
     preview: Post,
-    detail: Post,
+    detail: PostDetail,
   },
   [NDKKind.HorizontalVideo]: {
     preview: HorizontalVideo,
@@ -484,7 +485,6 @@ function EventMenu({
 }) {
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [shareGroup, setShareGroup] = useState<Group | undefined>(group);
-  const ndk = useNDK();
   const navigate = useNavigate();
   const groups = useSortedGroups();
   const isGroupEvent =
@@ -504,15 +504,7 @@ function EventMenu({
   } = useEmoji(event, group);
 
   function showDetail() {
-    const ev = new NDKEvent(ndk, event);
-    // @ts-expect-error for some reason it thinks this function takes a number
-    const nlink = ev.encode(relays);
-    const prefix = group
-      ? group.id === "_"
-        ? `/${getRelayHost(group.relay)}`
-        : `/${getRelayHost(group.relay)}/${group.id}`
-      : "";
-    const url = `${prefix}/e/${nlink}`;
+    const url = eventLink(event, group);
     navigate(url);
   }
 
@@ -691,17 +683,20 @@ function AsReply({
   group,
   className,
   onClick,
+  asLink = false,
 }: {
   event: NostrEvent;
   group?: Group;
   className?: string;
   onClick?: (ev: NostrEvent) => void;
+  asLink?: boolean;
 }) {
-  return (
+  const url = asLink ? eventLink(event, group) : undefined;
+  const content = (
     <div
       className={cn(
         "h-12 p-1 pl-2 border-l-4 rounded-md mb-1 bg-background/80 border-background dark:bg-background/40 dark:border-background/60",
-        onClick ? "cursor-pointer" : "",
+        onClick || asLink ? "cursor-pointer" : "",
         className,
       )}
       onClick={onClick ? () => onClick(event) : undefined}
@@ -731,6 +726,7 @@ function AsReply({
       </RichText>
     </div>
   );
+  return asLink && url ? <Link to={url}>{content}</Link> : content;
 }
 
 export function ReplyEmbed({
@@ -1321,6 +1317,7 @@ export function Embed({
   showReactions = true,
   options = {},
   relays = [],
+  asLink = false,
   asReply = false,
   onClick,
 }: {
@@ -1335,6 +1332,7 @@ export function Embed({
   classNames?: RichTextClassnames;
   relays: string[];
   asReply?: boolean;
+  asLink?: boolean;
   onClick?: (ev: NostrEvent) => void;
 }) {
   // todo: if is detail, swipe to reply/react
@@ -1354,6 +1352,7 @@ export function Embed({
   if (asReply) {
     return (
       <AsReply
+        asLink={asLink}
         event={event}
         group={group}
         className={className}

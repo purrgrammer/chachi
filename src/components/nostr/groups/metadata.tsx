@@ -105,10 +105,12 @@ export function GroupMetadata({
 export function CommunityMetadata({
   event,
   group,
+  hideDetails,
   className,
 }: {
   event: NostrEvent;
   group?: Group;
+  hideDetails?: boolean;
   className?: string;
 }) {
   const { data: profile } = useProfile(event.pubkey);
@@ -141,62 +143,106 @@ export function CommunityMetadata({
           </div>
         </div>
       </div>
-      {community?.relay ? (
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <Server className="size-4 text-muted-foreground" />
-            <h3 className="text-sm text-muted-foreground uppercase">
-              {t("community.relays.title")}
-            </h3>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <RelayLink
-              relay={community.relay}
-              classNames={{ icon: "size-4", name: "text-sm" }}
-            />
-          </div>
-        </div>
-      ) : null}
+      {!hideDetails && (
+        <>
+          {community?.relay ? (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Server className="size-4 text-muted-foreground" />
+                <h3 className="text-sm text-muted-foreground uppercase">
+                  {t("community.relays.title")}
+                </h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <RelayLink
+                  relay={community.relay}
+                  classNames={{ icon: "size-4", name: "text-sm" }}
+                />
+              </div>
+            </div>
+          ) : null}
 
-      {community?.blossom && community.blossom.length > 0 ? (
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <CloudUpload className="size-4 text-muted-foreground" />
-            <h3 className="text-sm text-muted-foreground uppercase">
-              {t("community.blossom.title")}
-            </h3>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {community.blossom.map((blossom) => (
-              <BlossomLink
-                key={blossom}
-                url={blossom}
-                classNames={{ icon: "size-4", name: "text-sm" }}
-              />
-            ))}
-          </div>
-        </div>
-      ) : null}
+          {community?.blossom && community.blossom.length > 0 ? (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <CloudUpload className="size-4 text-muted-foreground" />
+                <h3 className="text-sm text-muted-foreground uppercase">
+                  {t("community.blossom.title")}
+                </h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {community.blossom.map((blossom) => (
+                  <BlossomLink
+                    key={blossom}
+                    url={blossom}
+                    classNames={{ icon: "size-4", name: "text-sm" }}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
 
-      {community?.mint ? (
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <Landmark className="size-4 text-muted-foreground" />
-            <h3 className="text-sm text-muted-foreground uppercase">
-              {t("community.mint.title")}
-            </h3>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <MintLink
-              url={community.mint}
-              classNames={{ icon: "size-4", name: "text-sm" }}
-            />
-          </div>
-        </div>
-      ) : null}
-      <Button size="sm" onClick={openGroup}>
-        <MessagesSquare /> {t("group.metadata.join-the-conversation")}
-      </Button>
+          {community?.mint ? (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Landmark className="size-4 text-muted-foreground" />
+                <h3 className="text-sm text-muted-foreground uppercase">
+                  {t("community.mint.title")}
+                </h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <MintLink
+                  url={community.mint}
+                  classNames={{ icon: "size-4", name: "text-sm" }}
+                />
+              </div>
+            </div>
+          ) : null}
+          <Button size="sm" onClick={openGroup}>
+            <MessagesSquare /> {t("group.metadata.join-the-conversation")}
+          </Button>
+        </>
+      )}
     </div>
+  );
+}
+
+export function CommunitySummary({
+  event,
+  group,
+}: {
+  event: NostrEvent;
+  group?: Group;
+}) {
+  const { data: profile } = useProfile(event.pubkey);
+  const navigate = useNavigate();
+  function openGroup() {
+    navigate(`/c/${event.pubkey}`);
+  }
+  return (
+    <Button variant="outline" size="fit" onClick={openGroup}>
+      <div className="p-2 space-y-3 w-64 rounded-sm">
+        <div className="flex flex-col gap-1 items-center">
+          <NostrAvatar pubkey={event.pubkey} className="size-12" />
+          <div className="flex flex-col gap-0.5">
+            <h3 className="text-lg font-semibold line-clamp-1">
+              <Name pubkey={event.pubkey} />
+            </h3>
+            {profile?.about ? (
+              <RichText
+                tags={event.tags}
+                group={group}
+                className="text-xs text-center text-muted-foreground line-clamp-2"
+                options={{
+                  inline: true,
+                }}
+              >
+                {profile?.about}
+              </RichText>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </Button>
   );
 }

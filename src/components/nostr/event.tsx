@@ -43,6 +43,7 @@ export function Event({
   className,
   showReactions = true,
   asReply,
+  asLink,
   onClick,
 }: {
   id: string;
@@ -52,6 +53,7 @@ export function Event({
   className?: string;
   showReactions?: boolean;
   asReply?: boolean;
+  asLink?: boolean;
   onClick?: (ev: NostrEvent) => void;
 }) {
   const { data: event, status } = useEvent({ id, pubkey, relays });
@@ -76,6 +78,7 @@ export function Event({
       relays={relays}
       showReactions={showReactions}
       asReply={asReply}
+      asLink={asLink}
       onClick={onClick}
     />
   ) : (
@@ -141,18 +144,22 @@ export function Address({
 export function E({
   id,
   group,
+  className,
   pubkey,
   relays,
   showReactions,
   asReply,
+  asLink,
   onClick,
 }: {
   id: string;
   pubkey?: string;
+  className?: string;
   group?: Group;
   relays?: string[];
   showReactions?: boolean;
   asReply?: boolean;
+  asLink?: boolean;
   onClick?: (ev: NostrEvent) => void;
 }) {
   return (
@@ -163,7 +170,9 @@ export function E({
       relays={relays ? relays : group ? [group.relay] : []}
       showReactions={showReactions}
       asReply={asReply}
+      asLink={asLink}
       onClick={onClick}
+      className={className}
     />
   );
 }

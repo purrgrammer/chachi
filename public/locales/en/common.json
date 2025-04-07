@@ -54,6 +54,9 @@
       "mentions": "mentions",
       "none": "Nothing new for you... yet"
     },
+    "communities": {
+      "heading": "Communities"
+    },
     "featured": {
       "heading": "Featured"
     },
@@ -793,6 +796,14 @@
     },
     "blossom": {
       "title": "Media Servers"
+    },
+    "edit": {
+      "title": "Edit community",
+      "description": "Edit the community details",
+      "save": "Save changes",
+      "success": "Community updated",
+      "error": "Failed to update community",
+      "submit": "Save"
     }
   },
   "relay": {

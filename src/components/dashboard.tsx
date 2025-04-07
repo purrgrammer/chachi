@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
-import { Search, X, Flame, Activity, Sparkles } from "lucide-react";
+import { Search, X, Flame, Activity, Sparkles, Castle } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { CommunitySummary } from "@/components/nostr/groups/metadata";
 import { AvatarList } from "@/components/nostr/avatar-list";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import {
 } from "@/lib/messages";
 import { Input } from "@/components/ui/input";
 import { Highlight } from "@/components/highlight";
+import { useRequest } from "@/lib/nostr";
 import {
   useGroup,
   useAllGroups,
@@ -33,6 +35,10 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { useRelays } from "@/lib/nostr";
+import { COMMUNIKEY } from "@/lib/kinds";
+import { NostrEvent } from "nostr-tools";
+import { useFollows } from "@/lib/account";
 
 function Heading({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
@@ -41,6 +47,54 @@ function Heading({ icon, text }: { icon: React.ReactNode; text: string }) {
       <h3 className="text-sm font-light uppercase">{text}</h3>
     </div>
   );
+}
+
+// Communities
+
+function Community({ event }: { event: NostrEvent }) {
+  return <CommunitySummary event={event} />;
+}
+
+function Communities() {
+  const { t } = useTranslation();
+
+  const relays = useRelays();
+  const follows = useFollows();
+  const { events } = useRequest(
+    {
+      kinds: [COMMUNIKEY],
+      authors: follows,
+    },
+    relays
+  );
+  const communities = useMemo(() => {
+    const byPubkey = Object.groupBy(events, (e: NostrEvent) => e.pubkey);
+    return Object.values(byPubkey).map((evs) => {
+      return evs?.reduce((acc, ev) => {
+        if (acc.created_at < ev.created_at) return ev;
+        return acc;
+      }, evs[0]);
+    }) as NostrEvent[];
+  }, [events]);
+  return communities.length > 0 ? (
+    <div className="space-y-2">
+      <Heading
+        icon={<Castle className="size-4" />}
+        text={t("dashboard.communities.heading")}
+      />
+      <div
+        className="flex flex-row gap-2
+      w-[calc(100vw-2rem)]
+      md:w-[calc(100vw-20rem)]
+   group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100vw-6rem)]
+      overflow-hidden overflow-x-scroll no-scrollbar"
+      >
+        {communities.map((ev) => (
+          <Community key={ev.pubkey} event={ev} />
+        ))}
+      </div>
+    </div>
+  ) : null;
 }
 
 // Activity
@@ -343,13 +397,13 @@ function GroupSearch() {
       acc.result.push(g);
       return acc;
     },
-    { result: [] as GroupMetadata[], seen: new Set<string>() },
+    { result: [] as GroupMetadata[], seen: new Set<string>() }
   );
   const minChars = 2;
   const filteredGroups = deduped.filter(
     (g) =>
       g.name.toLowerCase().includes(search.toLowerCase()) ||
-      g.about?.toLowerCase().includes(search.toLowerCase()),
+      g.about?.toLowerCase().includes(search.toLowerCase())
   );
   const n = filteredGroups.length;
   const hasNoResults =
@@ -451,6 +505,7 @@ export function Dashboard() {
       <GroupsActivity />
       <FeaturedGroups />
       <NetworkGroups />
+      <Communities />
       <FindGroup />
     </div>
   );

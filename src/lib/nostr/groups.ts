@@ -37,12 +37,7 @@ import {
   GROUP_MEMBERS,
   GROUP_ADMINS,
 } from "@/lib/query";
-import {
-  getGroupInfo,
-  saveGroupInfo,
-  getCommunity,
-  saveCommunity,
-} from "@/lib/db";
+import { getGroupInfo, saveGroupInfo, saveCommunity } from "@/lib/db";
 
 export function useUserGroups(pubkey: string) {
   const ndk = useNDK();
@@ -373,7 +368,7 @@ export function useCloseGroups() {
     queryFn: async () => {
       const events = await ndk.fetchEvents(
         { kinds: [NDKKind.GroupMembers], "#p": follows },
-        { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.PARALLEL },
+        { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY },
         relaySet,
       );
       // todo: get metadatas
@@ -586,10 +581,10 @@ export function useCommunity(pubkey: string) {
   return useQuery({
     queryKey: ["COMMUNITY", pubkey],
     queryFn: async () => {
-      const cached = await getCommunity(pubkey);
-      if (cached) {
-        return cached;
-      }
+      //const cached = await getCommunity(pubkey);
+      //if (cached) {
+      //  return cached;
+      //}
       const relays = await fetchRelayList(ndk, pubkey);
       const info = await ndk.fetchEvent(
         {
