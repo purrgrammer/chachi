@@ -76,10 +76,12 @@ function Section({ group, kinds }: { group: Group; kinds: number[] }) {
     {
       kinds: kinds,
       authors: [group.id],
+      limit: 50,
     },
     {
       kinds: kinds,
       "#h": [group.id],
+      limit: 50,
     },
   ];
   return (
