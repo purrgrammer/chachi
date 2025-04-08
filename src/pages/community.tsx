@@ -101,7 +101,7 @@ function Section({ group, kinds }: { group: Group; kinds: number[] }) {
 }
 
 function CommunityContent({ pubkey }: { pubkey: string }) {
-  const { data: community } = useCommunity(pubkey);
+  const community = useCommunity(pubkey);
   const { t } = useTranslation();
   const group = community
     ? {

@@ -38,7 +38,14 @@ import {
   GROUP_MEMBERS,
   GROUP_ADMINS,
 } from "@/lib/query";
-import { getGroupInfo, saveGroupInfo, saveCommunity } from "@/lib/db";
+import {
+  getGroupInfo,
+  saveGroupInfo,
+  saveCommunity,
+  getCommunity,
+} from "@/lib/db";
+import { useLiveQuery } from "dexie-react-hooks";
+import { useEffect } from "react";
 
 export function useUserGroups(pubkey: string) {
   const ndk = useNDK();
@@ -579,13 +586,8 @@ export function useGroupDescription(group: Group) {
 
 export function useCommunity(pubkey: string) {
   const ndk = useNDK();
-  return useQuery({
-    queryKey: ["COMMUNITY", pubkey],
-    queryFn: async () => {
-      //const cached = await getCommunity(pubkey);
-      //if (cached) {
-      //  return cached;
-      //}
+  useEffect(() => {
+    const fetchCommunity = async () => {
       const relays = await fetchRelayList(ndk, pubkey);
       const info = await ndk.fetchEvent(
         {
@@ -625,7 +627,10 @@ export function useCommunity(pubkey: string) {
         sections,
       } as Community;
       saveCommunity(c);
-      return c;
-    },
-  });
+    };
+
+    fetchCommunity();
+  }, [pubkey]);
+
+  return useLiveQuery(() => getCommunity(pubkey), [pubkey]);
 }

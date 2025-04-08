@@ -132,7 +132,7 @@ function GroupMembers({ group }: { group: Group }) {
 
 function CommunityInfo({ group }: { group: Group }) {
   const { t } = useTranslation();
-  const { data: community } = useCommunity(group.id);
+  const community = useCommunity(group.id);
   return (
     <div className="flex flex-col gap-3 justify-around">
       {community?.relay ? (

@@ -105,7 +105,7 @@ export function useGroupchat(group: Group) {
 
 export function useCommunitychat(pubkey: string) {
   const ndk = useNDK();
-  const { data: community } = useCommunity(pubkey);
+  const community = useCommunity(pubkey);
   const group = {
     id: pubkey,
     relay: community?.relay || "",
@@ -144,7 +144,7 @@ export function useCommunitychat(pubkey: string) {
     };
   }, [community]);
 
-  return useLiveQuery(() => getGroupChat(group), [group.id, group.relay], []);
+  return useLiveQuery(() => getGroupChat(group), [group.id], []);
 }
 
 export function useLastMessage(group: Group) {

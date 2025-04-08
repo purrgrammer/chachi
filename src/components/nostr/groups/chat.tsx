@@ -990,7 +990,7 @@ export const CommunityChat = forwardRef(
     { pubkey }: { pubkey: string },
     ref: ForwardedRef<HTMLDivElement | null>,
   ) => {
-    const { data: community } = useCommunity(pubkey);
+    const community = useCommunity(pubkey);
     const group = {
       id: pubkey,
       relay: community?.relay || "",

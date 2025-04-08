@@ -114,7 +114,7 @@ export function CommunityMetadata({
   className?: string;
 }) {
   const { data: profile } = useProfile(event.pubkey);
-  const { data: community } = useCommunity(event.pubkey);
+  const community = useCommunity(event.pubkey);
   const navigate = useNavigate();
 
   function openGroup() {
