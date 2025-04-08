@@ -29,7 +29,6 @@ import {
 import { useNDK } from "@/lib/ndk";
 import { useRelays, useRelaySet } from "@/lib/nostr";
 import { isRelayURL } from "@/lib/relay";
-import { useCommunity } from "@/lib/nostr/groups";
 import type { Community } from "@/lib/types";
 import { ContentKinds } from "@/lib/constants/kinds";
 import { COMMUNIKEY } from "@/lib/kinds";
@@ -40,13 +39,18 @@ interface ContentSection {
   fee?: number;
 }
 
-export function CommunityEdit({ pubkey }: { pubkey: string }) {
+export function CommunityEdit({
+  pubkey,
+  community,
+}: {
+  pubkey: string;
+  community?: Community;
+}) {
   const { t } = useTranslation();
   const ndk = useNDK();
   const [showDialog, setShowDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("settings");
-  const { data: community } = useCommunity(pubkey);
   const userRelays = useRelays();
   const relaySet = useRelaySet(userRelays.filter((r) => isRelayURL(r)));
 

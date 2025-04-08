@@ -18,6 +18,8 @@ interface FeedProps extends React.HTMLAttributes<HTMLDivElement> {
   onlyRelays?: boolean;
   newPost?: ReactNode;
   className?: string;
+  loadingClassname?: string;
+  emptyClassname?: string;
 }
 
 const Feed = forwardRef(
@@ -30,6 +32,8 @@ const Feed = forwardRef(
       newPost,
       className,
       outboxRelays = [],
+      loadingClassname,
+      emptyClassname,
       ...props
     }: FeedProps,
     ref: ForwardedRef<HTMLDivElement | null>,
@@ -46,8 +50,12 @@ const Feed = forwardRef(
         ref={ref}
         {...props}
       >
-        {events.length === 0 && !eose && <Loading />}
-        {events.length === 0 && eose ? <Empty>{newPost}</Empty> : null}
+        {events.length === 0 && !eose && (
+          <Loading className={loadingClassname} />
+        )}
+        {events.length === 0 && eose ? (
+          <Empty className={emptyClassname}>{newPost}</Empty>
+        ) : null}
         {events.length > 0 && eose ? (
           <AnimatePresence initial={false}>
             <div className="flex flex-col gap-2 p-2">

@@ -37,6 +37,7 @@ function CommunityHeader({
     ? {
         id: pubkey,
         relay: community.relay,
+        isCommunity: true,
       }
     : null;
   const { t } = useTranslation();
@@ -62,7 +63,9 @@ function CommunityHeader({
             <TooltipContent>{t("group.metadata.community")}</TooltipContent>
           </Tooltip>
           <Separator orientation="vertical" className="ml-3 h-4" />
-          {isOwner && <CommunityEdit pubkey={pubkey} />}
+          {isOwner && community ? (
+            <CommunityEdit pubkey={pubkey} community={community} />
+          ) : null}
           {group ? <BookmarkGroup group={group} /> : null}
           {group ? <GroupInfo group={group} /> : null}
         </div>
@@ -86,7 +89,14 @@ function Section({ group, kinds }: { group: Group; kinds: number[] }) {
   ];
   return (
     <div className="h-full p-2">
-      <Feed group={group} filter={filter} />
+      <Feed
+        group={group}
+        filter={filter}
+        live={false}
+        onlyRelays={true}
+        loadingClassname="py-32"
+        emptyClassname="py-32"
+      />
     </div>
   );
 }
@@ -104,10 +114,18 @@ function CommunityContent({ pubkey }: { pubkey: string }) {
 
   return (
     <div>
-      <CommunityHeader pubkey={pubkey} community={community} />
+      {community ? (
+        <CommunityHeader pubkey={pubkey} community={community} />
+      ) : null}
       {community && group ? (
         <Tabs defaultValue="chat">
-          <TabsList>
+          <TabsList
+            className="
+          overflow-x-auto no-scrollbar 
+	  w-[100vw]
+md:w-[calc(100vw-16rem)]
+	  group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100vw-18rem)"
+          >
             <TabsTrigger value="chat">{t("content.type.chat")}</TabsTrigger>
             {community.sections?.map((section) => (
               <TabsTrigger key={section.name} value={section.name}>

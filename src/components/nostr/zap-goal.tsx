@@ -22,7 +22,13 @@ import { NDKKind } from "@nostr-dev-kit/ndk";
 //    .sort((a, b) => b.amount - a.amount);
 //}
 
-export function ZapGoal({ event, group }: { event: NostrEvent; group?: Group }) {
+export function ZapGoal({
+  event,
+  group,
+}: {
+  event: NostrEvent;
+  group?: Group;
+}) {
   const { t } = useTranslation();
   const website = event.tags.find((t) => t[0] === "r")?.[1];
   const relays = event.tags.find((t) => t[0] === "relays")?.slice(1) || [];
