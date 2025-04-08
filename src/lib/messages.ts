@@ -4,6 +4,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import {
   NDKEvent,
   NDKKind,
+  NDKRelaySet,
   NDKSubscription,
   NDKSubscriptionCacheUsage,
 } from "@nostr-dev-kit/ndk";
@@ -26,6 +27,7 @@ import db, { cache } from "@/lib/db";
 import { Group } from "@/lib/types";
 import { DELETE_GROUP } from "@/lib/kinds";
 import { LastSeen } from "@/lib/db";
+import { useCommunity } from "./nostr/groups";
 
 export function saveGroupEvent(event: NostrEvent, group: Group) {
   const record = {
@@ -97,6 +99,50 @@ export function useGroupchat(group: Group) {
       if (!isSubbed) sub?.stop();
     };
   }, [isSubbed, group.id, group.relay]);
+
+  return useLiveQuery(() => getGroupChat(group), [group.id, group.relay], []);
+}
+
+export function useCommunitychat(pubkey: string) {
+  const ndk = useNDK();
+  const { data: community } = useCommunity(pubkey);
+  const group = {
+    id: pubkey,
+    relay: community?.relay || "",
+    isCommunity: true,
+  };
+
+  useEffect(() => {
+    let sub: NDKSubscription | undefined;
+    if (!community) return;
+
+    getLastGroupMessage(group).then((last) => {
+      const relays = [community.relay, ...(community.backupRelays || [])];
+      const relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
+      const filter = {
+        kinds: [NDKKind.GroupChat, NDKKind.Nutzap],
+        "#h": [pubkey],
+        ...(last ? { since: last.created_at } : {}),
+      };
+      sub = ndk.subscribe(
+        filter,
+        {
+          cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+          groupable: false,
+          closeOnEose: false,
+        },
+        relaySet,
+      );
+
+      sub.on("event", (event) => {
+        saveGroupEvent(event.rawEvent() as NostrEvent, group);
+      });
+    });
+
+    return () => {
+      sub?.stop();
+    };
+  }, [community]);
 
   return useLiveQuery(() => getGroupChat(group), [group.id, group.relay], []);
 }

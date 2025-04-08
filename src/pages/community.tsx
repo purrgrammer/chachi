@@ -10,8 +10,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/nav-tabs";
-import { groupId } from "@/lib/groups";
-import { GroupChat } from "@/components/nostr/groups/chat";
+import { CommunityChat } from "@/components/nostr/groups/chat";
 import { useCommunity } from "@/lib/nostr/groups";
 import type { Community, Group } from "@/lib/types";
 import { GroupInfo } from "@/components/nostr/groups/info";
@@ -114,35 +113,43 @@ function CommunityContent({ pubkey }: { pubkey: string }) {
 
   return (
     <div>
-      {community ? (
-        <CommunityHeader pubkey={pubkey} community={community} />
-      ) : null}
-      {community && group ? (
-        <Tabs defaultValue="chat">
-          <TabsList
-            className="
+      <CommunityHeader pubkey={pubkey} community={community} />
+      <Tabs defaultValue="chat">
+        <TabsList
+          className="
           overflow-x-auto no-scrollbar 
 	  w-[100vw]
 md:w-[calc(100vw-16rem)]
 	  group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100vw-18rem)"
-          >
-            <TabsTrigger value="chat">{t("content.type.chat")}</TabsTrigger>
+        >
+          <TabsTrigger value="chat">{t("content.type.chat")}</TabsTrigger>
+          {community && group ? (
+            <>
+              {community.sections?.map((section) => (
+                <TabsTrigger key={section.name} value={section.name}>
+                  {section.name}
+                </TabsTrigger>
+              ))}
+            </>
+          ) : null}
+        </TabsList>
+        <TabsContent asChild value="chat">
+          <CommunityChat pubkey={pubkey} />
+        </TabsContent>
+        {community && group ? (
+          <>
             {community.sections?.map((section) => (
-              <TabsTrigger key={section.name} value={section.name}>
-                {section.name}
-              </TabsTrigger>
+              <TabsContent key={section.name} value={section.name}>
+                <Section
+                  key={section.name}
+                  group={group}
+                  kinds={section.kinds}
+                />
+              </TabsContent>
             ))}
-          </TabsList>
-          <TabsContent asChild value="chat">
-            <GroupChat key={groupId(group)} group={group} />
-          </TabsContent>
-          {community.sections?.map((section) => (
-            <TabsContent key={section.name} value={section.name}>
-              <Section key={section.name} group={group} kinds={section.kinds} />
-            </TabsContent>
-          ))}
-        </Tabs>
-      ) : null}
+          </>
+        ) : null}
+      </Tabs>
     </div>
   );
 }

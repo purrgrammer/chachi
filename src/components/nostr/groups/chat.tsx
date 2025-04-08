@@ -34,7 +34,7 @@ import { useSettings } from "@/lib/settings";
 import { formatShortNumber } from "@/lib/number";
 import { Badge } from "@/components/ui/badge";
 import { Name } from "@/components/nostr/name";
-import { useGroupParticipants } from "@/lib/nostr/groups";
+import { useCommunity, useGroupParticipants } from "@/lib/nostr/groups";
 import { Zap } from "@/components/nostr/zap";
 import { validateZap } from "@/lib/nip-57";
 import { ChatInput } from "@/components/nostr/chat/input";
@@ -53,6 +53,7 @@ import { useCopy } from "@/lib/hooks";
 import { useRelayInfo } from "@/lib/relay";
 import {
   useGroupchat,
+  useCommunitychat,
   useLastSeen,
   useNewMessage,
   saveLastSeen,
@@ -983,3 +984,153 @@ export const GroupChat = forwardRef(
   },
 );
 GroupChat.displayName = "GroupChat";
+
+export const CommunityChat = forwardRef(
+  (
+    { pubkey }: { pubkey: string },
+    ref: ForwardedRef<HTMLDivElement | null>,
+  ) => {
+    const { data: community } = useCommunity(pubkey);
+    const group = {
+      id: pubkey,
+      relay: community?.relay || "",
+      isCommunity: true,
+    };
+    const events = useCommunitychat(pubkey);
+    const hasBeenDeleted = events.some((e) => e.kind === DELETE_GROUP);
+    const [replyingTo, setReplyingTo] = useState<NostrEvent | undefined>();
+    const [scrollTo, setScrollTo] = useState<NostrEvent | undefined>();
+    // heights
+    const [inputHeight, setInputHeight] = useState(34);
+    const headerHeight = 96;
+    const nonChatHeight = inputHeight + headerHeight;
+    const me = usePubkey();
+    const canSign = useCanSign();
+    const isAdmin = canSign && me === pubkey;
+    const ndk = useNDK();
+    const relaySet = useRelaySet([group.relay]);
+    const [sentMessage, setSentMessage] = useState<NostrEvent | undefined>(
+      undefined,
+    );
+    const newMessage = useNewMessage(group);
+    const { events: deleteEvents } = useDeletions(group);
+    const { t } = useTranslation();
+    const lastSeen = useLastSeen(group);
+    const saveLast = useSaveLastSeen(group);
+
+    useEffect(() => {
+      return () => saveLast();
+    }, [group.id]);
+
+    function onNewMessage(ev: NostrEvent) {
+      setSentMessage(ev);
+      newMessage(ev);
+    }
+
+    function onZap(z?: NostrEvent) {
+      if (z) {
+        onNewMessage(z);
+      }
+    }
+
+    function canDelete(event: NostrEvent) {
+      return isAdmin || event.pubkey === me;
+    }
+
+    async function deleteEvent(event: NostrEvent) {
+      try {
+        const ev = new NDKEvent(ndk, {
+          kind:
+            event.pubkey === me || group.id === "_"
+              ? NDKKind.EventDeletion
+              : (9005 as NDKKind),
+          content: "",
+        } as NostrEvent);
+        ev.tag(new NDKEvent(ndk, event));
+        await ev.publish(relaySet);
+        toast.success(t("group.chat.event.delete.success"));
+      } catch (err) {
+        console.error(err);
+        toast.error(t("group.chat.event.delete.error"));
+      }
+    }
+
+    return (
+      <div className={`grid grid-col-[1fr_${inputHeight}px]"`} ref={ref}>
+        <Chat
+          group={group}
+          admins={[pubkey]}
+          style={
+            {
+              height: `calc(100vh - ${nonChatHeight}px)`,
+            } as React.CSSProperties
+          }
+          newMessage={sentMessage}
+          lastSeen={lastSeen ? lastSeen : undefined}
+          deleteEvents={deleteEvents}
+          scrollTo={scrollTo}
+          setScrollTo={setScrollTo}
+          // @ts-expect-error: these events are unsigned since they come from DB
+          events={events}
+          canDelete={canDelete}
+          deleteEvent={deleteEvent}
+          messageKinds={[NDKKind.GroupChat]}
+          components={{
+            [NDKKind.Nutzap]: ({ event, ...props }) => (
+              <ChatNutzap
+                key={event.id}
+                event={event}
+                group={group}
+                canDelete={canDelete}
+                deleteEvent={deleteEvent}
+                {...props}
+              />
+            ),
+            [NDKKind.Zap]: ({ event, ...props }) => (
+              <ChatZap
+                key={event.id}
+                event={event}
+                group={group}
+                canDelete={canDelete}
+                deleteEvent={deleteEvent}
+                {...props}
+              />
+            ),
+          }}
+          setReplyingTo={setReplyingTo}
+        />
+        {hasBeenDeleted ? (
+          <div
+            className="flex justify-center items-center"
+            style={{ height: `${inputHeight + 16}px` }}
+          >
+            <span className="text-sm text-muted-foreground">
+              {t("group.deleted")}
+            </span>
+          </div>
+        ) : (
+          <ChatInput
+            group={group}
+            height={inputHeight}
+            onHeightChange={(height) => {
+              setInputHeight(height);
+            }}
+            kind={NDKKind.GroupChat}
+            replyKind={NDKKind.GroupChat}
+            onNewMessage={onNewMessage}
+            replyingTo={replyingTo}
+            setReplyingTo={setReplyingTo}
+            tags={[["h", pubkey]]}
+          >
+            {replyingTo ? (
+              <NewZap event={replyingTo} group={group} onZap={onZap} />
+            ) : (
+              <New group={group} />
+            )}
+          </ChatInput>
+        )}
+      </div>
+    );
+  },
+);
+CommunityChat.displayName = "CommunityChat";
