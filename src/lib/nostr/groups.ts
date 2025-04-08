@@ -27,6 +27,7 @@ import type {
   GroupMembers,
   GroupMetadata,
   Community,
+  ContentSection,
 } from "@/lib/types";
 import {
   queryClient,
@@ -603,12 +604,25 @@ export function useCommunity(pubkey: string) {
         .map((t) => t[1]);
       const [firstRelay, ...backupRelays] = communityRelays;
       if (!firstRelay) throw new Error("Invalid community metadata");
+      const sections = info.tags.reduce((acc, t) => {
+        const last = acc.at(-1);
+        const [tag, value] = t;
+        if (tag === "content") {
+          acc.push({ name: value, kinds: [], fee: 0 });
+        } else if (tag === "k" && last) {
+          last.kinds.push(Number(value));
+        } else if (tag === "fee" && last) {
+          last.fee = Number(value);
+        }
+        return acc;
+      }, [] as ContentSection[]);
       const c = {
         pubkey,
         relay: firstRelay!,
         backupRelays,
         blossom: info.tags.filter((t) => t[0] === "blossom").map((t) => t[1]),
         mint: info.tags.find((t) => t[0] === "mint")?.[1],
+        sections,
       } as Community;
       saveCommunity(c);
       return c;

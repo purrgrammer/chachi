@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Castle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Navigate } from "react-router-dom";
@@ -12,13 +12,10 @@ import {
 } from "@/components/ui/nav-tabs";
 import { groupId } from "@/lib/groups";
 import { GroupChat } from "@/components/nostr/groups/chat";
-import { GroupPosts } from "@/components/nostr/posts/feed";
-import { GroupVideos } from "@/components/nostr/videos";
-import { GroupImages } from "@/components/nostr/images";
-import { GroupPolls } from "@/components/nostr/polls";
 import { useCommunity } from "@/lib/nostr/groups";
-import type { Community } from "@/lib/types";
+import type { Community, Group } from "@/lib/types";
 import { GroupInfo } from "@/components/nostr/groups/info";
+import Feed from "@/components/nostr/feed";
 import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
@@ -28,8 +25,6 @@ import {
 import { BookmarkGroup } from "@/components/nostr/groups/bookmark";
 import { CommunityEdit } from "@/components/nostr/groups/community-edit";
 import { usePubkey } from "@/lib/account";
-
-type GroupTab = "chat" | "posts" | "videos" | "images" | "polls";
 
 function CommunityHeader({
   pubkey,
@@ -76,58 +71,66 @@ function CommunityHeader({
   );
 }
 
-function CommunityContent({ pubkey, tab }: { pubkey: string; tab: GroupTab }) {
-  const navigate = useNavigate();
+function Section({ group, kinds }: { group: Group; kinds: number[] }) {
+  const filter = [
+    {
+      kinds: kinds,
+      authors: [group.id],
+    },
+    {
+      kinds: kinds,
+      "#h": [group.id],
+    },
+  ];
+  return (
+    <div className="h-full p-2">
+      <Feed group={group} filter={filter} />
+    </div>
+  );
+}
+
+function CommunityContent({ pubkey }: { pubkey: string }) {
   const { data: community } = useCommunity(pubkey);
   const { t } = useTranslation();
   const group = community
     ? {
         id: pubkey,
         relay: community.relay,
+        isCommunity: true,
       }
     : null;
-
-  function onValueChange(value: string) {
-    navigate(value === "chat" ? `/c/${pubkey}` : `/c/${pubkey}/${value}`);
-  }
 
   return (
     <div>
       <CommunityHeader pubkey={pubkey} community={community} />
       {community && group ? (
-        <Tabs value={tab} onValueChange={onValueChange}>
+        <Tabs defaultValue="chat">
           <TabsList>
             <TabsTrigger value="chat">{t("content.type.chat")}</TabsTrigger>
-            <TabsTrigger value="posts">{t("content.type.posts")}</TabsTrigger>
-            <TabsTrigger value="videos">{t("content.type.videos")}</TabsTrigger>
-            <TabsTrigger value="images">{t("content.type.images")}</TabsTrigger>
-            <TabsTrigger value="polls">{t("content.type.polls")}</TabsTrigger>
+            {community.sections?.map((section) => (
+              <TabsTrigger key={section.name} value={section.name}>
+                {section.name}
+              </TabsTrigger>
+            ))}
           </TabsList>
           <TabsContent asChild value="chat">
             <GroupChat key={groupId(group)} group={group} />
           </TabsContent>
-          <TabsContent asChild value="posts">
-            <GroupPosts key={groupId(group)} group={group} />
-          </TabsContent>
-          <TabsContent asChild value="videos">
-            <GroupVideos key={groupId(group)} group={group} />
-          </TabsContent>
-          <TabsContent asChild value="images">
-            <GroupImages key={groupId(group)} group={group} />
-          </TabsContent>
-          <TabsContent asChild value="polls">
-            <GroupPolls key={groupId(group)} group={group} />
-          </TabsContent>
+          {community.sections?.map((section) => (
+            <TabsContent key={section.name} value={section.name}>
+              <Section key={section.name} group={group} kinds={section.kinds} />
+            </TabsContent>
+          ))}
         </Tabs>
       ) : null}
     </div>
   );
 }
 
-export default function Community({ tab = "chat" }: { tab?: GroupTab }) {
+export default function Community() {
   const { pubkey } = useParams();
   if (!pubkey) {
     return <Navigate to="/" />;
   }
-  return <CommunityContent tab={tab} pubkey={pubkey} />;
+  return <CommunityContent pubkey={pubkey} />;
 }

@@ -244,7 +244,11 @@ function useUserEvents() {
         if (event.kind === NDKKind.SimpleGroupList) {
           const userGroups = event.tags
             .filter((t) => t[0] === "group" && t[1] && t[2] && isRelayURL(t[2]))
-            .map((t) => ({ id: t[1], relay: t[2] }));
+            .map((t) => ({
+              id: t[1],
+              relay: t[2],
+              isCommunity: Boolean(t[3]),
+            }));
           if (
             event.created_at &&
             event.created_at > (groupList.created_at || 0)
@@ -255,7 +259,11 @@ function useUserEvents() {
                 .filter(
                   (t) => t[0] === "group" && t[1] && t[2] && isRelayURL(t[2]),
                 )
-                .map((t) => ({ id: t[1], relay: t[2] }));
+                .map((t) => ({
+                  id: t[1],
+                  relay: t[2],
+                  isCommunity: Boolean(t[3]),
+                }));
               setGroupList({
                 groups: userGroups,
                 content: event.content,

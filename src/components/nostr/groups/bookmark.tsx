@@ -82,7 +82,12 @@ export function useBookmarkGroup(group: Group) {
       const event = new NDKEvent(ndk, {
         kind: NDKKind.SimpleGroupList,
         content: groupsContent,
-        tags: newGroups.map((g) => ["group", g.id, g.relay]),
+        tags: newGroups.map((g) => [
+          "group",
+          g.id,
+          g.relay,
+          ...(g.isCommunity ? ["community"] : []),
+        ]),
       } as NostrEvent);
       await event.publish(relaySet);
       //setGroups(newGroups);
@@ -100,7 +105,12 @@ export function useBookmarkGroup(group: Group) {
       const event = new NDKEvent(ndk, {
         kind: NDKKind.SimpleGroupList,
         content: groupsContent,
-        tags: newGroups.map((g) => ["group", g.id, g.relay]),
+        tags: newGroups.map((g) => [
+          "group",
+          g.id,
+          g.relay,
+          ...(g.isCommunity ? ["community"] : []),
+        ]),
       } as NostrEvent);
       await event.publish(relaySet);
       //setGroups(newGroups);

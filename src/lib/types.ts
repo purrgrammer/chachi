@@ -3,6 +3,7 @@ type GroupId = string;
 export interface Group {
   id: GroupId;
   relay: string;
+  isCommunity?: boolean;
 }
 
 export interface GroupMetadata extends Group {
@@ -12,7 +13,6 @@ export interface GroupMetadata extends Group {
   picture?: string;
   visibility?: "public" | "private";
   access?: "open" | "closed";
-  isCommunity?: boolean;
   nlink?: string;
 }
 
@@ -71,10 +71,17 @@ export interface Account {
   relays?: string[];
 }
 
+export interface ContentSection {
+  name: string;
+  kinds: number[];
+  fee?: number;
+}
+
 export interface Community {
   pubkey: string;
   relay: string;
   backupRelays?: string[];
   blossom: string[];
   mint?: string;
+  sections?: ContentSection[];
 }

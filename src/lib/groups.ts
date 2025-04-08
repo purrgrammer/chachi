@@ -5,6 +5,9 @@ import { groupsAtom } from "@/app/store";
 import type { Group } from "@/lib/types";
 
 export function groupId(group: Group) {
+  if (group.isCommunity) {
+    return group.id;
+  }
   return `${getRelayHost(group.relay)}'${group.id}`;
 }
 

@@ -54,16 +54,17 @@ export function PostDetail({
   const legacyReplyTo = event.tags.find(
     (t) => t[0] === "e" && t[3] === "reply",
   )?.[1];
+  const commentTo = event.tags.find((t) => t[0] === "e")?.[1];
   const legacyReplyRoot = event.tags.find(
     (t) => t[0] === "e" && t[3] === "root",
   )?.[1];
-  const replyTo = legacyReplyTo || legacyReplyRoot;
+  const replyTo = legacyReplyTo || legacyReplyRoot || commentTo;
   return (
     <>
       {subject ? <h3 className="text-lg font-semibold">{subject}</h3> : null}
       {replyTo ? (
         <div className="p-0 rounded-md bg-accent">
-          <E id={replyTo} asReply asLink className="w-full" />
+          <E id={replyTo} asReply asLink className="w-full pb-0" />
         </div>
       ) : null}
       <RichText

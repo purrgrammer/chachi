@@ -136,6 +136,9 @@ export function CommunityMetadata({
                 tags={event.tags}
                 group={group}
                 className="text-sm text-center text-muted-foreground line-clamp-1"
+                options={{
+                  inline: true,
+                }}
               >
                 {profile?.about}
               </RichText>
