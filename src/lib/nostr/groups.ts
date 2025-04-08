@@ -608,7 +608,7 @@ export function useCommunity(pubkey: string) {
         const last = acc.at(-1);
         const [tag, value] = t;
         if (tag === "content") {
-          acc.push({ name: value, kinds: [], fee: 0 });
+          acc.push({ name: value, kinds: [] });
         } else if (tag === "k" && last) {
           last.kinds.push(Number(value));
         } else if (tag === "fee" && last) {

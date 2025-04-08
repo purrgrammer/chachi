@@ -51,7 +51,9 @@ export function CommunityEdit({ pubkey }: { pubkey: string }) {
   const relaySet = useRelaySet(userRelays.filter((r) => isRelayURL(r)));
 
   // Content section states
-  const [contentSections, setContentSections] = useState<ContentSection[]>([]);
+  const [contentSections, setContentSections] = useState<ContentSection[]>(
+    community?.sections || [],
+  );
   const [newSectionName, setNewSectionName] = useState("");
   const [newSectionKinds, setNewSectionKinds] = useState<number[]>([]);
   const [newSectionFee, setNewSectionFee] = useState<string>("");

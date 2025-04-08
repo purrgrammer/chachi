@@ -10,14 +10,12 @@ import {
   NDKUser,
   NDKZapper,
   NDKPaymentConfirmation,
-  NDKSubscriptionCacheUsage,
 } from "@nostr-dev-kit/ndk";
 import { useMintList } from "@/lib/cashu";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet, useStream, useRelays } from "@/lib/nostr";
 import { NostrEvent } from "nostr-tools";
 import { LNURL } from "@/lib/query";
-import { Zap, validateZap } from "@/lib/nip-57";
 import { usePubkey } from "@/lib/account";
 
 export const HUGE_AMOUNT = 21_000;
@@ -271,41 +269,6 @@ export function useReceivedZaps() {
     limit: 50,
   };
   return useStream(filter, relays, true, true);
-}
-
-export function useZaps(event: NostrEvent, relays: string[], live = true) {
-  const ndk = useNDK();
-  const relaySet = useRelaySet(relays);
-  // todo: use user inbox relays too
-  const [zaps, setZaps] = useState<Zap[]>([]);
-
-  useEffect(() => {
-    const filter = {
-      kinds: [NDKKind.Zap],
-      ...new NDKEvent(ndk, event).filter(),
-    };
-    const sub = ndk.subscribe(
-      filter,
-      {
-        cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
-        closeOnEose: !live,
-      },
-      relaySet,
-    );
-
-    sub.on("event", (event) => {
-      const zap = validateZap(event.rawEvent() as NostrEvent);
-      if (zap) {
-        setZaps([...zaps, zap]);
-      } else {
-        console.warn("Invalid zap", event.rawEvent());
-      }
-    });
-
-    return () => sub.stop();
-  }, []);
-
-  return zaps;
 }
 
 interface ZapperConfig {

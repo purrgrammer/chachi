@@ -86,6 +86,7 @@ import {
   REPO,
   ISSUE,
   COMMENT,
+  GOAL,
   STREAM,
   CALENDAR_EVENT,
   GIF_SET,
@@ -122,6 +123,7 @@ import type { Group, Emoji as EmojiType } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import { LazyCodeBlock } from "@/components/lazy-code-block";
 import { NameList } from "@/components/nostr//name-list";
+import { ZapGoal } from "./zap-goal";
 
 type EventComponent = (props: {
   event: NostrEvent;
@@ -151,6 +153,10 @@ const eventDetails: Record<
   [COMMENT]: {
     preview: Post,
     detail: PostDetail,
+  },
+  [GOAL]: {
+    preview: ZapGoal,
+    detail: ZapGoal,
   },
   [NDKKind.GroupNote]: {
     preview: Post,

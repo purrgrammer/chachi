@@ -6,8 +6,11 @@ import { Progress } from "@/components/ui/progress";
 import { RichText } from "@/components/rich-text";
 import { formatShortNumber } from "@/lib/number";
 import { formatDateTime } from "@/lib/time";
-import { useZaps } from "@/lib/zap";
+import { validateZap } from "@/lib/nip-57";
+import { validateNutzap } from "@/lib/nip-61";
 import type { Group } from "@/lib/types";
+import { useReactions } from "@/lib/nostr";
+import { NDKKind } from "@nostr-dev-kit/ndk";
 
 //function zapLeaderboard(zaps: Zap[]): { pubkey: string; amount: number }[] {
 //  const contributions = zaps.reduce((acc, z) => {
@@ -19,7 +22,7 @@ import type { Group } from "@/lib/types";
 //    .sort((a, b) => b.amount - a.amount);
 //}
 
-export function ZapGoal({ event, group }: { event: NostrEvent; group: Group }) {
+export function ZapGoal({ event, group }: { event: NostrEvent; group?: Group }) {
   const { t } = useTranslation();
   const website = event.tags.find((t) => t[0] === "r")?.[1];
   const relays = event.tags.find((t) => t[0] === "relays")?.slice(1) || [];
@@ -29,8 +32,16 @@ export function ZapGoal({ event, group }: { event: NostrEvent; group: Group }) {
   const isExpired = expiryDate && expiryDate.getTime() < Date.now();
   const title = event.content.trim();
   const description = event.tags.find((t) => t[0] === "summary")?.[1]?.trim();
-  const zaps = useZaps(event, relays);
-  const totalZapped = zaps.reduce((acc, z) => acc + z.amount, 0);
+  const zaps = useReactions(
+    event,
+    [NDKKind.Zap, NDKKind.Nutzap],
+    relays,
+    !isExpired,
+  );
+  const zapEvents = zaps.events
+    .map((z) => (z.kind === NDKKind.Zap ? validateZap(z) : validateNutzap(z)))
+    .filter(Boolean) as { amount: number }[];
+  const totalZapped = zapEvents.reduce((acc, z) => acc + z.amount, 0);
   const totalGoal = Number(amount) / 1000;
   const percentage = Math.min((totalZapped / totalGoal) * 100, 100);
   return (
@@ -69,7 +80,11 @@ export function ZapGoal({ event, group }: { event: NostrEvent; group: Group }) {
         <div className="flex flex-row gap-3 p-1 items-center">
           <Progress value={percentage} max={100} />
           <span className="text-sm font-mono text-muted-foreground">
-            {percentage.toFixed()}%
+            {new Intl.NumberFormat("en-US", {
+              style: "percent",
+              maximumFractionDigits: 2,
+              minimumFractionDigits: 0,
+            }).format(percentage / 100)}
           </span>
         </div>
         {expiryDate ? (
