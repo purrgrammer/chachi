@@ -119,7 +119,7 @@ function GroupItem({ group }: { group: Group }) {
     : pubkey === group.id;
 
   function openGroup() {
-    if (metadata?.isCommunity) {
+    if (group.isCommunity || metadata?.isCommunity) {
       navigate(`/c/${group.id}`);
     } else {
       navigate(`/${getRelayHost(group.relay)}/${group.id}`);

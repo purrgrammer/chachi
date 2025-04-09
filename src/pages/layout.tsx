@@ -247,7 +247,7 @@ function useUserEvents() {
             .map((t) => ({
               id: t[1],
               relay: t[2],
-              isCommunity: Boolean(t[3]),
+              isCommunity: t[3] === "community",
             }));
           if (
             event.created_at &&
@@ -262,7 +262,7 @@ function useUserEvents() {
                 .map((t) => ({
                   id: t[1],
                   relay: t[2],
-                  isCommunity: Boolean(t[3]),
+                  isCommunity: t[3] === "community",
                 }));
               setGroupList({
                 groups: userGroups,

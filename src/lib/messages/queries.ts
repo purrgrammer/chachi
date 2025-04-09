@@ -23,8 +23,8 @@ export function saveGroupEvent(event: NostrEvent, group: Group) {
 export async function getGroupChat(group: Group) {
   const id = groupId(group);
   return db.events
-    .orderBy("created_at")
-    .filter((e) => e.group === id)
+    .where("[group+created_at]")
+    .between([id, Dexie.minKey], [id, Dexie.maxKey])
     .reverse()
     .limit(50)
     .toArray();
@@ -53,16 +53,32 @@ export async function getGroupChatParticipants(
 
 export async function getLastGroupMessage(group: Group) {
   const id = groupId(group);
+  const lastMessage = await db.events
+    .where("[group+created_at]")
+    .between([id, Dexie.minKey], [id, Dexie.maxKey])
+    .last();
+
+  if (
+    lastMessage &&
+    (lastMessage.kind === NDKKind.GroupChat ||
+      lastMessage.kind === NDKKind.Nutzap)
+  ) {
+    return lastMessage;
+  }
+
   const msgs = await db.events
-    .orderBy("created_at")
-    .filter(
-      (e) =>
-        e.group === id &&
-        (e.kind === NDKKind.GroupChat || e.kind === NDKKind.Nutzap),
+    .where("[group+created_at]")
+    .between(
+      [id, Dexie.minKey],
+      [id, lastMessage?.created_at || Date.now() / 1000],
+      false,
+      true,
     )
     .reverse()
+    .filter((e) => e.kind === NDKKind.GroupChat || e.kind === NDKKind.Nutzap)
     .limit(1)
     .toArray();
+
   return msgs[0];
 }
 

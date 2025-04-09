@@ -589,17 +589,24 @@ export function useCommunity(pubkey: string) {
   useEffect(() => {
     const fetchCommunity = async () => {
       const relays = await fetchRelayList(ndk, pubkey);
-      const info = await ndk.fetchEvent(
-        {
-          kinds: [COMMUNIKEY],
-          authors: [pubkey],
-        },
-        {
-          closeOnEose: true,
-          cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
-        },
-        NDKRelaySet.fromRelayUrls(relays, ndk),
+      const events = Array.from(
+        await ndk.fetchEvents(
+          {
+            kinds: [COMMUNIKEY],
+            authors: [pubkey],
+          },
+          {
+            closeOnEose: true,
+            cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+          },
+          NDKRelaySet.fromRelayUrls(relays, ndk),
+        ),
       );
+      if (events.length === 0) throw new Error("Can't find community metadata");
+      const info = events.reduce((acc, ev) => {
+        if (ev.created_at && ev.created_at > (acc.created_at || 0)) return ev;
+        return acc;
+      }, events[0]);
       if (!info) throw new Error("Can't find community metadata");
       const communityRelays = info.tags
         .filter((t) => t[0] === "r")
