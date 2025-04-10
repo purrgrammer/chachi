@@ -491,3 +491,27 @@ export function useRelays() {
   const relays = useAtomValue(relaysAtom);
   return relays.map((r) => r.url);
 }
+
+export async function fetchLatest(
+  ndk: NDK,
+  filter: NDKFilter,
+  relaySet: NDKRelaySet,
+) {
+  const events = Array.from(
+    await ndk.fetchEvents(
+      filter,
+      {
+        groupable: false,
+        closeOnEose: true,
+        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+      },
+      relaySet,
+    ),
+  );
+  if (events.length === 0) return null;
+  return events.reduce((acc, ev) => {
+    if (ev.created_at && acc.created_at && ev.created_at > acc.created_at)
+      return ev;
+    return acc;
+  }, events[0]);
+}

@@ -11,7 +11,7 @@ import { saveGroupEvent } from "@/lib/messages";
 import { getLastGroupMessage } from "@/lib/messages/queries";
 import { useStream } from "@/lib/nostr";
 import type { Group } from "@/lib/types";
-import { DELETE_GROUP } from "@/lib/kinds";
+import { DELETE_GROUP, RELATIONSHIP } from "@/lib/kinds";
 
 export function useDeletions(group: Group) {
   return useStream(
@@ -39,6 +39,7 @@ export function useGroupMessages(groups: Group[]) {
             NDKKind.GroupAdminRemoveUser,
             DELETE_GROUP,
             NDKKind.Nutzap,
+            RELATIONSHIP,
           ],
           "#h": [id],
           ...(lastMessage ? { since: lastMessage.created_at } : {}),

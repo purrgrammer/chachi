@@ -32,7 +32,7 @@ interface GroupList {
 }
 
 export const groupListAtom = atomWithStorage<GroupList>(
-  "groups",
+  "mygroups",
   {
     created_at: 0,
     content: "",
@@ -43,10 +43,20 @@ export const groupListAtom = atomWithStorage<GroupList>(
   createJSONStorage<GroupList>(() => localStorage),
   { getOnInit: true },
 );
+const communities = new Set([
+  "599f67f7df7694c603a6d0636e15ebc610db77dcfd47d6e5d05386d821fb3ea9",
+  "46fc871c1aedb295a8325abcf7663467d297b0a852733ceb06b0957d1c14bff4",
+  "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194",
+  "660d8c78651f70487ec9b8ddc283e29cf2561693dda3ba246d3fd3c08dbb7083",
+  "43baaf0c28e6cfb195b17ee083e19eb3a4afdfac54d9b6baf170270ed193e34c",
+]);
 export const groupsAtom = atom<Group[]>((get) => {
   const { groups, privateGroups } = get(groupListAtom);
   // todo: deduplicate, show private
-  return groups.concat(privateGroups || []);
+  return groups.concat(privateGroups || []).filter((g) => {
+    if (!g.isCommunity) return !communities.has(g.id);
+    return true;
+  });
 });
 export const groupsContentAtom = atom<string>((get) => {
   return get(groupListAtom).content;

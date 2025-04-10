@@ -25,7 +25,7 @@ import {
 } from "@/lib/messages/queries";
 import db, { cache } from "@/lib/db";
 import { Group } from "@/lib/types";
-import { DELETE_GROUP } from "@/lib/kinds";
+import { DELETE_GROUP, RELATIONSHIP } from "@/lib/kinds";
 import { LastSeen } from "@/lib/db";
 import { useCommunity } from "./nostr/groups";
 
@@ -74,6 +74,7 @@ export function useGroupchat(group: Group) {
           NDKKind.GroupAdminRemoveUser,
           DELETE_GROUP,
           NDKKind.Nutzap,
+          RELATIONSHIP,
         ],
         "#h": [group.id],
         ...(last ? { since: last.created_at } : {}),
@@ -120,7 +121,7 @@ export function useCommunitychat(pubkey: string) {
       const relays = [community.relay, ...(community.backupRelays || [])];
       const relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
       const filter = {
-        kinds: [NDKKind.GroupChat, NDKKind.Nutzap],
+        kinds: [NDKKind.GroupChat, NDKKind.Nutzap, RELATIONSHIP],
         "#h": [pubkey],
         ...(last ? { since: last.created_at } : {}),
       };

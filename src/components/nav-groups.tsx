@@ -1,5 +1,6 @@
 import { Reorder } from "framer-motion";
 import { useParams } from "react-router-dom";
+import { Avatar as NostrAvatar } from "@/components/nostr/avatar";
 import { useSortedGroups } from "@/lib/messages";
 import { useTranslation } from "react-i18next";
 import { groupId } from "@/lib/groups";
@@ -92,6 +93,88 @@ function RelayItem({ group }: { group: Group }) {
                     emojis: "size-4 opacity-70",
                     spans: "break-all",
                     urls: "pointer-events-none",
+                    mentions: "pointer-events-none",
+                  }}
+                  tags={lastMessage.tags}
+                >
+                  {lastMessage.content}
+                </RichText>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CommunityItem({ group }: { group: Group }) {
+  const lastMessage = useLastMessage(group);
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const unreadMessages = useUnreadMessages(group);
+  //const unreadMentions = useUnreadMentions(group);
+  const isActive = id === group.id;
+
+  function openGroup() {
+    navigate(`/c/${group.id}`);
+  }
+
+  return (
+    <div
+      className={`flex items-center p-1 py-2 cursor-pointer transition-colors ${isActive ? "bg-accent/50" : "bg-background"} hover:bg-accent/80 overflow-hidden group-has-[[data-collapsible=icon]]/sidebar-wrapper:bg-transparent group-has-[[data-collapsible=icon]]/sidebar-wrapper:py-1 transition-all`}
+      onClick={openGroup}
+    >
+      <div className="flex gap-2 items-center">
+        <div
+          className={`size-10 rounded-full ${isActive ? "group-has-[[data-collapsible=icon]]/sidebar-wrapper:ring-2 ring-primary ring-offset-1 ring-offset-background" : ""} relative`}
+        >
+          <NostrAvatar
+            pubkey={group.id}
+            className="rounded-full size-10 shrink-0"
+          />
+        </div>
+        <div className="flex flex-row gap-1 absolute top-3 right-2 group-has-[[data-collapsible=icon]]/sidebar-wrapper:top-0 group-has-[[data-collapsible=icon]]/sidebar-wrapper:right-0">
+          {unreadMessages && unreadMessages > 0 ? (
+            <Badge variant="counter">
+              <span className="font-mono text-xs font-light">
+                {unreadMessages >= 100 ? "99+" : unreadMessages}
+              </span>
+            </Badge>
+          ) : null}
+        </div>
+        <div className="flex flex-col">
+          <h3 className="line-clamp-1">
+            <Name pubkey={group.id} />
+          </h3>
+          {lastMessage ? (
+            <div className="flex flex-row justify-between items-center">
+              <div className="flex flex-row items-start text-xs line-clamp-1 text-muted-foreground">
+                <span className="font-semibold">
+                  <Name pubkey={lastMessage.pubkey} short />
+                </span>
+                <span className="mr-1">:</span>
+                <RichText
+                  group={group}
+                  className="leading-none line-clamp-1"
+                  options={{
+                    inline: true,
+                    emojis: true,
+                    mentions: true,
+                    events: false,
+                    urls: false,
+                    hashtags: true,
+                    ecash: false,
+                    codeBlock: false,
+                    syntax: false,
+                    images: false,
+                    audio: false,
+                    video: false,
+                    youtube: false,
+                  }}
+                  classNames={{
+                    emojis: "size-4 opacity-70",
+                    spans: "break-all",
                     mentions: "pointer-events-none",
                   }}
                   tags={lastMessage.tags}
@@ -213,6 +296,8 @@ function MyGroupList() {
             <SidebarMenuItem>
               {group.id === "_" ? (
                 <RelayItem group={group} />
+              ) : group.isCommunity ? (
+                <CommunityItem group={group} />
               ) : (
                 <GroupItem group={group} />
               )}

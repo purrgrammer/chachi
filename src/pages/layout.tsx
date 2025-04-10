@@ -35,6 +35,7 @@ import { fetchCustomEmojis } from "@/lib/nostr/emojis";
 import { useChachiWallet } from "@/lib/wallet";
 import { usePubkey } from "@/lib/account";
 import Landing from "@/components/landing";
+import { RELATIONSHIP } from "@/lib/kinds";
 
 function useUserEvents() {
   const ndk = useNDK();
@@ -213,6 +214,11 @@ function useUserEvents() {
           since: groupList.created_at,
         },
         {
+          kinds: [RELATIONSHIP],
+          authors: [pubkey],
+          //since: relationshipList.created_at,
+        },
+        {
           kinds: [NDKKind.Contacts],
           authors: [pubkey],
           since: contactList.created_at,
@@ -247,7 +253,6 @@ function useUserEvents() {
             .map((t) => ({
               id: t[1],
               relay: t[2],
-              isCommunity: t[3] === "community",
             }));
           if (
             event.created_at &&
@@ -281,6 +286,34 @@ function useUserEvents() {
                 privateGroups: [],
               });
             }
+          }
+        } else if (event.kind === RELATIONSHIP) {
+          const groupId = event.tags.find((t) => t[0] === "d")?.[1];
+          const isMember =
+            event.tags.find((t) => t[0] === "n" && t[1] === "follow") !==
+            undefined;
+          if (groupId && isMember) {
+            // add to group list
+            setGroupList((groupList) => {
+              const newGroups = groupList.groups.filter(
+                (g) => g.id !== groupId,
+              );
+              return {
+                ...groupList,
+                groups: [
+                  ...newGroups,
+                  { id: groupId, relay: "", isCommunity: true },
+                ],
+              };
+            });
+          } else if (groupId) {
+            // remove from group list
+            setGroupList((groupList) => {
+              const newGroups = groupList.groups.filter(
+                (g) => g.id !== groupId,
+              );
+              return { ...groupList, groups: newGroups };
+            });
           }
         } else if (event.kind === NDKKind.Contacts) {
           // todo: petnames
