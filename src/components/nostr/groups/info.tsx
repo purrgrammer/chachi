@@ -1,4 +1,5 @@
 import { Info, Crown, Server, CloudUpload, Landmark } from "lucide-react";
+import { Avatar as NostrAvatar } from "@/components/nostr/avatar";
 import {
   Drawer,
   DrawerContent,
@@ -11,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar as NostrAvatar } from "@/components/nostr/avatar";
 import { InputCopy } from "@/components/ui/input-copy";
 import { Name } from "@/components/nostr/name";
 import { RichText } from "@/components/rich-text";
@@ -218,13 +218,23 @@ function GroupInfoContent({ group }: { group: Group }) {
   return (
     <div className="flex flex-col gap-4 p-4 mx-auto w-full max-w-sm lg:max-w-lg">
       <DrawerHeader className="flex flex-col gap-3 items-center">
-        <GroupPicture
-          picture={picture}
-          name={name}
-          shortname={shortname}
-          className="size-16"
-        />
-        <DrawerTitle>{name || id}</DrawerTitle>
+        {group.isCommunity ? (
+          <NostrAvatar pubkey={group.id} className="size-16" />
+        ) : (
+          <GroupPicture
+            picture={picture}
+            name={name}
+            shortname={shortname}
+            className="size-16"
+          />
+        )}
+        {group.isCommunity ? (
+          <DrawerTitle>
+            <Name pubkey={group.id} />
+          </DrawerTitle>
+        ) : (
+          <DrawerTitle>{name || id}</DrawerTitle>
+        )}
         {nlink ? (
           <div className="flex flex-row gap-2 items-center">
             <InputCopy value={nlink} />
@@ -246,7 +256,7 @@ function GroupInfoContent({ group }: { group: Group }) {
             </Button>
           )}
 	  */}
-      {metadata?.isCommunity ? (
+      {group.isCommunity ? (
         <CommunityInfo group={group} />
       ) : (
         <GroupMembers group={group} />
