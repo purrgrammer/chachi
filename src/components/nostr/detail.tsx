@@ -95,7 +95,6 @@ import {
   COMMUNIKEY,
   CODE_SNIPPET,
   WORKOUT,
-  WORKOUT_TEMPLATE,
 } from "@/lib/kinds";
 import {
   Dialog,
