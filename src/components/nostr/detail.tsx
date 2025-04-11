@@ -127,7 +127,7 @@ import { LazyCodeBlock } from "@/components/lazy-code-block";
 import { NameList } from "@/components/nostr//name-list";
 import { ZapGoal } from "./zap-goal";
 import { Workout } from "./workout";
-import { WorkoutTemplate } from "./workout-template";
+//import { WorkoutTemplate } from "./workout-template";
 import { AppDefinition } from "@/components/nostr/nip-89";
 
 type EventComponent = (props: {
@@ -286,10 +286,10 @@ const eventDetails: Record<
     preview: Workout,
     detail: Workout,
   },
-  [WORKOUT_TEMPLATE]: {
-    preview: WorkoutTemplate,
-    detail: WorkoutTemplate,
-  },
+  //[WORKOUT_TEMPLATE]: {
+  //  preview: WorkoutTemplate,
+  //  detail: WorkoutTemplate,
+  //},
   [NDKKind.AppHandler]: {
     preview: AppDefinition,
     detail: AppDefinition,
