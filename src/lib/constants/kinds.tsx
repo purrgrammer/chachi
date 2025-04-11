@@ -1,5 +1,7 @@
+import { NDKKind } from "@nostr-dev-kit/ndk";
 import {
   FileText as NoteIcon,
+  Server as ServerIcon,
   Image,
   Video,
   Hash,
@@ -13,12 +15,15 @@ import {
   Heart,
   BookOpen,
   Bitcoin,
-  Flame,
   Coins,
   Trophy,
   SmilePlus,
   Castle,
   ImagePlay,
+  Quote,
+  Bug,
+  FolderCode,
+  AppWindow,
 } from "lucide-react";
 import {
   STREAM,
@@ -26,23 +31,66 @@ import {
   POLL,
   CALENDAR_EVENT,
   GIF_SET,
+  COMMUNIKEY,
   BOOK,
   CODE_SNIPPET,
   GOAL,
   CASHU_MINT,
+  ISSUE,
+  REPO,
 } from "@/lib/kinds";
 
 /**
  * Content kind icons and translation keys
  */
 export const ContentKinds = [
-  { kind: 1, translationKey: "kinds.1", icon: <NoteIcon size={16} /> },
-  { kind: 7, translationKey: "kinds.7", icon: <Heart size={16} /> },
-  { kind: 11, translationKey: "kinds.11", icon: <Hash size={16} /> },
-  { kind: 20, translationKey: "kinds.20", icon: <Image size={16} /> },
-  { kind: 21, translationKey: "kinds.21", icon: <Video size={16} /> },
   {
-    kind: 30023,
+    kind: NDKKind.GroupChat,
+    translationKey: "kinds.9",
+    icon: <MessageSquare size={16} />,
+  },
+  {
+    kind: NDKKind.Text,
+    translationKey: "kinds.1",
+    icon: <NoteIcon size={16} />,
+  },
+  {
+    kind: NDKKind.Reaction,
+    translationKey: "kinds.7",
+    icon: <Heart size={16} />,
+  },
+  {
+    kind: NDKKind.GroupNote,
+    translationKey: "kinds.11",
+    icon: <Hash size={16} />,
+  },
+  {
+    kind: NDKKind.Image,
+    translationKey: "kinds.20",
+    icon: <Image size={16} />,
+  },
+  {
+    kind: NDKKind.VerticalVideo,
+    translationKey: "kinds.34236",
+    icon: <Video size={16} />,
+  },
+  {
+    kind: NDKKind.AppRecommendation,
+    translationKey: "kinds.31989",
+    icon: <AppWindow size={16} />,
+  },
+  {
+    kind: NDKKind.AppHandler,
+    translationKey: "kinds.31990",
+    icon: <AppWindow size={16} />,
+  },
+  {
+    kind: NDKKind.HorizontalVideo,
+    translationKey: "kinds.34235",
+    icon: <Video size={16} />,
+  },
+  {
+    kind: NDKKind.Article,
     translationKey: "kinds.30023",
     icon: <ScrollText size={16} />,
   },
@@ -51,8 +99,24 @@ export const ContentKinds = [
     translationKey: "kinds.1111",
     icon: <MessageSquare size={16} />,
   },
+  { kind: ISSUE, translationKey: "kinds.1621", icon: <Bug size={16} /> },
+  {
+    kind: REPO,
+    translationKey: "kinds.30617",
+    icon: <FolderCode size={16} />,
+  },
+  {
+    kind: NDKKind.RelayList,
+    translationKey: "kinds.10002",
+    icon: <ServerIcon size={16} />,
+  },
   { kind: POLL, translationKey: "kinds.1068", icon: <Vote size={16} /> },
   { kind: STREAM, translationKey: "kinds.30311", icon: <Radio size={16} /> },
+  {
+    kind: NDKKind.Highlight,
+    translationKey: "kinds.9802",
+    icon: <Quote size={16} />,
+  },
   {
     kind: CALENDAR_EVENT,
     translationKey: "kinds.31923",
@@ -69,17 +133,28 @@ export const ContentKinds = [
     translationKey: "kinds.1337",
     icon: <Code size={16} />,
   },
-  { kind: 9735, translationKey: "kinds.9735", icon: <Zap size={16} /> },
-  { kind: 9321, translationKey: "kinds.9321", icon: <Coins size={16} /> },
+  { kind: NDKKind.Zap, translationKey: "kinds.9735", icon: <Zap size={16} /> },
+  {
+    kind: NDKKind.Nutzap,
+    translationKey: "kinds.9321",
+    icon: <Coins size={16} />,
+  },
   { kind: GOAL, translationKey: "kinds.9041", icon: <Trophy size={16} /> },
   {
     kind: CASHU_MINT,
     translationKey: "kinds.38172",
     icon: <Bitcoin size={16} />,
   },
-  { kind: 30015, translationKey: "kinds.30015", icon: <Flame size={16} /> },
-  { kind: 30030, translationKey: "kinds.30030", icon: <SmilePlus size={16} /> },
-  { kind: 10222, translationKey: "kinds.10222", icon: <Castle size={16} /> },
+  {
+    kind: NDKKind.EmojiSet,
+    translationKey: "kinds.30030",
+    icon: <SmilePlus size={16} />,
+  },
+  {
+    kind: COMMUNIKEY,
+    translationKey: "kinds.10222",
+    icon: <Castle size={16} />,
+  },
 ];
 
 /**

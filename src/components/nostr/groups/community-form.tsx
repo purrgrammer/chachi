@@ -50,6 +50,9 @@ export const communityFormSchema = z.object({
   primaryBlossomServer: z.string().url().optional(),
   backupBlossomServers: z.array(z.string().url()).default([]),
   communityMint: z.string().url().optional(),
+  description: z.string().optional(),
+  location: z.string().optional(),
+  geohash: z.string().optional(),
 });
 
 export type CommunityFormValues = z.infer<typeof communityFormSchema>;
@@ -605,6 +608,18 @@ export function createCommunityEvent(
 
   if (normalizedValues.communityMint) {
     event.tags.push(["mint", normalizedValues.communityMint, "cashu"]);
+  }
+
+  if (normalizedValues.description) {
+    event.tags.push(["description", normalizedValues.description]);
+  }
+
+  if (normalizedValues.location) {
+    event.tags.push(["location", normalizedValues.location]);
+  }
+
+  if (normalizedValues.geohash) {
+    event.tags.push(["g", normalizedValues.geohash]);
   }
 
   return event;

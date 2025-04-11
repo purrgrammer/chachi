@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import {
   Settings,
   FileText,
@@ -7,21 +7,16 @@ import {
   DollarSign,
   GripVertical,
   Pencil,
-  MapPin,
 } from "lucide-react";
 import { toast } from "sonner";
 import { NDKEvent } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { useTranslation } from "react-i18next";
 import { Reorder } from "framer-motion";
-import L from "leaflet";
-import Geohash from "latlon-geohash";
-import "leaflet/dist/leaflet.css";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -41,74 +36,13 @@ import { isRelayURL } from "@/lib/relay";
 import type { Community } from "@/lib/types";
 import { ContentKinds } from "@/lib/constants/kinds";
 import { COMMUNIKEY } from "@/lib/kinds";
-import { MapPicker } from "@/components/map-picker";
-
-// Fix Leaflet's default icon issue with React
-const DefaultIcon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
-
-interface MiniMapProps {
-  geohash: string;
-}
-
-function MiniMap({ geohash }: MiniMapProps) {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!mapContainerRef.current) return;
-
-    // Create map
-    const map = L.map(mapContainerRef.current, {
-      zoomControl: false,
-      scrollWheelZoom: false,
-      dragging: false,
-      attributionControl: false,
-    });
-
-    // Add OpenStreetMap tiles
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19,
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map);
-
-    try {
-      const { lat, lon } = Geohash.decode(geohash);
-      map.setView([lat, lon], 12);
-      L.marker([lat, lon], { icon: DefaultIcon }).addTo(map);
-    } catch (error) {
-      console.error("Invalid geohash:", error);
-    }
-
-    return () => {
-      map.remove();
-    };
-  }, [geohash]);
-
-  return (
-    <div
-      ref={mapContainerRef}
-      className="w-full h-[150px] rounded-md border mt-2"
-    />
-  );
-}
+import { queryClient } from "@/lib/query";
 
 interface ContentSection {
   name: string;
   kinds: number[];
   fee?: number;
 }
-
-// todo: optional description
-// todo: optional reference to a terms of service event
-// todo: optional location (human readable string)
-// todo: optional coordinates (geohash)
 
 export function CommunityEdit({
   pubkey,
@@ -141,22 +75,6 @@ export function CommunityEdit({
   const [editSectionFee, setEditSectionFee] = useState<string>("");
   const [isContentLoading, setIsContentLoading] = useState(false);
   const addSectionRef = useRef<HTMLDivElement>(null);
-
-  // Metadata states
-  const [description, setDescription] = useState(community?.description || "");
-  const [location, setLocation] = useState(community?.location || "");
-  const [geohash, setGeohash] = useState(community?.geohash || "");
-  const [isMetadataLoading, setIsMetadataLoading] = useState(false);
-  const [showMapPicker, setShowMapPicker] = useState(false);
-
-  useEffect(() => {
-    if (showAddSection && addSectionRef.current) {
-      addSectionRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "end",
-      });
-    }
-  }, [showAddSection]);
 
   function onOpenChange(open: boolean) {
     setShowDialog(open);
@@ -195,6 +113,7 @@ export function CommunityEdit({
       await ndkEvent.publish(relaySet);
       toast.success(t("community.edit.success"));
       setShowDialog(false);
+      queryClient.invalidateQueries({ queryKey: ["community", pubkey] });
     } catch (err) {
       console.error(err);
       toast.error(t("community.edit.error"));
@@ -213,10 +132,9 @@ export function CommunityEdit({
     try {
       setIsContentLoading(true);
       // Create a base event for the content sections
-      const event = new NDKEvent(ndk, {
-        kind: COMMUNIKEY,
-        tags: [["r", community.relay]],
-      } as NostrEvent);
+      const event = new NDKEvent(ndk);
+      event.kind = COMMUNIKEY;
+      event.tags.push(["r", community.relay]);
       community.backupRelays?.forEach((r) => event.tags.push(["r", r]));
       community.blossom?.forEach((r) => event.tags.push(["blossom", r]));
       if (community.mint) event.tags.push(["mint", community.mint, "cashu"]);
@@ -240,6 +158,7 @@ export function CommunityEdit({
       // Sign and publish the event
       await event.publish(relaySet);
       toast.success(t("community.edit.content_section.success"));
+      queryClient.invalidateQueries({ queryKey: ["community", pubkey] });
     } catch (err) {
       console.error("Error saving content sections:", err);
       toast.error(t("community.edit.content_section.error"));
@@ -256,31 +175,12 @@ export function CommunityEdit({
     }
   }
 
-  function addContentSection() {
-    if (!newSectionName.trim() || newSectionKinds.length === 0) {
-      return;
+  function toggleEditKindSelection(kind: number) {
+    if (editSectionKinds.includes(kind)) {
+      setEditSectionKinds(editSectionKinds.filter((k) => k !== kind));
+    } else {
+      setEditSectionKinds([...editSectionKinds, kind]);
     }
-
-    const newSection: ContentSection = {
-      name: newSectionName.trim(),
-      kinds: newSectionKinds,
-    };
-
-    if (newSectionFee && !isNaN(Number(newSectionFee))) {
-      newSection.fee = Number(newSectionFee);
-    }
-
-    setContentSections([...contentSections, newSection]);
-    setNewSectionName("");
-    setNewSectionKinds([]);
-    setNewSectionFee("");
-    setEditingSection(null);
-  }
-
-  function removeContentSection(name: string) {
-    setContentSections(
-      contentSections.filter((section) => section.name !== name),
-    );
   }
 
   function handleEditSection(section: ContentSection) {
@@ -311,40 +211,31 @@ export function CommunityEdit({
     setEditSectionFee("");
   }
 
-  function toggleEditKindSelection(kind: number) {
-    if (editSectionKinds.includes(kind)) {
-      setEditSectionKinds(editSectionKinds.filter((k) => k !== kind));
-    } else {
-      setEditSectionKinds([...editSectionKinds, kind]);
-    }
+  function removeContentSection(name: string) {
+    setContentSections(
+      contentSections.filter((section) => section.name !== name),
+    );
   }
 
-  async function handleSaveMetadata() {
-    if (!community) return;
-
-    try {
-      setIsMetadataLoading(true);
-      const event = new NDKEvent(ndk, {
-        kind: COMMUNIKEY,
-        tags: [["r", community.relay]],
-      } as NostrEvent);
-      community.backupRelays?.forEach((r) => event.tags.push(["r", r]));
-      community.blossom?.forEach((r) => event.tags.push(["blossom", r]));
-      if (community.mint) event.tags.push(["mint", community.mint, "cashu"]);
-
-      // Add metadata tags
-      if (description) event.tags.push(["description", description]);
-      if (location) event.tags.push(["location", location]);
-      if (geohash) event.tags.push(["g", geohash]);
-
-      await event.publish(relaySet);
-      toast.success(t("community.edit.metadata.success"));
-    } catch (err) {
-      console.error("Error saving metadata:", err);
-      toast.error(t("community.edit.metadata.error"));
-    } finally {
-      setIsMetadataLoading(false);
+  function addContentSection() {
+    if (!newSectionName.trim() || newSectionKinds.length === 0) {
+      return;
     }
+
+    const newSection: ContentSection = {
+      name: newSectionName.trim(),
+      kinds: newSectionKinds,
+    };
+
+    if (newSectionFee && !isNaN(Number(newSectionFee))) {
+      newSection.fee = Number(newSectionFee);
+    }
+
+    setContentSections([...contentSections, newSection]);
+    setNewSectionName("");
+    setNewSectionKinds([]);
+    setNewSectionFee("");
+    setEditingSection(null);
   }
 
   return (
@@ -360,7 +251,7 @@ export function CommunityEdit({
             <DialogTitle>{t("community.edit.title")}</DialogTitle>
           </DialogHeader>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList>
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="settings" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
                 {t("community.edit.settings")}
@@ -666,85 +557,9 @@ export function CommunityEdit({
                 </Button>
               </div>
             </TabsContent>
-            <TabsContent value="metadata" className="pt-2">
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">
-                      {t("community.edit.metadata.description")} (
-                      {t("community.edit.metadata.optional")})
-                    </label>
-                    <Textarea
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder={t(
-                        "community.edit.metadata.description_placeholder",
-                      )}
-                      className="min-h-[100px]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">
-                      {t("community.edit.metadata.location")} (
-                      {t("community.edit.metadata.optional")})
-                    </label>
-                    <Input
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      placeholder={t(
-                        "community.edit.metadata.location_placeholder",
-                      )}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">
-                      {t("community.edit.metadata.coordinates")} (
-                      {t("community.edit.metadata.optional")})
-                    </label>
-                    <div className="flex gap-2">
-                      <Input
-                        value={geohash}
-                        readOnly
-                        placeholder={t(
-                          "community.edit.metadata.coordinates_placeholder",
-                        )}
-                        className={geohash ? "bg-muted" : ""}
-                      />
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setShowMapPicker(true)}
-                      >
-                        <MapPin className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    {geohash && <MiniMap geohash={geohash} />}
-                  </div>
-                </div>
-
-                <Button
-                  className="w-full"
-                  onClick={handleSaveMetadata}
-                  disabled={isMetadataLoading}
-                >
-                  {isMetadataLoading
-                    ? t("community.edit.metadata.saving")
-                    : t("community.edit.metadata.save")}
-                </Button>
-              </div>
-            </TabsContent>
           </Tabs>
         </DialogContent>
       </Dialog>
-
-      <MapPicker
-        open={showMapPicker}
-        onOpenChange={setShowMapPicker}
-        onSelect={setGeohash}
-        initialGeohash={geohash}
-      />
     </>
   );
 }

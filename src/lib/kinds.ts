@@ -15,6 +15,8 @@ export const BOOK = 30040 as NDKKind;
 export const BOOK_CONTENT = 30041 as NDKKind;
 export const CASHU_MINT = 38172 as NDKKind;
 export const CODE_SNIPPET = 1337 as NDKKind;
+export const WORKOUT = 1301 as NDKKind;
+export const WORKOUT_TEMPLATE = 33401 as NDKKind;
 // Communikeys
 export const COMMUNIKEY = 10_222 as NDKKind;
 export const RELATIONSHIP = 30_382 as NDKKind;

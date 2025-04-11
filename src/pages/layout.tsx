@@ -25,6 +25,7 @@ import {
   mediaServerListAtom,
   emojiListAtom,
   emojiSetsAtom,
+  communikeyAtom,
 } from "@/app/store";
 import { isRelayURL } from "@/lib/relay";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -35,7 +36,7 @@ import { fetchCustomEmojis } from "@/lib/nostr/emojis";
 import { useChachiWallet } from "@/lib/wallet";
 import { usePubkey } from "@/lib/account";
 import Landing from "@/components/landing";
-import { RELATIONSHIP } from "@/lib/kinds";
+import { RELATIONSHIP, COMMUNIKEY } from "@/lib/kinds";
 
 function useUserEvents() {
   const ndk = useNDK();
@@ -45,6 +46,7 @@ function useUserEvents() {
   const relays = useAtomValue(relaysAtom);
   const [mints, setMints] = useAtom(mintListAtom);
   const [cashu, setCashu] = useAtom(cashuAtom);
+  const [communikey, setCommunikey] = useAtom(communikeyAtom);
   const [groupList, setGroupList] = useAtom(groupListAtom);
   const [relayList, setRelayList] = useAtom(relayListAtom);
   const [contactList, setContactList] = useAtom(contactListAtom);
@@ -194,6 +196,39 @@ function useUserEvents() {
       const lastSeen = cashu ? cashu.created_at : 0;
       if (event.created_at && event.created_at > lastSeen) {
         setCashu(event.rawEvent() as NostrEvent);
+      }
+    });
+
+    return () => sub.stop();
+  }, [pubkey]);
+
+  // Communikey
+  useEffect(() => {
+    if (!pubkey) return;
+
+    const filter = {
+      kinds: [COMMUNIKEY],
+      authors: [pubkey],
+      ...(communikey && communikey.created_at
+        ? { since: communikey.created_at }
+        : {}),
+    };
+    const sub = ndk.subscribe(
+      filter,
+      {
+        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+        closeOnEose: false,
+      },
+      NDKRelaySet.fromRelayUrls(
+        relays.map((r) => r.url),
+        ndk,
+      ),
+    );
+
+    sub.on("event", (event) => {
+      const lastSeen = communikey ? communikey.created_at : 0;
+      if (event.created_at && event.created_at > lastSeen) {
+        setCommunikey(event.rawEvent() as NostrEvent);
       }
     });
 

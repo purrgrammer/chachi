@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Avatar } from "@/components/nostr/avatar";
 import { Globe, MessageCircleQuestion } from "lucide-react";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
@@ -7,7 +8,7 @@ import { formatRelativeTime } from "@/lib/time";
 import { useGroup } from "@/lib/nostr/groups";
 import { groupURL } from "@/lib/groups";
 import { validateZap } from "@/lib/nip-57";
-import { User } from "@/components/nostr/user";
+import { Name } from "./name";
 
 function GroupName({ id, relay }: { id: string; relay: string }) {
   const group = { id, relay };
@@ -41,12 +42,6 @@ export function Header({ event }: { event: NostrEvent }) {
   const publishedAt = event.tags.find((t) => t[0] === "published_at")?.[1];
   const startsAt = event.tags.find((t) => t[0] === "starts")?.[1];
   const timestamp = Number(publishedAt) || Number(startsAt) || event.created_at;
-  const op = (
-    <User
-      pubkey={author ?? event.pubkey}
-      classNames={{ avatar: "size-6", name: "text-md", wrapper: "gap-1.5" }}
-    />
-  );
   const groupName = (
     <span className="text-xs text-muted-foreground">
       {group && relay ? (
@@ -64,18 +59,26 @@ export function Header({ event }: { event: NostrEvent }) {
       )}
     </span>
   );
+  const op = (
+    <div className="flex flex-row items-center gap-1.5">
+      <Avatar pubkey={author ?? event.pubkey} className="size-9" />
+      <div className="flex flex-col gap-0">
+        <span className="text-md">
+          <Name pubkey={author ?? event.pubkey} />
+        </span>
+        {groupName}
+      </div>
+    </div>
+  );
   const time = (
-    <span className="text-xs text-muted-foreground">
+    <span className="text-sm text-muted-foreground">
       {formatRelativeTime(timestamp ?? 0)}
     </span>
   );
   return (
     <div className="flex flex-row items-center justify-between w-full">
       {op}
-      <div className="flex flex-row items-center gap-3">
-        {groupName}
-        {time}
-      </div>
+      <div className="flex flex-row items-center gap-3">{time}</div>
     </div>
   );
 }

@@ -24,6 +24,7 @@ import {
 import { BookmarkGroup } from "@/components/nostr/groups/bookmark";
 import { CommunityEdit } from "@/components/nostr/groups/community-edit";
 import { usePubkey } from "@/lib/account";
+import Welcome from "@/components/nostr/groups/welcome";
 
 function CommunityHeader({
   pubkey,
@@ -103,6 +104,7 @@ function Section({ group, kinds }: { group: Group; kinds: number[] }) {
 function CommunityContent({ pubkey }: { pubkey: string }) {
   const community = useCommunity(pubkey);
   const { t } = useTranslation();
+  const userPubkey = usePubkey();
   const group = community
     ? {
         id: pubkey,
@@ -114,7 +116,7 @@ function CommunityContent({ pubkey }: { pubkey: string }) {
   return (
     <div>
       <CommunityHeader pubkey={pubkey} community={community} />
-      <Tabs defaultValue="chat">
+      <Tabs defaultValue={userPubkey ? "chat" : community ? "welcome" : "chat"}>
         <TabsList
           className="
           overflow-x-auto no-scrollbar 
@@ -122,6 +124,11 @@ function CommunityContent({ pubkey }: { pubkey: string }) {
 md:w-[calc(100vw-16rem)]
 	  group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100vw-18rem)"
         >
+          {community ? (
+            <TabsTrigger value="welcome">
+              {t("content.type.welcome")}
+            </TabsTrigger>
+          ) : null}
           <TabsTrigger value="chat">{t("content.type.chat")}</TabsTrigger>
           {community && group ? (
             <>
@@ -133,6 +140,11 @@ md:w-[calc(100vw-16rem)]
             </>
           ) : null}
         </TabsList>
+        {community ? (
+          <TabsContent asChild value="welcome">
+            <Welcome key={community.pubkey} community={community} />
+          </TabsContent>
+        ) : null}
         <TabsContent asChild value="chat">
           <CommunityChat pubkey={pubkey} />
         </TabsContent>

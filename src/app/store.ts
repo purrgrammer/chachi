@@ -154,6 +154,13 @@ export const cashuAtom = atomWithStorage<NostrEvent | null>(
   { getOnInit: true },
 );
 
+export const communikeyAtom = atomWithStorage<NostrEvent | null>(
+  "communikey",
+  null,
+  createJSONStorage<NostrEvent | null>(() => localStorage),
+  { getOnInit: true },
+);
+
 // Emojis
 interface EmojiList {
   created_at: number;
@@ -186,11 +193,13 @@ export function useResetState() {
   const [, setEmojiList] = useAtom(emojiListAtom);
   const [, setCashu] = useAtom(cashuAtom);
   const [, setMintList] = useAtom(mintListAtom);
+  const [, setCommunikey] = useAtom(communikeyAtom);
 
   return () => {
     setAccount(null);
     setLoginMethod(null);
     setCashu(null);
+    setCommunikey(null);
     setMintList({ created_at: 0, mints: [], relays: [] });
     setGroupList({ created_at: 0, content: "", groups: [] });
     setRelayList({ created_at: 0, relays: [] });

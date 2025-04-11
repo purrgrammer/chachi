@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useNavigate } from "@/lib/navigation";
-import { ChevronsUpDown, LogOut, Settings, Zap, HandHeart } from "lucide-react";
+import {
+  ChevronsUpDown,
+  LogOut,
+  Settings,
+  Zap,
+  HandHeart,
+  Castle,
+} from "lucide-react";
 import { Login } from "@/components/nostr/login";
 import { Avatar } from "@/components/nostr/avatar";
 import { Name } from "@/components/nostr/name";
@@ -32,6 +39,8 @@ import {
 } from "@nostr-dev-kit/ndk-wallet";
 import { useNDKWallets } from "@/lib/wallet";
 import { CHACHI_PUBKEY, CHACHI_GROUP } from "@/constants";
+import { useAtomValue } from "jotai";
+import { communikeyAtom } from "@/app/store";
 
 function UserInfo({ pubkey }: { pubkey: string }) {
   return (
@@ -59,6 +68,7 @@ export function NavUser() {
   const pubkey = account?.pubkey;
   const isExpanded = state === "expanded" || open || openMobile;
   const { t } = useTranslation();
+  const communikey = useAtomValue(communikeyAtom);
 
   function openWallet(wallet: NDKWallet) {
     if (wallet instanceof NDKNWCWallet && wallet.pairingCode) {
@@ -102,15 +112,26 @@ export function NavUser() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                {communikey && (
+                  <DropdownMenuItem onClick={() => navigate(`/c/${pubkey}`)}>
+                    <Castle className="text-muted-foreground size-4" />
+                    {t("user.community")}
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={() => navigate("/zaps")}>
                   <Zap className="text-muted-foreground size-4" />
                   {t("user.zaps")}
                 </DropdownMenuItem>
-                {wallets.map((wallet) => (
-                  <DropdownMenuItem onClick={() => openWallet(wallet)}>
-                    <WalletBalance wallet={wallet} />
-                  </DropdownMenuItem>
-                ))}
+                {wallets.length > 0 ? (
+                  <>
+                    <DropdownMenuSeparator />
+                    {wallets.map((wallet) => (
+                      <DropdownMenuItem onClick={() => openWallet(wallet)}>
+                        <WalletBalance wallet={wallet} />
+                      </DropdownMenuItem>
+                    ))}
+                  </>
+                ) : null}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate("/settings")}>
                   <Settings className="text-muted-foreground size-4" />

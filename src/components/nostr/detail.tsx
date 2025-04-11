@@ -94,6 +94,8 @@ import {
   CASHU_MINT,
   COMMUNIKEY,
   CODE_SNIPPET,
+  WORKOUT,
+  WORKOUT_TEMPLATE,
 } from "@/lib/kinds";
 import {
   Dialog,
@@ -124,6 +126,9 @@ import { useTranslation } from "react-i18next";
 import { LazyCodeBlock } from "@/components/lazy-code-block";
 import { NameList } from "@/components/nostr//name-list";
 import { ZapGoal } from "./zap-goal";
+import { Workout } from "./workout";
+import { WorkoutTemplate } from "./workout-template";
+import { AppDefinition } from "@/components/nostr/nip-89";
 
 type EventComponent = (props: {
   event: NostrEvent;
@@ -276,6 +281,18 @@ const eventDetails: Record<
   [CODE_SNIPPET]: {
     preview: CodeSnippet,
     detail: CodeSnippet,
+  },
+  [WORKOUT]: {
+    preview: Workout,
+    detail: Workout,
+  },
+  [WORKOUT_TEMPLATE]: {
+    preview: WorkoutTemplate,
+    detail: WorkoutTemplate,
+  },
+  [NDKKind.AppHandler]: {
+    preview: AppDefinition,
+    detail: AppDefinition,
   },
 };
 

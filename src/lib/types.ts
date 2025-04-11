@@ -81,6 +81,10 @@ export interface Community {
   pubkey: string;
   relay: string;
   backupRelays?: string[];
+  description?: string;
+  tos?: string;
+  location?: string;
+  geohash?: string;
   blossom: string[];
   mint?: string;
   sections?: ContentSection[];

@@ -111,10 +111,10 @@ function RelayItem({ group }: { group: Group }) {
 function CommunityItem({ group }: { group: Group }) {
   const lastMessage = useLastMessage(group);
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { pubkey } = useParams();
   const unreadMessages = useUnreadMessages(group);
   //const unreadMentions = useUnreadMentions(group);
-  const isActive = id === group.id;
+  const isActive = pubkey === group.id;
 
   function openGroup() {
     navigate(`/c/${group.id}`);

@@ -38,7 +38,6 @@ import { useTranslation } from "react-i18next";
 import { useRelays } from "@/lib/nostr";
 import { COMMUNIKEY } from "@/lib/kinds";
 import { NostrEvent } from "nostr-tools";
-import { useFollows } from "@/lib/account";
 
 function Heading({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
@@ -59,11 +58,10 @@ function Communities() {
   const { t } = useTranslation();
 
   const relays = useRelays();
-  const follows = useFollows();
   const { events } = useRequest(
     {
       kinds: [COMMUNIKEY],
-      authors: follows,
+      limit: 50,
     },
     relays,
   );
