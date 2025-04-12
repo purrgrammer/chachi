@@ -3,6 +3,7 @@ import { NostrEvent } from "nostr-tools";
 import { RichText } from "@/components/rich-text";
 import { cn } from "@/lib/utils";
 import { formatDateTime } from "@/lib/time";
+//import { MiniMap } from "@/components/map-minimap";
 import type { Group } from "@/lib/types";
 
 export function CalendarEvent({
@@ -22,6 +23,8 @@ export function CalendarEvent({
   const startDate = event.tags.find((tag) => tag[0] === "start")?.[1];
   const tz = event.tags.find((tag) => tag[0] === "start_tzid")?.[1];
   const location = event.tags.find((tag) => tag[0] === "location")?.[1];
+  //const geohash = event.tags.find((tag) => tag[0] === "g")?.[1];
+
   return (
     <div className={cn("flex flex-col gap-1", className)}>
       {image ? (
@@ -61,6 +64,14 @@ export function CalendarEvent({
             {summary}
           </RichText>
         ) : null}
+
+        {/*
+        {geohash && (
+          <div className="mt-2">
+            <MiniMap geohash={geohash} height="120px" />
+          </div>
+        )}
+	*/}
       </div>
     </div>
   );

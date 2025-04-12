@@ -1,25 +1,14 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import {
-  ExternalLink,
-  Code,
-  GitPullRequest,
-  Globe,
-  Info,
-  Tags,
-  Layers,
-} from "lucide-react";
+import { ExternalLink, Code, Globe, Tags, Layers } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Avatar as NostrAvatar } from "@/components/nostr/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useARef } from "@/lib/nostr";
 import { ContentKinds } from "@/lib/constants/kinds";
-import { useRecommendedApps as useRecommendedAppsImpl } from "@/lib/nip-89";
 import { NostrEvent } from "nostr-tools";
 import { useTranslation } from "react-i18next";
 import { Name } from "./name";
-
-export { useRecommendedAppsImpl as useRecommendedApps };
 
 export function AppCard({
   address,
@@ -80,7 +69,7 @@ export function AppCard({
             ) : null}
           </div>
         </div>
-        <div className="flex flex-col gap-2 px-2">
+        <div className="flex flex-col gap-2">
           {profile.website ? (
             <Link
               to={profile.website}
@@ -98,7 +87,7 @@ export function AppCard({
           {supportedKinds.map((kindInfo) => (
             <div
               key={kindInfo!.kind}
-              className={`flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 rounded-full ${
+              className={`flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 rounded-full ${
                 kinds.includes(kindInfo!.kind) ? "" : "opacity-50"
               }`}
             >
@@ -142,9 +131,9 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
     .filter(Boolean);
 
   return (
-    <div className="w-full mx-auto">
+    <div className="w-full mx-auto flex flex-col gap-1">
       {/* Header with banner and profile */}
-      <div className="relative mb-4">
+      <div className="relative">
         {profile.banner && (
           <div className="absolute top-0 left-0 right-0 h-32 overflow-hidden rounded-t-lg">
             <img
@@ -166,70 +155,47 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
               </AvatarFallback>
             </Avatar>
           )}
-          <div>
+          <div className="flex flex-col gap-0">
             <h2 className="text-2xl font-bold">{appName}</h2>
-            {profile.nip05 && (
-              <p className="text-sm text-muted-foreground">{profile.nip05}</p>
+            {profile.about && (
+              <p className="text-muted-foreground line-clamp-1">
+                {profile.about}
+              </p>
             )}
           </div>
         </div>
       </div>
 
-      {/* Links section */}
-      <div className="flex flex-col gap-0.5 mb-4">
-        {profile.website && (
-          <Link
-            to={profile.website}
-            className="font-mono text-xs px-2 hover:underline hover:decoration-dotted"
-            target="_blank"
-          >
-            <div className="flex flex-row items-center gap-1">
-              <Globe className="size-3 text-muted-foreground" />
-              {profile.website}
-            </div>
-          </Link>
-        )}
-
-        {repositories.length > 0 && (
-          <Link
-            to={repositories[0]}
-            className="font-mono text-xs px-2 hover:underline hover:decoration-dotted"
-            target="_blank"
-          >
-            <div className="flex flex-row items-center gap-1">
-              <Code className="size-3 text-muted-foreground" />
-              {repositories[0]}
-            </div>
-          </Link>
-        )}
-
-        {repositories.length > 0 && repositories[0].includes("github.com") && (
-          <Link
-            to={`${repositories[0]}/pulls`}
-            className="font-mono text-xs px-2 hover:underline hover:decoration-dotted"
-            target="_blank"
-          >
-            <div className="flex flex-row items-center gap-1">
-              <GitPullRequest className="size-3 text-muted-foreground" />
-              {t("app.contribute", "Contribute")}
-            </div>
-          </Link>
-        )}
-      </div>
-
       {/* Content sections with reduced spacing */}
       <div className="space-y-4">
-        {profile.about && (
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-row items-center gap-1">
-              <Info className="size-4 text-muted-foreground" />
-              <h2 className="text-sm font-light uppercase text-muted-foreground">
-                {t("app.about", "About")}
-              </h2>
-            </div>
-            <p className="text-muted-foreground">{profile.about}</p>
-          </div>
-        )}
+        {/* Links section */}
+        <div className="flex flex-col gap-0.5">
+          {profile.website && (
+            <Link
+              to={profile.website}
+              className="line-clamp-1 break-all font-mono text-xs hover:underline hover:decoration-dotted"
+              target="_blank"
+            >
+              <div className="flex flex-row items-center gap-1">
+                <Globe className="size-3 text-muted-foreground" />
+                {profile.website}
+              </div>
+            </Link>
+          )}
+
+          {repositories.length > 0 && (
+            <Link
+              to={repositories[0]}
+              className="line-clamp-1 break-all font-mono text-xs hover:underline hover:decoration-dotted"
+              target="_blank"
+            >
+              <div className="flex flex-row items-center gap-1">
+                <Code className="size-3 text-muted-foreground" />
+                {repositories[0]}
+              </div>
+            </Link>
+          )}
+        </div>
 
         {categories.length > 0 && (
           <div className="flex flex-col gap-2">
@@ -241,9 +207,7 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
             </div>
             <div className="flex flex-wrap gap-2">
               {categories.map((category) => (
-                <Badge key={category} variant="secondary">
-                  {category}
-                </Badge>
+                <Badge key={category}>{category}</Badge>
               ))}
             </div>
           </div>
