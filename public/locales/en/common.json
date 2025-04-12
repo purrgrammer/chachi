@@ -953,5 +953,8 @@
       "blossom": "Media Servers",
       "mint": "Mint"
     }
+  },
+  "app": {
+    "supported_kinds": "Content Types"
   }
 }

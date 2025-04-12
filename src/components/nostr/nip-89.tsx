@@ -229,7 +229,7 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
               <div className="flex flex-row items-center gap-1">
                 <Layers className="size-4 text-muted-foreground" />
                 <h2 className="text-sm font-light uppercase text-muted-foreground">
-                  {t("app.supported_kinds", "Supported Content Types")}
+                  {t("app.supported_kinds", "Content Types")}
                 </h2>
               </div>
               <div className="flex flex-wrap gap-2">
