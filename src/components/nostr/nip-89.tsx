@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ExternalLink, Code, Globe, Tags, Layers } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -103,6 +103,7 @@ export function AppCard({
 
 export function AppDefinition({ event }: { event: NostrEvent }) {
   const { t } = useTranslation();
+  const [isBannerLoaded, setBannerLoaded] = useState(false);
   const profile = useMemo(() => {
     try {
       return JSON.parse(event.content);
@@ -130,111 +131,118 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
     .map((kind) => ContentKinds.find((k) => k.kind === kind))
     .filter(Boolean);
 
+  const banner = profile.banner;
+
   return (
-    <div className="w-full mx-auto flex flex-col gap-1">
-      {/* Header with banner and profile */}
-      <div className="relative">
-        {profile.banner && (
-          <div className="absolute top-0 left-0 right-0 h-32 overflow-hidden rounded-t-lg">
-            <img
-              src={profile.banner}
-              alt={`${appName} banner`}
-              className="w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/90"></div>
-          </div>
+    <div className="flex items-center justify-center">
+      <div className="flex flex-col relative w-full max-w-4xl">
+        {banner && (
+          <img
+            src={banner}
+            alt={`${appName} banner`}
+            className="w-full min-h-42 max-h-96 aspect-image object-cover rounded-t-lg"
+            onLoad={() => setBannerLoaded(true)}
+          />
         )}
         <div
-          className={`flex items-center gap-4 ${profile.banner ? "pt-16" : ""} relative z-10`}
+          className={`flex flex-row justify-between ${isBannerLoaded ? "-mt-20" : ""}`}
         >
-          {profile.picture && (
-            <Avatar className="size-20 border-4 border-background">
-              <AvatarImage src={profile.picture} alt={appName} />
-              <AvatarFallback>
-                {appName.slice(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-          )}
-          <div className="flex flex-col gap-0">
-            <h2 className="text-2xl font-bold">{appName}</h2>
-            {profile.about && (
-              <p className="text-muted-foreground line-clamp-1">
-                {profile.about}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Content sections with reduced spacing */}
-      <div className="space-y-4">
-        {/* Links section */}
-        <div className="flex flex-col gap-0.5">
-          {profile.website && (
-            <Link
-              to={profile.website}
-              className="line-clamp-1 break-all font-mono text-xs hover:underline hover:decoration-dotted"
-              target="_blank"
-            >
-              <div className="flex flex-row items-center gap-1">
-                <Globe className="size-3 text-muted-foreground" />
-                {profile.website}
+          <div className="p-2 flex flex-col items-start gap-3">
+            <div className="flex flex-col gap-1 items-start ml-3">
+              {profile.picture ? (
+                <Avatar className="size-32 border-4 border-background">
+                  <AvatarImage src={profile.picture} alt={appName} />
+                  <AvatarFallback>
+                    {typeof appName === "string"
+                      ? appName.slice(0, 2).toUpperCase()
+                      : "AP"}
+                  </AvatarFallback>
+                </Avatar>
+              ) : event.pubkey ? (
+                <NostrAvatar
+                  pubkey={event.pubkey}
+                  className="size-32 border-4 border-background"
+                />
+              ) : null}
+              <div className="flex flex-col gap-0 mt-2">
+                <h2 className="text-2xl font-bold">{appName}</h2>
+                {profile.about && (
+                  <p className="text-balance text-muted-foreground line-clamp-2">
+                    {profile.about}
+                  </p>
+                )}
               </div>
-            </Link>
-          )}
-
-          {repositories.length > 0 && (
-            <Link
-              to={repositories[0]}
-              className="line-clamp-1 break-all font-mono text-xs hover:underline hover:decoration-dotted"
-              target="_blank"
-            >
-              <div className="flex flex-row items-center gap-1">
-                <Code className="size-3 text-muted-foreground" />
-                {repositories[0]}
-              </div>
-            </Link>
-          )}
-        </div>
-
-        {categories.length > 0 && (
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-row items-center gap-1">
-              <Tags className="size-4 text-muted-foreground" />
-              <h2 className="text-sm font-light uppercase text-muted-foreground">
-                {t("app.categories", "Categories")}
-              </h2>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Badge key={category}>{category}</Badge>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {kindInfos.length > 0 && (
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-row items-center gap-1">
-              <Layers className="size-4 text-muted-foreground" />
-              <h2 className="text-sm font-light uppercase text-muted-foreground">
-                {t("app.supported_kinds", "Supported Content Types")}
-              </h2>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {kindInfos.map((kindInfo) => (
-                <Badge
-                  key={kindInfo!.kind}
-                  variant="secondary"
-                  className="text-xs flex items-center gap-1"
+            <div className="px-2 flex flex-col items-start gap-0.5">
+              {profile.website && (
+                <Link
+                  to={profile.website}
+                  className="font-mono text-xs px-2 hover:underline hover:decoration-dotted"
+                  target="_blank"
                 >
-                  {kindInfo!.icon}
-                  <span>{t(kindInfo!.translationKey)}</span>
-                </Badge>
-              ))}
+                  <div className="flex flex-row items-center gap-1">
+                    <Globe className="size-3 text-muted-foreground" />
+                    {profile.website}
+                  </div>
+                </Link>
+              )}
+
+              {repositories.length > 0 && (
+                <Link
+                  to={repositories[0]}
+                  className="font-mono text-xs px-2 hover:underline hover:decoration-dotted"
+                  target="_blank"
+                >
+                  <div className="flex flex-row items-center gap-1">
+                    <Code className="size-3 text-muted-foreground" />
+                    {repositories[0]}
+                  </div>
+                </Link>
+              )}
             </div>
           </div>
-        )}
+        </div>
+
+        <div className="px-6 pt-2 flex flex-col gap-4">
+          {categories.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-row items-center gap-1">
+                <Tags className="size-4 text-muted-foreground" />
+                <h2 className="text-sm font-light uppercase text-muted-foreground">
+                  {t("app.categories", "Categories")}
+                </h2>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {categories.map((category) => (
+                  <Badge key={category}>{category}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {kindInfos.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-row items-center gap-1">
+                <Layers className="size-4 text-muted-foreground" />
+                <h2 className="text-sm font-light uppercase text-muted-foreground">
+                  {t("app.supported_kinds", "Supported Content Types")}
+                </h2>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {kindInfos.map((kindInfo) => (
+                  <Badge
+                    key={kindInfo!.kind}
+                    variant="secondary"
+                    className="text-xs flex items-center gap-1"
+                  >
+                    {kindInfo!.icon}
+                    <span>{t(kindInfo!.translationKey)}</span>
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
