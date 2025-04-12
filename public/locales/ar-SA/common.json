@@ -7,11 +7,13 @@
     "no-groups": "لا يوجد مجموعات"
   },
   "user": {
+    "community": "Community",
     "donate": "تبرع",
     "thank-you": "شكرا لك على تبرعك 💜",
     "support-chachi": "التبرع لنا",
     "support-chachi-description": "هو مشروع مجاني ومفتوح المصدر. تبرعك يساعد في إبقاء المشروع حي ويدعم تطوير ميزات جديدة.",
     "login": {
+      "or": "Or",
       "start": "ابدأ",
       "title": "ابدأ الآن",
       "description": "استخدم هويتك الحالية أو أنشئ هوية جديدة.",
@@ -53,6 +55,9 @@
       "unread": "غير مقروء",
       "mentions": "الإشارات",
       "none": "لا شيء جديد لك... حتى الآن"
+    },
+    "communities": {
+      "heading": "Communities"
     },
     "featured": {
       "heading": "مميز"
@@ -275,7 +280,15 @@
           "content": "يمكن لأي شخص الانضمام"
         }
       },
-      "join-the-conversation": "الانضمام إلى المحادثة"
+      "join-the-conversation": "الانضمام إلى المحادثة",
+      "map_picker": {
+        "title": "Select Location",
+        "select": "Select Location",
+        "description": "Click on the map to select a location or search by address",
+        "search_placeholder": "Search for a location...",
+        "location_not_found": "Location not found",
+        "search_error": "Error searching for location"
+      }
     },
     "info": {
       "admin": "المشرف",
@@ -405,6 +418,7 @@
     "type": {
       "chat": "الدردشة",
       "post": "نشر",
+      "welcome": "Welcome",
       "posts": "منشورات",
       "articles": "مقالات",
       "poll": "استطلاع",
@@ -782,7 +796,100 @@
     },
     "blossom": {
       "title": "خوادم الوسائط"
+    },
+    "edit": {
+      "title": "Edit community",
+      "cancel": "Cancel",
+      "description": "Edit the community details",
+      "save": "Save changes",
+      "success": "Community updated",
+      "add_button": "Save",
+      "error": "Failed to update community",
+      "submit": "Save",
+      "settings": "Settings",
+      "content": "Content",
+      "content_section": {
+        "add": "Add content section",
+        "add_button": "Add section",
+        "sections": "Content sections",
+        "empty": "No content sections added yet",
+        "name": "Section name",
+        "name_placeholder": "Enter section name",
+        "fee": "Fee amount (sats)",
+        "fee_placeholder": "Enter fee amount",
+        "optional": "optional",
+        "kinds": "Content types",
+        "save": "Save changes",
+        "saving": "Saving...",
+        "success": "Content sections saved successfully",
+        "error": "Failed to save content sections"
+      },
+      "metadata": {
+        "tab": "Information",
+        "description": "Description",
+        "description_placeholder": "Enter a description for your community",
+        "location": "Location",
+        "location_placeholder": "Enter a human-readable location",
+        "coordinates": "Coordinates",
+        "coordinates_placeholder": "Enter geohash coordinates",
+        "map_picker": {
+          "title": "Select Location",
+          "select": "Select Location",
+          "description": "Click on the map to select a location or search by address",
+          "search_placeholder": "Search for a location...",
+          "location_not_found": "Location not found",
+          "search_error": "Error searching for location"
+        },
+        "optional": "optional",
+        "save": "Save changes",
+        "saving": "Saving...",
+        "success": "Metadata saved successfully",
+        "error": "Failed to save metadata"
+      }
     }
+  },
+  "kinds": {
+    "0": "User Metadata",
+    "1": "Short Text Note",
+    "31990": "App",
+    "31989": "App Recommendation",
+    "3": "Follows",
+    "4": "Encrypted DM",
+    "5": "Deletion",
+    "6": "Repost",
+    "7": "Reaction",
+    "9": "Chat",
+    "11": "Thread",
+    "20": "Picture",
+    "21": "Video",
+    "40": "Channel Creation",
+    "41": "Channel Metadata",
+    "42": "Channel Message",
+    "10002": "Relay List",
+    "1063": "File Metadata",
+    "1621": "Issue",
+    "30617": "Repository",
+    "34235": "Horizontal Video",
+    "34236": "Vertical Video",
+    "1068": "Poll",
+    "1111": "Comment",
+    "1337": "Code Snippet",
+    "9041": "Goal",
+    "9321": "Nutzap",
+    "9734": "Zap Request",
+    "9735": "Zap",
+    "9802": "Highlight",
+    "10001": "Pin List",
+    "10222": "Community Key",
+    "30015": "Interests",
+    "30023": "Long-form",
+    "30030": "Emoji Set",
+    "30040": "Book",
+    "30169": "GIF Set",
+    "30311": "Stream",
+    "30315": "Status",
+    "31923": "Calendar Event",
+    "38172": "Cashu Mint"
   },
   "relay": {
     "new": {
@@ -824,5 +931,19 @@
     "source-code-desc": "Chachi هو مشروع مجاني ومفتوح المصدر، يمكن لأي شخص المساهمة فيه عبر إرسال ملاحظات أو اقتراحات أو الإبلاغ عن أخطاء برمجية أو طلب إضافة وظائف جديدة أو المشاركة في نقاشات المجتمع أو إرسال طلبات دمج التعديلات البرمجية",
     "source-code-link": "عرض الكود المصدر",
     "source-code-chat": "انضم إلى الدردشة المجتمعية"
+  },
+  "groups": {
+    "welcome": {
+      "apps": "Recommended apps",
+      "pinned-posts": "Pinned posts",
+      "join": "Join",
+      "joined": "Joined",
+      "relays": "Relays",
+      "blossom": "Media Servers",
+      "mint": "Mint"
+    }
+  },
+  "app": {
+    "supported_kinds": "Content Types"
   }
 }
