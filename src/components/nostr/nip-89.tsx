@@ -49,7 +49,7 @@ export function AppCard({
           className="rounded-none w-full h-40 aspect-image object-fit rounded-t-md"
         />
       ) : null}
-      <div className="flex flex-col gap-4 p-4">
+      <div className="flex flex-col gap-4">
         <div className="flex flex-row items-center gap-3">
           {profile?.picture ? (
             <Avatar className="size-14">
@@ -63,7 +63,7 @@ export function AppCard({
                 (app?.pubkey ? <Name pubkey={app.pubkey} /> : "Unknown App")}
             </h3>
             {profile.about ? (
-              <p className="text-sm text-muted-foreground line-clamp-2">
+              <p className="text-sm text-muted-foreground line-clamp-1">
                 {profile.about}
               </p>
             ) : null}
@@ -147,8 +147,8 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
         <div
           className={`flex flex-row justify-between ${isBannerLoaded ? "-mt-20" : ""}`}
         >
-          <div className="p-2 flex flex-col items-start gap-3">
-            <div className="flex flex-col gap-1 items-start ml-3">
+          <div className="flex flex-col items-start gap-3">
+            <div className="flex flex-col gap-1 items-start">
               {profile.picture ? (
                 <Avatar className="size-32 border-4 border-background">
                   <AvatarImage src={profile.picture} alt={appName} />
@@ -167,13 +167,13 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
               <div className="flex flex-col gap-0 mt-2">
                 <h2 className="text-2xl font-bold">{appName}</h2>
                 {profile.about && (
-                  <p className="text-balance text-muted-foreground line-clamp-2">
+                  <p className="text-balance text-muted-foreground line-clamp-1">
                     {profile.about}
                   </p>
                 )}
               </div>
             </div>
-            <div className="px-2 flex flex-col items-start gap-0.5">
+            <div className="flex flex-col items-start gap-0.5 pb-2">
               {profile.website && (
                 <Link
                   to={profile.website}
@@ -182,7 +182,9 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
                 >
                   <div className="flex flex-row items-center gap-1">
                     <Globe className="size-3 text-muted-foreground" />
-                    {profile.website}
+                    <span className="line-clamp-1 break-all">
+                      {profile.website}
+                    </span>
                   </div>
                 </Link>
               )}
@@ -195,7 +197,9 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
                 >
                   <div className="flex flex-row items-center gap-1">
                     <Code className="size-3 text-muted-foreground" />
-                    {repositories[0]}
+                    <span className="line-clamp-1 break-all">
+                      {repositories[0]}
+                    </span>
                   </div>
                 </Link>
               )}
@@ -203,7 +207,7 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
           </div>
         </div>
 
-        <div className="px-6 pt-2 flex flex-col gap-4">
+        <div className="pt-2 flex flex-col gap-4">
           {categories.length > 0 && (
             <div className="flex flex-col gap-2">
               <div className="flex flex-row items-center gap-1">
