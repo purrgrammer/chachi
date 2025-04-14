@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 import { LnAddress } from "@/components/ln";
 import { Embed } from "@/components/nostr/detail";
 import { User } from "@/components/nostr/user";
-import { AppCard } from "@/components/nostr/nip-89";
+import { ARef } from "@/components/nostr/event";
 import { useRecommendedApps } from "@/lib/nip-89";
 import { RichText } from "@/components/rich-text";
 import { Nip05 } from "@/components/nostr/nip05";
@@ -210,8 +210,8 @@ export default function Welcome({ community }: { community: Community }) {
                 </h2>
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-                {apps.map(({ address, kinds }) => (
-                  <AppCard key={address} address={address} kinds={kinds} />
+                {apps.map(({ address }) => (
+                  <ARef key={address} address={address} relays={relays} />
                 ))}
               </div>
             </div>

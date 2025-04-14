@@ -127,7 +127,7 @@ import { NameList } from "@/components/nostr//name-list";
 import { ZapGoal } from "./zap-goal";
 import { Workout } from "./workout";
 //import { WorkoutTemplate } from "./workout-template";
-import { AppDefinition } from "@/components/nostr/nip-89";
+import { AppDefinition, AppRecommendation } from "@/components/nostr/nip-89";
 
 type EventComponent = (props: {
   event: NostrEvent;
@@ -292,6 +292,10 @@ const eventDetails: Record<
   [NDKKind.AppHandler]: {
     preview: AppDefinition,
     detail: AppDefinition,
+  },
+  [NDKKind.AppRecommendation]: {
+    preview: AppRecommendation,
+    detail: AppRecommendation,
   },
 };
 

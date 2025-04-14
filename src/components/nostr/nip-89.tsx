@@ -10,46 +10,43 @@ import { NostrEvent } from "nostr-tools";
 import { useTranslation } from "react-i18next";
 import { Name } from "./name";
 
-export function AppCard({
-  address,
-  kinds,
-}: {
-  address: string;
-  kinds: number[];
-}) {
-  const { t } = useTranslation();
+export function AppCard({ address }: { address: string }) {
   const { data: app } = useARef(["a", address]);
+  return app ? <AppRecommendation event={app} /> : null;
+}
+
+export function AppRecommendation({ event }: { event: NostrEvent }) {
+  const { t } = useTranslation();
   const profile = useMemo(() => {
-    if (!app) return {};
     try {
-      return JSON.parse(app.content);
+      return JSON.parse(event.content);
     } catch (error) {
       console.error(error);
       return {};
     }
-  }, [app]);
+  }, [event]);
 
   const supportedKinds = (
-    app?.tags.filter((t) => t[0] === "k").map((t) => Number(t[1])) || []
+    event.tags.filter((t) => t[0] === "k").map((t) => Number(t[1])) || []
   )
     .map((kind) => ContentKinds.find((k) => k.kind === kind))
     .filter(Boolean);
 
   return profile?.name ? (
-    <div className="border rounded-md max-w-xl">
+    <div className="border rounded-md max-w-md">
       {profile.banner ? (
         <img
           src={profile.banner}
           alt="Banner"
-          className="w-full h-40 aspect-image object-fit rounded-t-md"
+          className="h-40 aspect-image object-fit rounded-t-md"
         />
-      ) : app?.pubkey ? (
+      ) : (
         <NostrAvatar
-          pubkey={app.pubkey}
+          pubkey={event.pubkey}
           className="rounded-none w-full h-40 aspect-image object-fit rounded-t-md"
         />
-      ) : null}
-      <div className="flex flex-col gap-4">
+      )}
+      <div className="flex flex-col gap-4 px-4 py-2">
         <div className="flex flex-row items-center gap-3">
           {profile?.picture ? (
             <Avatar className="size-14">
@@ -59,8 +56,7 @@ export function AppCard({
           ) : null}
           <div className="flex flex-col gap-0">
             <h3 className="text-lg font-semibold">
-              {profile.name ||
-                (app?.pubkey ? <Name pubkey={app.pubkey} /> : "Unknown App")}
+              {profile.name || <Name pubkey={event.pubkey} />}
             </h3>
             {profile.about ? (
               <p className="text-sm text-muted-foreground line-clamp-1">
@@ -87,9 +83,7 @@ export function AppCard({
           {supportedKinds.map((kindInfo) => (
             <div
               key={kindInfo!.kind}
-              className={`flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 rounded-full ${
-                kinds.includes(kindInfo!.kind) ? "" : "opacity-50"
-              }`}
+              className="flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 rounded-full"
             >
               {kindInfo!.icon}
               <span>{t(kindInfo!.translationKey)}</span>

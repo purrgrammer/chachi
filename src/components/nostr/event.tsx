@@ -86,6 +86,19 @@ export function Event({
   );
 }
 
+export function ARef({
+  address,
+  relays,
+}: {
+  address: string;
+  relays: string[];
+}) {
+  const [k, pubkey, d] = address.split(":");
+  return (
+    <Address kind={Number(k)} pubkey={pubkey} identifier={d} relays={relays} />
+  );
+}
+
 export function Address({
   group,
   pubkey,
