@@ -506,7 +506,8 @@
     "loading": "تحميل الحدث",
     "not-found": "لم يتم العثور على الحدث",
     "fetch-error": "خطأ في جلب الحدث",
-    "replied": "رد"
+    "replied": "رد",
+    "thread": "Thread"
   },
   "events": {
     "loading": "تحميل الأحداث",
