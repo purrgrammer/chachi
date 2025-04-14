@@ -506,7 +506,8 @@
     "loading": "正在加载事件",
     "not-found": "未找到事件",
     "fetch-error": "获取事件时出错了",
-    "replied": "replied"
+    "replied": "replied",
+    "thread": "Thread"
   },
   "events": {
     "loading": "正在加载事件",
