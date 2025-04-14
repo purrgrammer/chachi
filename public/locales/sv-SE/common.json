@@ -506,7 +506,8 @@
     "loading": "Laddar event",
     "not-found": "Event inte hittat",
     "fetch-error": "Fel vid hämtning av event",
-    "replied": "svarade"
+    "replied": "svarade",
+    "thread": "Thread"
   },
   "events": {
     "loading": "Laddar event",
