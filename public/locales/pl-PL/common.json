@@ -506,7 +506,8 @@
     "loading": "Ładowanie wydarzenia",
     "not-found": "Nie znaleziono zdarzenia",
     "fetch-error": "Błąd podczas pobierania wydarzenia",
-    "replied": "odpowiedziano"
+    "replied": "odpowiedziano",
+    "thread": "Thread"
   },
   "events": {
     "loading": "Ładowanie zdarzeń",

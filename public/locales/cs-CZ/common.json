@@ -506,7 +506,8 @@
     "loading": "Načítání události",
     "not-found": "Událost nenalezena",
     "fetch-error": "Chyba při načítání události",
-    "replied": "odpověděl"
+    "replied": "odpověděl",
+    "thread": "Thread"
   },
   "events": {
     "loading": "Načítání událostí",

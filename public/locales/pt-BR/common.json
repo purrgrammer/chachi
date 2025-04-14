@@ -506,7 +506,8 @@
     "loading": "Carregando evento",
     "not-found": "Evento não encontrado",
     "fetch-error": "Erro ao buscar evento",
-    "replied": "respondeu"
+    "replied": "respondeu",
+    "thread": "Thread"
   },
   "events": {
     "loading": "Carregando eventos",

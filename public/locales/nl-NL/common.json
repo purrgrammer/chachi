@@ -506,7 +506,8 @@
     "loading": "Event laden",
     "not-found": "Event niet gevonden",
     "fetch-error": "Fout bij ophalen event",
-    "replied": "replied"
+    "replied": "replied",
+    "thread": "Thread"
   },
   "events": {
     "loading": "Events laden",
