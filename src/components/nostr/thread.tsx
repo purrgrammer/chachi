@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NostrEvent } from "nostr-tools";
 import { NDKKind } from "@nostr-dev-kit/ndk";
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Chat } from "@/components/nostr/chat/chat";
 import { ChatInput } from "@/components/nostr/chat/input";
 import { ChatZap } from "@/components/nostr/chat/zap";
@@ -10,6 +10,8 @@ import { useGroupAdminsList } from "@/lib/nostr/groups";
 import { usePubkey } from "@/lib/account";
 import type { Group } from "@/lib/types";
 import { Embed } from "@/components/nostr/detail";
+import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ThreadComponentProps {
   event: NostrEvent;
@@ -34,7 +36,7 @@ export function Thread({
   onOpenChange?: (open: boolean) => void;
   group?: Group;
 }) {
-  console.log("THREAD", root, group);
+  const { t } = useTranslation();
   const [replyingTo, setReplyingTo] = useState<NostrEvent | undefined>();
   const isFromGroup = root.tags.find((t) => t[0] === "h" && t[1] === group?.id);
   const [scrollTo, setScrollTo] = useState<NostrEvent | undefined>();
@@ -48,6 +50,7 @@ export function Thread({
   };
 
   const deleteEvent = (event: NostrEvent) => {
+    // todo: implement deletion
     console.log("Delete event:", event);
   };
 
@@ -86,10 +89,24 @@ export function Thread({
 
   // todo: @ autocomplete thread participants
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="flex flex-col h-[100vh]">
-        <div className="flex flex-col h-full overflow-hidden">
-          <div className="flex-grow overflow-hidden relative">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        className="flex flex-col h-[100vh] max-w-full w-full p-0 m-0 border-0 rounded-none"
+        hideClose
+      >
+        <div className="flex flex-col h-full overflow-hidden relative">
+          <div className="sticky top-0 z-10 bg-background p-4 border-b flex items-center justify-between">
+            <h2 className="text-lg font-medium">{t("event.thread")}</h2>
+            <button
+              onClick={() => onOpenChange?.(false)}
+              className="p-1 rounded-full hover:bg-muted"
+              aria-label="Close"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <div className="flex-grow overflow-y-auto">
             <Chat
               events={[...replies.reverse(), root]}
               group={isFromGroup ? group : undefined}
@@ -103,44 +120,38 @@ export function Thread({
               deleteEvent={deleteEvent}
               setReplyingTo={setReplyingTo}
               scrollTo={scrollTo}
-              style={
-                {
-                  paddingTop: "1rem",
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  overflow: "auto",
-                  WebkitOverflowScrolling: "touch", // For iOS smooth scrolling
-                } as React.CSSProperties
-              }
               setScrollTo={setScrollTo}
               newMessage={newMessage}
               deleteEvents={[]}
               showTimestamps={false}
               components={components}
-              className="h-full"
+              className="h-full pb-4 px-2"
             />
           </div>
 
-          <ChatInput
-            kind={1111 as NDKKind}
-            replyKind={1111 as NDKKind}
-            group={isFromGroup ? group : undefined}
-            rootEvent={root}
-            disabled={!replyingTo}
-            placeholder="Reply to a message"
-            replyingTo={replyingTo}
-            setReplyingTo={setReplyingTo}
-            onNewMessage={handleNewMessage}
-            height={inputHeight}
-            onHeightChange={setInputHeight}
-            pubkeys={replies.map((r) => r.pubkey)}
-            tags={isFromGroup && group ? [["h", group.id, group.relay]] : []}
-          />
+          <div className="sticky bottom-0 z-10 bg-background border-t">
+            <ChatInput
+              kind={
+                root.kind === NDKKind.Text ? NDKKind.Text : NDKKind.GenericReply
+              }
+              replyKind={
+                root.kind === NDKKind.Text ? NDKKind.Text : NDKKind.GenericReply
+              }
+              group={isFromGroup ? group : undefined}
+              rootEvent={root}
+              disabled={!replyingTo}
+              placeholder="Reply to a message"
+              replyingTo={replyingTo}
+              setReplyingTo={setReplyingTo}
+              onNewMessage={handleNewMessage}
+              height={inputHeight}
+              onHeightChange={setInputHeight}
+              pubkeys={replies.map((r) => r.pubkey)}
+              tags={isFromGroup && group ? [["h", group.id, group.relay]] : []}
+            />
+          </div>
         </div>
-      </DrawerContent>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   );
 }

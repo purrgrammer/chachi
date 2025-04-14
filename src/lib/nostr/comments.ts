@@ -12,39 +12,43 @@ export function useReplies(event: NostrEvent, group?: Group, live = true) {
   const isFromGroup = event.tags.find(
     (t) => t[0] === "h" && t[1] === group?.id,
   );
+
   const filters = [
     event.kind === NDKKind.Text
       ? {
           kinds: [NDKKind.Text],
           ...(isFromGroup && group ? { "#h": [group.id] } : {}),
-          ...ev.filter(),
+          "#e": [event.id],
+          limit: 200,
         }
       : {
           kinds: [NDKKind.GenericReply],
           ...(isFromGroup && group ? { "#h": [group.id] } : {}),
           ...ev.filter(),
           "#k": [String(ev.kind)],
+          limit: 200,
         },
     {
       kinds: [NDKKind.Zap, NDKKind.Nutzap],
       ...(isFromGroup && group ? { "#h": [group.id] } : {}),
       ...ev.filter(),
+      limit: 100,
     },
   ];
+
   const replies = useStream(
     filters,
     isFromGroup && group ? [group.relay] : [],
     live,
     true,
   );
-  const sortedReplies = [...replies.events];
-  if (event.kind === NDKKind.Text) {
-    sortedReplies.sort((a, b) => a.created_at - b.created_at);
-  }
+
+  const sortedEvents = [...replies.events];
+  sortedEvents.sort((a, b) => a.created_at - b.created_at);
 
   return {
     ...replies,
-    events: sortedReplies,
+    events: sortedEvents,
   };
 }
 
@@ -64,20 +68,24 @@ export function useDirectReplies(
       ? {
           kinds: [NDKKind.Text],
           ...(isFromGroup && group ? { "#h": [group.id] } : {}),
-          ...ev.filter(),
+          "#e": [event.id],
+          limit: 100,
         }
       : {
           kinds: [NDKKind.GenericReply],
           ...(isFromGroup && group ? { "#h": [group.id] } : {}),
           [`#${t.toUpperCase()}`]: [v],
           "#k": [String(ev.kind)],
+          limit: 100,
         },
     {
       kinds: [NDKKind.Zap, NDKKind.Nutzap],
       ...(isFromGroup && group ? { "#h": [group.id] } : {}),
       ...ev.filter(),
+      limit: 100,
     },
   ];
+
   const replies = useStream(
     filters,
     isFromGroup && group ? [group.relay] : [],
@@ -85,10 +93,36 @@ export function useDirectReplies(
     true,
   );
 
+  // Filter for direct replies only using NIP-10 marker rules
+  const directReplies = replies.events.filter((reply) => {
+    // Skip if this is not a text kind (zaps and other types handled differently)
+    if (reply.kind !== NDKKind.Text) return true;
+
+    // Find all e tags to check for proper reply structure
+    const eTags = reply.tags.filter((tag) => tag[0] === "e");
+
+    // If there are no e tags, it's not a reply
+    if (eTags.length === 0) return false;
+
+    // Per NIP-10: The last e tag without a marker is the reply root
+    // The e tag with marker "reply" is the direct reply target
+    // Or if no marker exists, the last e tag is the direct reply target
+
+    // Check if there's an explicit reply marker pointing to our event
+    const hasDirectReplyMarker = eTags.some(
+      (tag) => tag[1] === event.id && (tag[3] === "reply" || tag.length === 2),
+    );
+
+    // If there's a direct marker, or this is the only e-tag (implicit direct reply)
+    return (
+      hasDirectReplyMarker || (eTags.length === 1 && eTags[0][1] === event.id)
+    );
+  });
+
   // Sort the replies using the sortComments function
   return {
     ...replies,
-    events: sortComments(replies.events, event.pubkey),
+    events: sortComments(directReplies, event.pubkey),
   };
 }
 
