@@ -89,13 +89,21 @@ export function Event({
 export function ARef({
   address,
   relays,
+  showReactions = true,
 }: {
   address: string;
   relays: string[];
+  showReactions?: boolean;
 }) {
   const [k, pubkey, d] = address.split(":");
   return (
-    <Address kind={Number(k)} pubkey={pubkey} identifier={d} relays={relays} />
+    <Address
+      kind={Number(k)}
+      pubkey={pubkey}
+      identifier={d}
+      relays={relays}
+      showReactions={showReactions}
+    />
   );
 }
 

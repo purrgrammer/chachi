@@ -36,7 +36,9 @@ import { useBookmarkGroup } from "./bookmark";
 
 function PinnedPost({ tag, relays }: { tag: string[]; relays: string[] }) {
   const { data: post } = useTag(tag);
-  return post ? <Embed event={post} relays={relays} /> : null;
+  return post ? (
+    <Embed event={post} relays={relays} showReactions={false} />
+  ) : null;
 }
 
 export default function Welcome({ community }: { community: Community }) {
@@ -211,7 +213,12 @@ export default function Welcome({ community }: { community: Community }) {
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
                 {apps.map(({ address }) => (
-                  <ARef key={address} address={address} relays={relays} />
+                  <ARef
+                    key={address}
+                    address={address}
+                    relays={relays}
+                    showReactions={false}
+                  />
                 ))}
               </div>
             </div>

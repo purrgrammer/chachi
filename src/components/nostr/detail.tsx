@@ -290,10 +290,16 @@ const eventDetails: Record<
   //  detail: WorkoutTemplate,
   //},
   [NDKKind.AppHandler]: {
+    noHeader: true,
+    className: "p-0 pb-2",
+    innerClassname: "p-0",
     preview: AppDefinition,
     detail: AppDefinition,
   },
   [NDKKind.AppRecommendation]: {
+    noHeader: true,
+    className: "p-0 pb-2",
+    innerClassname: "p-0",
     preview: AppRecommendation,
     detail: AppRecommendation,
   },

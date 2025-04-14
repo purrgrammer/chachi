@@ -4,16 +4,10 @@ import { ExternalLink, Code, Globe, Tags, Layers } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Avatar as NostrAvatar } from "@/components/nostr/avatar";
 import { Badge } from "@/components/ui/badge";
-import { useARef } from "@/lib/nostr";
 import { ContentKinds } from "@/lib/constants/kinds";
 import { NostrEvent } from "nostr-tools";
 import { useTranslation } from "react-i18next";
 import { Name } from "./name";
-
-export function AppCard({ address }: { address: string }) {
-  const { data: app } = useARef(["a", address]);
-  return app ? <AppRecommendation event={app} /> : null;
-}
 
 export function AppRecommendation({ event }: { event: NostrEvent }) {
   const { t } = useTranslation();
@@ -139,7 +133,7 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
           />
         )}
         <div
-          className={`flex flex-row justify-between ${isBannerLoaded ? "-mt-20" : ""}`}
+          className={`flex flex-col px-4 py-2 ${isBannerLoaded ? "-mt-20" : ""}`}
         >
           <div className="flex flex-col items-start gap-3">
             <div className="flex flex-col gap-1 items-start">
@@ -199,47 +193,47 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
               )}
             </div>
           </div>
-        </div>
 
-        <div className="pt-2 flex flex-col gap-4">
-          {categories.length > 0 && (
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row items-center gap-1">
-                <Tags className="size-4 text-muted-foreground" />
-                <h2 className="text-sm font-light uppercase text-muted-foreground">
-                  {t("app.categories", "Categories")}
-                </h2>
+          <div className="pt-2 flex flex-col gap-4">
+            {categories.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-row items-center gap-1">
+                  <Tags className="size-4 text-muted-foreground" />
+                  <h2 className="text-sm font-light uppercase text-muted-foreground">
+                    {t("app.categories", "Categories")}
+                  </h2>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((category) => (
+                    <Badge key={category}>{category}</Badge>
+                  ))}
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <Badge key={category}>{category}</Badge>
-                ))}
-              </div>
-            </div>
-          )}
+            )}
 
-          {kindInfos.length > 0 && (
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row items-center gap-1">
-                <Layers className="size-4 text-muted-foreground" />
-                <h2 className="text-sm font-light uppercase text-muted-foreground">
-                  {t("app.supported_kinds", "Content Types")}
-                </h2>
+            {kindInfos.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-row items-center gap-1">
+                  <Layers className="size-4 text-muted-foreground" />
+                  <h2 className="text-sm font-light uppercase text-muted-foreground">
+                    {t("app.supported_kinds", "Content Types")}
+                  </h2>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {kindInfos.map((kindInfo) => (
+                    <Badge
+                      key={kindInfo!.kind}
+                      variant="secondary"
+                      className="text-xs flex items-center gap-1"
+                    >
+                      {kindInfo!.icon}
+                      <span>{t(kindInfo!.translationKey)}</span>
+                    </Badge>
+                  ))}
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {kindInfos.map((kindInfo) => (
-                  <Badge
-                    key={kindInfo!.kind}
-                    variant="secondary"
-                    className="text-xs flex items-center gap-1"
-                  >
-                    {kindInfo!.icon}
-                    <span>{t(kindInfo!.translationKey)}</span>
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>
