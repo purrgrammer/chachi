@@ -455,7 +455,7 @@ export async function fetchRelayList(ndk: NDK, pubkey: string) {
       if (ev) {
         return ev.tags.filter((t) => t[0] === "r").map((t) => t[1]);
       }
-      throw new Error("Can't find relay list");
+      return [];
     });
 }
 

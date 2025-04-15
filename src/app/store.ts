@@ -1,6 +1,7 @@
 import { atom, useAtom } from "jotai";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import { NostrEvent } from "nostr-tools";
+import { discoveryRelays } from "@/lib/relay";
 import type { LoginMethod, Account, Group, Relay, EmojiSet } from "@/lib/types";
 
 // todo: navigation history
@@ -70,10 +71,10 @@ interface RelayList {
 }
 
 export const relayListAtom = atomWithStorage<RelayList>(
-  "relay-list",
+  "my-relay-list",
   {
     created_at: 0,
-    relays: [],
+    relays: discoveryRelays.map((url) => ({ url })),
   },
   createJSONStorage<RelayList>(() => localStorage),
   { getOnInit: true },

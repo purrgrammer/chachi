@@ -18,7 +18,7 @@ import {
   fetchProfile,
   fetchRelayList,
 } from "@/lib/nostr";
-import { nip29Relays, isRelayURL } from "@/lib/relay";
+import { nip29Relays, discoveryRelays, isRelayURL } from "@/lib/relay";
 import { useAccount } from "@/lib/account";
 import { useRelayInfo, fetchRelayInfo } from "@/lib/relay";
 import { LEAVE_REQUEST, COMMUNIKEY } from "@/lib/kinds";
@@ -599,7 +599,7 @@ export function useCommunity(pubkey: string) {
             closeOnEose: true,
             cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
           },
-          NDKRelaySet.fromRelayUrls(relays, ndk),
+          NDKRelaySet.fromRelayUrls(relays.concat(discoveryRelays), ndk),
         ),
       );
       if (events.length === 0) throw new Error("Can't find community metadata");
