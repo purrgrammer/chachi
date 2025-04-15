@@ -932,7 +932,7 @@ function CashuWalletCoins({ wallet }: { wallet: NDKCashuWallet }) {
   async function syncProofs() {
     try {
       setIsSyncing(true);
-      await wallet.checkProofs();
+      await wallet.consolidateTokens();
       toast.success(t("wallet.sync-success"));
       refreshWallet(wallet);
     } catch (err) {
@@ -1691,10 +1691,6 @@ function SendEcash({
   const [amount, setAmount] = useState("21");
   const isAmountValid =
     amount && Number(amount) > 0 && Number(amount) <= mintBalance;
-
-  useEffect(() => {
-    wallet.checkProofs();
-  }, []);
 
   async function onWithdrawCash() {
     try {

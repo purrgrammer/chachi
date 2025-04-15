@@ -198,10 +198,6 @@ export function useChachiWallet() {
           addToken(cashuWallet, event);
         }
       });
-
-      sub.on("eose", () => {
-        cashuWallet.checkProofs();
-      });
     };
 
     syncWallet();
