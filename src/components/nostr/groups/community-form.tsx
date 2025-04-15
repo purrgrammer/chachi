@@ -208,6 +208,9 @@ export function CommunityForm({
       communityMint:
         initialValues?.communityMint ||
         (userMints.length > 0 ? userMints[0] : ""),
+      description: initialValues?.description || "",
+      location: initialValues?.location || "",
+      geohash: initialValues?.geohash || "",
     },
   });
 

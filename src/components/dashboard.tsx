@@ -23,11 +23,7 @@ import {
   useGroupPicture,
 } from "@/lib/nostr/groups";
 import { groupId, useMyGroups, useOpenGroup } from "@/lib/groups";
-import {
-  nip29Relays,
-  getRelayHost,
-  useRelayInfo,
-} from "@/lib/relay";
+import { nip29Relays, getRelayHost, useRelayInfo } from "@/lib/relay";
 import { CreateGroup } from "@/components/nostr/groups/create";
 import type { Group, GroupMetadata } from "@/lib/types";
 import {

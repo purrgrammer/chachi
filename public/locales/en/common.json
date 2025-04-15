@@ -81,7 +81,8 @@
         "no-groups-found-for-x-want-to": "No groups found for \"{{search}}\", want to ",
         "start-one": "start one",
         "?": "?"
-      }
+      },
+      "action": "Search"
     }
   },
   "group": {
@@ -285,9 +286,11 @@
         "title": "Select Location",
         "select": "Select Location",
         "description": "Click on the map to select a location or search by address",
+        "search_description": "Search for a location or click on the map to select coordinates.",
         "search_placeholder": "Search for a location...",
         "location_not_found": "Location not found",
-        "search_error": "Error searching for location"
+        "search_error": "Error searching for location",
+        "no_location_selected": "Search for a location or click the map"
       }
     },
     "info": {
@@ -848,9 +851,11 @@
           "title": "Select Location",
           "select": "Select Location",
           "description": "Click on the map to select a location or search by address",
+          "search_description": "Search for a location or click on the map to select coordinates.",
           "search_placeholder": "Search for a location...",
           "location_not_found": "Location not found",
-          "search_error": "Error searching for location"
+          "search_error": "Error searching for location",
+          "no_location_selected": "Search for a location or click the map"
         },
         "optional": "optional",
         "save": "Save changes",

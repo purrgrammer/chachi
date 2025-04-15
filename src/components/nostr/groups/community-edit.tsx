@@ -8,15 +8,13 @@ import {
   GripVertical,
   Pencil,
   MapPin,
+  Info,
 } from "lucide-react";
 import { toast } from "sonner";
 import { NDKEvent } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { useTranslation } from "react-i18next";
 import { Reorder } from "framer-motion";
-import L from "leaflet";
-import Geohash from "latlon-geohash";
-import "leaflet/dist/leaflet.css";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -42,62 +40,7 @@ import type { Community } from "@/lib/types";
 import { ContentKinds } from "@/lib/constants/kinds";
 import { COMMUNIKEY } from "@/lib/kinds";
 import { MapPicker } from "@/components/map-picker";
-
-// Fix Leaflet's default icon issue with React
-const DefaultIcon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
-
-interface MiniMapProps {
-  geohash: string;
-}
-
-function MiniMap({ geohash }: MiniMapProps) {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!mapContainerRef.current) return;
-
-    // Create map
-    const map = L.map(mapContainerRef.current, {
-      zoomControl: false,
-      scrollWheelZoom: false,
-      dragging: false,
-      attributionControl: false,
-    });
-
-    // Add OpenStreetMap tiles
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19,
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map);
-
-    try {
-      const { lat, lon } = Geohash.decode(geohash);
-      map.setView([lat, lon], 12);
-      L.marker([lat, lon], { icon: DefaultIcon }).addTo(map);
-    } catch (error) {
-      console.error("Invalid geohash:", error);
-    }
-
-    return () => {
-      map.remove();
-    };
-  }, [geohash]);
-
-  return (
-    <div
-      ref={mapContainerRef}
-      className="w-full h-[150px] rounded-md border mt-2"
-    />
-  );
-}
+import { PigeonMiniMap } from "@/components/map-pigeon-minimap";
 
 interface ContentSection {
   name: string;
@@ -123,7 +66,15 @@ export function CommunityEdit({
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("settings");
   const userRelays = useRelays();
-  const relaySet = useRelaySet(userRelays.filter((r) => isRelayURL(r)));
+  const userRelaysFiltered = userRelays.filter((r) => isRelayURL(r));
+  const communityRelays = [
+    community?.relay,
+    ...(community?.backupRelays || []),
+  ].filter((r): r is string => typeof r === "string" && isRelayURL(r));
+  const allRelays = Array.from(
+    new Set([...userRelaysFiltered, ...communityRelays]),
+  );
+  const relaySet = useRelaySet(allRelays);
 
   // Content section states
   const [contentSections, setContentSections] = useState<ContentSection[]>(
@@ -148,6 +99,22 @@ export function CommunityEdit({
   const [geohash, setGeohash] = useState(community?.geohash || "");
   const [isMetadataLoading, setIsMetadataLoading] = useState(false);
   const [showMapPicker, setShowMapPicker] = useState(false);
+
+  // Effect to update form state when community prop changes
+  useEffect(() => {
+    if (community) {
+      setDescription(community.description || "");
+      setLocation(community.location || "");
+      setGeohash(community.geohash || "");
+      setContentSections(community.sections || []);
+    } else {
+      // Reset if community becomes undefined (e.g., navigating away)
+      setDescription("");
+      setLocation("");
+      setGeohash("");
+      setContentSections([]);
+    }
+  }, [community]); // Rerun when the community object changes
 
   useEffect(() => {
     if (showAddSection && addSectionRef.current) {
@@ -328,11 +295,24 @@ export function CommunityEdit({
         kind: COMMUNIKEY,
         tags: [["r", community.relay]],
       } as NostrEvent);
+
       community.backupRelays?.forEach((r) => event.tags.push(["r", r]));
+
       community.blossom?.forEach((r) => event.tags.push(["blossom", r]));
+
       if (community.mint) event.tags.push(["mint", community.mint, "cashu"]);
 
-      // Add metadata tags
+      // Note: Using the `contentSections` state ensures the latest order is saved
+      contentSections.forEach((section) => {
+        event.tags.push(["content", section.name]);
+        section.kinds.forEach((kind) => {
+          event.tags.push(["k", kind.toString()]);
+        });
+        if (section.fee !== undefined) {
+          event.tags.push(["fee", section.fee.toString()]);
+        }
+      });
+
       if (description) event.tags.push(["description", description]);
       if (location) event.tags.push(["location", location]);
       if (geohash) event.tags.push(["g", geohash]);
@@ -361,6 +341,10 @@ export function CommunityEdit({
           </DialogHeader>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList>
+              <TabsTrigger value="metadata" className="flex items-center gap-2">
+                <Info className="h-4 w-4" />
+                {t("community.edit.metadata.tab")}
+              </TabsTrigger>
               <TabsTrigger value="settings" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
                 {t("community.edit.settings")}
@@ -370,6 +354,79 @@ export function CommunityEdit({
                 {t("community.edit.content")}
               </TabsTrigger>
             </TabsList>
+            <TabsContent value="metadata">
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">
+                      {t("community.edit.metadata.description")} (
+                      {t("community.edit.metadata.optional")})
+                    </label>
+                    <Textarea
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder={t(
+                        "community.edit.metadata.description_placeholder",
+                      )}
+                      className="min-h-[100px]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">
+                      {t("community.edit.metadata.location")} (
+                      {t("community.edit.metadata.optional")})
+                    </label>
+                    <Input
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      placeholder={t(
+                        "community.edit.metadata.location_placeholder",
+                      )}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">
+                      {t("community.edit.metadata.coordinates")} (
+                      {t("community.edit.metadata.optional")})
+                    </label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={geohash}
+                        readOnly
+                        placeholder={t(
+                          "community.edit.metadata.coordinates_placeholder",
+                        )}
+                        className={geohash ? "bg-muted" : ""}
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setShowMapPicker(true)}
+                      >
+                        <MapPin className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    {geohash && (
+                      <div className="my-2">
+                        <PigeonMiniMap geohash={geohash} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <Button
+                  className="w-full"
+                  onClick={handleSaveMetadata}
+                  disabled={isMetadataLoading}
+                >
+                  {isMetadataLoading
+                    ? t("community.edit.metadata.saving")
+                    : t("community.edit.metadata.save")}
+                </Button>
+              </div>
+            </TabsContent>
             <TabsContent value="settings">
               <CommunityForm
                 onSubmit={handleSubmit}
@@ -663,75 +720,6 @@ export function CommunityEdit({
                   {isContentLoading
                     ? t("community.edit.content_section.saving")
                     : t("community.edit.content_section.save")}
-                </Button>
-              </div>
-            </TabsContent>
-            <TabsContent value="metadata" className="pt-2">
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">
-                      {t("community.edit.metadata.description")} (
-                      {t("community.edit.metadata.optional")})
-                    </label>
-                    <Textarea
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder={t(
-                        "community.edit.metadata.description_placeholder",
-                      )}
-                      className="min-h-[100px]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">
-                      {t("community.edit.metadata.location")} (
-                      {t("community.edit.metadata.optional")})
-                    </label>
-                    <Input
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      placeholder={t(
-                        "community.edit.metadata.location_placeholder",
-                      )}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">
-                      {t("community.edit.metadata.coordinates")} (
-                      {t("community.edit.metadata.optional")})
-                    </label>
-                    <div className="flex gap-2">
-                      <Input
-                        value={geohash}
-                        readOnly
-                        placeholder={t(
-                          "community.edit.metadata.coordinates_placeholder",
-                        )}
-                        className={geohash ? "bg-muted" : ""}
-                      />
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setShowMapPicker(true)}
-                      >
-                        <MapPin className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    {geohash && <MiniMap geohash={geohash} />}
-                  </div>
-                </div>
-
-                <Button
-                  className="w-full"
-                  onClick={handleSaveMetadata}
-                  disabled={isMetadataLoading}
-                >
-                  {isMetadataLoading
-                    ? t("community.edit.metadata.saving")
-                    : t("community.edit.metadata.save")}
                 </Button>
               </div>
             </TabsContent>

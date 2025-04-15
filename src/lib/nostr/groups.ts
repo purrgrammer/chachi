@@ -632,6 +632,9 @@ export function useCommunity(pubkey: string) {
         blossom: info.tags.filter((t) => t[0] === "blossom").map((t) => t[1]),
         mint: info.tags.find((t) => t[0] === "mint")?.[1],
         sections,
+        description: info.tagValue("description"),
+        location: info.tagValue("location"),
+        geohash: info.tagValue("g"),
       } as Community;
       saveCommunity(c);
     };

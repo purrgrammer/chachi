@@ -1,6 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import L from "leaflet";
+import { useEffect, useState } from "react";
+import { Map, Marker, ZoomControl } from "pigeon-maps";
+import { osm } from "pigeon-maps/providers";
 import Geohash from "latlon-geohash";
+import { Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,23 +13,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useTranslation } from "react-i18next";
-import { Search } from "lucide-react";
-
-// Import Leaflet CSS
-import "leaflet/dist/leaflet.css";
-
-// Fix Leaflet's default icon issue with React
-const DefaultIcon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
 
 interface MapPickerProps {
   open: boolean;
@@ -39,6 +28,8 @@ interface SearchResult {
   display_name: string;
 }
 
+type Point = [number, number];
+
 export function MapPicker({
   open,
   onOpenChange,
@@ -46,95 +37,43 @@ export function MapPicker({
   initialGeohash,
 }: MapPickerProps) {
   const { t } = useTranslation();
-  const mapRef = useRef<L.Map | null>(null);
-  const markerRef = useRef<L.Marker | null>(null);
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const [selectedPosition, setSelectedPosition] = useState<
-    [number, number] | null
-  >(null);
+  const [center, setCenter] = useState<Point>([51.505, -0.09]);
+  const [zoom, setZoom] = useState<number>(3);
+  const [markerPosition, setMarkerPosition] = useState<Point | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchError, setSearchError] = useState<string | null>(null);
 
-  // Initialize map when component mounts
   useEffect(() => {
-    if (!open || !mapContainerRef.current) return;
-
-    let map: L.Map | null = null;
-
-    // Small delay to ensure the dialog is fully rendered
-    setTimeout(() => {
-      // Clean up previous map instance if exists
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
+    if (open && initialGeohash) {
+      try {
+        const { lat, lon } = Geohash.decode(initialGeohash);
+        const initialPoint: Point = [lat, lon];
+        setCenter(initialPoint);
+        setMarkerPosition(initialPoint);
+        setZoom(13);
+      } catch (error) {
+        console.error("Invalid initial geohash:", error);
+        setMarkerPosition(null);
       }
-
-      if (mapContainerRef.current) {
-        // Create map
-        map = L.map(mapContainerRef.current, {
-          minZoom: 2,
-          maxZoom: 19,
-          zoomControl: true,
-          scrollWheelZoom: true,
-        }).setView([51.505, -0.09], 3);
-
-        // Add OpenStreetMap tiles with direct HTTPS URLs
-        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          maxZoom: 19,
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        }).addTo(map);
-
-        // Save map reference
-        mapRef.current = map;
-
-        // Set initial position if geohash is provided
-        if (initialGeohash) {
-          try {
-            const { lat, lon } = Geohash.decode(initialGeohash);
-            map.setView([lat, lon], 12);
-            markerRef.current = L.marker([lat, lon], {
-              icon: DefaultIcon,
-            }).addTo(map);
-            setSelectedPosition([lat, lon]);
-          } catch (error) {
-            console.error("Invalid geohash:", error);
-          }
-        }
-
-        // Handle map click
-        map.on("click", (e) => {
-          const { lat, lng } = e.latlng;
-          if (markerRef.current) {
-            markerRef.current.setLatLng([lat, lng]);
-          } else {
-            markerRef.current = L.marker([lat, lng], {
-              icon: DefaultIcon,
-            }).addTo(map!);
-          }
-          setSelectedPosition([lat, lng]);
-        });
-
-        // Force a resize to ensure proper rendering
-        window.dispatchEvent(new Event("resize"));
-      }
-    }, 300);
-
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-        markerRef.current = null;
-      }
-    };
+    } else if (open) {
+      setCenter([51.505, -0.09]);
+      setZoom(3);
+      setMarkerPosition(null);
+    }
   }, [open, initialGeohash]);
 
+  function handleMapClick({ latLng }: { latLng: Point }) {
+    setMarkerPosition(latLng);
+  }
+
   function handleSelect() {
-    if (selectedPosition) {
-      const [lat, lng] = selectedPosition;
-      const geohash = Geohash.encode(lat, lng, 9); // 9 characters for ~5m precision
+    if (markerPosition) {
+      const [lat, lng] = markerPosition;
+      const geohash = Geohash.encode(lat, lng, 9);
       onSelect(geohash);
       onOpenChange(false);
+    } else {
+      console.warn("Attempted to select with no position.");
     }
   }
 
@@ -142,12 +81,15 @@ export function MapPicker({
     e.preventDefault();
     setSearchError(null);
 
-    if (!searchQuery.trim() || !mapRef.current) return;
+    if (!searchQuery.trim()) return;
 
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`,
       );
+      if (!response.ok) {
+        throw new Error(`Nominatim API error: ${response.statusText}`);
+      }
       const results: SearchResult[] = await response.json();
 
       if (results.length > 0) {
@@ -155,31 +97,30 @@ export function MapPicker({
         const latNum = Number(lat);
         const lonNum = Number(lon);
 
-        mapRef.current.setView([latNum, lonNum], 13);
-
-        if (markerRef.current) {
-          markerRef.current.setLatLng([latNum, lonNum]);
+        if (!isNaN(latNum) && !isNaN(lonNum)) {
+          const position: Point = [latNum, lonNum];
+          setCenter(position);
+          setMarkerPosition(position);
+          setZoom(13);
         } else {
-          markerRef.current = L.marker([latNum, lonNum], {
-            icon: DefaultIcon,
-          }).addTo(mapRef.current);
+          throw new Error("Invalid coordinates received from Nominatim");
         }
-
-        setSelectedPosition([latNum, lonNum]);
       } else {
+        setMarkerPosition(null);
         setSearchError(
           t("community.edit.metadata.map_picker.location_not_found"),
         );
       }
     } catch (error) {
       console.error("Search error:", error);
+      setMarkerPosition(null);
       setSearchError(t("community.edit.metadata.map_picker.search_error"));
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] w-[95vw] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] w-[95vw] max-h-[90vh] overflow-y-auto flex flex-col">
         <DialogHeader>
           <DialogTitle>
             {t("community.edit.metadata.map_picker.title")}
@@ -188,7 +129,7 @@ export function MapPicker({
             {t("community.edit.metadata.map_picker.description")}
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 flex-grow">
           <form onSubmit={handleSearch} className="flex gap-2">
             <Input
               value={searchQuery}
@@ -198,24 +139,54 @@ export function MapPicker({
                 "Search for location..."
               }
               className="flex-1"
+              aria-label={
+                t("community.edit.metadata.map_picker.search_placeholder") ||
+                "Search for location"
+              }
             />
-            <Button type="submit" size="icon">
+            <Button
+              type="submit"
+              size="icon"
+              aria-label={t("search.action") || "Search"}
+            >
               <Search className="h-4 w-4" />
             </Button>
           </form>
-          {searchError && <p className="text-sm text-red-500">{searchError}</p>}
-          <div
-            ref={mapContainerRef}
-            className="w-full h-[40vh] md:h-[400px] rounded-md border"
-          />
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              {t("community.edit.cancel")}
-            </Button>
-            <Button onClick={handleSelect} disabled={!selectedPosition}>
-              {t("community.edit.metadata.map_picker.select")}
-            </Button>
+          {searchError && (
+            <p className="text-sm text-red-500" role="alert">
+              {searchError}
+            </p>
+          )}
+          <div className="w-full flex-grow h-[300px] md:h-auto rounded-md border overflow-hidden min-h-[250px]">
+            <Map
+              provider={osm}
+              height={400}
+              center={center}
+              zoom={zoom}
+              onBoundsChanged={({ center, zoom }) => {
+                setCenter(center);
+                setZoom(zoom);
+              }}
+              onClick={handleMapClick}
+            >
+              <ZoomControl />
+              {markerPosition && (
+                <Marker
+                  width={30}
+                  anchor={markerPosition}
+                  color="hsl(var(--primary))"
+                />
+              )}
+            </Map>
           </div>
+        </div>
+        <div className="flex justify-end gap-2 mt-4 flex-shrink-0">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            {t("community.edit.cancel")}
+          </Button>
+          <Button onClick={handleSelect} disabled={!markerPosition}>
+            {t("community.edit.metadata.map_picker.select")}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

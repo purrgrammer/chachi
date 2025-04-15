@@ -8,10 +8,10 @@ import {
   Server,
   CloudUpload,
   Landmark,
+  MapPin,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { LnAddress } from "@/components/ln";
 import { Embed } from "@/components/nostr/detail";
 import { User } from "@/components/nostr/user";
 import { ARef } from "@/components/nostr/event";
@@ -29,10 +29,11 @@ import { BlossomLink } from "@/components/blossom";
 import { MintLink } from "@/components/mint";
 import { Badge } from "@/components/ui/badge";
 import { ContentKinds } from "@/lib/constants/kinds";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { usePubkey } from "@/lib/account";
 import { toast } from "sonner";
 import { useBookmarkGroup } from "./bookmark";
+import Geohash from "latlon-geohash";
 
 function PinnedPost({ tag, relays }: { tag: string[]; relays: string[] }) {
   const { data: post } = useTag(tag);
@@ -67,7 +68,7 @@ export default function Welcome({ community }: { community: Community }) {
           : []),
     ]),
   );
-  const description = profile?.about || community.description;
+  const description = community.description || profile?.about;
   const { data: pinned = [] } = usePinnedPosts(community.pubkey, relays);
   const { data: apps = [] } = useRecommendedApps(community.pubkey, relays);
   const banner = profile?.banner || profile?.picture;
@@ -76,6 +77,29 @@ export default function Welcome({ community }: { community: Community }) {
   const allKinds = Array.from(
     new Set(community.sections?.flatMap((section) => section.kinds) || []),
   );
+
+  // Logic to generate Google Maps URL
+  const mapUrl = useMemo(() => {
+    const location = community.location;
+    const geohash = community.geohash;
+
+    if (location) {
+      // If human-readable location exists, use it as the search query
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+    } else if (geohash) {
+      try {
+        // If only geohash exists, decode it to lat/lon
+        const { lat, lon } = Geohash.decode(geohash);
+        // Use lat,lon for a precise point marker
+        return `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+      } catch (error) {
+        console.error("Failed to decode geohash for map link:", error);
+        // Fallback to searching the raw geohash if decoding fails
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(geohash)}`;
+      }
+    }
+    return null;
+  }, [community.location, community.geohash]);
 
   const handleJoinClick = async () => {
     if (!pubkey) {
@@ -109,26 +133,28 @@ export default function Welcome({ community }: { community: Community }) {
           className={`flex flex-row justify-between ${isBannerLoaded ? "-mt-20" : ""}`}
         >
           <div className="p-2 flex flex-col items-start gap-3">
-            <div className="flex flex-col gap-1 items-start ml-3">
-              <User
-                notClickable
-                pubkey={community.pubkey}
-                classNames={{
-                  avatar: "size-32 border-4 border-background",
-                  name: "text-4xl",
-                  wrapper: "flex-col gap-0 items-start",
-                }}
-              />
-              {description ? (
-                <RichText
-                  tags={profile?.tags}
-                  className="text-balance text-muted-foreground"
-                >
-                  {description}
-                </RichText>
-              ) : null}
+            <div className="flex flex-col gap-2 items-start ml-3">
+              <div className="flex flex-col gap-1">
+                <User
+                  notClickable
+                  pubkey={community.pubkey}
+                  classNames={{
+                    avatar: "size-32 border-4 border-background",
+                    name: "text-4xl",
+                    wrapper: "flex-col gap-0 items-start",
+                  }}
+                />
+                {description ? (
+                  <RichText
+                    tags={profile?.tags}
+                    className="text-balance text-muted-foreground"
+                  >
+                    {description}
+                  </RichText>
+                ) : null}
+              </div>
               {allKinds.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-2">
+                <div className="flex flex-wrap gap-1.5">
                   {allKinds.map((kind) => {
                     const kindInfo = ContentKinds.find((k) => k.kind === kind);
                     return kindInfo ? (
@@ -145,22 +171,40 @@ export default function Welcome({ community }: { community: Community }) {
                 </div>
               )}
             </div>
-            {profile?.website || profile?.lud16 || profile?.nip05 ? (
-              <div className="px-2 flex flex-col items-start gap-0.5">
+            {profile?.website ||
+            profile?.nip05 ||
+            community.location ||
+            community.geohash ? (
+              <div className="px-2 flex flex-col items-start gap-1">
+                {mapUrl ? (
+                  <Link
+                    to={mapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-xs px-2 hover:underline hover:decoration-dotted"
+                  >
+                    <div className="flex flex-row items-center gap-1">
+                      <MapPin className="size-3 text-muted-foreground" />
+                      {community.location ? (
+                        <span className="font-mono">{community.location}</span>
+                      ) : (
+                        <span className="font-mono">{community.geohash}</span>
+                      )}
+                    </div>
+                  </Link>
+                ) : null}
                 {profile?.website ? (
                   <Link
                     to={profile.website}
                     className="font-mono text-xs px-2 hover:underline hover:decoration-dotted"
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     <div className="flex flex-row items-center gap-1">
                       <LinkIcon className="size-3 text-muted-foreground" />
                       {profile.website}
                     </div>
                   </Link>
-                ) : null}
-                {profile?.lud16 ? (
-                  <LnAddress pubkey={profile.pubkey} address={profile.lud16} />
                 ) : null}
                 {profile?.nip05 ? (
                   <span className="font-mono text-xs px-2">
