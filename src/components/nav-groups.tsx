@@ -316,10 +316,13 @@ export function NavGroups() {
   return myGroups.length > 0 ? (
     <MyGroupList />
   ) : (
-    <div className="flex justify-center items-center">
-      <span className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden text-sm text-muted-foreground">
-        {t("nav.no-groups")}
-      </span>
+    <div className="flex flex-col gap-2">
+      <div className="flex justify-center items-center">
+        <span className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden text-sm text-muted-foreground">
+          {t("nav.no-groups")}
+        </span>
+      </div>
+      <CreateGroup className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden" />
     </div>
   );
 }
