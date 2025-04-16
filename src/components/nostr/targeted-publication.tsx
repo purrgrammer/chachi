@@ -258,7 +258,7 @@ export function NewPublication({
         kind: TARGETED_PUBLICATION,
         content: "",
         tags: [
-          ["d", fetchedEvent.tagId()],
+          ["d", fetchedEvent.id],
           ["k", fetchedEvent.kind!.toString()],
           ["p", fetchedEvent.pubkey],
           fetchedEvent.tagReference(),
