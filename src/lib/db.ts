@@ -9,7 +9,7 @@ export const cache = new NDKCacheAdapterDexie({
   dbName: "ndk",
 });
 
-interface Event {
+export interface Event {
   id: string;
   group: string;
   kind: number;
@@ -19,7 +19,7 @@ interface Event {
   tags: string[][];
 }
 
-interface TokenEvent {
+export interface TokenEvent {
   id: string;
   kind: number;
   created_at: number;
