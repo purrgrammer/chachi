@@ -81,6 +81,15 @@ function Reply({
     event && event.kind === NDKKind.Zap
       ? validateZap(event)?.pubkey || event?.pubkey
       : event?.pubkey;
+
+  const isGroupChat = event?.kind === NDKKind.GroupChat;
+  const isText = event?.kind === NDKKind.Text;
+  const isGenericReply = event?.kind === NDKKind.GenericReply;
+
+  if (!(isGroupChat || isText || isGenericReply)) {
+    return null;
+  }
+
   return (
     <div
       className={cn(
@@ -295,7 +304,7 @@ function MessageContent({
   const legacyReply = event.tags.find((t) => t[3] === "reply")?.[1];
   const eReply = event.tags.find((t) => t[0] === "e")?.[1];
   const quotedReply = event.tags.find(
-    (t) => t[0] === "q" && t[1]?.length === 64,
+    (t) => t[0] === "q" && t[1] && t[1].length === 64,
   )?.[1];
   const replyTo = legacyReply || eReply || quotedReply;
   const replyRoot = event.tags.find((t) => t[3] === "root")?.[1];

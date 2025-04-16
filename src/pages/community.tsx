@@ -81,18 +81,15 @@ function Section({ group, kinds }: { group: Group; kinds: number[] }) {
     {
       kinds: kinds,
       authors: [group.id],
-      limit: 50,
     },
     {
       kinds: [TARGETED_PUBLICATION],
       "#k": kinds.map((k) => k.toString()),
       "#h": [group.id],
-      limit: 50,
     },
     {
       kinds: kinds,
       "#h": [group.id],
-      limit: 50,
     },
   ];
   return (
