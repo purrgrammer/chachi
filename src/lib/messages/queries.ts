@@ -20,7 +20,7 @@ export function saveGroupEvent(event: NostrEvent, group: Group) {
   db.events.put(record);
 }
 
-export async function getGroupChat(group: Group) {
+export async function getGroupEvents(group: Group) {
   const id = groupId(group);
   return db.events
     .where("[group+created_at]")
@@ -53,43 +53,17 @@ export async function getGroupChatParticipants(
 
 export async function getLastGroupMessage(group: Group) {
   const id = groupId(group);
-  const lastMessage = await db.events
+  return db.events
     .where("[group+created_at]")
     .between([id, Dexie.minKey], [id, Dexie.maxKey])
     .last();
-
-  if (
-    lastMessage &&
-    (lastMessage.kind === NDKKind.GroupChat ||
-      lastMessage.kind === NDKKind.Nutzap)
-  ) {
-    return lastMessage;
-  }
-
-  const msgs = await db.events
-    .where("[group+created_at]")
-    .between(
-      [id, Dexie.minKey],
-      [id, lastMessage?.created_at || Date.now() / 1000],
-      false,
-      true,
-    )
-    .reverse()
-    .filter((e) => e.kind === NDKKind.GroupChat || e.kind === NDKKind.Nutzap)
-    .limit(1)
-    .toArray();
-
-  return msgs[0];
 }
 
 export async function getGroupMessagesAfter(group: Group, timestamp = 0) {
   const id = groupId(group);
   return db.events
-    .where("[group+kind+created_at]")
-    .between(
-      [id, NDKKind.GroupChat, timestamp + 1],
-      [id, NDKKind.GroupChat, Dexie.maxKey],
-    )
+    .where("[group+created_at]")
+    .between([id, timestamp + 1], [id, Dexie.maxKey])
     .count();
 }
 
@@ -109,13 +83,10 @@ export async function getGroupsSortedByLastMessage(groups: Group[]) {
 
 export async function getLastSeen(group: Group) {
   const id = groupId(group);
-  const results = await db.lastSeen
-    .orderBy("created_at")
-    .filter((e) => e.group === id)
-    .reverse()
-    .limit(1)
-    .toArray();
-  return results[0];
+  return db.lastSeen
+    .where("[group+created_at]")
+    .between([id, Dexie.minKey], [id, Dexie.maxKey])
+    .last();
 }
 
 export async function getGroupMentionsAfter(

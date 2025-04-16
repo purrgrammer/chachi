@@ -20,6 +20,97 @@ import {
   //useUnreadMentions,
 } from "@/lib/messages";
 import type { Group } from "@/lib/types";
+import { NDKKind } from "@nostr-dev-kit/ndk";
+
+interface MessageEvent {
+  id: string;
+  group: string;
+  kind: number;
+  created_at: number;
+  content: string;
+  pubkey: string;
+  tags: string[][];
+}
+
+const LastMessagePreview = ({
+  lastMessage,
+  group,
+}: {
+  lastMessage: MessageEvent;
+  group: Group;
+}) => {
+  const { t } = useTranslation();
+
+  if (lastMessage.kind === NDKKind.GroupAdminAddUser) {
+    const pubkey =
+      lastMessage.tags.find((t) => t[0] === "p")?.[1] || lastMessage.pubkey;
+    return (
+      <div className="flex flex-row items-start text-xs line-clamp-1 gap-1 text-muted-foreground italic">
+        <span className="font-semibold">
+          <Name pubkey={pubkey} short />
+        </span>
+        <span className="text-muted-foreground">
+          {t("group.chat.user.joined")}
+        </span>
+      </div>
+    );
+  }
+
+  if (lastMessage.kind === NDKKind.GroupAdminRemoveUser) {
+    const pubkey =
+      lastMessage.tags.find((t) => t[0] === "p")?.[1] || lastMessage.pubkey;
+    return (
+      <div className="flex flex-row items-start text-xs line-clamp-1 gap-1 text-muted-foreground italic">
+        <span className="font-semibold">
+          <Name pubkey={pubkey} short />
+        </span>
+        <span className="text-muted-foreground">
+          {t("group.chat.user.left")}
+        </span>
+      </div>
+    );
+  }
+
+  // todo: relationship
+
+  return (
+    <div className="flex flex-row justify-between items-center">
+      <div className="flex flex-row items-start text-xs line-clamp-1 text-muted-foreground">
+        <span className="font-semibold">
+          <Name pubkey={lastMessage.pubkey} short />
+        </span>
+        <span className="mr-1">:</span>
+        <RichText
+          group={group}
+          className="leading-none line-clamp-1"
+          options={{
+            inline: true,
+            emojis: true,
+            mentions: true,
+            hashtags: true,
+            events: false,
+            ecash: false,
+            codeBlock: false,
+            syntax: false,
+            images: false,
+            video: false,
+            audio: false,
+            youtube: false,
+          }}
+          classNames={{
+            emojis: "size-4 opacity-70",
+            spans: "break-all",
+            urls: "pointer-events-none",
+            mentions: "pointer-events-none",
+          }}
+          tags={lastMessage.tags}
+        >
+          {lastMessage.content}
+        </RichText>
+      </div>
+    </div>
+  );
+};
 
 function RelayItem({ group }: { group: Group }) {
   const { host } = useParams();
@@ -66,41 +157,7 @@ function RelayItem({ group }: { group: Group }) {
             {relayInfo?.name || group.id.slice(0, 8)}
           </h3>
           {lastMessage ? (
-            <div className="flex flex-row justify-between items-center">
-              <div className="flex flex-row items-start text-xs line-clamp-1 text-muted-foreground">
-                <span className="font-semibold">
-                  <Name pubkey={lastMessage.pubkey} short />
-                </span>
-                <span className="mr-1">:</span>
-                <RichText
-                  group={group}
-                  className="leading-none line-clamp-1"
-                  options={{
-                    inline: true,
-                    emojis: true,
-                    mentions: true,
-                    hashtags: true,
-                    events: false,
-                    ecash: false,
-                    codeBlock: false,
-                    syntax: false,
-                    images: false,
-                    video: false,
-                    audio: false,
-                    youtube: false,
-                  }}
-                  classNames={{
-                    emojis: "size-4 opacity-70",
-                    spans: "break-all",
-                    urls: "pointer-events-none",
-                    mentions: "pointer-events-none",
-                  }}
-                  tags={lastMessage.tags}
-                >
-                  {lastMessage.content}
-                </RichText>
-              </div>
-            </div>
+            <LastMessagePreview lastMessage={lastMessage} group={group} />
           ) : null}
         </div>
       </div>
@@ -148,41 +205,7 @@ function CommunityItem({ group }: { group: Group }) {
             <Name pubkey={group.id} />
           </h3>
           {lastMessage ? (
-            <div className="flex flex-row justify-between items-center">
-              <div className="flex flex-row items-start text-xs line-clamp-1 text-muted-foreground">
-                <span className="font-semibold">
-                  <Name pubkey={lastMessage.pubkey} short />
-                </span>
-                <span className="mr-1">:</span>
-                <RichText
-                  group={group}
-                  className="leading-none line-clamp-1"
-                  options={{
-                    inline: true,
-                    emojis: true,
-                    mentions: true,
-                    events: false,
-                    urls: false,
-                    hashtags: true,
-                    ecash: false,
-                    codeBlock: false,
-                    syntax: false,
-                    images: false,
-                    audio: false,
-                    video: false,
-                    youtube: false,
-                  }}
-                  classNames={{
-                    emojis: "size-4 opacity-70",
-                    spans: "break-all",
-                    mentions: "pointer-events-none",
-                  }}
-                  tags={lastMessage.tags}
-                >
-                  {lastMessage.content}
-                </RichText>
-              </div>
-            </div>
+            <LastMessagePreview lastMessage={lastMessage} group={group} />
           ) : null}
         </div>
       </div>
@@ -239,41 +262,7 @@ function GroupItem({ group }: { group: Group }) {
             {metadata?.name || group.id.slice(0, 8)}
           </h3>
           {lastMessage ? (
-            <div className="flex flex-row justify-between items-center">
-              <div className="flex flex-row items-start text-xs line-clamp-1 text-muted-foreground">
-                <span className="font-semibold">
-                  <Name pubkey={lastMessage.pubkey} short />
-                </span>
-                <span className="mr-1">:</span>
-                <RichText
-                  group={group}
-                  className="leading-none line-clamp-1"
-                  options={{
-                    inline: true,
-                    emojis: true,
-                    mentions: true,
-                    events: false,
-                    urls: false,
-                    hashtags: true,
-                    ecash: false,
-                    codeBlock: false,
-                    syntax: false,
-                    images: false,
-                    audio: false,
-                    video: false,
-                    youtube: false,
-                  }}
-                  classNames={{
-                    emojis: "size-4 opacity-70",
-                    spans: "break-all",
-                    mentions: "pointer-events-none",
-                  }}
-                  tags={lastMessage.tags}
-                >
-                  {lastMessage.content}
-                </RichText>
-              </div>
-            </div>
+            <LastMessagePreview lastMessage={lastMessage} group={group} />
           ) : null}
         </div>
       </div>

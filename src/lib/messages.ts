@@ -15,7 +15,7 @@ import { useRelaySet } from "@/lib/nostr";
 import { usePubkey } from "@/lib/account";
 import { groupId } from "@/lib/groups";
 import {
-  getGroupChat,
+  getGroupEvents,
   getLastGroupMessage,
   getGroupsSortedByLastMessage,
   getLastSeen,
@@ -101,7 +101,7 @@ export function useGroupchat(group: Group) {
     };
   }, [isSubbed, group.id, group.relay]);
 
-  return useLiveQuery(() => getGroupChat(group), [group.id, group.relay], []);
+  return useLiveQuery(() => getGroupEvents(group), [group.id, group.relay], []);
 }
 
 export function useCommunitychat(pubkey: string) {
@@ -145,7 +145,7 @@ export function useCommunitychat(pubkey: string) {
     };
   }, [community]);
 
-  return useLiveQuery(() => getGroupChat(group), [group.id], []);
+  return useLiveQuery(() => getGroupEvents(group), [group.id], []);
 }
 
 export function useLastMessage(group: Group) {
