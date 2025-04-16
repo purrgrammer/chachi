@@ -177,5 +177,5 @@ export default function Community() {
   if (!pubkey) {
     return <Navigate to="/" />;
   }
-  return <CommunityContent pubkey={pubkey} />;
+  return <CommunityContent key={pubkey} pubkey={pubkey} />;
 }
