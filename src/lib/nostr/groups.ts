@@ -17,6 +17,7 @@ import {
   useStream,
   fetchProfile,
   fetchRelayList,
+  fetchLatest,
 } from "@/lib/nostr";
 import { nip29Relays, discoveryRelays, isRelayURL } from "@/lib/relay";
 import { useAccount } from "@/lib/account";
@@ -584,62 +585,55 @@ export function useGroupDescription(group: Group) {
   return isRelayGroup ? relayInfo?.description : metadata?.about;
 }
 
+export async function fetchCommunity(ndk: NDK, pubkey: string) {
+  const relays = await fetchRelayList(ndk, pubkey);
+  const info = await fetchLatest(
+    ndk,
+    {
+      kinds: [COMMUNIKEY],
+      authors: [pubkey],
+    },
+    NDKRelaySet.fromRelayUrls(relays.concat(discoveryRelays), ndk),
+  );
+  if (!info) throw new Error("Can't find community metadata");
+  const communityRelays = info.tags
+    .filter((t) => t[0] === "r")
+    .map((t) => t[1]);
+  const [firstRelay, ...backupRelays] = communityRelays;
+  if (!firstRelay) throw new Error("Invalid community metadata");
+  const sections = info.tags.reduce((acc, t) => {
+    const last = acc.at(-1);
+    const [tag, value] = t;
+    if (tag === "content") {
+      acc.push({ name: value, kinds: [] });
+    } else if (tag === "k" && last) {
+      last.kinds.push(Number(value));
+    } else if (tag === "fee" && last) {
+      last.fee = Number(value);
+    }
+    return acc;
+  }, [] as ContentSection[]);
+  return {
+    pubkey,
+    relay: firstRelay!,
+    backupRelays,
+    blossom: info.tags.filter((t) => t[0] === "blossom").map((t) => t[1]),
+    mint: info.tags.find((t) => t[0] === "mint")?.[1],
+    sections,
+    description: info.tagValue("description"),
+    location: info.tagValue("location"),
+    geohash: info.tagValue("g"),
+  } as Community;
+}
+
 export function useCommunity(pubkey: string) {
   const ndk = useNDK();
   useEffect(() => {
-    const fetchCommunity = async () => {
-      const relays = await fetchRelayList(ndk, pubkey);
-      const events = Array.from(
-        await ndk.fetchEvents(
-          {
-            kinds: [COMMUNIKEY],
-            authors: [pubkey],
-          },
-          {
-            closeOnEose: true,
-            cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
-          },
-          NDKRelaySet.fromRelayUrls(relays.concat(discoveryRelays), ndk),
-        ),
-      );
-      if (events.length === 0) throw new Error("Can't find community metadata");
-      const info = events.reduce((acc, ev) => {
-        if (ev.created_at && ev.created_at > (acc.created_at || 0)) return ev;
-        return acc;
-      }, events[0]);
-      if (!info) throw new Error("Can't find community metadata");
-      const communityRelays = info.tags
-        .filter((t) => t[0] === "r")
-        .map((t) => t[1]);
-      const [firstRelay, ...backupRelays] = communityRelays;
-      if (!firstRelay) throw new Error("Invalid community metadata");
-      const sections = info.tags.reduce((acc, t) => {
-        const last = acc.at(-1);
-        const [tag, value] = t;
-        if (tag === "content") {
-          acc.push({ name: value, kinds: [] });
-        } else if (tag === "k" && last) {
-          last.kinds.push(Number(value));
-        } else if (tag === "fee" && last) {
-          last.fee = Number(value);
-        }
-        return acc;
-      }, [] as ContentSection[]);
-      const c = {
-        pubkey,
-        relay: firstRelay!,
-        backupRelays,
-        blossom: info.tags.filter((t) => t[0] === "blossom").map((t) => t[1]),
-        mint: info.tags.find((t) => t[0] === "mint")?.[1],
-        sections,
-        description: info.tagValue("description"),
-        location: info.tagValue("location"),
-        geohash: info.tagValue("g"),
-      } as Community;
+    const getCommunity = async () => {
+      const c = await fetchCommunity(ndk, pubkey);
       saveCommunity(c);
     };
-
-    fetchCommunity();
+    getCommunity();
   }, [pubkey]);
 
   return useLiveQuery(() => getCommunity(pubkey), [pubkey]);

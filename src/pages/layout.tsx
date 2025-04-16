@@ -30,7 +30,7 @@ import {
 import { isRelayURL } from "@/lib/relay";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset } from "@/components/ui/sidebar";
-import { useGroups } from "@/lib/nostr/groups";
+import { fetchCommunity, useGroups } from "@/lib/nostr/groups";
 import { useGroupMessages } from "@/lib/nostr/chat";
 import { fetchCustomEmojis } from "@/lib/nostr/emojis";
 import { useChachiWallet } from "@/lib/wallet";
@@ -329,18 +329,21 @@ function useUserEvents() {
             undefined;
           if (groupId && isMember) {
             // add to group list
-            setGroupList((groupList) => {
-              const newGroups = groupList.groups.filter(
-                (g) => g.id !== groupId,
-              );
-              return {
-                ...groupList,
-                groups: [
-                  ...newGroups,
-                  { id: groupId, relay: "", isCommunity: true },
-                ],
-              };
-            });
+            const c = await fetchCommunity(ndk, groupId);
+            if (c) {
+              setGroupList((groupList) => {
+                const newGroups = groupList.groups.filter(
+                  (g) => g.id !== groupId,
+                );
+                return {
+                  ...groupList,
+                  groups: [
+                    ...newGroups,
+                    { id: groupId, relay: c.relay, isCommunity: true },
+                  ],
+                };
+              });
+            }
           } else if (groupId) {
             // remove from group list
             setGroupList((groupList) => {
