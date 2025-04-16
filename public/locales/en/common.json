@@ -419,6 +419,7 @@
       "posts": "Posts",
       "articles": "Articles",
       "poll": "Poll",
+      "publication": "Targeted Publication",
       "polls": "Polls",
       "video": "Video",
       "videos": "Videos",
@@ -811,6 +812,23 @@
     },
     "blossom": {
       "title": "Media Servers"
+    },
+    "targeted-publication": {
+      "new": "New publication",
+      "description": "Create a publication that is targeted to one or more communities",
+      "success": "Publication created successfully",
+      "error": "Failed to create publication",
+      "post": "Post",
+      "posting": "Posting...",
+      "event-not-found": "Event not found",
+      "loading": "Loading...",
+      "enter-nip19": "Enter a NIP-19 identifier",
+      "event-found": "Event found",
+      "post-success": "Publication posted successfully",
+      "post-error": "Failed to post publication",
+      "select-communities": "Select communities",
+      "select-communities-desc": "Select the communities you want to target",
+      "communities-selected": "{{count}} communities selected"
     },
     "edit": {
       "title": "Edit community",

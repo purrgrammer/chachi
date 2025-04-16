@@ -9,6 +9,7 @@ import { useGroup } from "@/lib/nostr/groups";
 import { groupURL } from "@/lib/groups";
 import { validateZap } from "@/lib/nip-57";
 import { Name } from "./name";
+import { TARGETED_PUBLICATION } from "@/lib/kinds";
 
 function GroupName({ id, relay }: { id: string; relay: string }) {
   const group = { id, relay };
@@ -38,7 +39,9 @@ export function Header({ event }: { event: NostrEvent }) {
     ? host
     : event.kind === NDKKind.Zap
       ? validateZap(event)?.pubkey
-      : event.pubkey;
+      : event.kind === TARGETED_PUBLICATION
+        ? event.tags.find((t) => t[0] === "p")?.[1] || event.pubkey
+        : event.pubkey;
   const publishedAt = event.tags.find((t) => t[0] === "published_at")?.[1];
   const startsAt = event.tags.find((t) => t[0] === "starts")?.[1];
   const timestamp = Number(publishedAt) || Number(startsAt) || event.created_at;
@@ -66,7 +69,7 @@ export function Header({ event }: { event: NostrEvent }) {
         <span className="text-md">
           <Name pubkey={author ?? event.pubkey} />
         </span>
-        {groupName}
+        {event.kind === TARGETED_PUBLICATION ? null : groupName}
       </div>
     </div>
   );

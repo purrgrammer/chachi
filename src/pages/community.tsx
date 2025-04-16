@@ -25,6 +25,8 @@ import { BookmarkGroup } from "@/components/nostr/groups/bookmark";
 import { CommunityEdit } from "@/components/nostr/groups/community-edit";
 import { usePubkey } from "@/lib/account";
 import Welcome from "@/components/nostr/groups/welcome";
+import { NewPublication } from "@/components/nostr/targeted-publication";
+import { TARGETED_PUBLICATION } from "@/lib/kinds";
 
 function CommunityHeader({
   pubkey,
@@ -82,13 +84,20 @@ function Section({ group, kinds }: { group: Group; kinds: number[] }) {
       limit: 50,
     },
     {
+      kinds: [TARGETED_PUBLICATION],
+      "#k": kinds.map((k) => k.toString()),
+      "#h": [group.id],
+      limit: 50,
+    },
+    {
       kinds: kinds,
       "#h": [group.id],
       limit: 50,
     },
   ];
   return (
-    <div className="h-full p-2">
+    <div className="flex flex-col items-center justify-center gap-0 p-2 h-full">
+      <NewPublication group={group} />
       <Feed
         group={group}
         filter={filter}

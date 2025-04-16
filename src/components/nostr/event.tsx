@@ -45,6 +45,7 @@ export function Event({
   asReply,
   asLink,
   onClick,
+  inline = false,
 }: {
   id: string;
   relays: string[];
@@ -55,6 +56,7 @@ export function Event({
   asReply?: boolean;
   asLink?: boolean;
   onClick?: (ev: NostrEvent) => void;
+  inline?: boolean;
 }) {
   const { data: event, status } = useEvent({ id, pubkey, relays });
 
@@ -80,9 +82,31 @@ export function Event({
       asReply={asReply}
       asLink={asLink}
       onClick={onClick}
+      inline={inline}
     />
   ) : (
     <EventNotFound />
+  );
+}
+
+export function ERef({
+  id,
+  relays,
+  showReactions = true,
+  inline = false,
+}: {
+  id: string;
+  relays: string[];
+  showReactions?: boolean;
+  inline?: boolean;
+}) {
+  return (
+    <Event
+      id={id}
+      relays={relays}
+      showReactions={showReactions}
+      inline={inline}
+    />
   );
 }
 
@@ -90,10 +114,12 @@ export function ARef({
   address,
   relays,
   showReactions = true,
+  inline = false,
 }: {
   address: string;
   relays: string[];
   showReactions?: boolean;
+  inline?: boolean;
 }) {
   const [k, pubkey, d] = address.split(":");
   return (
@@ -103,6 +129,7 @@ export function ARef({
       identifier={d}
       relays={relays}
       showReactions={showReactions}
+      inline={inline}
     />
   );
 }
@@ -117,6 +144,7 @@ export function Address({
   showReactions = true,
   asReply,
   onClick,
+  inline = false,
 }: {
   group?: Group;
   pubkey: string;
@@ -127,6 +155,7 @@ export function Address({
   showReactions?: boolean;
   asReply?: boolean;
   onClick?: (ev: NostrEvent) => void;
+  inline?: boolean;
 }) {
   const { data: event, status } = useAddress({
     pubkey,
@@ -156,6 +185,7 @@ export function Address({
       showReactions={showReactions}
       asReply={asReply}
       onClick={onClick}
+      inline={inline}
     />
   ) : (
     <EventNotFound />

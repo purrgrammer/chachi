@@ -31,6 +31,7 @@ import { ChatBubble, ChatBubbleDetail } from "@/components/nostr/chat-bubble";
 import { Header } from "@/components/nostr/header";
 import { Reactions } from "@/components/nostr/reactions";
 import { Book, BookContent } from "@/components/nostr/book";
+import { TargetedPublication } from "@/components/nostr/targeted-publication";
 import {
   Tabs,
   TabsContent,
@@ -95,6 +96,7 @@ import {
   COMMUNIKEY,
   CODE_SNIPPET,
   WORKOUT,
+  TARGETED_PUBLICATION,
 } from "@/lib/kinds";
 import {
   Dialog,
@@ -142,6 +144,7 @@ const eventDetails: Record<
   number,
   {
     noHeader?: boolean;
+    inline?: boolean;
     className?: string;
     innerClassname?: string;
     preview: EventComponent; // when an event appears mentioned in a post
@@ -302,6 +305,10 @@ const eventDetails: Record<
     innerClassname: "p-0",
     preview: AppRecommendation,
     detail: AppRecommendation,
+  },
+  [TARGETED_PUBLICATION]: {
+    preview: TargetedPublication,
+    detail: TargetedPublication,
   },
 };
 
@@ -771,6 +778,7 @@ export function ReplyEmbed({
   showReactions = true,
   options = {},
   relays = [],
+  inline = false,
 }: {
   event: NostrEvent;
   root: NostrEvent;
@@ -781,6 +789,7 @@ export function ReplyEmbed({
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
   relays: string[];
+  inline?: boolean;
 }) {
   const ndk = useNDK();
   const userRelays = useRelays();
@@ -907,6 +916,10 @@ export function ReplyEmbed({
       ) : null}
     </div>
   );
+
+  if (inline && components?.preview) {
+    return components.preview({ event, relays, group, options, classNames });
+  }
 
   // todo: emojis show before dragging
   return (
@@ -1086,6 +1099,7 @@ export function FeedEmbed({
   showReactions = true,
   options = {},
   relays = [],
+  inline = false,
 }: {
   event: NostrEvent;
   group?: Group;
@@ -1095,6 +1109,7 @@ export function FeedEmbed({
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
   relays: string[];
+  inline?: boolean;
 }) {
   const ndk = useNDK();
   const userRelays = useRelays();
@@ -1140,6 +1155,10 @@ export function FeedEmbed({
     } finally {
       setShowEmojiPicker(false);
     }
+  }
+
+  if (inline && components?.preview) {
+    return components.preview({ event, relays, group, options, classNames });
   }
 
   const header = components?.noHeader ? null : (
@@ -1352,6 +1371,7 @@ export function Embed({
   asLink = false,
   asReply = false,
   onClick,
+  inline = false,
 }: {
   event: NostrEvent;
   group?: Group;
@@ -1366,6 +1386,7 @@ export function Embed({
   asReply?: boolean;
   asLink?: boolean;
   onClick?: (ev: NostrEvent) => void;
+  inline?: boolean;
 }) {
   // todo: if is detail, swipe to reply/react
   const { t } = useTranslation();
@@ -1392,6 +1413,11 @@ export function Embed({
       />
     );
   }
+
+  if (inline && components?.preview) {
+    return components.preview({ event, relays, group, options, classNames });
+  }
+
   return (
     <div
       className={cn(

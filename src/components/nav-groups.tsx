@@ -90,13 +90,19 @@ function PaymentPreview({ group, zap }: { group: Group; zap: Zap | Nutzap }) {
 }
 
 function NutzapPreview({ group, event }: { group: Group; event: Event }) {
-  const zap = useMemo(() => validateNutzap(event as unknown as NostrEvent), [event]);
+  const zap = useMemo(
+    () => validateNutzap(event as unknown as NostrEvent),
+    [event],
+  );
   if (!zap) return null;
   return <PaymentPreview group={group} zap={zap} />;
 }
 
 function ZapPreview({ group, event }: { group: Group; event: Event }) {
-  const zap = useMemo(() => validateZap(event as unknown as NostrEvent), [event]);
+  const zap = useMemo(
+    () => validateZap(event as unknown as NostrEvent),
+    [event],
+  );
   if (!zap) return null;
   return <PaymentPreview group={group} zap={zap} />;
 }
