@@ -98,7 +98,7 @@ function Section({ group, kinds }: { group: Group; kinds: number[] }) {
       <Feed
         group={group}
         filter={filter}
-        live={false}
+        live={true}
         onlyRelays={true}
         loadingClassname="py-32"
         emptyClassname="py-32"
