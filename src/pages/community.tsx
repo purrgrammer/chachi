@@ -81,15 +81,18 @@ function Section({ group, kinds }: { group: Group; kinds: number[] }) {
     {
       kinds: kinds,
       authors: [group.id],
+      limit: 20,
     },
     {
       kinds: [TARGETED_PUBLICATION],
       "#k": kinds.map((k) => k.toString()),
       "#h": [group.id],
+      limit: 20,
     },
     {
       kinds: kinds,
       "#h": [group.id],
+      limit: 20,
     },
   ];
   return (
@@ -98,8 +101,8 @@ function Section({ group, kinds }: { group: Group; kinds: number[] }) {
       <Feed
         group={group}
         filter={filter}
-        live={true}
-        onlyRelays={true}
+        live
+        onlyRelays
         loadingClassname="py-32"
         emptyClassname="py-32"
       />
