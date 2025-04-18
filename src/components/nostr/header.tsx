@@ -9,6 +9,7 @@ import { useGroup } from "@/lib/nostr/groups";
 import { groupURL } from "@/lib/groups";
 import { validateZap } from "@/lib/nip-57";
 import { Name } from "./name";
+import { CommunityList } from "./community-list";
 import { TARGETED_PUBLICATION } from "@/lib/kinds";
 
 function GroupName({ id, relay }: { id: string; relay: string }) {
@@ -45,6 +46,9 @@ export function Header({ event }: { event: NostrEvent }) {
   const publishedAt = event.tags.find((t) => t[0] === "published_at")?.[1];
   const startsAt = event.tags.find((t) => t[0] === "starts")?.[1];
   const timestamp = Number(publishedAt) || Number(startsAt) || event.created_at;
+  const hPubkeyTags = event.tags
+    .filter((t) => t[0] === "h" && t[1]?.length === 64)
+    .map((t) => t[1]);
   const groupName = (
     <span className="text-xs text-muted-foreground">
       {group && relay ? (
@@ -69,7 +73,15 @@ export function Header({ event }: { event: NostrEvent }) {
         <span className="text-md">
           <Name pubkey={author ?? event.pubkey} />
         </span>
-        {event.kind === TARGETED_PUBLICATION ? null : groupName}
+        {event.kind === TARGETED_PUBLICATION && hPubkeyTags.length > 1 ? (
+          <CommunityList
+            avatarClassName="size-3"
+            textClassName="font-light text-xs text-muted-foreground"
+            pubkeys={hPubkeyTags}
+          />
+        ) : (
+          groupName
+        )}
       </div>
     </div>
   );

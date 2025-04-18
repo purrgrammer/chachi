@@ -1,11 +1,10 @@
+import { Link } from "react-router-dom";
 import { useProfiles } from "@/lib/nostr";
 import { User } from "@/components/nostr/user";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
-// todo: configurable link
-
-export function NameList({
+export function CommunityList({
   pubkeys,
   suffix,
   className,
@@ -29,8 +28,13 @@ export function NameList({
     <div className={cn("flex flex-wrap items-center gap-1.5", className)}>
       {isMoreThanMax
         ? deduped.slice(0, max).map((pubkey, idx) => (
-            <div key={pubkey} className="flex items-center gap-0">
+            <Link
+              to={`/c/${pubkey}`}
+              key={pubkey}
+              className="flex items-center gap-0"
+            >
               <User
+                notClickable
                 key={pubkey}
                 pubkey={pubkey}
                 classNames={{
@@ -46,11 +50,16 @@ export function NameList({
                   {t("names.and-more", { more: deduped.length - max })}
                 </span>
               ) : null}
-            </div>
+            </Link>
           ))
         : deduped.map((pubkey, idx) => (
-            <div key={pubkey} className="flex items-center gap-0">
+            <Link
+              key={pubkey}
+              to={`/c/${pubkey}`}
+              className="flex items-center gap-0"
+            >
               <User
+                notClickable
                 key={pubkey}
                 pubkey={pubkey}
                 classNames={{
@@ -66,11 +75,9 @@ export function NameList({
                   {t("names.and")}
                 </span>
               ) : null}
-            </div>
+            </Link>
           ))}
-      {suffix && deduped.length > 0 ? (
-        <span className={textClassName}> {suffix}</span>
-      ) : null}
+      <span className={textClassName}> {suffix}</span>
     </div>
   );
 }
