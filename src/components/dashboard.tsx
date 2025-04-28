@@ -468,11 +468,12 @@ function GroupSearch() {
 }
 
 function FindGroup() {
+  const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-2 items-center md:flex-row">
       <p className="text-sm font-light">{t("dashboard.search.prompt")}</p>
-      <Dialog>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger>
           <Button
             variant="link"
@@ -490,7 +491,7 @@ function FindGroup() {
               </div>
             </DialogTitle>
           </DialogHeader>
-          <GroupSearch />
+          {isOpen && <GroupSearch />}
         </DialogContent>
       </Dialog>
     </div>
