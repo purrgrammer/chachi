@@ -816,7 +816,6 @@ export const GroupChat = forwardRef(
     const hasBeenDeleted = events.some((e) => e.kind === DELETE_GROUP);
     const [replyingTo, setReplyingTo] = useState<NostrEvent | undefined>();
     const [scrollTo, setScrollTo] = useState<NostrEvent | undefined>();
-    const previousMessageIds = events.slice(-3).map((e) => e.id.slice(0, 8));
     // heights
     const [inputHeight, setInputHeight] = useState(34);
     const headerHeight = 96;
@@ -956,18 +955,10 @@ export const GroupChat = forwardRef(
             onNewMessage={onNewMessage}
             replyingTo={replyingTo}
             setReplyingTo={setReplyingTo}
-            tags={
-              previousMessageIds.length > 0
-                ? [
-                    ["h", group.id, group.relay],
-                    ...(isRelayGroup ? [["-"]] : []),
-                    ["previous", ...previousMessageIds],
-                  ]
-                : [
-                    ["h", group.id, group.relay],
-                    ...(isRelayGroup ? [["-"]] : []),
-                  ]
-            }
+            tags={[
+              ["h", group.id, group.relay],
+              ...(isRelayGroup ? [["-"]] : []),
+            ]}
             showJoinRequest={
               !canIPoast && relayInfo?.supported_nips?.includes(29)
             }
