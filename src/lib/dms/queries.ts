@@ -1,6 +1,7 @@
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { PrivateGroup as Group } from "@/lib/types";
 import db from "@/lib/db";
+import Dexie from "dexie";
 
 function groupId(g: Group) {
   return g.id;
@@ -8,16 +9,12 @@ function groupId(g: Group) {
 
 export async function getGroupChat(group: Group) {
   const id = groupId(group);
-  const events = await db.dms
-    .where("[group+kind]")
-    .anyOf([
-      [id, NDKKind.PrivateDirectMessage],
-      [id, NDKKind.Nutzap],
-    ])
+  return db.dms
+    .where("[group+created_at]")
+    .between([id, Dexie.minKey], [id, Dexie.maxKey])
     .reverse()
-    .sortBy("created_at");
-  // todo: pagination
-  return events.slice(0, 100);
+    .limit(100)
+    .toArray();
 }
 
 export async function getGroupChatParticipants(
@@ -37,22 +34,18 @@ export async function getGroupChatParticipants(
 
 export async function getLastGroupMessage(group: Group) {
   const id = groupId(group);
-  const msgs = await db.dms
-    .where("[group+kind]")
-    .anyOf([
-      [id, NDKKind.PrivateDirectMessage],
-      [id, NDKKind.Nutzap],
-    ])
-    .sortBy("created_at");
-  return msgs?.at(-1);
+  return db.dms
+    .where("[group+created_at]")
+    .between([id, Dexie.minKey], [id, Dexie.maxKey])
+    .filter((e) => e.kind !== NDKKind.Reaction)
+    .last();
 }
 
 export async function getGroupMessagesAfter(group: Group, timestamp = 0) {
   const id = groupId(group);
   return db.dms
-    .where("[group+kind]")
-    .equals([id, NDKKind.PrivateDirectMessage])
-    .and((ev) => ev.created_at > timestamp)
+    .where("[group+created_at]")
+    .between([id, timestamp + 1], [id, Dexie.maxKey])
     .count();
 }
 
@@ -61,6 +54,7 @@ export async function getGroupReactions(group: Group) {
   const reactions = await db.dms
     .where("[group+kind]")
     .equals([id, NDKKind.Reaction])
+    .limit(100)
     .toArray();
   return reactions.filter((r) => r.pubkey);
 }
@@ -80,14 +74,11 @@ export async function getGroupsSortedByLastMessage(groups: Group[]) {
 }
 
 export async function getLastSeen(group: Group) {
-  const results = await db.lastSeen
-    .where("[group+kind]")
-    .anyOf([
-      [groupId(group), NDKKind.PrivateDirectMessage],
-      [groupId(group), NDKKind.Nutzap],
-    ])
-    .sortBy("created_at");
-  return results.at(-1);
+  const id = groupId(group);
+  return db.lastSeen
+    .where("[group+created_at]")
+    .between([id, Dexie.minKey], [id, Dexie.maxKey])
+    .last();
 }
 
 export async function getGroupMentionsAfter(
@@ -97,13 +88,12 @@ export async function getGroupMentionsAfter(
 ) {
   const id = groupId(group);
   return db.dms
-    .where("[group+kind]")
-    .equals([id, NDKKind.PrivateDirectMessage])
-    .and(
-      (ev) =>
-        ev.created_at > timestamp &&
-        ev.tags.some((t) => t[0] === "p" && t[1] === pubkey),
+    .where("[group+kind+created_at]")
+    .between(
+      [id, NDKKind.PrivateDirectMessage, timestamp + 1],
+      [id, NDKKind.PrivateDirectMessage, Dexie.maxKey],
     )
+    .and((ev) => ev.tags.some((t) => t[0] === "p" && t[1] === pubkey))
     .count();
 }
 
@@ -115,4 +105,10 @@ export async function getUnreadMessages(group: Group) {
 export async function getUnreadMessagesCount(group: Group) {
   const lastSeen = await getLastSeen(group);
   return getGroupMessagesAfter(group, lastSeen?.created_at || 0);
+}
+
+export async function getTotalUnreadMessages(groups: Group[]) {
+  const countsPromises = groups.map(getUnreadMessagesCount);
+  const counts = await Promise.all(countsPromises);
+  return counts.reduce((sum, count) => sum + count, 0);
 }

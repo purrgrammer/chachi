@@ -15,7 +15,7 @@ export function useNavigate() {
     } else {
       navigate(url);
     }
-    
+
     if (isMobile) {
       setOpenMobile(false);
     }

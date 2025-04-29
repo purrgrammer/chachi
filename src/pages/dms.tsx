@@ -1,7 +1,4 @@
-import {
-  useUnreadMessages,
-  useSortedGroups,
-} from "@/lib/nostr/dm";
+import { useUnreadMessages, useSortedGroups } from "@/lib/nostr/dm";
 import { Link } from "react-router-dom";
 import { RelayIcon } from "@/components/nostr/relay";
 import { useDMRelays, usePubkey } from "@/lib/account";

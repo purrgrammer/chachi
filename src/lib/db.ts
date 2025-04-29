@@ -100,7 +100,7 @@ class ChachiDatabase extends Dexie {
 
   constructor(name: string) {
     super(name);
-    this.version(10).stores({
+    this.version(13).stores({
       events:
         "&id,created_at,group,[group+kind],[group+kind+created_at],[group+created_at]",
       lastSeen: "[group+kind],created_at,[group+created_at]",
@@ -108,7 +108,7 @@ class ChachiDatabase extends Dexie {
       tokenEvents: "&id,created_at",
       groupInfo: "[id+relay]",
       community: "&pubkey",
-      dms: "&id,gift,created_at,group,[group+kind]",
+      dms: "&id,gift,created_at,group,pubkey,[group+kind],[group+kind+created_at],[group+created_at],[group+pubkey]",
     });
   }
 }

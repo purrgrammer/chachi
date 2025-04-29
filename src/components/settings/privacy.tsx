@@ -1,5 +1,12 @@
 import { useTranslation } from "react-i18next";
-import { VenetianMask, MessageSquare, Server, Plus, Trash2, RotateCcw } from "lucide-react";
+import {
+  VenetianMask,
+  MessageSquare,
+  Server,
+  Plus,
+  Trash2,
+  RotateCcw,
+} from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -40,7 +47,9 @@ function DmRelay({
       <div className="flex flex-row items-center gap-2">
         <RelayLink
           relay={url}
-          classNames={{ name: "text-sm font-mono hover:underline hover:decoration-dotted" }}
+          classNames={{
+            name: "text-sm font-mono hover:underline hover:decoration-dotted",
+          }}
         />
       </div>
       <Button
@@ -126,7 +135,7 @@ function DmRelayList({
   const [isSaving, setIsSaving] = useState(false);
   const ndk = useNDK();
   const myRelays = useRelays();
-  const relaySet = useRelaySet(myRelays)
+  const relaySet = useRelaySet(myRelays);
 
   async function saveDmRelayList(relayUrls: string[]) {
     try {
@@ -134,9 +143,7 @@ function DmRelayList({
       const event = new NDKEvent(ndk, {
         kind: NDKKind.DirectMessageReceiveRelayList,
         content: "",
-        tags: [
-          ...relayUrls.map((url) => ["relay", url]),
-        ],
+        tags: [...relayUrls.map((url) => ["relay", url])],
       } as NostrEvent);
       await event.publish(relaySet);
     } catch (err) {
@@ -151,7 +158,7 @@ function DmRelayList({
     if (dmRelayList.relays.some((r) => r.url === url)) {
       return;
     }
-    
+
     const newRelays = [...dmRelayList.relays, { url }];
     const relayUrls = newRelays.map((r) => r.url);
     saveDmRelayList(relayUrls);
@@ -199,9 +206,11 @@ const privacySchema = z.object({
 
 export function Privacy() {
   const { t } = useTranslation();
-  const [privateMessagesEnabled, setPrivateMessagesEnabled] = useAtom(privateMessagesEnabledAtom);
+  const [privateMessagesEnabled, setPrivateMessagesEnabled] = useAtom(
+    privateMessagesEnabledAtom,
+  );
   const [dmRelayList] = useAtom(dmRelayListAtom);
-  
+
   const form = useForm<z.infer<typeof privacySchema>>({
     resolver: zodResolver(privacySchema),
     defaultValues: {
@@ -230,7 +239,7 @@ export function Privacy() {
               {t("settings.privacy.title")}
             </h4>
           </div>
-          
+
           <FormField
             control={form.control}
             name="privateMessagesEnabled"
@@ -279,4 +288,4 @@ export function Privacy() {
       </form>
     </Form>
   );
-} 
+}

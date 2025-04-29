@@ -53,7 +53,10 @@ export default function Settings() {
         </div>
       </Header>
       <div className="p-2 sm:pl-12">
-        <Tabs defaultValue={tab} onValueChange={(value) => setTab(value as Tab)}>
+        <Tabs
+          defaultValue={tab}
+          onValueChange={(value) => setTab(value as Tab)}
+        >
           <TabsList>
             {tabs.map((t) => {
               const { icon, text } = tabConfig[t];
@@ -61,7 +64,13 @@ export default function Settings() {
                 <TabsTrigger key={t} value={t}>
                   <div className="flex flex-row items-center gap-2">
                     {icon}
-                    <span className={t === tab ? "visible transition-all" : "hidden sm:block"}>{text}</span>
+                    <span
+                      className={
+                        t === tab ? "visible transition-all" : "hidden sm:block"
+                      }
+                    >
+                      {text}
+                    </span>
                   </div>
                 </TabsTrigger>
               );

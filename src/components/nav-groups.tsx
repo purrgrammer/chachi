@@ -1,5 +1,5 @@
 import { Reorder } from "framer-motion";
-import { useAtomValue, useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { useParams } from "react-router-dom";
 import { VenetianMask } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
@@ -360,11 +360,7 @@ function PrivateGroups() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const unreadMessages = usePrivateUnreadMessages();
-  const [privateMessagesEnabled] = useAtom(privateMessagesEnabledAtom);
-  
-  // Don't render if private messages are disabled
-  if (!privateMessagesEnabled) return null;
-  
+
   return (
     <div
       className={`flex flex-row gap-2 items-center p-1 py-2 cursor-pointer transition-colors hover:bg-accent/80 overflow-hidden group-has-[[data-collapsible=icon]]/sidebar-wrapper:bg-transparent group-has-[[data-collapsible=icon]]/sidebar-wrapper:py-1 transition-all relative`}

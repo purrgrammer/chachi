@@ -29,6 +29,7 @@ import { PrivateGroup as Group, PrivateGroup } from "@/lib/types";
 import { useOnWebRTCSignal } from "@/components/webrtc";
 import { WEBRTC_SIGNAL } from "@/lib/kinds";
 import { privateMessagesEnabledAtom } from "@/app/store";
+import Dexie from "dexie";
 
 export function groupId(event: NostrEvent) {
   const p = event.tags
@@ -218,7 +219,7 @@ export function useDirectMessages() {
       return null;
     },
     pubkey,
-    privateMessagesEnabled
+    privateMessagesEnabled,
   );
   return null;
 }
@@ -234,8 +235,7 @@ function splitIntoChunks(arr: string, chunkSize: number): string[] {
 export function useGroups() {
   const pubkey = usePubkey();
   const follows = useFollows();
-  // todo: return all groups and do the split in the component
-  // todo: use something more efficient than dm.dms.toArray to check for existing messages
+
   return useLiveQuery(
     async () => {
       const groups = await db.dms.orderBy("group").uniqueKeys();
@@ -270,6 +270,7 @@ export function useGroups() {
 export function useGroupRequests() {
   const pubkey = usePubkey();
   const follows = useFollows();
+
   return useLiveQuery(
     async () => {
       const dms = await db.dms.toArray();
@@ -297,11 +298,13 @@ export function useGroupRequests() {
 export function useGroupMessages(id: string) {
   return useLiveQuery(
     async () => {
-      const messages = await db.dms
-        .where("group")
-        .equals(id)
-        .sortBy("created_at");
-      return messages.reverse();
+      return await db.dms
+        .where("[group+created_at]")
+        .between([id, Dexie.minKey], [id, Dexie.maxKey])
+        .reverse()
+        .filter((e) => e.kind !== NDKKind.Reaction)
+        .limit(100)
+        .toArray();
     },
     [id],
     [],
@@ -340,20 +343,18 @@ export function useLastSeen(group: Group) {
 
 export function useUnreads() {
   const pubkey = usePubkey();
+  const groups = useGroups();
+
   return useLiveQuery(
     async () => {
-      if (!pubkey) return 0;
+      if (!pubkey || !groups || groups.length === 0) return 0;
 
-      const groups = (await db.dms.orderBy("group").uniqueKeys()).map((id) =>
-        idToGroup(String(id), pubkey!),
-      );
-      const unreads = await Promise.all(
-        groups.map((g) => getUnreadMessages(g)),
-      );
+      // Get unread counts for each group in parallel
+      const unreads = await Promise.all(groups.map(getUnreadMessages));
       return unreads.reduce((acc, curr) => acc + curr, 0);
     },
-    [pubkey],
-    [],
+    [pubkey, groups],
+    0,
   );
 }
 
