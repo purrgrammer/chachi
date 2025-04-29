@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { PrivateRoute } from "@/components/private-route";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
@@ -74,11 +75,19 @@ const router = createBrowserRouter([
       },
       {
         path: "/dm",
-        element: <DirectMessages />,
+        element: (
+          <PrivateRoute>
+            <DirectMessages />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/dm/:id",
-        element: <DirectMessageGroup />,
+        element: (
+          <PrivateRoute>
+            <DirectMessageGroup />
+          </PrivateRoute>
+        ),
       },
       {
         path: ":host",

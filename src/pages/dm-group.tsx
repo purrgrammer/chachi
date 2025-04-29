@@ -11,7 +11,6 @@ import { Avatar } from "@/components/nostr/avatar";
 import { Header } from "@/components/header";
 import {
   useGroupMessages,
-  useDirectMessages,
   useDirectMessageRelays,
   idToGroup,
   useLastSeen,
@@ -329,7 +328,6 @@ function DirectMessageGroupId({ id, pubkey }: { id: string; pubkey: string }) {
 }
 
 export default function DirectMessageGroup() {
-  useDirectMessages();
   const pubkey = usePubkey();
   const { id } = useParams();
   const { t } = useTranslation();

@@ -1,6 +1,7 @@
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { useLiveQuery } from "dexie-react-hooks";
 import { NDKEvent } from "@nostr-dev-kit/ndk";
+import { useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
 import {
   getLastGroupMessage,
@@ -27,6 +28,7 @@ import { usePubkey, useFollows, useDMRelays } from "@/lib/account";
 import { PrivateGroup as Group, PrivateGroup } from "@/lib/types";
 import { useOnWebRTCSignal } from "@/components/webrtc";
 import { WEBRTC_SIGNAL } from "@/lib/kinds";
+import { privateMessagesEnabledAtom } from "@/app/store";
 
 export function groupId(event: NostrEvent) {
   const p = event.tags
@@ -68,13 +70,16 @@ function useStreamMap(
   relaySet: NDKRelaySet,
   transform: (ev: NDKEvent) => Promise<NostrEvent | null>,
   pubkey?: string,
+  enabled = true,
 ) {
   const ndk = useNDK();
   const [events, setEvents] = useState<NostrEvent[]>([]);
 
   useEffect(() => {
-    console.log("REQ.GIFT", filter, relaySet.relays);
     if (!pubkey) return;
+    if (!enabled) return;
+    console.log("REQ.GIFT", filter, relaySet.relays);
+
     const sub = ndk.subscribe(
       filter,
       {
@@ -95,7 +100,7 @@ function useStreamMap(
     });
 
     return () => sub.stop();
-  }, [pubkey]);
+  }, [pubkey, enabled]);
 
   return events;
 }
@@ -176,6 +181,7 @@ export function useDirectMessages() {
   const allRelays = Array.from(
     new Set(relays.concat(dmRelays.dm || dmRelays.fallback)),
   );
+  const privateMessagesEnabled = useAtomValue(privateMessagesEnabledAtom);
   const relaySet = useRelaySet(allRelays);
   // todo: sync from latest - 2 weeks
   const filter = {
@@ -212,6 +218,7 @@ export function useDirectMessages() {
       return null;
     },
     pubkey,
+    privateMessagesEnabled
   );
   return null;
 }

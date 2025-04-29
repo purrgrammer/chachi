@@ -36,6 +36,7 @@ import { fetchCustomEmojis } from "@/lib/nostr/emojis";
 import { useChachiWallet } from "@/lib/wallet";
 import { RELATIONSHIP, COMMUNIKEY } from "@/lib/kinds";
 import { discoveryRelays } from "@/lib/relay";
+import { useDirectMessages } from "@/lib/nostr/dm";
 
 function useUserEvents() {
   const ndk = useNDK();
@@ -424,6 +425,8 @@ function useUserEvents() {
   useGroupMessages(groupList.groups);
   // Wallet
   useChachiWallet();
+  // DMs
+  useDirectMessages();
 }
 
 function NostrSync({ children }: { children: ReactNode }) {

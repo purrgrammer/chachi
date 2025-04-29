@@ -274,6 +274,7 @@ export function CreateGroup({
                   <p className="text-sm text-muted-foreground truncate">
                     {t("private-group.create.participants", {
                       n: selectedPubkeys.length,
+                      count: selectedPubkeys.length
                     })}
                   </p>
                 </div>
@@ -285,11 +286,11 @@ export function CreateGroup({
               {selectedPubkeys.map((pubkey) => (
                 <div
                   key={pubkey}
-                  className="flex items-center justify-between rounded-lg border p-1"
+                  className="flex items-center justify-between rounded-lg border pl-3 p-1"
                 >
                   <User
+                  notClickable
                     pubkey={pubkey}
-                    notClickable
                     classNames={{ avatar: "size-6" }}
                   />
                   <Button

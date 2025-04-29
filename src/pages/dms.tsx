@@ -1,7 +1,6 @@
 import {
   useUnreadMessages,
   useSortedGroups,
-  useDirectMessages,
 } from "@/lib/nostr/dm";
 import { Link } from "react-router-dom";
 import { RelayIcon } from "@/components/nostr/relay";
@@ -140,7 +139,6 @@ function RelayItem({ relay }: { relay: string }) {
   );
 }
 export default function DirectMessages() {
-  useDirectMessages();
   const dmRelays = useDMRelays();
   const hasNoDMRelays = dmRelays.dm.length === 0;
   const { t } = useTranslation();

@@ -690,6 +690,23 @@
     "paid-request": "Paid"
   },
   "settings": {
+    "privacy": {
+      "title": "Privacy",
+      "description": "Manage your privacy settings",
+      "private-messages": "Private messages",
+      "private-messages-description": "Enable private messages for your account",
+      "privateMessages": {
+        "title": "Private messages",
+        "description": "Enable private messages"
+      },
+      "dm-relays": {
+        "title": "Private message relays",
+        "description": "Configure relays used for private messages",
+        "add": "Add Relay",
+        "placeholder": "wss://relay.example.com",
+        "invalid-url": "Please enter a valid relay URL"
+      }
+    },
     "title": "Settings",
     "ui": {
       "title": "Appearance",
@@ -990,7 +1007,9 @@
       "success": "Private group created",
       "error": "Failed to create private group",
       "follows": "Follows",
-      "participants": "{{ n }} participants",
+      "participants": "{{ n }} participant",
+      "participants_plural": "{{ n }} participants",
+      "private-message": "Private message",
       "add-some-participants": "Add one or more participants to the group",
       "group-members": "Group members",
       "search-follows": "Start typing to search your follows",
@@ -1021,11 +1040,20 @@
     "no-dm-relays": "No private message relays found",
     "groups": "Groups",
     "saved-messages": "Saved messages",
+    "invalid-group": "Invalid group",
     "webrtc": {
       "incoming-call": "Incoming call",
       "decline": "Decline",
       "accept": "Accept",
-      "incoming-call-description": "is calling you"
+      "incoming-call-description": "is calling you",
+      "ongoing-call": "Ongoing call",
+      "end-call": "End call",
+      "outgoing-call-started": "Outgoing call started",
+      "incoming-call-received": "Incoming call received",
+      "call-answered": "Call answered",
+      "call-ended": "Call ended",
+      "call-connected": "Call connected",
+      "invalid-group": "Invalid group"
     }
   }
 }

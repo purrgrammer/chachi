@@ -1,4 +1,5 @@
 import { Reorder } from "framer-motion";
+import { useAtomValue, useAtom } from "jotai";
 import { useParams } from "react-router-dom";
 import { VenetianMask } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
@@ -29,6 +30,7 @@ import { Event } from "@/lib/db";
 import { validateNutzap, Nutzap } from "@/lib/nip-61";
 import { useMemo } from "react";
 import { Bitcoin } from "lucide-react";
+import { privateMessagesEnabledAtom } from "@/app/store";
 
 interface MessageEvent {
   id: string;
@@ -358,6 +360,11 @@ function PrivateGroups() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const unreadMessages = usePrivateUnreadMessages();
+  const [privateMessagesEnabled] = useAtom(privateMessagesEnabledAtom);
+  
+  // Don't render if private messages are disabled
+  if (!privateMessagesEnabled) return null;
+  
   return (
     <div
       className={`flex flex-row gap-2 items-center p-1 py-2 cursor-pointer transition-colors hover:bg-accent/80 overflow-hidden group-has-[[data-collapsible=icon]]/sidebar-wrapper:bg-transparent group-has-[[data-collapsible=icon]]/sidebar-wrapper:py-1 transition-all relative`}
@@ -386,9 +393,10 @@ function PrivateGroups() {
 
 function MyGroupList() {
   const sortedGroups = useSortedGroups();
+  const privateMessagesEnabled = useAtomValue(privateMessagesEnabledAtom);
   return (
     <SidebarMenu className="gap-0">
-      <PrivateGroups />
+      {privateMessagesEnabled ? <PrivateGroups /> : null}
       <Reorder.Group
         axis="y"
         layoutScroll

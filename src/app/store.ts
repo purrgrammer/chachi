@@ -217,3 +217,10 @@ export function useResetState() {
     setEmojiList({ created_at: 0, emojis: [] });
   };
 }
+
+export const privateMessagesEnabledAtom = atomWithStorage<boolean>(
+  "nip-17",
+  false, // Disabled by default
+  undefined,
+  { getOnInit: true }
+);
