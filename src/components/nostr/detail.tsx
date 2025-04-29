@@ -97,6 +97,7 @@ import {
   CODE_SNIPPET,
   WORKOUT,
   TARGETED_PUBLICATION,
+  FOLLOW_PACK,
 } from "@/lib/kinds";
 import {
   Dialog,
@@ -258,6 +259,10 @@ const eventDetails: Record<
     detail: Stream,
   },
   [NDKKind.CategorizedPeopleList]: {
+    preview: People,
+    detail: People,
+  },
+  [FOLLOW_PACK]: {
     preview: People,
     detail: People,
   },
