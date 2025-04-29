@@ -34,8 +34,6 @@ import { fetchCommunity, useGroups } from "@/lib/nostr/groups";
 import { useGroupMessages } from "@/lib/nostr/chat";
 import { fetchCustomEmojis } from "@/lib/nostr/emojis";
 import { useChachiWallet } from "@/lib/wallet";
-import { usePubkey } from "@/lib/account";
-import Landing from "@/components/landing";
 import { RELATIONSHIP, COMMUNIKEY } from "@/lib/kinds";
 import { discoveryRelays } from "@/lib/relay";
 

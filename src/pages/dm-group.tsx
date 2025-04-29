@@ -31,7 +31,9 @@ import { ProfileDrawer } from "@/components/nostr/profile";
 import { useSaveLastSeen } from "@/lib/nostr/dm";
 
 function GroupChat({ id, group }: { id: string; group: PrivateGroup }) {
-  const [sentMessage, setSentMessage] = useState<NostrEvent | undefined>(undefined);
+  const [sentMessage, setSentMessage] = useState<NostrEvent | undefined>(
+    undefined,
+  );
   const [scrollTo, setScrollTo] = useState<NostrEvent | undefined>(undefined);
   const messages = useGroupMessages(id);
   const me = usePubkey();

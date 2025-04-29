@@ -24,6 +24,7 @@ const Settings = lazy(() => import("@/pages/settings"));
 const Mint = lazy(() => import("@/pages/mint"));
 const Nutzaps = lazy(() => import("@/pages/nutzaps"));
 const Relay = lazy(() => import("@/pages/relay"));
+const Community = lazy(() => import("@/pages/community"));
 
 const LoadingScreen = () => {
   return (

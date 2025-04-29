@@ -455,11 +455,10 @@ export function Fragments({
 }
 
 function extractEcash(fragments: Fragment[]): Fragment[] {
-  return extract(
-    fragments,
-    cashuRequestRegex,
-    (s) => ({ type: "cashu-request", token: s }),
-  );
+  return extract(fragments, cashuRequestRegex, (s) => ({
+    type: "cashu-request",
+    token: s,
+  }));
 }
 
 const defaultOptions = {

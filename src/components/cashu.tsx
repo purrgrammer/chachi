@@ -90,7 +90,7 @@ function RedeemToken({ token }: { token: string }) {
       toast.success(`Ecash redeemed`);
     } catch (err) {
       toast.error(
-        `Error redeeming token: ${(err as Error | undefined)?.message || "Unknown error"}`
+        `Error redeeming token: ${(err as Error | undefined)?.message || "Unknown error"}`,
       );
     } finally {
       setIsRedeeming(false);
@@ -137,13 +137,13 @@ export function CashuToken({
     <div
       className={cn(
         "flex flex-col gap-1 p-1 px-2 border rounded-md relative bg-background/80 rounded-md",
-        className
+        className,
       )}
     >
       <div
         className={cn(
           "border-gradient rounded-md",
-          sum >= HUGE_AMOUNT ? "border-animated-gradient" : ""
+          sum >= HUGE_AMOUNT ? "border-animated-gradient" : "",
         )}
       >
         <div className="flex flex-row items-center">
@@ -237,40 +237,36 @@ export function PayCashuRequest({
         <CashuRequestDetails request={request} />
         <WalletSelector />
         <DialogFooter>
-      {isPaid ? (
-        <div className="flex flex-row items-center justify-center gap-2 h-10">
-          <Check className="size-7 text-green-500" />
-          <span className="text-xl">{t("ecash.paid-request")}</span>
-        </div>
-      ) : (
-        <Button disabled={!wallet} onClick={payRequest} className="w-full">
-          <Banknote />
-          {t("ecash.pay")}
-        </Button>
-      )}
+          {isPaid ? (
+            <div className="flex flex-row items-center justify-center gap-2 h-10">
+              <Check className="size-7 text-green-500" />
+              <span className="text-xl">{t("ecash.paid-request")}</span>
+            </div>
+          ) : (
+            <Button disabled={!wallet} onClick={payRequest} className="w-full">
+              <Banknote />
+              {t("ecash.pay")}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
 
-function CashuRequestDetails({
-  request,
-}: {
-  request: PaymentRequest;
-}) {
+function CashuRequestDetails({ request }: { request: PaymentRequest }) {
   const nostrTarget = request.transport.find((t) => t.type === "nostr");
   const pubkey = nostrTarget?.target;
   const description = request.description;
   const amount = request.amount;
 
-  return  (
-      <div className="flex flex-row items-center gap-6 justify-between">
-        {pubkey ? <NProfile nprofile={pubkey} /> : null}
-        {description ? (
-          <p className="text-sm text-muted-foreground">{description}</p>
-        ) : null}
-        {amount ? (
+  return (
+    <div className="flex flex-row items-center gap-6 justify-between">
+      {pubkey ? <NProfile nprofile={pubkey} /> : null}
+      {description ? (
+        <p className="text-sm text-muted-foreground">{description}</p>
+      ) : null}
+      {amount ? (
         <div className="flex flex-row items-center">
           <Bitcoin className="size-7 text-muted-foreground" />
           <span className="font-mono text-4xl">
@@ -313,7 +309,7 @@ export function CashuRequest({
     <div
       className={cn(
         "flex flex-col gap-2 p-2 border rounded-md relative bg-background min-w-md",
-        className
+        className,
       )}
     >
       <div className="flex w-full flex-row gap-10 justify-between">
@@ -325,7 +321,7 @@ export function CashuRequest({
         </div>
       </div>
       <CashuRequestDetails request={req} />
-        <PayCashuRequest request={req} className={className} />
+      <PayCashuRequest request={req} className={className} />
     </div>
   ) : null;
 }

@@ -211,7 +211,9 @@ export function useNDKWallet(): [
   (wallet: NDKWallet) => NDKWallet,
 ] {
   const ndk = useNDK();
-  const [wallet, setWallet] = useState<NDKWallet | undefined>(ndk.wallet as NDKWallet | undefined);
+  const [wallet, setWallet] = useState<NDKWallet | undefined>(
+    ndk.wallet as NDKWallet | undefined,
+  );
   return [
     wallet,
     (wallet: NDKWallet) => {
