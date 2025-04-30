@@ -8,6 +8,7 @@ import {
   Copy,
   Ban,
   Bitcoin,
+  Pin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMintList } from "@/lib/cashu";
@@ -76,7 +77,7 @@ function Reply({
       className={cn(
         "h-12 p-1 pl-2 border-l-4 rounded-md mb-1 bg-background/80 border-background dark:bg-background/40 dark:border-background/60",
         event ? "cursor-pointer" : "animate-pulse place-content-center",
-        className
+        className,
       )}
       onClick={
         event ? () => setScrollTo?.(event as unknown as NostrEvent) : undefined
@@ -165,10 +166,11 @@ export function ChatMessage({
   const ref = useRef<HTMLDivElement | null>(null);
   const lastSeenRef = useRef<HTMLDivElement | null>(null);
   const isMobile = useIsMobile();
+  const subject = event.tags.find((t) => t[0] === "subject")?.[1];
   const author = event.pubkey;
   const content = event.content.trim();
   const legacyReply = event.tags.find(
-    (t) => t[3] === "reply" || t[3] === "root"
+    (t) => t[3] === "reply" || t[3] === "root",
   )?.[1];
   const quotedReply = event.tags.find((t) => t[0] === "q")?.[1];
   const replyTo = legacyReply || quotedReply;
@@ -192,7 +194,7 @@ export function ChatMessage({
       urls: true,
       ecash: true,
     },
-    event.tags
+    event.tags,
   );
   const eventFragmentIds = useMemo(() => {
     return fragments.flatMap((f) => {
@@ -305,11 +307,11 @@ export function ChatMessage({
           if (pubkey === me) {
             await savePrivateEvent(
               ev.rawEvent() as unknown as NostrEvent,
-              gift.rawEvent() as unknown as NostrEvent
+              gift.rawEvent() as unknown as NostrEvent,
             );
           }
           await gift.publish(relaySet);
-        })
+        }),
       );
     } catch (err) {
       console.error(err);
@@ -320,6 +322,15 @@ export function ChatMessage({
     }
   }
 
+  if (subject && !content)
+    return (
+      <div className="flex flex-row items-center gap-1.5">
+        <Pin className="size-3 text-muted-foreground" />
+        <span className="text-sm text-muted-foreground line-clamp-1">
+          {subject}
+        </span>
+      </div>
+    );
   if (!content) return null;
 
   return (
@@ -338,7 +349,7 @@ export function ChatMessage({
         ref={ref}
         className={cn(
           `flex flex-row gap-2 items-end ${isLast ? "mb-0" : isChain ? "mb-0.5" : "mb-2"} ${isMine ? "ml-auto" : ""} transition-colors ${isFocused ? "bg-accent/30 rounded-lg" : ""}`,
-          className
+          className,
         )}
       >
         {isMine || isChain ? null : (
@@ -390,6 +401,14 @@ export function ChatMessage({
                   }
                 />
               ) : null}
+              {subject ? (
+                <div className="flex flex-row items-center gap-1">
+                  <Pin className="size-3 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground line-clamp-1">
+                    {subject}
+                  </span>
+                </div>
+              ) : null}
               {isDeleted ? (
                 <div
                   className={`flex flex-row items-center gap-1 ${isMine ? "text-primary-foreground" : "text-muted-foreground"}`}
@@ -432,7 +451,7 @@ export function ChatMessage({
                   event={event}
                   events={
                     reactions.filter((r) =>
-                      r.tags.find((t) => t[1] === event.id)
+                      r.tags.find((t) => t[1] === event.id),
                     ) as unknown as NostrEvent[]
                   }
                 />
@@ -636,7 +655,7 @@ export function Chat({
   const deletedIds = new Set(
     deleteEvents
       .map((e) => e.tags.find((t) => t[0] === "e")?.[1])
-      .filter(Boolean)
+      .filter(Boolean),
   );
   const me = usePubkey();
 
@@ -648,7 +667,7 @@ export function Chat({
     <div
       className={cn(
         "flex flex-col-reverse overflow-x-hidden overflow-y-auto px-2 w-full transition-height relative pretty-scrollbar",
-        className
+        className,
       )}
       style={style}
     >
@@ -699,11 +718,7 @@ export function Chat({
               />
             ) : event.kind !== NDKKind.Reaction ? (
               <div key={event.id} className="flex flex-col w-full max-w-lg">
-                <Embed
-                  event={event}
-                  canOpenDetails={false}
-                  relays={[]}
-                />
+                <Embed event={event} canOpenDetails={false} relays={[]} />
               </div>
             ) : null;
           })}
