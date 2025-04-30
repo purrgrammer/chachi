@@ -56,6 +56,7 @@ import {
 import { useTranslation } from "react-i18next";
 import i18n from "i18next";
 import { getLanguage } from "@/i18n";
+import { Embed } from "../detail";
 
 function Reply({
   id,
@@ -75,7 +76,7 @@ function Reply({
       className={cn(
         "h-12 p-1 pl-2 border-l-4 rounded-md mb-1 bg-background/80 border-background dark:bg-background/40 dark:border-background/60",
         event ? "cursor-pointer" : "animate-pulse place-content-center",
-        className,
+        className
       )}
       onClick={
         event ? () => setScrollTo?.(event as unknown as NostrEvent) : undefined
@@ -167,7 +168,7 @@ export function ChatMessage({
   const author = event.pubkey;
   const content = event.content.trim();
   const legacyReply = event.tags.find(
-    (t) => t[3] === "reply" || t[3] === "root",
+    (t) => t[3] === "reply" || t[3] === "root"
   )?.[1];
   const quotedReply = event.tags.find((t) => t[0] === "q")?.[1];
   const replyTo = legacyReply || quotedReply;
@@ -191,7 +192,7 @@ export function ChatMessage({
       urls: true,
       ecash: true,
     },
-    event.tags,
+    event.tags
   );
   const eventFragmentIds = useMemo(() => {
     return fragments.flatMap((f) => {
@@ -304,11 +305,11 @@ export function ChatMessage({
           if (pubkey === me) {
             await savePrivateEvent(
               ev.rawEvent() as unknown as NostrEvent,
-              gift.rawEvent() as unknown as NostrEvent,
+              gift.rawEvent() as unknown as NostrEvent
             );
           }
           await gift.publish(relaySet);
-        }),
+        })
       );
     } catch (err) {
       console.error(err);
@@ -337,7 +338,7 @@ export function ChatMessage({
         ref={ref}
         className={cn(
           `flex flex-row gap-2 items-end ${isLast ? "mb-0" : isChain ? "mb-0.5" : "mb-2"} ${isMine ? "ml-auto" : ""} transition-colors ${isFocused ? "bg-accent/30 rounded-lg" : ""}`,
-          className,
+          className
         )}
       >
         {isMine || isChain ? null : (
@@ -431,7 +432,7 @@ export function ChatMessage({
                   event={event}
                   events={
                     reactions.filter((r) =>
-                      r.tags.find((t) => t[1] === event.id),
+                      r.tags.find((t) => t[1] === event.id)
                     ) as unknown as NostrEvent[]
                   }
                 />
@@ -635,7 +636,7 @@ export function Chat({
   const deletedIds = new Set(
     deleteEvents
       .map((e) => e.tags.find((t) => t[0] === "e")?.[1])
-      .filter(Boolean),
+      .filter(Boolean)
   );
   const me = usePubkey();
 
@@ -647,7 +648,7 @@ export function Chat({
     <div
       className={cn(
         "flex flex-col-reverse overflow-x-hidden overflow-y-auto px-2 w-full transition-height relative pretty-scrollbar",
-        className,
+        className
       )}
       style={style}
     >
@@ -696,6 +697,14 @@ export function Chat({
                 isChain={messages[idx + 1]?.pubkey === event.pubkey}
                 isFirstInChain={messages[idx - 1]?.pubkey !== event.pubkey}
               />
+            ) : event.kind !== NDKKind.Reaction ? (
+              <div key={event.id} className="flex flex-col w-full max-w-lg">
+                <Embed
+                  event={event}
+                  canOpenDetails={false}
+                  relays={[]}
+                />
+              </div>
             ) : null;
           })}
         </div>

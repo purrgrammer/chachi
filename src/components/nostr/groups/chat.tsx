@@ -991,7 +991,6 @@ export const CommunityChat = forwardRef(
     const hasBeenDeleted = events.some((e) => e.kind === DELETE_GROUP);
     const [replyingTo, setReplyingTo] = useState<NostrEvent | undefined>();
     const [scrollTo, setScrollTo] = useState<NostrEvent | undefined>();
-    // heights
     const [inputHeight, setInputHeight] = useState(34);
     const headerHeight = 96;
     const nonChatHeight = inputHeight + headerHeight;

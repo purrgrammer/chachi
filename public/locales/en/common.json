@@ -545,6 +545,7 @@
   },
   "header": {
     "public": "Public",
+    "private": "Private",
     "unknown": "Unknown"
   },
   "book": {

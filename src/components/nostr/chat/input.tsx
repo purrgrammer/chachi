@@ -103,14 +103,13 @@ export function ChatInput({
   showJoinRequest?: boolean;
   children?: React.ReactNode;
 }) {
-  const [isPosting, setIsPosting] = useState(false);
+  const { t } = useTranslation();
   const ndk = useNDK();
   const me = usePubkey();
   const canPoast = useCanSign();
-  // message
+  const [isPosting, setIsPosting] = useState(false);
   const [message, setMessage] = useState("");
   const [customEmojis, setCustomEmojis] = useState<Emoji[]>([]);
-  const { t } = useTranslation();
   const addUnpublishedEvent = useAddUnpublishedEvent();
 
   async function sendMessage(msg: string) {
