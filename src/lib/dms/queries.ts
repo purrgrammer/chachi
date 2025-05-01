@@ -46,6 +46,7 @@ export async function getGroupMessagesAfter(group: Group, timestamp = 0) {
   return db.dms
     .where("[group+created_at]")
     .between([id, timestamp + 1], [id, Dexie.maxKey])
+    .filter((e) => e.kind !== NDKKind.Reaction)
     .count();
 }
 
