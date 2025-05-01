@@ -16,8 +16,10 @@ import {
 import { NewZapDialog } from "@/components/nostr/zap";
 import { NDKRelaySet } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
+// todo: lazily load components
 import { Empty } from "@/components/empty";
 import { Name } from "@/components/nostr/name";
+import Badge from "@/components/nostr/badge";
 import { Loading } from "@/components/loading";
 import { useNavigate } from "react-router-dom";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
@@ -314,6 +316,10 @@ const eventDetails: Record<
   [TARGETED_PUBLICATION]: {
     preview: TargetedPublication,
     detail: TargetedPublication,
+  },
+  [NDKKind.BadgeDefinition]: {
+    preview: Badge,
+    detail: Badge,
   },
 };
 

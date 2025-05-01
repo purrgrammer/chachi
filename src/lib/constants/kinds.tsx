@@ -24,6 +24,7 @@ import {
   Bug,
   FolderCode,
   AppWindow,
+  Award,
 } from "lucide-react";
 import {
   STREAM,
@@ -154,6 +155,11 @@ export const ContentKinds = [
     kind: COMMUNIKEY,
     translationKey: "kinds.10222",
     icon: <Castle size={16} />,
+  },
+  {
+    kind: NDKKind.BadgeDefinition,
+    translationKey: "kinds.30009",
+    icon: <Award size={16} />,
   },
 ];
 

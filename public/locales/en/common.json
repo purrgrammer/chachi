@@ -901,7 +901,8 @@
   },
   "kinds": {
     "0": "User Metadata",
-    "1": "Short Text Note",
+    "1": "Note",
+    "30009": "Badge",
     "31990": "App",
     "31989": "App Recommendation",
     "3": "Follows",
