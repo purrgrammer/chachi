@@ -1057,5 +1057,14 @@
       "call-connected": "Call connected",
       "invalid-group": "Invalid group"
     }
+  },
+  "rsvp": {
+    "going": "going",
+    "tentative": "tentative",
+    "declined": "declined",
+    "yes": "yes",
+    "no": "no",
+    "maybe": "maybe",
+    "rsvp": "RSVP"
   }
 }
