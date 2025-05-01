@@ -100,12 +100,12 @@ class ChachiDatabase extends Dexie {
 
   constructor(name: string) {
     super(name);
-    this.version(11).stores({
+    this.version(12).stores({
       events:
         "&id,created_at,group,[group+kind],[group+kind+created_at],[group+created_at]",
       lastSeen: "[group+kind],created_at,[group+created_at]",
       nutzaps: "&id,status,txId",
-      tokenEvents: "&id,created_at",
+      tokenEvents: "&id,created_at,[pubkey+created_at]",
       groupInfo: "[id+relay]",
       community: "&pubkey",
       dms: "&id,gift,created_at,group,pubkey,[group+kind],[group+kind+created_at],[group+created_at],[group+pubkey]",
@@ -122,8 +122,11 @@ export function getUnpublishedEvents() {
     .then((events) => events.map((e) => e.event));
 }
 
-export function getTokenEvents() {
-  return db.tokenEvents.orderBy("created_at").toArray();
+export function getTokenEvents(pubkey: string) {
+  return db.tokenEvents
+    .where("[pubkey+created_at]")
+    .between([pubkey, Dexie.minKey], [pubkey, Dexie.maxKey])
+    .toArray();
 }
 
 export function saveTokenEvent(token: NDKCashuToken) {

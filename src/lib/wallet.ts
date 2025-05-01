@@ -167,7 +167,7 @@ export function useChachiWallet() {
     const syncWallet = async () => {
       if (!cashuWallet || !pubkey) return;
 
-      const tokenEvents = await getTokenEvents();
+      const tokenEvents = await getTokenEvents(pubkey);
       await Promise.allSettled(
         tokenEvents?.map((tokenEvent) => {
           const ev = new NDKEvent(ndk, tokenEvent);
