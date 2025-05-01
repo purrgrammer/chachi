@@ -9,6 +9,9 @@ export function eventLink(ev: NostrEvent, group?: Group) {
     group && ev.tags.find((t) => t[0] === "h" && t[1] === group.id);
   const event = new NDKEvent(ndk, ev);
   const nlink = event.encode();
+  if (group?.isCommunity) {
+    return `/c/${group.id}/e/${nlink}`;
+  }
   if (isFromGroup) {
     return group.id === "_"
       ? `/${getRelayHost(group.relay)}/e/${nlink}`

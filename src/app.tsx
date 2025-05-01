@@ -18,6 +18,7 @@ const DirectMessages = lazy(() => import("@/pages/dms"));
 const DirectMessageGroup = lazy(() => import("@/pages/dm-group"));
 const Group = lazy(() => import("@/pages/group"));
 const Event = lazy(() => import("@/pages/event"));
+const CommunityEvent = lazy(() => import("@/pages/community-event"));
 const Wallet = lazy(() => import("@/pages/wallet"));
 const NWCWallet = lazy(() => import("@/pages/wallet/nwc"));
 const WebLNWallet = lazy(() => import("@/pages/wallet/webln"));
@@ -96,6 +97,10 @@ const router = createBrowserRouter([
       {
         path: "/c/:pubkey",
         element: <Community />,
+      },
+      {
+        path: "/c/:pubkey/e/:nlink",
+        element: <CommunityEvent />,
       },
       {
         path: "/posts/:host",
