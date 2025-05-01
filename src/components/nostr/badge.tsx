@@ -11,7 +11,11 @@ export default function Badge({ event }: { event: NostrEvent }) {
   return (
     <div className="flex flex-col gap-2 w-full items-center justify-center">
       {img ? (
-        <img src={img} alt={name} className="size-32 sm:size-48 lg:size-64 rounded-full" />
+        <img
+          src={img}
+          alt={name}
+          className="size-32 sm:size-48 lg:size-64 rounded-full"
+        />
       ) : null}
       <div className="flex flex-row gap-1 items-center justify-center">
         <Award className="size-6 text-muted-foreground" />

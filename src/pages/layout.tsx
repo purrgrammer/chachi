@@ -95,6 +95,13 @@ function useUserEvents() {
             console.error(err);
           });
       }
+    } else if (loginMethod === '"nsec"') {
+      const nsecaccount = accounts.find((a) => a.method === "nsec");
+      if (nsecaccount && nsecaccount.privkey) {
+        const signer = new NDKPrivateKeySigner(nsecaccount.privkey);
+        ndk.signer = signer;
+        setAccount(nsecaccount);
+      }
     }
   }, []);
 
