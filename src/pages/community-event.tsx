@@ -3,20 +3,23 @@ import { useNostrLink } from "@/lib/nostr";
 import { EventDetail } from "@/components/nostr/detail";
 import type { Group } from "@/lib/types";
 import { useCommunity } from "@/lib/nostr/groups";
+import { useTranslation } from "react-i18next";
+import { Loading } from "@/components/loading";
 
-// todo: error page
-function WrongLink() {
-  return <span>Link not recognized</span>;
+export function WrongLink() {
+  const { t } = useTranslation();
+  return <span>{t("event.link-not-recognized")}</span>;
 }
 
 function EventDetailPage({ group, nlink }: { group?: Group; nlink: string }) {
-  // todo: loading state
   const { event, relays, error } = useNostrLink(nlink);
   return event ? (
     <EventDetail key={event.id} event={event} group={group} relays={relays} />
   ) : error ? (
     <WrongLink />
-  ) : null;
+  ) : (
+    <Loading className="my-16" />
+  );
 }
 
 function CommunityEventPageContent({

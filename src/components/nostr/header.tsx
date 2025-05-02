@@ -76,7 +76,7 @@ export function Header({ event }: { event: NostrEvent }) {
           pubkey={author ?? event.pubkey}
           classNames={{ avatar: "hidden", name: "text-md font-normal" }}
         />
-        {event.kind === TARGETED_PUBLICATION && hPubkeyTags.length > 1 ? (
+        {event.kind === TARGETED_PUBLICATION && hPubkeyTags.length > 0 ? (
           <CommunityList
             avatarClassName="size-3"
             textClassName="font-light text-xs text-muted-foreground"

@@ -517,7 +517,8 @@
     "not-found": "Event not found",
     "fetch-error": "Error fetching event",
     "replied": "replied",
-    "thread": "Thread"
+    "thread": "Thread",
+    "link-not-recognized": "Link not recognized"
   },
   "events": {
     "loading": "Loading events",

@@ -220,6 +220,13 @@ export function useARef(tag: string[]) {
   });
 }
 
+const nostrLinkOptions = {
+  closeOnEose: true,
+  cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+  groupable: false,
+  dontSaveToCache: true,
+};
+
 export function useNostrLink(nlink: string) {
   const ndk = useNDK();
   const userRelays = useRelays();
@@ -231,7 +238,7 @@ export function useNostrLink(nlink: string) {
     try {
       const decoded = nip19.decode(nlink);
       if (decoded.type === "nevent") {
-        const relays = decoded.data.relays ?? [];
+        const relays = decoded.data.relays ?? userRelays;
         setRelays(relays);
         ndk
           .fetchEvent(
@@ -242,10 +249,7 @@ export function useNostrLink(nlink: string) {
                 : {}),
               ids: [decoded.data.id],
             },
-            {
-              closeOnEose: true,
-              cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST,
-            },
+            nostrLinkOptions,
             NDKRelaySet.fromRelayUrls(relays, ndk),
           )
           .then((ev) => {
@@ -254,7 +258,7 @@ export function useNostrLink(nlink: string) {
             }
           });
       } else if (decoded.type === "naddr") {
-        const relays = decoded.data.relays ?? [];
+        const relays = decoded.data.relays ?? userRelays;
         setRelays(relays);
         ndk
           .fetchEvent(
@@ -263,10 +267,7 @@ export function useNostrLink(nlink: string) {
               authors: [decoded.data.pubkey],
               "#d": [decoded.data.identifier],
             },
-            {
-              closeOnEose: true,
-              cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST,
-            },
+            nostrLinkOptions,
             NDKRelaySet.fromRelayUrls(relays, ndk),
           )
           .then((ev) => {
@@ -276,16 +277,13 @@ export function useNostrLink(nlink: string) {
           });
       } else if (decoded.type === "note") {
         const relays = userRelays;
-        setRelays(relays ? relays : []);
+        setRelays(relays);
         ndk
           .fetchEvent(
             {
               ids: [decoded.data],
             },
-            {
-              closeOnEose: true,
-              cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST,
-            },
+            nostrLinkOptions,
             NDKRelaySet.fromRelayUrls(relays, ndk),
           )
           .then((ev) => {
