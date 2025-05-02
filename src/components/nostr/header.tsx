@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Avatar } from "@/components/nostr/avatar";
 import { Globe, MessageCircleQuestion } from "lucide-react";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
@@ -8,8 +7,8 @@ import { formatRelativeTime } from "@/lib/time";
 import { useGroup } from "@/lib/nostr/groups";
 import { groupURL } from "@/lib/groups";
 import { validateZap } from "@/lib/nip-57";
-import { Name } from "./name";
-import { CommunityList } from "./community-list";
+import { User } from "@/components/nostr/user";
+import { CommunityList } from "@/components/nostr/community-list";
 import { TARGETED_PUBLICATION } from "@/lib/kinds";
 
 function GroupName({ id, relay }: { id: string; relay: string }) {
@@ -68,11 +67,15 @@ export function Header({ event }: { event: NostrEvent }) {
   );
   const op = (
     <div className="flex flex-row items-center gap-1.5">
-      <Avatar pubkey={author ?? event.pubkey} className="size-9" />
+      <User
+        pubkey={author ?? event.pubkey}
+        classNames={{ avatar: "size-9", name: "hidden" }}
+      />
       <div className="flex flex-col gap-0">
-        <span className="text-md">
-          <Name pubkey={author ?? event.pubkey} />
-        </span>
+        <User
+          pubkey={author ?? event.pubkey}
+          classNames={{ avatar: "hidden", name: "text-md font-normal" }}
+        />
         {event.kind === TARGETED_PUBLICATION && hPubkeyTags.length > 1 ? (
           <CommunityList
             avatarClassName="size-3"
