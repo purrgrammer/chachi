@@ -565,11 +565,8 @@ function MessageContent({
                   <RichText
                     group={group}
                     tags={event.tags}
-                    options={{
-                      ...richTextOptions,
-                      syntax: true,
-                      codeBlock: true,
-                    }}
+                    fragments={fragments}
+                    options={richTextOptions}
                     classNames={{
                       ...{
                         singleEmoji: "w-32 h-32 aspect-auto rounded-md",

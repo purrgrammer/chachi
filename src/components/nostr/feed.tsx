@@ -20,6 +20,9 @@ interface FeedProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
   loadingClassname?: string;
   emptyClassname?: string;
+  slidingWindow?: number;
+  feedClassName?: string;
+  showReactions?: boolean;
 }
 
 const Feed = forwardRef(
@@ -34,6 +37,9 @@ const Feed = forwardRef(
       outboxRelays = [],
       loadingClassname,
       emptyClassname,
+      feedClassName,
+      slidingWindow,
+      showReactions = true,
       ...props
     }: FeedProps,
     ref: ForwardedRef<HTMLDivElement | null>,
@@ -58,23 +64,26 @@ const Feed = forwardRef(
         ) : null}
         {events.length > 0 && eose ? (
           <AnimatePresence initial={false}>
-            <div className="flex flex-col gap-2 p-2">
+            <div className={cn("flex flex-col gap-2 p-2", feedClassName)}>
               {newPost}
               <div className="flex flex-col gap-1 w-[calc(100vw-2rem)] sm:w-[420px] md:w-[510px]">
-                {events.map((event) => (
-                  <motion.div
-                    key={event.id}
-                    initial={{ scale: 0.2 }}
-                    animate={{ scale: 1 }}
-                  >
-                    <FeedEmbed
-                      event={event}
-                      group={group}
-                      canOpenDetails
-                      relays={relays}
-                    />
-                  </motion.div>
-                ))}
+                {(slidingWindow ? events.slice(0, slidingWindow) : events).map(
+                  (event) => (
+                    <motion.div
+                      key={event.id}
+                      initial={{ scale: 0.2 }}
+                      animate={{ scale: 1 }}
+                    >
+                      <FeedEmbed
+                        event={event}
+                        group={group}
+                        canOpenDetails
+                        relays={relays}
+                        showReactions={showReactions}
+                      />
+                    </motion.div>
+                  ),
+                )}
               </div>
             </div>
           </AnimatePresence>

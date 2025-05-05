@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useRelayInfo } from "@/lib/relay";
 import { useHost } from "@/lib/hooks";
-import { getRelayHost } from "@/lib/relay";
 import { cn } from "@/lib/utils";
 
 export function RelayLink({
@@ -13,7 +12,7 @@ export function RelayLink({
 }) {
   return (
     <Link
-      to={`/${getRelayHost(relay)}`}
+      to={`/relay/${encodeURIComponent(relay)}`}
       className={cn(
         "flex items-center gap-2 hover:underline hover:decoration-dotted",
         classNames?.wrapper,

@@ -25,6 +25,7 @@ import {
   FolderCode,
   AppWindow,
   Award,
+  Users,
 } from "lucide-react";
 import {
   STREAM,
@@ -39,6 +40,7 @@ import {
   CASHU_MINT,
   ISSUE,
   REPO,
+  FOLLOW_PACK,
 } from "@/lib/kinds";
 
 /**
@@ -161,7 +163,19 @@ export const ContentKinds = [
     translationKey: "kinds.30009",
     icon: <Award size={16} />,
   },
+  {
+    kind: FOLLOW_PACK,
+    translationKey: "kinds.39089",
+    icon: <Users size={16} />,
+  },
+  {
+    kind: NDKKind.FollowSet,
+    translationKey: "kinds.30000",
+    icon: <Users size={16} />,
+  },
 ];
+
+export const SupportedKinds = ContentKinds.map((k) => k.kind);
 
 /**
  * Content categories for grouping kinds

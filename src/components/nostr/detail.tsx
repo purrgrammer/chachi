@@ -133,6 +133,7 @@ import { ZapGoal } from "./zap-goal";
 import { Workout } from "./workout";
 //import { WorkoutTemplate } from "./workout-template";
 import { AppDefinition, AppRecommendation } from "@/components/nostr/nip-89";
+import RelayList from "./relay-list";
 
 type EventComponent = (props: {
   event: NostrEvent;
@@ -320,6 +321,14 @@ const eventDetails: Record<
   [NDKKind.BadgeDefinition]: {
     preview: Badge,
     detail: Badge,
+  },
+  [NDKKind.RelayList]: {
+    preview: RelayList,
+    detail: RelayList,
+  },
+  [NDKKind.RelaySet]: {
+    preview: RelayList,
+    detail: RelayList,
   },
 };
 

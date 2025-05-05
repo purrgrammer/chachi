@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { BookLock, BookOpen, Castle, Shield, ShieldOff } from "lucide-react";
 import { useGroup, useGroupParticipants } from "@/lib/nostr/groups";
 import { GroupInfo } from "@/components/nostr/groups/info";
@@ -7,7 +6,6 @@ import { EditGroup } from "@/components/nostr/groups/edit";
 import { Separator } from "@/components/ui/separator";
 import { Header } from "@/components/header";
 import { usePubkey } from "@/lib/account";
-import { getRelayHost } from "@/lib/relay";
 import { groupId } from "@/lib/groups";
 import { JoinRequests } from "@/components/nostr/groups/join-requests";
 import {
@@ -16,7 +14,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { Group } from "@/lib/types";
-import { RelayName } from "@/components/nostr/relay";
+import { RelayName, RelayLink } from "@/components/nostr/relay";
 import { useTranslation } from "react-i18next";
 
 export function GroupHeader({ group }: { group: Group }) {
@@ -47,12 +45,14 @@ export function GroupHeader({ group }: { group: Group }) {
                 )}
               </h2>
               {!isRelayGroup ? (
-                <Link
-                  to={`/${getRelayHost(group.relay)}`}
-                  className="hidden sm:block p-0 font-mono text-xs text-muted-foreground line-clamp-1"
-                >
-                  {getRelayHost(group.relay)}
-                </Link>
+                <RelayLink
+                  relay={group.relay}
+                  classNames={{
+                    icon: "size-3",
+                    wrapper: "gap-1",
+                    name: "text-xs text-muted-foreground line-clamp-1",
+                  }}
+                />
               ) : null}
             </div>
           </div>

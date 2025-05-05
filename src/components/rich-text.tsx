@@ -482,6 +482,7 @@ export function RichText({
   children,
   options = {},
   tags = [],
+  fragments,
   className,
   classNames = {},
   group,
@@ -489,12 +490,16 @@ export function RichText({
   children: string;
   options?: RichTextOptions;
   tags?: string[][];
+  fragments?: Fragment[];
   className?: string;
   classNames?: RichTextClassnames;
   group?: Group;
 }) {
   const opts = useMemo(() => ({ ...defaultOptions, ...options }), [options]);
-  const fragments = useMemo(() => {
+  const frags = useMemo(() => {
+    if (fragments) {
+      return fragments;
+    }
     // Process text with all formatting in one go
     let result = toFragments(
       children || "",
@@ -552,10 +557,8 @@ export function RichText({
       }
       return acc;
     }, [] as Fragment[]);
-  }, [children, opts, tags]);
-  const body = fragments.map((f, idx) =>
-    toNode(f, idx, classNames, group, opts),
-  );
+  }, [children, opts, tags, fragments]);
+  const body = frags.map((f, idx) => toNode(f, idx, classNames, group, opts));
   return options.inline ? (
     <span dir="auto" className={className}>
       {...body}

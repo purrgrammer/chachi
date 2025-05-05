@@ -40,7 +40,7 @@ function ProfileDrawerContent({
         <InputCopy
           value={
             relays && relays.length > 0
-              ? nip19.nprofileEncode({ pubkey, relays })
+              ? nip19.nprofileEncode({ pubkey, relays: relays.slice(0, 3) })
               : nip19.npubEncode(pubkey)
           }
         />

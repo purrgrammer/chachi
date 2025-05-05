@@ -1,34 +1,41 @@
 import { useMemo } from "react";
-import { Link } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Link as LinkIcon } from "lucide-react";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
-import { Avatar } from "@/components/nostr/avatar";
-import { Name } from "@/components/nostr/name";
+import { User } from "@/components/nostr/user";
 import { cn } from "@/lib/utils";
 import { useERef, useARef } from "@/lib/nostr";
+import { eventLink } from "@/lib/links";
 
-function Author({ pubkey }: { pubkey: string }) {
+function ArticleLink({ event }: { event: NostrEvent }) {
   return (
-    <div className="flex gap-1.5 items-center">
-      <Avatar pubkey={pubkey} className="size-5" />
-      <span className="text-sm font-semibold">
-        <Name pubkey={pubkey} />
-      </span>
-    </div>
+    <Link
+      to={eventLink(event)}
+      className="hover:underline hover:decoration-dotted"
+    >
+      <div className="flex gap-1.5 items-center">
+        <User
+          pubkey={event.pubkey}
+          classNames={{ avatar: "size-4", name: "hidden" }}
+        />
+        <h3 className="text-md font-normal">
+          {event.tags.find((t) => t[0] === "title")?.[1]}
+        </h3>
+      </div>
+    </Link>
   );
 }
 
 function ARef({ author, tag }: { author?: string; tag: string[] }) {
   const { data: event } = useARef(tag);
   return event && event?.kind === NDKKind.Article ? (
-    <div className="flex gap-1.5 items-center">
-      <Avatar pubkey={event.pubkey} className="size-5" />
-      <span className="text-sm font-semibold">
-        {event.tags.find((t) => t[0] === "title")?.[1]}
-      </span>
-    </div>
+    <ArticleLink event={event} />
   ) : author ? (
-    <Author pubkey={author} />
+    <User
+      pubkey={author}
+      classNames={{ avatar: "size-5", name: "text-sm font-semibold" }}
+    />
   ) : null;
 }
 
@@ -36,9 +43,15 @@ function ERef({ author, tag }: { author?: string; tag: string[] }) {
   const { data: event } = useERef(tag);
   // todo: optionally show original event
   return event ? (
-    <Author pubkey={event.pubkey} />
+    <User
+      pubkey={event.pubkey}
+      classNames={{ avatar: "size-5", name: "text-sm font-semibold" }}
+    />
   ) : author ? (
-    <Author pubkey={author} />
+    <User
+      pubkey={author}
+      classNames={{ avatar: "size-5", name: "text-sm font-semibold" }}
+    />
   ) : null;
 }
 
@@ -53,15 +66,15 @@ function Website({ event, url }: { event: NostrEvent; url: string }) {
   }, [url]);
   return (
     <div className="flex gap-1.5 items-center">
-      <Link className="size-3" />
-      <a
-        href={`${url}#~:text:=${encodeURIComponent(event.content)}`}
+      <LinkIcon className="size-4 text-muted-foreground" />
+      <Link
+        to={`${url}#:~:text=${encodeURIComponent(event.content)}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-sm underline decoration-dotted"
+        className="hover:underline hover:decoration-dotted line-clamp-1 break-all"
       >
         {href}
-      </a>
+      </Link>
     </div>
   );
 }
@@ -91,7 +104,10 @@ export function Highlight({
       ) : e ? (
         <ERef author={author} tag={e} />
       ) : author ? (
-        <Author pubkey={author} />
+        <User
+          pubkey={author}
+          classNames={{ avatar: "size-5", name: "text-sm font-semibold" }}
+        />
       ) : null}
     </div>
   );
