@@ -41,10 +41,10 @@ export function CalendarEvent({
   const image = event.tags.find((tag) => tag[0] === "image")?.[1];
   const startDate = event.tags.find((tag) => tag[0] === "start")?.[1];
   const endDate = event.tags.find((tag) => tag[0] === "end")?.[1];
-  const isExpired = endDate
-    ? Number(endDate) < Date.now()
-    : startDate
-      ? Number(startDate) < Date.now()
+  const isExpired = startDate
+    ? Number(startDate) * 1000 < Date.now()
+    : endDate
+      ? Number(endDate) * 1000 < Date.now()
       : false;
   const tz = event.tags.find((tag) => tag[0] === "start_tzid")?.[1];
   const location = event.tags.find((tag) => tag[0] === "location")?.[1];
