@@ -343,11 +343,7 @@ export function ZapPreview({
   group?: Group;
 }) {
   const zap = validateZap(event);
-  return zap ? (
-    <Zap zap={zap} group={group} animateGradient={false} />
-  ) : (
-    <span>Invalid zap</span>
-  );
+  return zap ? <Zap zap={zap} group={group} animateGradient={false} /> : null;
 }
 
 export function Zap({

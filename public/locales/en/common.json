@@ -1168,6 +1168,7 @@
     "content-types": "Content Types",
     "clear": "Clear",
     "all": "All",
-    "save": "Save"
+    "save": "Save",
+    "load-older": "Load older posts"
   }
 }

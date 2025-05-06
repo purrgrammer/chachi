@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import type { ForwardedRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ReactNode } from "react";
@@ -9,6 +9,9 @@ import { Loading } from "@/components/loading";
 import { cn } from "@/lib/utils";
 import { useStream } from "@/lib/nostr";
 import type { Group } from "@/lib/types";
+import { HardDriveDownload } from "lucide-react";
+import { Button } from "../ui/button";
+import { useTranslation } from "react-i18next";
 
 interface FeedProps extends React.HTMLAttributes<HTMLDivElement> {
   group?: Group;
@@ -23,6 +26,7 @@ interface FeedProps extends React.HTMLAttributes<HTMLDivElement> {
   slidingWindow?: number;
   feedClassName?: string;
   showReactions?: boolean;
+  loadOlder?: boolean;
 }
 
 const Feed = forwardRef(
@@ -40,13 +44,17 @@ const Feed = forwardRef(
       feedClassName,
       slidingWindow,
       showReactions = true,
+      loadOlder = false,
       ...props
     }: FeedProps,
     ref: ForwardedRef<HTMLDivElement | null>,
   ) => {
+    const { t } = useTranslation();
+    const [shouldShowOlder, setShouldShowOlder] = useState(false);
     const relays =
       outboxRelays.length > 0 ? outboxRelays : group ? [group.relay] : [];
     const { eose, events } = useStream(filter, relays, live, onlyRelays);
+    const oldest = events.at(-1)?.created_at ?? 0;
     return (
       <div
         className={cn(
@@ -86,6 +94,31 @@ const Feed = forwardRef(
                 )}
               </div>
             </div>
+            {loadOlder && oldest > 0 && !shouldShowOlder ? (
+              <div className="flex items-center justify-center w-full my-8">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShouldShowOlder(true)}
+                >
+                  <HardDriveDownload />
+                  {t("feed.load-older")}
+                </Button>
+              </div>
+            ) : shouldShowOlder && oldest > 0 ? (
+              <div className="pt-2">
+                <Feed
+                  filter={{ ...filter, until: oldest - 1 }}
+                  live={false}
+                  onlyRelays={onlyRelays}
+                  outboxRelays={outboxRelays}
+                  feedClassName={feedClassName}
+                  loadOlder={loadOlder}
+                  loadingClassname={loadingClassname}
+                  emptyClassname={emptyClassname}
+                />
+              </div>
+            ) : null}
           </AnimatePresence>
         ) : null}
       </div>

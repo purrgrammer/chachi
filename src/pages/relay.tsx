@@ -1,4 +1,9 @@
-import { Navigate, useParams } from "react-router-dom";
+import {
+  Navigate,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { Link } from "react-router-dom";
 import {
   Server,
@@ -22,7 +27,11 @@ import {
   getKindInfo,
 } from "@/lib/constants/kinds";
 import { useState, useEffect } from "react";
-import { NDKKind } from "@nostr-dev-kit/ndk";
+import {
+  NDKKind,
+  NDKRelaySet,
+  NDKSubscriptionCacheUsage,
+} from "@nostr-dev-kit/ndk";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -47,10 +56,11 @@ import {
 } from "@/components/ui/nav-tabs";
 import { useTranslation } from "react-i18next";
 import { getNipInfo } from "@/lib/constants/nips";
-import { useRequest } from "@/lib/nostr";
 import { NameList } from "@/components/nostr/name-list";
 import { InputCopy } from "@/components/ui/input-copy";
 import { COMMUNIKEY } from "@/lib/kinds";
+import { useNDK } from "@/lib/ndk";
+import { useQuery } from "@tanstack/react-query";
 
 // todo: searchable group list if relay supports nip 29
 
@@ -88,14 +98,35 @@ function RelayCommunities({ relay }: { relay: string }) {
   );
 }
 
-function RelayUsers({ relay }: { relay: string }) {
+function useRelayUsers(relay: string) {
+  const ndk = useNDK();
   const filter = {
     kinds: [NDKKind.RelayList],
     "#r": [relay],
   };
-  const { events } = useRequest(filter, [relay]);
-  const users = events.map((e) => e.pubkey);
-  if (users.length === 0) {
+  return useQuery({
+    queryKey: ["relay-users", relay],
+    queryFn: async () => {
+      const events = await ndk.fetchEvents(
+        filter,
+        {
+          closeOnEose: true,
+          cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+        },
+        NDKRelaySet.fromRelayUrls([relay], ndk),
+      );
+      const users = Array.from(
+        new Set(Array.from(events).map((e) => e.pubkey)),
+      );
+      return users;
+    },
+    staleTime: Infinity,
+  });
+}
+
+function RelayUsers({ relay }: { relay: string }) {
+  const { data: users } = useRelayUsers(relay);
+  if (!users) {
     return null;
   }
   return (
@@ -209,10 +240,19 @@ function RelayInfo({ relay }: { relay: string }) {
 
 function RelayFeed({ relay }: { relay: string }) {
   const limit = 20;
+  const [searchParams, setSearchParams] = useSearchParams({
+    kinds: [String(NDKKind.Text)],
+    live: "true",
+  });
+  const defaultKinds = searchParams
+    .getAll("kinds")
+    .map(Number)
+    .filter((k) => SupportedKinds.includes(k));
+  const defaultLive = searchParams.get("live") === "true";
 
-  const [kinds, setKinds] = useState<NDKKind[]>([NDKKind.Text]);
-  const [tempKinds, setTempKinds] = useState<NDKKind[]>([NDKKind.Text]);
-  const [live, setLive] = useState(true);
+  const [kinds, setKinds] = useState<NDKKind[]>(defaultKinds);
+  const [tempKinds, setTempKinds] = useState<NDKKind[]>(defaultKinds);
+  const [live, setLive] = useState(defaultLive);
   const [filterChanged, setFilterChanged] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
@@ -228,6 +268,19 @@ function RelayFeed({ relay }: { relay: string }) {
 
   if (!relay) {
     return <Navigate to="/" />;
+  }
+
+  function handleLiveChange(checked: boolean) {
+    setLive(checked);
+    setSearchParams(
+      {
+        kinds: kinds.map(String),
+        live: checked.toString(),
+      },
+      {
+        replace: true,
+      },
+    );
   }
 
   const handleKindToggle = (kind: NDKKind, checked: boolean) => {
@@ -249,6 +302,15 @@ function RelayFeed({ relay }: { relay: string }) {
   const handleSaveFilters = () => {
     setKinds(tempKinds);
     setIsPopoverOpen(false);
+    setSearchParams(
+      {
+        kinds: tempKinds.map(String),
+        live: live.toString(),
+      },
+      {
+        replace: true,
+      },
+    );
   };
 
   return (
@@ -376,7 +438,7 @@ function RelayFeed({ relay }: { relay: string }) {
             aria-label={t("feed.live-updates")}
             id="live-mode"
             checked={live}
-            onCheckedChange={setLive}
+            onCheckedChange={handleLiveChange}
           />
         </div>
       </div>
@@ -391,16 +453,18 @@ function RelayFeed({ relay }: { relay: string }) {
         slidingWindow={limit}
         loadingClassname="py-32"
         emptyClassname="py-32"
+        loadOlder
       />
     </div>
   );
 }
 
-//type RelayTab = "info" | "feed";
+type RelayTab = "info" | "feed" | "groups" | "communities";
 
-export default function Relay() {
+export default function Relay({ tab = "info" }: { tab?: RelayTab }) {
   const { relay } = useParams();
   const { data: info } = useRelayInfo(relay!);
+  const navigate = useNavigate();
   const supportsNip29 = info?.supported_nips
     ?.map((n) => String(n))
     .includes("29");
@@ -409,6 +473,13 @@ export default function Relay() {
     return <Navigate to="/" />;
   }
 
+  function onValueChange(value: string) {
+    if (value === "info") {
+      navigate(`/relay/${encodeURIComponent(relay!)}`);
+    } else {
+      navigate(`/relay/${encodeURIComponent(relay!)}/${value}`);
+    }
+  }
   return (
     <div className="flex flex-col" key={relay}>
       <Header>
@@ -434,7 +505,7 @@ export default function Relay() {
           </Tooltip>
         </div>
       </Header>
-      <Tabs defaultValue="info">
+      <Tabs value={tab} onValueChange={onValueChange}>
         <TabsList>
           <TabsTrigger value="info">{t("relay.info")}</TabsTrigger>
           <TabsTrigger value="feed">{t("relay.feed")}</TabsTrigger>

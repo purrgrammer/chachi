@@ -4,8 +4,7 @@ import { Vote } from "lucide-react";
 import type { NostrEvent } from "nostr-tools";
 import { RichText } from "@/components/rich-text";
 import { Progress } from "@/components/ui/progress";
-import { Avatar } from "@/components/nostr/avatar";
-import { Name } from "@/components/nostr/name";
+import { User } from "@/components/nostr/user";
 import { Button } from "@/components/ui/button";
 import { useVote, useVotes } from "@/lib/nostr/polls";
 import { usePubkey } from "@/lib/account";
@@ -228,12 +227,14 @@ function ResultOption({
       </h3>
       <div className="flex flex-col gap-2">
         {optionVotes.map((vote) => (
-          <div className="flex flex-row gap-2 items-center">
-            <Avatar pubkey={vote.pubkey} className="size-6" />
-            <span className="text-sm text-muted-foreground">
-              <Name pubkey={vote.pubkey} />
-            </span>
-          </div>
+          <User
+            key={vote.pubkey}
+            pubkey={vote.pubkey}
+            classNames={{
+              avatar: "size-5",
+              name: "font-normal text-sm text-muted-foreground",
+            }}
+          />
         ))}
       </div>
     </div>
