@@ -322,6 +322,7 @@ function MessageContent({
     {
       events: true,
       images: true,
+      mentions: true,
       video: true,
       audio: true,
       emojis: true,
