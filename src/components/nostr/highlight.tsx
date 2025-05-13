@@ -5,6 +5,8 @@ import { NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { User } from "@/components/nostr/user";
 import { cn } from "@/lib/utils";
+import { Embed } from "@/components/nostr/detail";
+import { RichText } from "@/components/rich-text";
 import { useERef, useARef } from "@/lib/nostr";
 import { eventLink } from "@/lib/links";
 
@@ -19,7 +21,7 @@ function ArticleLink({ event }: { event: NostrEvent }) {
           pubkey={event.pubkey}
           classNames={{ avatar: "size-4", name: "hidden" }}
         />
-        <h3 className="text-md font-normal">
+        <h3 className="text-md font-normal line-clamp-1">
           {event.tags.find((t) => t[0] === "title")?.[1]}
         </h3>
       </div>
@@ -43,10 +45,7 @@ function ERef({ author, tag }: { author?: string; tag: string[] }) {
   const { data: event } = useERef(tag);
   // todo: optionally show original event
   return event ? (
-    <User
-      pubkey={event.pubkey}
-      classNames={{ avatar: "size-5", name: "text-sm font-semibold" }}
-    />
+    <Embed event={event} relays={[]} />
   ) : author ? (
     <User
       pubkey={author}
@@ -92,8 +91,10 @@ export function Highlight({
   const a = event.tags.find((tag) => tag[0] === "a");
   const e = event.tags.find((tag) => tag[0] === "e");
   const author = event.tags.find((tag) => tag[0] === "p")?.[1];
+  const comment = event.tags.find((tag) => tag[0] === "comment")?.[1];
   return (
     <div className={cn("flex flex-col gap-2 items-start", className)}>
+      {comment ? <RichText tags={event.tags}>{comment}</RichText> : null}
       <blockquote className="border-l-4 border-neutral-500/60 dark:border-neutral-100/50 pl-4 py-1 leading-tight">
         {event.content}
       </blockquote>
