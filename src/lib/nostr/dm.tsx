@@ -2,7 +2,7 @@ import { useQuery, useQueries } from "@tanstack/react-query";
 import { useLiveQuery } from "dexie-react-hooks";
 import { NDKEvent } from "@nostr-dev-kit/ndk";
 import { useAtomValue } from "jotai";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   getLastGroupMessage,
   getGroupsSortedByLastMessage,
@@ -74,7 +74,6 @@ function useStreamMap(
   enabled = true,
 ) {
   const ndk = useNDK();
-  const [events, setEvents] = useState<NostrEvent[]>([]);
 
   useEffect(() => {
     if (!pubkey) return;
@@ -93,17 +92,11 @@ function useStreamMap(
     );
 
     sub.on("event", (event) => {
-      transform(event).then((ev) => {
-        if (ev && !events.find((e) => e.id === ev.id)) {
-          setEvents((evs) => [...evs, ev]);
-        }
-      });
+      transform(event)
     });
 
     return () => sub.stop();
   }, [pubkey, enabled]);
-
-  return events;
 }
 
 export async function fetchDirectMessageRelays(ndk: NDK, pubkey: string) {
