@@ -23,6 +23,7 @@ export function EmojiPicker({
 }) {
   const { theme } = useTheme();
   const { data: custom } = useCustomEmojis();
+
   const customEmoji =
     custom?.map(({ name, emojis }) => {
       const customEmojis = emojis.map(({ name, image }) => ({
@@ -35,6 +36,7 @@ export function EmojiPicker({
 
   function onSelect(e: Emoji) {
     onEmojiSelect(e);
+    onOpenChange(false);
   }
 
   // todo: scroll?

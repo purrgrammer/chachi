@@ -92,7 +92,7 @@ function useStreamMap(
     );
 
     sub.on("event", (event) => {
-      transform(event)
+      transform(event);
     });
 
     return () => sub.stop();

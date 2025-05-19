@@ -44,16 +44,14 @@ export function GroupHeader({ group }: { group: Group }) {
                   <>{name || group.id.slice(0, 6)}</>
                 )}
               </h2>
-              {!isRelayGroup ? (
-                <RelayLink
-                  relay={group.relay}
-                  classNames={{
-                    icon: "size-3",
-                    wrapper: "gap-1",
-                    name: "text-xs text-muted-foreground line-clamp-1",
-                  }}
-                />
-              ) : null}
+              <RelayLink
+                relay={group.relay}
+                classNames={{
+                  icon: "size-3",
+                  wrapper: "gap-1",
+                  name: "text-xs text-muted-foreground line-clamp-1",
+                }}
+              />
             </div>
           </div>
           {isRelayGroup ? null : (
