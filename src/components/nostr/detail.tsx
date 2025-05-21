@@ -248,7 +248,7 @@ const eventDetails: Record<
   [NDKKind.Nutzap]: {
     noHeader: true,
     className:
-      "relative rounded-md bg-background/80 border-none my-0.5 bg-red-100",
+      "relative rounded-md bg-background/80 border-none my-0.5",
     preview: NutzapPreview,
     detail: NutzapDetail,
     reply: NutzapReply,
