@@ -1,33 +1,13 @@
-import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Globe, MessageCircleQuestion } from "lucide-react";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { formatRelativeTime } from "@/lib/time";
-import { useGroup } from "@/lib/nostr/groups";
-import { groupURL } from "@/lib/groups";
 import { validateZap } from "@/lib/nip-57";
 import { User } from "@/components/nostr/user";
 import { CommunityList } from "@/components/nostr/community-list";
 import { TARGETED_PUBLICATION } from "@/lib/kinds";
-
-function GroupName({ id, relay }: { id: string; relay: string }) {
-  const group = { id, relay };
-  const { data: metadata } = useGroup(group);
-  return metadata ? (
-    <Link
-      to={groupURL(group)}
-      className="text-xs hover:cursor-pointer hover:underline hover:decoration-dotted"
-    >
-      <div className="flex flex-row items-center gap-1">
-        {metadata.picture ? (
-          <img src={metadata.picture} className="size-3 rounded-full" />
-        ) : null}
-        <span>{metadata.name}</span>
-      </div>
-    </Link>
-  ) : null;
-}
+import { GroupLink } from "@/components/nostr/group-link";
 
 export function Header({ event }: { event: NostrEvent }) {
   const { t } = useTranslation();
@@ -51,7 +31,7 @@ export function Header({ event }: { event: NostrEvent }) {
   const groupName = (
     <span className="text-xs text-muted-foreground">
       {group && relay ? (
-        <GroupName id={group} relay={relay} />
+        <GroupLink group={{ id: group, relay }} />
       ) : group ? (
         <div className="flex flex-row items-center gap-1">
           <MessageCircleQuestion className="size-3" />
