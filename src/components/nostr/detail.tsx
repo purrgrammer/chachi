@@ -1524,7 +1524,7 @@ export function EventDetail({
       justify-center
       p-0
 	  w-[100vw]
-md:w-[calc(100vw-16rem)]
+md:w-[calc(100vw-18rem)]
 	  group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100vw-4rem)]"
     >
       <div className="w-full max-w-xl">

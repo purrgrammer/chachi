@@ -130,7 +130,7 @@ function CommunityContent({ pubkey }: { pubkey: string }) {
           className="
           overflow-x-auto no-scrollbar 
 	  w-[100vw]
-md:w-[calc(100vw-16rem)]
+md:w-[calc(100vw-18rem)]
 	  group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100vw-18rem)"
         >
           {community ? (
