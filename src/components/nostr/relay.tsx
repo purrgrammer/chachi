@@ -40,15 +40,9 @@ export function RelayIcon({
   className?: string;
 }) {
   const { data: metadata } = useRelayInfo(relay);
-  // fixme: temporary fix since their icon 404s
-  const host = useHost(relay);
-  const isCoinOs = host.endsWith(".coinos.io");
-  const isAlby = host.endsWith(".getalby.com");
-  const coinOsFavicon = "https://coinos.io/favicon.ico";
-  const albyFavicon = "https://getalby.com/favicon.ico";
   return metadata?.icon ? (
     <img
-      src={isCoinOs ? coinOsFavicon : isAlby ? albyFavicon : metadata.icon}
+      src={metadata.icon}
       className={cn("size-4 object-cover rounded-full", className)}
       alt={relay}
     />

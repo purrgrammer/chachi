@@ -90,12 +90,6 @@ export function fetchRelayInfo(url: string): Promise<RelayInfo> {
     },
   })
     .then((res) => res.json())
-    .then((info: RelayInfo) => {
-      if (!info.icon) {
-        info.icon = `${httpUrl}/favicon.ico`;
-      }
-      return info;
-    });
 }
 
 // todo: cache these in localStorage
