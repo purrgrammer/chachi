@@ -77,7 +77,7 @@ export function useGroupchat(group: Group) {
           RELATIONSHIP,
         ],
         "#h": [group.id],
-        ...(last ? { since: last.created_at } : {}),
+        ...(last ? { since: last.created_at + 1 } : {}),
       };
       sub = ndk.subscribe(
         filter,
@@ -90,14 +90,12 @@ export function useGroupchat(group: Group) {
       );
 
       sub.on("event", (event) => {
-        // todo: check that event.h is the same as group.id
-        // todo: check that event.h relay is the group relay
         saveGroupEvent(event.rawEvent() as NostrEvent, group);
       });
     });
 
     return () => {
-      if (!isSubbed) sub?.stop();
+      sub?.stop();
     };
   }, [isSubbed, group.id, group.relay]);
 

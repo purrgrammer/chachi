@@ -4,7 +4,13 @@ import { Group } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 
-export function GroupLink({ group, classNames }: { group: Group, classNames?: { avatar: string, name: string } }) {
+export function GroupLink({
+  group,
+  classNames,
+}: {
+  group: Group;
+  classNames?: { avatar: string; name: string };
+}) {
   const { data: metadata } = useGroup(group);
   return metadata ? (
     <Link
@@ -13,7 +19,10 @@ export function GroupLink({ group, classNames }: { group: Group, classNames?: { 
     >
       <div className="flex flex-row items-center gap-1">
         {metadata.picture ? (
-          <img src={metadata.picture} className={cn("size-3 rounded-full", classNames?.avatar)} />
+          <img
+            src={metadata.picture}
+            className={cn("size-3 rounded-full", classNames?.avatar)}
+          />
         ) : null}
         <span className={cn("text-sm", classNames?.name)}>{metadata.name}</span>
       </div>

@@ -88,8 +88,7 @@ export function fetchRelayInfo(url: string): Promise<RelayInfo> {
     headers: {
       Accept: "application/nostr+json",
     },
-  })
-    .then((res) => res.json())
+  }).then((res) => res.json());
 }
 
 // todo: cache these in localStorage

@@ -1,6 +1,7 @@
 import { useAtomValue } from "jotai";
 import { nip19 } from "nostr-tools";
 import { useQuery, useQueries } from "@tanstack/react-query";
+import { groupId } from "@/lib/groups";
 import NDK, {
   NDKEvent,
   NDKRelaySet,
@@ -226,8 +227,9 @@ export function useGroups(groups: Group[]) {
   const ndk = useNDK();
   return useQueries({
     queries: groups.map((group) => ({
-      queryKey: [GROUP_METADATA, group.id, group.relay],
+      queryKey: [GROUP_METADATA, groupId(group)],
       queryFn: async () => {
+        console.log("SYNC.GROUP.MESSAGES>METADATA", groupId(group));
         if (!group) throw new Error("Group not found");
         const metadata = await fetchGroupMetadata(ndk, group);
         if (metadata) {

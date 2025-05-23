@@ -114,6 +114,7 @@ export function useSentNutzaps() {
 }
 
 export function useNutzaps() {
+  // todo: also query nostr nutzaps
   return useLiveQuery(() => getNutzaps(), [], []);
 }
 

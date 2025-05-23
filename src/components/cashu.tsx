@@ -209,6 +209,7 @@ export function PayCashuRequest({
   async function payRequest() {
     try {
       setIsPaying(true);
+      // todo: implement cashu request payment
     } catch (err) {
       console.error(err);
     } finally {
