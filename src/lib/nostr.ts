@@ -13,12 +13,7 @@ import NDK, {
 } from "@nostr-dev-kit/ndk";
 import { relaysAtom } from "@/app/store";
 import { useNDK } from "@/lib/ndk";
-import {
-  isRelayURL,
-  discoveryRelays,
-  profileRelays,
-  fallbackRelays,
-} from "@/lib/relay";
+import { isRelayURL, discoveryRelays, fallbackRelays } from "@/lib/relay";
 import { EVENT, ADDRESS, PROFILE, RELAY_LIST } from "@/lib/query";
 import db from "@/lib/db";
 
@@ -394,7 +389,7 @@ export function fetchProfile(ndk: NDK, pubkey: string, relays: string[]) {
       },
       { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY },
       NDKRelaySet.fromRelayUrls(
-        relays.length > 0 ? relays : profileRelays,
+        relays.length > 0 ? relays : discoveryRelays,
         ndk,
       ),
     )
@@ -416,7 +411,7 @@ export function useProfiles(pubkeys: string[]) {
     queries: pubkeys.map((pubkey) => {
       return {
         queryKey: [PROFILE, pubkey],
-        queryFn: () => fetchProfile(ndk, pubkey, profileRelays),
+        queryFn: () => fetchProfile(ndk, pubkey, discoveryRelays),
         staleTime: Infinity,
         gcTime: 0,
       };

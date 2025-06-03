@@ -1,10 +1,10 @@
 import { createContext, useContext } from "react";
 import NDK, { NDKRelayAuthPolicies } from "@nostr-dev-kit/ndk";
 import { cache } from "@/lib/db";
-import { bootstrapRelays, discoveryRelays } from "@/lib/relay";
+import { discoveryRelays } from "@/lib/relay";
 
 export const ndk = new NDK({
-  explicitRelayUrls: bootstrapRelays,
+  explicitRelayUrls: discoveryRelays,
   outboxRelayUrls: discoveryRelays,
   enableOutboxModel: false,
   cacheAdapter: cache,

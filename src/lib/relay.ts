@@ -55,13 +55,13 @@ export interface RelayInfo {
   fees?: RelayFees;
 }
 
-export const discoveryRelays = ["wss://purplepag.es", "wss://relay.nostr.band"];
-
-export const profileRelays = ["wss://purplepag.es", "wss://relay.nostr.band"];
-
-export const bootstrapRelays = Array.from(
-  new Set(discoveryRelays.concat(profileRelays)),
-);
+export const discoveryRelays = [
+  "wss://purplepag.es",
+  "wss://relay.nostr.band",
+  "wss://profiles.nostrver.se",
+  "wss://profiles.nostr1.com",
+  "wss://indexer.coracle.social",
+];
 
 export const fallbackRelays = ["wss://relay.nostr.band"];
 
