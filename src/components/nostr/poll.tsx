@@ -127,7 +127,7 @@ export function Poll({
       toast.success(t("vote.success"));
     } catch (err) {
       console.error(err);
-      toast.error("vote.error");
+      toast.error(t("vote.error"));
     }
   }
 
