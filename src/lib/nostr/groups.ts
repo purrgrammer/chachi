@@ -233,7 +233,10 @@ async function fetchGroupMembers(ndk: NDK, group: Group): Promise<string[]> {
       kinds: [NDKKind.GroupMembers],
       "#d": [group.id],
     },
-    { closeOnEose: true },
+    {
+      closeOnEose: true,
+      cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+    },
     relaySet,
   );
 
@@ -254,7 +257,10 @@ async function fetchGroupAdmins(ndk: NDK, group: Group): Promise<string[]> {
       kinds: [NDKKind.GroupAdmins],
       "#d": [group.id],
     },
-    { closeOnEose: true },
+    {
+      closeOnEose: true,
+      cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+    },
     relaySet,
   );
 
@@ -744,7 +750,7 @@ export function useAddAdmin(group: Group) {
     } as NostrEvent);
     await event.publish(relaySet);
     queryClient.invalidateQueries({
-      queryKey: [GROUP_ADMINS, group.id, group.relay],
+      queryKey: [GROUP_PARTICIPANTS, groupId(group)],
     });
     return event.rawEvent() as NostrEvent;
   };
@@ -764,7 +770,7 @@ export function useRemoveAdmin(group: Group) {
     } as NostrEvent);
     await event.publish(relaySet);
     queryClient.invalidateQueries({
-      queryKey: [GROUP_ADMINS, group.id, group.relay],
+      queryKey: [GROUP_PARTICIPANTS, groupId(group)],
     });
     return event.rawEvent() as NostrEvent;
   };
@@ -792,19 +798,6 @@ export function useGroupDescription(group: Group) {
   const { data: relayInfo } = useRelayInfo(relay);
   const isRelayGroup = id === "_";
   return isRelayGroup ? relayInfo?.description : metadata?.about;
-}
-
-export function useGroupRoles(group: Group) {
-  const ndk = useNDK();
-  return useQuery({
-    queryKey: [GROUP_ROLES, group.id, group.relay],
-    queryFn: async () => {
-      const roles = await fetchGroupRoles(ndk, group);
-      return roles;
-    },
-    staleTime: Infinity,
-    gcTime: 0,
-  });
 }
 
 export async function fetchGroupRoles(

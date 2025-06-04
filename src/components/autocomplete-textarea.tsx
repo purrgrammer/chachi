@@ -139,7 +139,7 @@ export function AutocompleteTextarea({
   const [autocompleteEmojiTerm, setAutocompleteEmojiTerm] = useState("");
 
   const { profiles } = useProfiles(
-    group && members ? members : pubkeys ? pubkeys : follows ? follows : []
+    group && members ? members : pubkeys ? pubkeys : follows ? follows : [],
   );
   const autocompleteProfiles =
     autocompleteTerm && isAutocompleting
@@ -183,7 +183,7 @@ export function AutocompleteTextarea({
   const autocompleteEmojis = (
     autocompleteEmojiTerm && isAutocompletingEmoji
       ? allEmojis.filter((e) =>
-          e.name.toLowerCase().includes(autocompleteEmojiTerm.toLowerCase())
+          e.name.toLowerCase().includes(autocompleteEmojiTerm.toLowerCase()),
         )
       : allEmojis
   ).slice(0, 21);
@@ -204,7 +204,7 @@ export function AutocompleteTextarea({
   function autocompleteProfile(p: Profile) {
     // todo: nprofile if possible
     setMessage(
-      message.replace(autocompleteRegex, `nostr:${npubEncode(p.pubkey)} `)
+      message.replace(autocompleteRegex, `nostr:${npubEncode(p.pubkey)} `),
     );
     onProfileAutocomplete?.(p);
     setIsAutocompleting(false);
@@ -291,7 +291,7 @@ export function AutocompleteTextarea({
         ref={ref}
         className={cn(
           `text-md focus-visible:outline-none focus:ring-ring focus-visible:ring-ring w-full p-1 px-3 resize-none ${isAutocompleting || isAutocompletingEmoji || reply ? "rounded-b-xl rounded-t-none ring ring-ring ring-1" : "rounded-xl"}`,
-          className
+          className,
         )}
         minRows={1}
         maxRows={3}

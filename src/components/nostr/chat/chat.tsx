@@ -11,7 +11,7 @@ import {
   ShieldBan,
   Bitcoin,
 } from "lucide-react";
-import { NostrEvent } from "nostr-tools";
+import type { NostrEvent } from "nostr-tools";
 import { Button } from "@/components/ui/button";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { cn } from "@/lib/utils";
@@ -155,7 +155,6 @@ function UserMessage({
   className,
   scrollTo,
   setScrollTo,
-  showReactions,
 }: {
   group?: Group;
   event: NostrEvent;
@@ -176,7 +175,6 @@ function UserMessage({
   className?: string;
   scrollTo?: NostrEvent;
   setScrollTo?: (ev?: NostrEvent) => void;
-  showReactions?: boolean;
 }) {
   return (
     <>
@@ -204,7 +202,6 @@ function UserMessage({
         className={className}
         scrollTo={scrollTo}
         setScrollTo={setScrollTo}
-        showReactions={showReactions}
       />
     </>
   );
@@ -233,7 +230,6 @@ function MessageContent({
   className,
   scrollTo,
   setScrollTo,
-  showReactions = true,
 }: {
   group?: Group;
   event: NostrEvent;
@@ -256,7 +252,6 @@ function MessageContent({
   className?: string;
   scrollTo?: NostrEvent;
   setScrollTo?: (ev?: NostrEvent) => void;
-  showReactions?: boolean;
 }) {
   const { t } = useTranslation();
   const [settings] = useSettings();
@@ -317,7 +312,7 @@ function MessageContent({
     });
   }, [fragments]);
   const shouldShowReply =
-    showReply && replyTo && !eventFragmentIds.includes(replyTo);
+    !isDeleted && showReply && replyTo && !eventFragmentIds.includes(replyTo);
   const isSingleCustomEmoji =
     fragments.length === 1 &&
     fragments[0].type === "block" &&
@@ -550,7 +545,7 @@ function MessageContent({
                     {content}
                   </RichText>
                 )}
-                {showReactions ? (
+                {isDeleted ? null : (
                   <Reactions
                     className="pt-1"
                     event={event}
@@ -558,7 +553,7 @@ function MessageContent({
                     kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
                     live={isInView}
                   />
-                ) : null}
+                )}
                 {showingZapDialog && group ? (
                   <NewZapDialog
                     open
@@ -632,15 +627,17 @@ function MessageContent({
               <>
                 <ContextMenuSeparator />
                 <ContextMenuLabel>{t("group.info.admin")}</ContextMenuLabel>
-                <ContextMenuItem
-                  className="cursor-pointer"
-                  onClick={() => kick(event)}
-                >
-                  {t("chat.user.kick.action")}
-                  <ContextMenuShortcut>
-                    <ShieldBan className="w-4 h-4" />
-                  </ContextMenuShortcut>
-                </ContextMenuItem>
+                {group?.isCommunity ? null : (
+                  <ContextMenuItem
+                    className="cursor-pointer"
+                    onClick={() => kick(event)}
+                  >
+                    {t("chat.user.kick.action")}
+                    <ContextMenuShortcut>
+                      <ShieldBan className="w-4 h-4" />
+                    </ContextMenuShortcut>
+                  </ContextMenuItem>
+                )}
                 {deleteEvent ? (
                   <ContextMenuItem
                     className="cursor-pointer"
@@ -648,7 +645,7 @@ function MessageContent({
                   >
                     {t("chat.message.delete.action")}
                     <ContextMenuShortcut>
-                      <Trash className="w-4 h-4" />
+                      <Trash className="w-4 h-4 text-destructive" />
                     </ContextMenuShortcut>
                   </ContextMenuItem>
                 ) : null}
@@ -725,7 +722,6 @@ export function ChatMessage(props: {
   className?: string;
   scrollTo?: NostrEvent;
   setScrollTo?: (ev?: NostrEvent) => void;
-  showReactions?: boolean;
 }) {
   const { event, isMine } = props;
   const me = usePubkey();
@@ -797,18 +793,12 @@ export function Chat({
   showTimestamps = true,
   className,
   lastSeen,
-  deleteEvents,
   scrollTo,
   setScrollTo,
 }: ChatProps) {
   // todo: check admin events against relay pubkey
   const groupedMessages = groupByDay(events);
   const lastMessage = events.filter((e) => e.kind === NDKKind.GroupChat).at(0);
-  const deletedIds = new Set(
-    deleteEvents
-      .map((e) => e.tags.find((t) => t[0] === "e")?.[1])
-      .filter(Boolean),
-  );
   const me = usePubkey();
 
   useEffect(() => {
@@ -842,7 +832,7 @@ export function Chat({
                 canDelete={canDelete}
                 deleteEvent={deleteEvent}
                 admins={admins}
-                isDeleted={deletedIds.has(event.id)}
+                isDeleted={Boolean("deleted" in event && event.deleted)}
                 isChain={messages[idx + 1]?.pubkey === event.pubkey}
                 isLastSeen={
                   event.id === lastSeen?.ref && event.id !== lastMessage?.id

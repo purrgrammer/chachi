@@ -43,6 +43,14 @@ export function saveGroupEvent(event: NostrEvent, group: Group) {
   cache.discardUnpublishedEvent(event.id);
 }
 
+export async function deleteGroupEvent(id: string, group: Group) {
+  const record = await db.events.get(id);
+  // make sure the event belongs to the group
+  if (record?.group === groupId(group)) {
+    db.events.update(id, { deleted: true });
+  }
+}
+
 export function saveLastSeen(ev: NostrEvent, group: Group) {
   const ndkEvent = new NDKEvent(undefined, ev);
   const [tag, ref] = ndkEvent.tagReference();
@@ -75,6 +83,8 @@ export function useGroupchat(group: Group) {
           DELETE_GROUP,
           NDKKind.Nutzap,
           RELATIONSHIP,
+          NDKKind.EventDeletion,
+          9005 as NDKKind,
         ],
         "#h": [group.id],
         ...(last ? { since: last.created_at + 1 } : {}),
@@ -83,6 +93,7 @@ export function useGroupchat(group: Group) {
         filter,
         {
           cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+          skipOptimisticPublishEvent: true,
           groupable: false,
           closeOnEose: false,
         },
@@ -90,7 +101,16 @@ export function useGroupchat(group: Group) {
       );
 
       sub.on("event", (event) => {
-        saveGroupEvent(event.rawEvent() as NostrEvent, group);
+        if (event.kind === NDKKind.EventDeletion || event.kind === 9005) {
+          const ids = event.tags
+            .filter((t) => t[0] === "e" && t[1]?.length === 64)
+            .map((t) => t[1]);
+          if (ids.length > 0) {
+            ids.forEach((id) => deleteGroupEvent(id, group));
+          }
+        } else {
+          saveGroupEvent(event.rawEvent() as NostrEvent, group);
+        }
       });
     });
 

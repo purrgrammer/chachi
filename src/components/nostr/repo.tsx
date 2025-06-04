@@ -28,7 +28,7 @@ export function Repo({ event }: { event: NostrEvent; group?: Group }) {
       <div className="flex flex-col items-center justify-center gap-2">
         {clone ? (
           <div className="flex flex-row items-center gap-2">
-            <Code className="size-3" />
+            <Code className="size-3 flex-shrink-0" />
             <InputCopy value={clone} />
           </div>
         ) : null}
@@ -39,7 +39,7 @@ export function Repo({ event }: { event: NostrEvent; group?: Group }) {
               href={web}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm underline decoration-dotted line-clamp-1 break-all"
+              className="text-sm underline decoration-dotted break-all line-clamp-1"
             >
               {web}
             </a>

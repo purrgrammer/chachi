@@ -277,7 +277,7 @@ export function ChatZap({
                 >
                   {t("chat.message.delete.action")}
                   <ContextMenuShortcut>
-                    <Trash className="w-4 h-4" />
+                    <Trash className="w-4 h-4 text-destructive" />
                   </ContextMenuShortcut>
                 </ContextMenuItem>
               ) : null}

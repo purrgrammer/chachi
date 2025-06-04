@@ -7,7 +7,7 @@ import {
   NDKSubscriptionCacheUsage,
 } from "@nostr-dev-kit/ndk";
 import { useNDK } from "@/lib/ndk";
-import { saveGroupEvent } from "@/lib/messages";
+import { deleteGroupEvent, saveGroupEvent } from "@/lib/messages";
 import { getLastGroupMessage } from "@/lib/messages/queries";
 import { useStream } from "@/lib/nostr";
 import type { Group } from "@/lib/types";
@@ -86,6 +86,8 @@ export function useGroupMessages(groups: Group[]) {
             DELETE_GROUP,
             NDKKind.Nutzap,
             RELATIONSHIP,
+            NDKKind.EventDeletion,
+            9005 as NDKKind,
           ],
           "#h": [id],
           ...(lastMessage ? { since: lastMessage.created_at + 1 } : {}),
@@ -97,6 +99,7 @@ export function useGroupMessages(groups: Group[]) {
           filter,
           {
             cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+            skipOptimisticPublishEvent: true,
             groupable: false,
             closeOnEose: false,
           },
@@ -105,7 +108,16 @@ export function useGroupMessages(groups: Group[]) {
 
         sub.on("event", (event) => {
           console.log("SYNC.GROUP.MESSAGES>EVENT", group, event.rawEvent());
-          saveGroupEvent(event.rawEvent() as NostrEvent, group);
+          if (event.kind === NDKKind.EventDeletion || event.kind === 9005) {
+            const ids = event.tags
+              .filter((t) => t[0] === "e" && t[1]?.length === 64)
+              .map((t) => t[1]);
+            if (ids.length > 0) {
+              ids.forEach((id) => deleteGroupEvent(id, group));
+            }
+          } else {
+            saveGroupEvent(event.rawEvent() as NostrEvent, group);
+          }
         });
 
         subscriptionsRef.current.set(id, sub as NDKSubscription);

@@ -49,7 +49,7 @@ export function useMintKeys(url: string) {
   });
 }
 
-// todo: cache in DB
+// todo: cache in DB?
 export function fetchMintKeys(url: string): Promise<Array<MintKeys>> {
   return queryClient.fetchQuery({
     queryKey: [MINT_KEYS, url],

@@ -124,6 +124,7 @@ export interface Event {
   content: string;
   pubkey: string;
   tags: string[][];
+  deleted?: boolean;
 }
 
 export type Currency = "sat" | "USD" | "EUR" | string;

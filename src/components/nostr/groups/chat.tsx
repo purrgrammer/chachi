@@ -46,7 +46,6 @@ import { NewZap } from "@/components/nostr/zap";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet } from "@/lib/nostr";
 import { useMintList } from "@/lib/cashu";
-import { useDeletions } from "@/lib/nostr/chat";
 import { usePubkey, useCanSign } from "@/lib/account";
 import type { Group } from "@/lib/types";
 import { useCopy } from "@/lib/hooks";
@@ -59,6 +58,7 @@ import {
   saveLastSeen,
   useSaveLastSeen,
   saveGroupEvent,
+  deleteGroupEvent,
 } from "@/lib/messages";
 import { DELETE_GROUP } from "@/lib/kinds";
 import { Nutzap } from "@/components/nostr/nutzap";
@@ -317,7 +317,7 @@ function ChatZap({
                 >
                   {t("chat.message.delete.action")}
                   <ContextMenuShortcut>
-                    <Trash className="w-4 h-4" />
+                    <Trash className="w-4 h-4 text-destructive" />
                   </ContextMenuShortcut>
                 </ContextMenuItem>
               ) : null}
@@ -679,7 +679,7 @@ function ChatNutzap({
                 >
                   {t("chat.message.delete.action")}
                   <ContextMenuShortcut>
-                    <Trash className="w-4 h-4" />
+                    <Trash className="w-4 h-4 text-destructive" />
                   </ContextMenuShortcut>
                 </ContextMenuItem>
               ) : null}
@@ -840,7 +840,6 @@ export const GroupChat = forwardRef(
       undefined,
     );
     const newMessage = useNewMessage(group);
-    const { events: deleteEvents } = useDeletions(group);
     const isRelayGroup = group.id === "_";
     const canIPoast =
       me &&
@@ -880,7 +879,9 @@ export const GroupChat = forwardRef(
       try {
         const ev = new NDKEvent(ndk, {
           kind:
-            event.pubkey === me || group.id === "_"
+            event.pubkey === me ||
+            group.id === "_" ||
+            (group.isCommunity && group.id === me)
               ? NDKKind.EventDeletion
               : (9005 as NDKKind),
           content: "",
@@ -888,6 +889,7 @@ export const GroupChat = forwardRef(
         ev.tag(new NDKEvent(ndk, event));
         await ev.publish(relaySet);
         toast.success(t("group.chat.event.delete.success"));
+        deleteGroupEvent(event.id, group);
       } catch (err) {
         console.error(err);
         toast.error(t("group.chat.event.delete.error"));
@@ -906,7 +908,6 @@ export const GroupChat = forwardRef(
           }
           newMessage={sentMessage}
           lastSeen={lastSeen ? lastSeen : undefined}
-          deleteEvents={deleteEvents}
           scrollTo={scrollTo}
           setScrollTo={setScrollTo}
           // @ts-expect-error: these events are unsigned since they come from DB
@@ -1013,7 +1014,6 @@ export const CommunityChat = forwardRef(
       undefined,
     );
     const newMessage = useNewMessage(group);
-    const { events: deleteEvents } = useDeletions(group);
     const { t } = useTranslation();
     const lastSeen = useLastSeen(group);
     const saveLast = useSaveLastSeen(group);
@@ -1041,7 +1041,9 @@ export const CommunityChat = forwardRef(
       try {
         const ev = new NDKEvent(ndk, {
           kind:
-            event.pubkey === me || group.id === "_"
+            event.pubkey === me ||
+            group.id === "_" ||
+            (group.isCommunity && group.id === me)
               ? NDKKind.EventDeletion
               : (9005 as NDKKind),
           content: "",
@@ -1049,6 +1051,7 @@ export const CommunityChat = forwardRef(
         ev.tag(new NDKEvent(ndk, event));
         await ev.publish(relaySet);
         toast.success(t("group.chat.event.delete.success"));
+        deleteGroupEvent(event.id, group);
       } catch (err) {
         console.error(err);
         toast.error(t("group.chat.event.delete.error"));
@@ -1067,7 +1070,6 @@ export const CommunityChat = forwardRef(
           }
           newMessage={sentMessage}
           lastSeen={lastSeen ? lastSeen : undefined}
-          deleteEvents={deleteEvents}
           scrollTo={scrollTo}
           setScrollTo={setScrollTo}
           // @ts-expect-error: these events are unsigned since they come from DB
