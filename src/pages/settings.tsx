@@ -49,7 +49,6 @@ export default function Settings() {
         <div className="flex flex-row items-center gap-1.5">
           <SettingsIcon className="size-5 text-muted-foreground" />
           <h1>{t("settings.title")}</h1>
-          {tab}
         </div>
       </Header>
       <div className="p-2 sm:pl-12">
