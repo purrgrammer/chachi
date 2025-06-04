@@ -18,7 +18,7 @@ import { Emoji } from "@/components/emoji";
 import { Input } from "@/components/ui/input";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
 import { User } from "@/components/nostr/user";
-import { NDKKind, NDKNutzap } from "@nostr-dev-kit/ndk";
+import { NDKNutzap } from "@nostr-dev-kit/ndk";
 import { validateZap, Zap as ZapType } from "@/lib/nip-57";
 import { formatShortNumber } from "@/lib/number";
 import {
@@ -40,7 +40,6 @@ import {
   DialogDescription,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useGroup } from "@/lib/nostr/groups";
 import { WalletSelector } from "@/components/wallet";
 import type { Group, Emoji as EmojiType } from "@/lib/types";
 import { useRelays } from "@/lib/nostr";
@@ -77,7 +76,6 @@ export function NewZapDialog({
 }) {
   const { t } = useTranslation();
   const amounts = useZapAmounts();
-  const { data: metadata } = useGroup(group);
   const increaseZapAmount = useIncreaseZapAmount();
   const [customEmojis, setCustomEmojis] = useState<EmojiType[]>([]);
   const [isOpen, setIsOpen] = useState(open);
@@ -165,9 +163,6 @@ export function NewZapDialog({
         const tags = [
           ...(group ? [["h", group.id, group.relay]] : []),
           ...(event ? [["e", event.id]] : []),
-          ...(group?.id && metadata && metadata.pubkey
-            ? [["a", `${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`]]
-            : []),
           ...customEmojis.flatMap((e) =>
             e.name && e.image ? [["emoji", e.name, e.image]] : [],
           ),
@@ -200,9 +195,6 @@ export function NewZapDialog({
       } else {
         const tags = [
           ...(group ? [["h", group.id, group.relay]] : []),
-          ...(group && metadata?.pubkey
-            ? [["a", `${NDKKind.GroupMetadata}:${metadata.pubkey}:${group.id}`]]
-            : []),
           ...customEmojis.flatMap((e) =>
             e.name && e.image ? [["emoji", e.name, e.image]] : [],
           ),

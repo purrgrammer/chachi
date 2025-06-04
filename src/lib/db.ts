@@ -2,6 +2,7 @@ import Dexie, { Table } from "dexie";
 import NDKCacheAdapterDexie from "@nostr-dev-kit/ndk-cache-dexie";
 import { NDKCashuToken, NDKEvent } from "@nostr-dev-kit/ndk";
 import { Event, Group, GroupMetadata, Community } from "./types";
+import { groupId } from "./groups";
 //import { Transaction } from "@/lib/wallet";
 
 // todo: tweak cache sizes
@@ -41,8 +42,7 @@ export interface GroupInfo {
 }
 
 export interface GroupParticipants {
-  id: string;
-  relay: string;
+  group: string;
   members: string[];
   admins: string[];
 }
@@ -83,6 +83,7 @@ class ChachiDatabase extends Dexie {
   lastSeen!: Table<LastSeen>;
   tokenEvents!: Table<TokenEvent>;
   groupInfo!: Table<GroupInfo>;
+  groupParticipants!: Table<GroupParticipants>;
   //transactions!: Table<Transaction>;
   nutzaps!: Table<Nutzap>;
   community!: Table<Community>;
@@ -90,13 +91,14 @@ class ChachiDatabase extends Dexie {
 
   constructor(name: string) {
     super(name);
-    this.version(12).stores({
+    this.version(13).stores({
       events:
         "&id,created_at,group,[group+kind],[group+kind+created_at],[group+created_at]",
       lastSeen: "[group+kind],created_at,[group+created_at]",
       nutzaps: "&id,status,txId",
       tokenEvents: "&id,created_at,[pubkey+created_at]",
       groupInfo: "[id+relay]",
+      groupParticipants: "&group",
       community: "&pubkey",
       dms: "&id,gift,created_at,group,pubkey,[group+kind],[group+kind+created_at],[group+created_at],[group+pubkey]",
     });
@@ -172,4 +174,36 @@ export function getCommunity(pubkey: string) {
 
 export function saveCommunity(community: Community) {
   db.community.put(community);
+}
+
+export function saveGroupParticipants(
+  group: Group,
+  members: string[],
+  admins: string[],
+) {
+  const id = groupId(group);
+  db.groupParticipants.put({
+    group: id,
+    members,
+    admins,
+  });
+}
+
+export function getGroupParticipants(group: Group) {
+  const id = groupId(group);
+  if (group.isCommunity) {
+    return {
+      group: id,
+      admins: [group.id],
+      members: [],
+    };
+  }
+  if (group.id === "_") {
+    return {
+      group: id,
+      admins: [],
+      members: [],
+    };
+  }
+  return db.groupParticipants.get(id);
 }

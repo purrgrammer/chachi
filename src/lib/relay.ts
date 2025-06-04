@@ -60,7 +60,6 @@ export const discoveryRelays = [
   "wss://relay.nostr.band",
   "wss://profiles.nostrver.se",
   "wss://profiles.nostr1.com",
-  "wss://indexer.coracle.social",
 ];
 
 export const fallbackRelays = ["wss://relay.nostr.band"];
