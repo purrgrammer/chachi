@@ -1192,7 +1192,7 @@ async function _analyzeTarget(
     }
   } else if (invoice) {
     try {
-      const decoded = decode(content);
+      const decoded = decode(content.replace(/^(lightning:)?/, ""));
       if (decoded) {
         onInvoice(content);
       }

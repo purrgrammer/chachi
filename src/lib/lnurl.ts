@@ -33,7 +33,7 @@ export function fetchInvoice(
 
 // todo: improve this
 export function isLnInvoice(s: string) {
-  return s.startsWith("lnbc");
+  return s.startsWith("lightning:lnbc") || s.startsWith("lnbc");
 }
 
 // yoinked from lnurl-pay https://github.com/GaloyMoney/lnurl-pay
