@@ -183,6 +183,10 @@ const router = createBrowserRouter([
         element: <Relay tab="feed" />,
       },
       {
+        path: "/relay/:relay/chat",
+        element: <Relay tab="chat" />,
+      },
+      {
         path: "/relay/:relay/groups",
         element: <Relay tab="groups" />,
       },

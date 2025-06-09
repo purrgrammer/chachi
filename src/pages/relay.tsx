@@ -32,6 +32,7 @@ import {
   NDKRelaySet,
   NDKSubscriptionCacheUsage,
 } from "@nostr-dev-kit/ndk";
+import { GroupChat } from "@/components/nostr/groups/chat";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -459,7 +460,7 @@ function RelayFeed({ relay }: { relay: string }) {
   );
 }
 
-type RelayTab = "info" | "feed" | "groups" | "communities";
+type RelayTab = "info" | "feed" | "chat" | "groups" | "communities";
 
 function RelayPage({ relay, tab = "info" }: { relay: string; tab?: RelayTab }) {
   const { data: info } = useRelayInfo(relay);
@@ -467,6 +468,10 @@ function RelayPage({ relay, tab = "info" }: { relay: string; tab?: RelayTab }) {
   const supportsNip29 = info?.supported_nips
     ?.map((n) => String(n))
     .includes("29");
+  const group = {
+    relay,
+    id: "_",
+  };
 
   function onValueChange(value: string) {
     if (value === "info") {
@@ -504,6 +509,7 @@ function RelayPage({ relay, tab = "info" }: { relay: string; tab?: RelayTab }) {
         <TabsList>
           <TabsTrigger value="info">{t("relay.info")}</TabsTrigger>
           <TabsTrigger value="feed">{t("relay.feed")}</TabsTrigger>
+          <TabsTrigger value="chat">{t("relay.chat")}</TabsTrigger>
           {supportsNip29 ? (
             <TabsTrigger value="groups">{t("relay.groups")}</TabsTrigger>
           ) : null}
@@ -516,6 +522,9 @@ function RelayPage({ relay, tab = "info" }: { relay: string; tab?: RelayTab }) {
         </TabsContent>
         <TabsContent value="feed">
           <RelayFeed relay={relay} />
+        </TabsContent>
+        <TabsContent value="chat">
+          <GroupChat group={group} />
         </TabsContent>
         <TabsContent value="groups">
           <RelayGroups relay={relay} />

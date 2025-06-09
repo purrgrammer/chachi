@@ -1040,6 +1040,7 @@
     "contact": "Contact",
     "groups": "Groups",
     "communities": "Communities",
+    "chat": "Chat",
     "new": {
       "title": "New",
       "description": "Create a new relay to host your content",
