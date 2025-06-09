@@ -1192,9 +1192,10 @@ async function _analyzeTarget(
     }
   } else if (invoice) {
     try {
-      const decoded = decode(content.replace(/^(lightning:)?/, ""));
+      const cleanInvoice = content.replace(/^lightning:/, "");
+      const decoded = decode(cleanInvoice);
       if (decoded) {
-        onInvoice(content);
+        onInvoice(cleanInvoice);
       }
     } catch (err) {
       console.error(err);
