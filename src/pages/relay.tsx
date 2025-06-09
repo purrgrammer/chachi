@@ -447,7 +447,7 @@ function RelayFeed({ relay }: { relay: string }) {
         feedClassName="p-0"
         key={`${relay}-${kinds.join(",")}`}
         filter={{ kinds, limit }}
-        outboxRelays={[relay!]}
+        outboxRelays={[relay]}
         live={live}
         onlyRelays
         slidingWindow={limit}
@@ -461,23 +461,18 @@ function RelayFeed({ relay }: { relay: string }) {
 
 type RelayTab = "info" | "feed" | "groups" | "communities";
 
-export default function Relay({ tab = "info" }: { tab?: RelayTab }) {
-  const { relay } = useParams();
-  const { data: info } = useRelayInfo(relay!);
+function RelayPage({ relay, tab = "info" }: { relay: string; tab?: RelayTab }) {
+  const { data: info } = useRelayInfo(relay);
   const navigate = useNavigate();
   const supportsNip29 = info?.supported_nips
     ?.map((n) => String(n))
     .includes("29");
 
-  if (!relay || !isRelayURL(relay)) {
-    return <Navigate to="/" />;
-  }
-
   function onValueChange(value: string) {
     if (value === "info") {
-      navigate(`/relay/${encodeURIComponent(relay!)}`);
+      navigate(`/relay/${encodeURIComponent(relay)}`);
     } else {
-      navigate(`/relay/${encodeURIComponent(relay!)}/${value}`);
+      navigate(`/relay/${encodeURIComponent(relay)}/${value}`);
     }
   }
   return (
@@ -487,13 +482,13 @@ export default function Relay({ tab = "info" }: { tab?: RelayTab }) {
           <div className="flex flex-row gap-2 items-center">
             <Tooltip>
               <TooltipTrigger asChild>
-                <RelayIcon relay={relay!} className="size-8" />
+                <RelayIcon relay={relay} className="size-8" />
               </TooltipTrigger>
               <TooltipContent>{t("relay.info")}</TooltipContent>
             </Tooltip>
             <div className="flex flex-col gap-0">
               <h1 className="text-lg font-normal leading-none">
-                <RelayName relay={relay!} />
+                <RelayName relay={relay} />
               </h1>
             </div>
           </div>
@@ -517,18 +512,37 @@ export default function Relay({ tab = "info" }: { tab?: RelayTab }) {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="info">
-          <RelayInfo relay={relay!} />
+          <RelayInfo relay={relay} />
         </TabsContent>
         <TabsContent value="feed">
-          <RelayFeed relay={relay!} />
+          <RelayFeed relay={relay} />
         </TabsContent>
         <TabsContent value="groups">
-          <RelayGroups relay={relay!} />
+          <RelayGroups relay={relay} />
         </TabsContent>
         <TabsContent value="communities">
-          <RelayCommunities relay={relay!} />
+          <RelayCommunities relay={relay} />
         </TabsContent>
       </Tabs>
     </div>
   );
+}
+
+export default function Relay({ tab = "info" }: { tab?: RelayTab }) {
+  const { relay: relayUrl } = useParams();
+
+  if (!relayUrl) {
+    return <Navigate to="/" />;
+  }
+
+  const relay =
+    relayUrl.startsWith("ws://") || relayUrl.startsWith("wss://")
+      ? relayUrl
+      : `wss://${relayUrl}`;
+
+  if (!isRelayURL(relay)) {
+    return <Navigate to="/" />;
+  }
+
+  return <RelayPage relay={relay} tab={tab} />;
 }
