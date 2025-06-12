@@ -137,7 +137,7 @@ export function NewZapDialog({
             setIsZapping(false);
             toast.success(
               t("zap.dialog.success", {
-                amount: formatShortNumber(Number(amount)),
+                amount: formatShortNumber(Number(amount) / 1000),
                 name:
                   profile?.name || profile?.display_name || pubkey.slice(0, 6),
               }),

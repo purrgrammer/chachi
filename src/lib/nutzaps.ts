@@ -84,12 +84,10 @@ export function useNutzapMonitor() {
     setNutzapMonitor(monitor);
 
     monitor.on("seen", (event) => {
-      //console.log("NUTZAP.SEEN", event.rawEvent());
       saveNutzap(event.rawEvent() as NostrEvent);
     });
 
     monitor.on("redeem", (events) => {
-      //console.log("NUTZAP.REDEEM", event.rawEvent());
       for (const event of events) {
         saveNutzap(
           event.rawEvent() as NostrEvent,
@@ -106,16 +104,13 @@ export function useNutzapMonitor() {
     });
 
     monitor.on("spent", (event) => {
-      //console.log("NUTZAP.SPENT", event.rawEvent());
       saveNutzap(event.rawEvent() as NostrEvent, "spent");
     });
 
     monitor.on("failed", (event) => {
-      //console.log("NUTZAP.FAILED", event.rawEvent());
       saveNutzap(event.rawEvent() as NostrEvent, "failed");
     });
 
-    console.log("NUTZAP MONITOR START", knownNutzaps);
     monitor.start({
       knownNutzaps,
       pageSize: MONITOR_PAGE_SIZE,
