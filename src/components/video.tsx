@@ -6,7 +6,7 @@ export function Video({ url, className }: { url: string; className?: string }) {
       preload="metadata"
       controls
       src={url}
-      className={cn("bg-background aspect-video rounded-md", className)}
+      className={cn("w-full max-w-full bg-background aspect-video rounded-md", className)}
     />
   );
 }

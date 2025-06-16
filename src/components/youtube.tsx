@@ -14,7 +14,7 @@ export function YoutubeEmbed({
   const m = url.match(youtubeUrlRegex);
   if (!m) return null;
   return (
-    <div className="min-w-[250px] md:min-w-[430px]">
+    <div className="w-full max-w-full min-w-0">
       <ReactPlayer
         url={url}
         controls
