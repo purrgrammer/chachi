@@ -1,0 +1,12 @@
+{
+  "js-dev": {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "deno", "run", "-A", "jsr:@soapbox/js-dev-mcp"]
+  },
+  "nostr": {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "deno", "run", "-A", "jsr:@nostrbook/mcp"]
+  }
+}
