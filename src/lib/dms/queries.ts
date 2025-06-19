@@ -41,13 +41,22 @@ export async function getLastGroupMessage(group: Group) {
     .last();
 }
 
-export async function getGroupMessagesAfter(group: Group, timestamp = 0) {
+export async function getGroupMessagesAfter(
+  group: Group,
+  timestamp = 0,
+  excludePubkey?: string,
+) {
   const id = groupId(group);
-  return db.dms
+  let query = db.dms
     .where("[group+created_at]")
     .between([id, timestamp + 1], [id, Dexie.maxKey])
-    .filter((e) => e.kind !== NDKKind.Reaction)
-    .count();
+    .filter((e) => e.kind !== NDKKind.Reaction);
+
+  if (excludePubkey) {
+    query = query.and((ev) => ev.pubkey !== excludePubkey);
+  }
+
+  return query.count();
 }
 
 export async function getGroupReactions(group: Group) {
@@ -98,18 +107,37 @@ export async function getGroupMentionsAfter(
     .count();
 }
 
-export async function getUnreadMessages(group: Group) {
+export async function getUnreadMessages(
+  group: Group,
+  currentUserPubkey?: string,
+) {
   const lastSeen = await getLastSeen(group);
-  return getGroupMessagesAfter(group, lastSeen?.created_at || 0);
+  return getGroupMessagesAfter(
+    group,
+    lastSeen?.created_at || 0,
+    currentUserPubkey,
+  );
 }
 
-export async function getUnreadMessagesCount(group: Group) {
+export async function getUnreadMessagesCount(
+  group: Group,
+  currentUserPubkey?: string,
+) {
   const lastSeen = await getLastSeen(group);
-  return getGroupMessagesAfter(group, lastSeen?.created_at || 0);
+  return getGroupMessagesAfter(
+    group,
+    lastSeen?.created_at || 0,
+    currentUserPubkey,
+  );
 }
 
-export async function getTotalUnreadMessages(groups: Group[]) {
-  const countsPromises = groups.map(getUnreadMessagesCount);
+export async function getTotalUnreadMessages(
+  groups: Group[],
+  currentUserPubkey?: string,
+) {
+  const countsPromises = groups.map((group) =>
+    getUnreadMessagesCount(group, currentUserPubkey),
+  );
   const counts = await Promise.all(countsPromises);
   return counts.reduce((sum, count) => sum + count, 0);
 }

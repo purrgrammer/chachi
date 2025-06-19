@@ -343,7 +343,9 @@ export function useUnreads() {
       if (!pubkey || !groups || groups.length === 0) return 0;
 
       // Get unread counts for each group in parallel
-      const unreads = await Promise.all(groups.map(getUnreadMessages));
+      const unreads = await Promise.all(
+        groups.map((group) => getUnreadMessages(group, pubkey)),
+      );
       return unreads.reduce((acc, curr) => acc + curr, 0);
     },
     [pubkey, groups],
@@ -352,17 +354,21 @@ export function useUnreads() {
 }
 
 export function useUnreadMessages(group: Group) {
-  return useLiveQuery(() => getUnreadMessages(group), [group.id]);
+  const me = usePubkey();
+  return useLiveQuery(() => getUnreadMessages(group, me), [group.id, me]);
 }
 
 export function usePrivateUnreadMessages() {
   const groups = useGroups();
+  const me = usePubkey();
   return useLiveQuery(
     async () => {
-      const unreads = await Promise.all(groups.map(getUnreadMessages));
+      const unreads = await Promise.all(
+        groups.map((group) => getUnreadMessages(group, me)),
+      );
       return unreads.reduce((acc, curr) => acc + curr, 0);
     },
-    [groups],
+    [groups, me],
     0,
   );
 }

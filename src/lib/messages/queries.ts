@@ -59,12 +59,21 @@ export async function getLastGroupMessage(group: Group) {
     .last();
 }
 
-export async function getGroupMessagesAfter(group: Group, timestamp = 0) {
+export async function getGroupMessagesAfter(
+  group: Group,
+  timestamp = 0,
+  excludePubkey?: string,
+) {
   const id = groupId(group);
-  return db.events
+  let query = db.events
     .where("[group+created_at]")
-    .between([id, timestamp + 1], [id, Dexie.maxKey])
-    .count();
+    .between([id, timestamp + 1], [id, Dexie.maxKey]);
+
+  if (excludePubkey) {
+    query = query.and((ev) => ev.pubkey !== excludePubkey);
+  }
+
+  return query.count();
 }
 
 export async function getGroupsSortedByLastMessage(groups: Group[]) {
@@ -110,7 +119,14 @@ export async function getUnreadMentions(group: Group, pubkey: string) {
   return getGroupMentionsAfter(group, pubkey, lastSeen?.created_at || 0);
 }
 
-export async function getUnreadMessages(group: Group) {
+export async function getUnreadMessages(
+  group: Group,
+  currentUserPubkey?: string,
+) {
   const lastSeen = await getLastSeen(group);
-  return getGroupMessagesAfter(group, lastSeen?.created_at || 0);
+  return getGroupMessagesAfter(
+    group,
+    lastSeen?.created_at || 0,
+    currentUserPubkey,
+  );
 }

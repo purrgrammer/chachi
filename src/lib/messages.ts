@@ -181,7 +181,11 @@ export function useUnreads(groups: Group[]) {
 }
 
 export function useUnreadMessages(group: Group) {
-  return useLiveQuery(() => getUnreadMessages(group), [group.id, group.relay]);
+  const me = usePubkey();
+  return useLiveQuery(
+    () => getUnreadMessages(group, me),
+    [group.id, group.relay, me],
+  );
 }
 
 export function useUnreadMentions(group: Group) {
