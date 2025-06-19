@@ -10,7 +10,9 @@ export function ModeratedCommunitiesPreview({
   event: NostrEvent;
   className?: string;
 }) {
-  const name = event.tags.find((t) => t[0] === "name")?.[1];
+  const name =
+    event.tags.find((t) => t[0] === "name")?.[1] ||
+    event.tags.find((t) => t[0] === "d")?.[1];
   const description = event.tags.find((t) => t[0] === "description")?.[1];
   const image = event.tags.find((t) => t[0] === "image")?.[1];
   const moderators = event.tags.filter((t) => t[0] === "p").map((t) => t[1]);

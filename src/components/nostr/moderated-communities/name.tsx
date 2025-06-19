@@ -26,7 +26,9 @@ export function ModeratedCommunityName({ address }: { address: string }) {
     );
   }
 
-  const name = event.tags.find((t) => t[0] === "name")?.[1];
+  const name =
+    event.tags.find((t) => t[0] === "name")?.[1] ||
+    event.tags.find((t) => t[0] === "d")?.[1];
 
   return (
     <Link to={`/e/${nembed}`}>
