@@ -41,6 +41,7 @@ import {
   ISSUE,
   REPO,
   FOLLOW_PACK,
+  MODERATED_COMMUNITY,
 } from "@/lib/kinds";
 
 /**
@@ -171,6 +172,11 @@ export const ContentKinds = [
   {
     kind: NDKKind.FollowSet,
     translationKey: "kinds.30000",
+    icon: <Users size={16} />,
+  },
+  {
+    kind: MODERATED_COMMUNITY,
+    translationKey: "kinds.34550",
     icon: <Users size={16} />,
   },
 ];
