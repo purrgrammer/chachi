@@ -112,6 +112,7 @@ function Reply({
             tags={event.tags}
             options={{
               mentions: true,
+              reactions: false,
               urls: true,
               emojis: true,
               images: false,
@@ -210,7 +211,10 @@ function UserMessage({
         isMine={true}
         showRootReply={showRootReply}
         canReact={canReact}
-        richTextOptions={richTextOptions}
+        richTextOptions={{
+          ...richTextOptions,
+          reactions: false,
+        }}
         richTextClassnames={richTextClassnames}
         className={className}
         scrollTo={scrollTo}
@@ -328,6 +332,7 @@ function MessageContent({
       emojis: true,
       urls: true,
       ecash: true,
+      reactions: false,
     },
     event.tags,
   );
@@ -567,7 +572,10 @@ function MessageContent({
                     group={group}
                     tags={event.tags}
                     fragments={fragments}
-                    options={richTextOptions}
+                    options={{
+                      ...richTextOptions,
+                      reactions: false,
+                    }}
                     classNames={{
                       ...{
                         singleEmoji: "w-32 h-32 aspect-auto rounded-md",
@@ -831,6 +839,7 @@ interface ChatProps extends MotionProps {
       setReplyingTo?: (event: NostrEvent) => void;
       deleteEvent?: (event: NostrEvent) => void;
       canDelete?: (event: NostrEvent) => boolean;
+      showReactions?: boolean;
     }>
   >;
   setReplyingTo?: (event: NostrEvent | undefined) => void;
@@ -930,6 +939,7 @@ export function Chat({
                 setReplyingTo={setReplyingTo}
                 scrollTo={scrollTo}
                 setScrollTo={setScrollTo}
+                showReactions={false}
               />
             ) : null;
           })}

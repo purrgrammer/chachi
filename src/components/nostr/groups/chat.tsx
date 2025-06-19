@@ -88,6 +88,7 @@ interface ChatZapProps {
   setReplyingTo?: (event: NostrEvent) => void;
   deleteEvent?: (event: NostrEvent) => void;
   canDelete?: (event: NostrEvent) => boolean;
+  showReactions?: boolean;
 }
 
 function ChatZap({
@@ -99,6 +100,7 @@ function ChatZap({
   setScrollTo,
   canDelete,
   deleteEvent,
+  showReactions,
 }: ChatZapProps) {
   // todo: gestures
   const zap = validateZap(event);
@@ -224,7 +226,7 @@ function ChatZap({
                       "flex flex-col gap-1 relative p-1 px-2 bg-background/80 rounded-md",
                       isMine
                         ? "rounded-tl-md rounded-tr-md rounded-bl-md rounded-br-none"
-                        : "rounded-tl-md rounded-tr-md rounded-br-md rounded-bl-none",
+                        : "rounded-tl-md rounded-tr-md rounded-br-md rounded-bl-none"
                     )}
                   >
                     <Zap
@@ -243,12 +245,14 @@ function ChatZap({
                         onlyEmojis: isMine ? "ml-auto" : "",
                       }}
                     />
-                    <Reactions
-                      event={event}
-                      relays={[group.relay]}
-                      kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
-                      live={isInView}
-                    />
+                    {showReactions ? (
+                      <Reactions
+                        event={event}
+                        relays={[group.relay]}
+                        kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
+                        live={isInView}
+                      />
+                    ) : null}
                   </div>
                 </div>
               </div>
@@ -382,6 +386,7 @@ function ChatNutzap({
   setScrollTo,
   canDelete,
   deleteEvent,
+  showReactions,
 }: ChatZapProps) {
   // todo: gestures
   const ndk = useNDK();
@@ -473,12 +478,12 @@ function ChatNutzap({
               // todo: msat unit
               const amount = proofs.reduce(
                 (acc, proof) => acc + proof.amount,
-                0,
+                0
               );
               toast.success(
                 t("nutzaps.redeem-success", {
                   amount: formatShortNumber(amount),
-                }),
+                })
               );
             },
           });
@@ -568,7 +573,7 @@ function ChatNutzap({
                         "flex flex-col gap-1 relative p-1 px-2 bg-background/80",
                         isMine
                           ? "rounded-tl-md rounded-tr-md rounded-bl-md rounded-br-none"
-                          : "rounded-tl-md rounded-tr-md rounded-br-md rounded-bl-none",
+                          : "rounded-tl-md rounded-tr-md rounded-br-md rounded-bl-none"
                       )}
                     >
                       <Nutzap
@@ -587,12 +592,18 @@ function ChatNutzap({
                           onlyEmojis: isMine ? "ml-auto" : "",
                         }}
                       />
-                      <Reactions
-                        event={event}
-                        relays={[group.relay]}
-                        kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
-                        live={isInView}
-                      />
+                      {showReactions ? (
+                        <Reactions
+                          event={event}
+                          relays={[group.relay]}
+                          kinds={[
+                            NDKKind.Nutzap,
+                            NDKKind.Zap,
+                            NDKKind.Reaction,
+                          ]}
+                          live={isInView}
+                        />
+                      ) : null}
                     </div>
                   )}
                 </div>
@@ -827,7 +838,7 @@ export const GroupChat = forwardRef(
     const ndk = useNDK();
     const relaySet = useRelaySet([group.relay]);
     const [sentMessage, setSentMessage] = useState<NostrEvent | undefined>(
-      undefined,
+      undefined
     );
     const newMessage = useNewMessage(group);
     const { events: deleteEvents } = useDeletions(group);
@@ -841,7 +852,7 @@ export const GroupChat = forwardRef(
         events.find(
           (e) =>
             e.kind === NDKKind.GroupAdminAddUser &&
-            e.tags.find((t) => t[0] === "p" && t[1] === me),
+            e.tags.find((t) => t[0] === "p" && t[1] === me)
         ));
     const { t } = useTranslation();
     const lastSeen = useLastSeen(group);
@@ -972,14 +983,14 @@ export const GroupChat = forwardRef(
         )}
       </div>
     );
-  },
+  }
 );
 GroupChat.displayName = "GroupChat";
 
 export const CommunityChat = forwardRef(
   (
     { pubkey }: { pubkey: string },
-    ref: ForwardedRef<HTMLDivElement | null>,
+    ref: ForwardedRef<HTMLDivElement | null>
   ) => {
     const community = useCommunity(pubkey);
     const group = {
@@ -1000,7 +1011,7 @@ export const CommunityChat = forwardRef(
     const ndk = useNDK();
     const relaySet = useRelaySet([group.relay]);
     const [sentMessage, setSentMessage] = useState<NostrEvent | undefined>(
-      undefined,
+      undefined
     );
     const newMessage = useNewMessage(group);
     const { events: deleteEvents } = useDeletions(group);
@@ -1074,6 +1085,7 @@ export const CommunityChat = forwardRef(
                 canDelete={canDelete}
                 deleteEvent={deleteEvent}
                 {...props}
+                showReactions
               />
             ),
             [NDKKind.Zap]: ({ event, ...props }) => (
@@ -1084,6 +1096,7 @@ export const CommunityChat = forwardRef(
                 canDelete={canDelete}
                 deleteEvent={deleteEvent}
                 {...props}
+                showReactions
               />
             ),
           }}
@@ -1121,6 +1134,6 @@ export const CommunityChat = forwardRef(
         )}
       </div>
     );
-  },
+  }
 );
 CommunityChat.displayName = "CommunityChat";

@@ -212,6 +212,7 @@ function toNode(
         group={group}
         relays={fragment.relays}
         className={classNames.events}
+        showReactions={options?.reactions}
       />
     );
   }
@@ -263,6 +264,7 @@ function toNode(
         relays={fragment.relays}
         group={group}
         className={classNames.events}
+        showReactions={options?.reactions}
       />
     );
   }
@@ -357,6 +359,7 @@ function toNode(
 
 export interface RichTextOptions {
   inline?: boolean;
+  reactions?: boolean;
   emojis?: boolean;
   mentions?: boolean;
   events?: boolean;
