@@ -41,6 +41,15 @@ export async function getLastGroupMessage(group: Group) {
     .last();
 }
 
+export async function getLastUserMessage(group: Group, userPubkey: string) {
+  const id = groupId(group);
+  return db.dms
+    .where("[group+created_at]")
+    .between([id, Dexie.minKey], [id, Dexie.maxKey])
+    .filter((e) => e.kind !== NDKKind.Reaction && e.pubkey === userPubkey)
+    .last();
+}
+
 export async function getGroupMessagesAfter(
   group: Group,
   timestamp = 0,
@@ -112,11 +121,17 @@ export async function getUnreadMessages(
   currentUserPubkey?: string,
 ) {
   const lastSeen = await getLastSeen(group);
-  return getGroupMessagesAfter(
-    group,
-    lastSeen?.created_at || 0,
-    currentUserPubkey,
-  );
+  let baseline = lastSeen?.created_at || 0;
+
+  // If we have a current user, use the later of last seen or last user message
+  if (currentUserPubkey) {
+    const lastUserMessage = await getLastUserMessage(group, currentUserPubkey);
+    if (lastUserMessage) {
+      baseline = Math.max(baseline, lastUserMessage.created_at);
+    }
+  }
+
+  return getGroupMessagesAfter(group, baseline, currentUserPubkey);
 }
 
 export async function getUnreadMessagesCount(
@@ -124,11 +139,17 @@ export async function getUnreadMessagesCount(
   currentUserPubkey?: string,
 ) {
   const lastSeen = await getLastSeen(group);
-  return getGroupMessagesAfter(
-    group,
-    lastSeen?.created_at || 0,
-    currentUserPubkey,
-  );
+  let baseline = lastSeen?.created_at || 0;
+
+  // If we have a current user, use the later of last seen or last user message
+  if (currentUserPubkey) {
+    const lastUserMessage = await getLastUserMessage(group, currentUserPubkey);
+    if (lastUserMessage) {
+      baseline = Math.max(baseline, lastUserMessage.created_at);
+    }
+  }
+
+  return getGroupMessagesAfter(group, baseline, currentUserPubkey);
 }
 
 export async function getTotalUnreadMessages(
