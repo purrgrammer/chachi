@@ -1584,7 +1584,7 @@ function SendToWallet({
         deposit.on("success", () =>
           toast.success(t("wallet.withdraw.success")),
         );
-        deposit.on("error", () => toast.success(t("wallet.withdraw.error")));
+        deposit.on("error", () => toast.error(t("wallet.withdraw.error")));
         const result = await deposit.start();
         // @ts-expect-error: incorrect return type
         await wallet.lnPay({ pr: result.paymentRequest });
