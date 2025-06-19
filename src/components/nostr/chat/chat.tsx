@@ -156,6 +156,7 @@ function UserMessage({
   className,
   scrollTo,
   setScrollTo,
+  showReactions,
 }: {
   group?: Group;
   event: NostrEvent;
@@ -176,6 +177,7 @@ function UserMessage({
   className?: string;
   scrollTo?: NostrEvent;
   setScrollTo?: (ev?: NostrEvent) => void;
+  showReactions?: boolean;
 }) {
   const { t } = useTranslation();
   const isUnpublished = useIsUnpublished(event.id);
@@ -236,6 +238,7 @@ function UserMessage({
             </Button>
           ) : null
         }
+        showReactions={showReactions}
       />
     </>
   );
@@ -266,6 +269,7 @@ function MessageContent({
   setScrollTo,
   isUnpublished = false,
   retryButton,
+  showReactions,
 }: {
   group?: Group;
   event: NostrEvent;
@@ -290,6 +294,7 @@ function MessageContent({
   setScrollTo?: (ev?: NostrEvent) => void;
   isUnpublished?: boolean;
   retryButton?: React.ReactNode;
+  showReactions?: boolean;
 }) {
   const { t } = useTranslation();
   const [settings] = useSettings();
@@ -587,13 +592,15 @@ function MessageContent({
                     {content}
                   </RichText>
                 )}
-                <Reactions
-                  className="pt-1"
-                  event={event}
-                  relays={[...(relay ? [relay] : [])]}
-                  kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
-                  live={isInView}
-                />
+                {showReactions ? (
+                  <Reactions
+                    className="pt-1"
+                    event={event}
+                    relays={[...(relay ? [relay] : [])]}
+                    kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
+                    live={isInView}
+                  />
+                ) : null}
                 {showingZapDialog && group ? (
                   <NewZapDialog
                     open
@@ -761,6 +768,7 @@ export function ChatMessage(props: {
   className?: string;
   scrollTo?: NostrEvent;
   setScrollTo?: (ev?: NostrEvent) => void;
+  showReactions?: boolean;
 }) {
   const { event, isMine } = props;
   const me = usePubkey();

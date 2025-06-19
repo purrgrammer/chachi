@@ -34,7 +34,7 @@ export function ModeratedCommunityName({ address }: { address: string }) {
     <Link to={`/e/${nembed}`}>
       <div className="flex flex-row items-center gap-1">
         <Users className="size-3" />
-        <span className="text-primary-foreground hover:underline hover:decoration-dotted">
+        <span className="text-foreground hover:underline hover:decoration-dotted">
           {name}
         </span>
       </div>

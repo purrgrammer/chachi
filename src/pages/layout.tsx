@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue } from "jotai";
 import { NostrEvent } from "nostr-tools";
 import { ReactNode, useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import NDK, {
   NDKUser,
   NDKKind,
@@ -28,6 +28,8 @@ import {
   communikeyAtom,
 } from "@/app/store";
 import { isRelayURL } from "@/lib/relay";
+import Landing from "@/components/landing";
+import { LoadingScreen } from "@/components/loading-screen";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { fetchCommunity, useGroups } from "@/lib/nostr/groups";
@@ -37,6 +39,7 @@ import { useChachiWallet } from "@/lib/wallet";
 import { RELATIONSHIP, COMMUNIKEY } from "@/lib/kinds";
 import { discoveryRelays } from "@/lib/relay";
 import { useDirectMessages } from "@/lib/nostr/dm";
+import { usePubkey } from "@/lib/account";
 
 function useUserEvents() {
   const ndk = useNDK();
@@ -436,8 +439,22 @@ function useUserEvents() {
   useDirectMessages();
 }
 
+const authRoutes = ["/", "/dm", "/wallet", "/settings", "/zaps"];
+
 function NostrSync({ children }: { children: ReactNode }) {
   useUserEvents();
+  const location = useLocation();
+  const loginMethod = localStorage.getItem("login-method");
+  const pubkey = usePubkey();
+  if (!loginMethod) {
+    return <Landing />;
+  }
+  if (!pubkey && !loginMethod && authRoutes.includes(location.pathname)) {
+    return <Landing />;
+  }
+  if (!pubkey && loginMethod && authRoutes.includes(location.pathname)) {
+    return <LoadingScreen />;
+  }
   return children;
 }
 

@@ -241,6 +241,7 @@ function Testimonials() {
               key={testimonial.id}
               event={testimonial}
               showReply={false}
+              showReactions={false}
             />
           ))}
         </div>
@@ -372,6 +373,7 @@ function GetStarted() {
     </div>
   );
 }
+
 export default function Landing() {
   /*
   const emojis = [
@@ -421,7 +423,7 @@ export default function Landing() {
       */}
       <Supporters />
       <SourceCode />
-      <footer className="bg-white flex items-center justify-center text-background w-full py-12">
+      <footer className="bg-white text-black flex items-center justify-center text-background w-full py-12">
         <div className="flex flex-col max-w-xl">
           <div className="flex flex-row items-center gap-1">
             <Logo width={18} height={18} />

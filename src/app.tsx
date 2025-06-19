@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { Provider } from "jotai";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -9,6 +9,7 @@ import { PrivateRoute } from "@/components/private-route";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
+import { LoadingScreen } from "@/components/loading-screen";
 import ndk, { nwcNdk, NDKContext } from "@/lib/ndk";
 import { queryClient } from "@/lib/query";
 
@@ -27,32 +28,6 @@ const Mint = lazy(() => import("@/pages/mint"));
 const Nutzaps = lazy(() => import("@/pages/nutzaps"));
 const Relay = lazy(() => import("@/pages/relay"));
 const Community = lazy(() => import("@/pages/community"));
-
-const LoadingScreen = () => {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{
-        opacity: 1,
-      }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, ease: "easeInOut" }}
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 50,
-      }}
-    >
-      <img src="/favicon.png" className="w-32 h-32 rounded-full" />
-    </motion.div>
-  );
-};
 
 const router = createBrowserRouter([
   {

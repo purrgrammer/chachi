@@ -34,6 +34,7 @@ interface ChatBubbleProps {
   group?: Group;
   showReply?: boolean;
   showRootReply?: boolean;
+  showReactions?: boolean;
 }
 
 export function ChatBubble({
@@ -41,6 +42,7 @@ export function ChatBubble({
   group,
   showReply = true,
   showRootReply = true,
+  showReactions = false,
 }: ChatBubbleProps) {
   const { t } = useTranslation();
   const me = usePubkey();
@@ -72,6 +74,7 @@ export function ChatBubble({
         admins={[]}
         showReply={showReply}
         showRootReply={showRootReply}
+        showReactions={showReactions}
       />
     </div>
   );
