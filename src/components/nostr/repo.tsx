@@ -34,12 +34,12 @@ export function Repo({ event }: { event: NostrEvent; group?: Group }) {
         ) : null}
         {web ? (
           <div className="flex flex-row items-center gap-2">
-            <Link className="size-3" />
+            <Link className="size-3 flex-shrink-0" />
             <a
               href={web}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm underline decoration-dotted"
+              className="text-sm underline decoration-dotted line-clamp-1 break-all"
             >
               {web}
             </a>
