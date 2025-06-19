@@ -100,6 +100,7 @@ import {
   WORKOUT,
   TARGETED_PUBLICATION,
   FOLLOW_PACK,
+  MODERATED_COMMUNITY,
 } from "@/lib/kinds";
 import {
   Dialog,
@@ -123,6 +124,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { WikiPreview, WikiDetail } from "@/components/nostr/wiki";
+import {
+  ModeratedCommunitiesPreview,
+  ModeratedCommunitiesContent,
+} from "@/components/nostr/moderated-communities";
 import { useSortedGroups, saveGroupEvent } from "@/lib/messages";
 import { usePubkey, useCanSign } from "@/lib/account";
 import type { Group, Emoji as EmojiType } from "@/lib/types";
@@ -329,6 +334,11 @@ const eventDetails: Record<
   [NDKKind.RelaySet]: {
     preview: RelayList,
     detail: RelayList,
+  },
+  [MODERATED_COMMUNITY]: {
+    preview: ModeratedCommunitiesPreview,
+    detail: ModeratedCommunitiesPreview,
+    content: ModeratedCommunitiesContent,
   },
 };
 

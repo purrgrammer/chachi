@@ -23,10 +23,9 @@ import {
   //useUnreadMentions,
 } from "@/lib/messages";
 import { usePrivateUnreadMessages } from "@/lib/nostr/dm";
-import type { Group } from "@/lib/types";
+import type { Group, Event } from "@/lib/types";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { validateZap, Zap } from "@/lib/nip-57";
-import { Event } from "@/lib/db";
 import { validateNutzap, Nutzap } from "@/lib/nip-61";
 import { useMemo } from "react";
 import { Bitcoin } from "lucide-react";

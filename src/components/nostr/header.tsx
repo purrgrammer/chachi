@@ -3,14 +3,18 @@ import { Globe, MessageCircleQuestion } from "lucide-react";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { formatRelativeTime } from "@/lib/time";
+import { ModeratedCommunityName } from "@/components/nostr/moderated-communities";
 import { validateZap } from "@/lib/nip-57";
 import { User } from "@/components/nostr/user";
 import { CommunityList } from "@/components/nostr/community-list";
-import { TARGETED_PUBLICATION } from "@/lib/kinds";
+import { MODERATED_COMMUNITY, TARGETED_PUBLICATION } from "@/lib/kinds";
 import { GroupLink } from "@/components/nostr/group-link";
 
 export function Header({ event }: { event: NostrEvent }) {
   const { t } = useTranslation();
+  const aTag = event.tags.find((t) => t[0] === "a")?.[1];
+  const isCommunityPost =
+    aTag && aTag.split(":")[0] === String(MODERATED_COMMUNITY);
   const groupTag = event.tags.find((t) => t[0] === "h");
   const [, group, relay] = groupTag ? groupTag : [];
   // todo: try harder to figure out the right relay if not present
@@ -37,6 +41,8 @@ export function Header({ event }: { event: NostrEvent }) {
           <MessageCircleQuestion className="size-3" />
           <span>{t("header.unknown")}</span>
         </div>
+      ) : isCommunityPost ? (
+        <ModeratedCommunityName address={aTag} />
       ) : (
         <div className="flex flex-row items-center gap-1">
           <Globe className="size-3" />

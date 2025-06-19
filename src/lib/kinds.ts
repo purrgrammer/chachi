@@ -24,3 +24,6 @@ export const FOLLOW_PACK = 39089 as NDKKind;
 export const COMMUNIKEY = 10_222 as NDKKind;
 export const RELATIONSHIP = 30_382 as NDKKind;
 export const TARGETED_PUBLICATION = 30_222 as NDKKind;
+// NIP-72 Communities
+export const MODERATED_COMMUNITY = 34550 as NDKKind;
+export const POST_APPROVAL = 4550 as NDKKind;

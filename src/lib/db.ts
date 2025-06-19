@@ -1,23 +1,13 @@
 import Dexie, { Table } from "dexie";
 import NDKCacheAdapterDexie from "@nostr-dev-kit/ndk-cache-dexie";
 import { NDKCashuToken, NDKEvent } from "@nostr-dev-kit/ndk";
-import { Group, GroupMetadata, Community } from "./types";
+import { Event, Group, GroupMetadata, Community } from "./types";
 //import { Transaction } from "@/lib/wallet";
 
 // todo: tweak cache sizes
 export const cache = new NDKCacheAdapterDexie({
   dbName: "ndk",
 });
-
-export interface Event {
-  id: string;
-  group: string;
-  kind: number;
-  created_at: number;
-  content: string;
-  pubkey: string;
-  tags: string[][];
-}
 
 export interface TokenEvent {
   id: string;

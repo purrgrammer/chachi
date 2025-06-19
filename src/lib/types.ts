@@ -94,3 +94,14 @@ export type PrivateGroup = {
   id: string;
   pubkeys: string[];
 };
+
+// Unsigned nostr event
+export interface Event {
+  id: string;
+  group: string;
+  kind: number;
+  created_at: number;
+  content: string;
+  pubkey: string;
+  tags: string[][];
+}
