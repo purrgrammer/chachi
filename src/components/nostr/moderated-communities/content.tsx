@@ -4,7 +4,7 @@ import { Embed } from "@/components/nostr/detail";
 import { NDKKind, NDKSubscriptionCacheUsage } from "@nostr-dev-kit/ndk";
 import { useRelaySet } from "@/lib/nostr";
 import { useNDK } from "@/lib/ndk";
-import { POST_APPROVAL } from "@/lib/kinds";
+import { POST_APPROVAL, MODERATED_COMMUNITY } from "@/lib/kinds";
 
 type ModeratedCommunity = {
   pubkey: string;
@@ -38,6 +38,7 @@ function useApprovedPosts(community: ModeratedCommunity) {
         .filter(Boolean) as string[];
       const aRefs = Array.from(events)
         .map((e) => e.tags.find((t) => t[0] === "a")?.[1])
+        .filter((a) => a && !a.startsWith(`${MODERATED_COMMUNITY}:`))
         .filter(Boolean) as string[];
       return ndk
         .fetchEvents(
@@ -45,7 +46,9 @@ function useApprovedPosts(community: ModeratedCommunity) {
             // moderator's posts
             {
               kinds: [NDKKind.Text, NDKKind.Article, NDKKind.GroupNote],
-              "#d": [community.id],
+              "#a": [
+                `${MODERATED_COMMUNITY}:${community.pubkey}:${community.id}`,
+              ],
               authors: community.moderators,
             },
             // approved posts
