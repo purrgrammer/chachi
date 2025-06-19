@@ -1165,11 +1165,15 @@
     "rsvp": "RSVP"
   },
   "feed": {
-    "live-updates": "Live",
     "content-types": "Content Types",
     "clear": "Clear",
     "all": "All",
     "save": "Save",
     "load-older": "Load older posts"
+  },
+  "stream": {
+    "live-updates": "Live",
+    "ended": "Ended",
+    "planned": "Planned"
   }
 }

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import type { NostrEvent } from "nostr-tools";
 import ReactPlayer from "react-player";
-import { Radio, Play } from "lucide-react";
+import { Radio, Play, Square, Calendar } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import Hashtags from "@/components/nostr/hashtags";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,21 +27,27 @@ export function Stream({
   options?: RichTextOptions;
   classNames?: RichTextClassnames;
 }) {
+  const { t } = useTranslation();
   const [isPlaying, setIsPlaying] = useState(false);
   const title = event.tags.find((t) => t[0] === "title")?.[1];
   const summary = event.tags.find((t) => t[0] === "summary")?.[1];
   const image = event.tags.find((t) => t[0] === "image")?.[1];
-  const isLive = event.tags.find((t) => t[0] === "status")?.[1] === "live";
+  const status = event.tags.find((t) => t[0] === "status")?.[1];
   const stream = event.tags.find((t) => t[0] === "streaming")?.[1];
+  const recording = event.tags.find((t) => t[0] === "recording")?.[1];
+
+  const isLive = status === "live";
+  const isPlanned = status === "planned";
+  const hasEnded = status === "ended" || Boolean(recording);
   return (
     <div className="flex flex-col gap-1">
       <div className="mb-1 relative">
-        {image && isLive && stream ? (
+        {image && ((isLive && stream) || (hasEnded && recording)) ? (
           isPlaying ? (
             <ReactPlayer
-              url={stream}
-              hlsOptions={{ autoStartLoad: false }}
+              url={isLive ? stream : recording}
               controls={true}
+              playing={isPlaying}
               className="aspect-video rounded-sm"
               width="100%"
               height="100%"
@@ -71,7 +78,25 @@ export function Stream({
             <div className="flex flex-row items-center gap-1">
               <Radio className="size-4 animate-pulse" />
               <span className="hidden md:inline text-xs uppercase font-light">
-                Live
+                {t("stream.live-updates")}
+              </span>
+            </div>
+          </Badge>
+        ) : hasEnded ? (
+          <Badge variant="secondary" className="absolute top-1 right-1">
+            <div className="flex flex-row items-center gap-1">
+              <Square className="size-4" />
+              <span className="hidden md:inline text-xs uppercase font-light">
+                {t("stream.ended")}
+              </span>
+            </div>
+          </Badge>
+        ) : isPlanned ? (
+          <Badge variant="outline" className="absolute top-1 right-1">
+            <div className="flex flex-row items-center gap-1">
+              <Calendar className="size-4" />
+              <span className="hidden md:inline text-xs uppercase font-light">
+                {t("stream.planned")}
               </span>
             </div>
           </Badge>
