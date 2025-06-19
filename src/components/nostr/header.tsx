@@ -80,7 +80,7 @@ export function Header({ event }: { event: NostrEvent }) {
     </span>
   );
   return (
-    <div className="flex flex-row items-center justify-between w-full">
+    <div className="flex flex-row items-center gap-12 justify-between w-full">
       {op}
       <div className="flex flex-row items-center gap-3">{time}</div>
     </div>
