@@ -11,7 +11,7 @@ import { User } from "@/components/nostr/user";
 import { RichText } from "@/components/rich-text";
 import { Nip05 } from "@/components/nostr/nip05";
 import { LoadingScreen } from "@/components/loading-screen";
-import { GroupItem } from "@/components/nostr/groups/group-item";
+import { Group } from "@/components/nostr/group";
 import { RelayLink } from "@/components/nostr/relay";
 import { Button } from "@/components/ui/button";
 import {
@@ -220,9 +220,9 @@ function ProfileWelcome({ pubkey, relays }: { pubkey: string; relays: string[] }
                   {t("profile.groups", "Groups")}
                 </h2>
               </div>
-              <div className="grid grid-cols-1 gap-1">
+              <div className="flex flex-wrap gap-4 justify-center sm:justify-start">
                 {nip29Groups.map((group) => (
-                  <GroupItem key={`${group.id}:${group.relay}`} group={group} />
+                  <Group key={`${group.id}:${group.relay}`} group={group} />
                 ))}
               </div>
             </div>
