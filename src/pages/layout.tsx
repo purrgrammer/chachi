@@ -441,6 +441,10 @@ function useUserEvents() {
 
 const authRoutes = ["/", "/dm", "/wallet", "/settings", "/zaps"];
 
+function isAuthRoute(pathname: string) {
+  return authRoutes.some((route) => pathname.startsWith(route));
+}
+
 function NostrSync({ children }: { children: ReactNode }) {
   useUserEvents();
   const location = useLocation();
@@ -449,11 +453,11 @@ function NostrSync({ children }: { children: ReactNode }) {
   if (!loginMethod) {
     return <Landing />;
   }
-  if (!pubkey && !loginMethod && authRoutes.includes(location.pathname)) {
+  if (!pubkey && !loginMethod && isAuthRoute(location.pathname)) {
     return <Landing />;
   }
-  if (!pubkey && loginMethod && authRoutes.includes(location.pathname)) {
-    return <LoadingScreen />;
+  if (!pubkey && loginMethod) {
+    return isAuthRoute(location.pathname) ? <Landing /> : <LoadingScreen />;
   }
   return children;
 }

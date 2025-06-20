@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 //import { Embed } from "@/components/nostr/detail";
 import { ChatBubble } from "./nostr/chat-bubble";
 import { Login } from "@/components/nostr/login";
-import { Emoji } from "./emoji";
+//import { Emoji } from "./emoji";
 import { useStream } from "@/lib/nostr";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { CHACHI_PUBKEY, CHACHI_RELAYS } from "@/constants";
@@ -387,25 +387,22 @@ export default function Landing() {
     <div className="flex flex-col items-center w-full min-h-screen">
       <div className="flex flex-col items-center justify-center py-20 text-center px-4 md:flex-row gap-6 md:gap-12">
         <div className="mb-6">
-          <Logo width={220} height={220} />
+          <div className="flex flex-col gap-2 items-center">
+            <Logo width={220} height={220} />
+            <h1 className="text-8xl font-semibold leading-none">chachi</h1>
+          </div>
         </div>
         <div className="flex flex-col items-start">
-          <h1 className="text-8xl font-semibold leading-none">chachi</h1>
-          <h2 className="text-6xl font-normal leading-none text-left">
-            <span className="text-7xl font-semibold text-gradient bg-clip-text text-transparent">
+          <h2 className="text-8xl font-normal leading-none text-balance">
+            <span className="font-semibold text-gradient bg-clip-text text-transparent">
               vibe
             </span>
-            <Emoji
-              image="https://cdn.betterttv.net/emote/65eb56841061568fccac9e01/3x.webp"
-              name="catTime"
-              className="size-14 ml-1 -mt-2"
-            />
             <br />
-            with your tribe
-            {/*
-        <Emoji image="https://cdn.betterttv.net/emote/658f28f95e7e78960777148d/3x.webp" name="Glorp" className="size-10 ml-2 -mt-1" />   
-        <Emoji image="https://cdn.betterttv.net/emote/641b685809065320f4a2cf72/3x.webp" name="MEOWDY" className="size-10 ml-2 -mt-1" />
-        */}
+            with your
+            <br />
+            <span className="font-semibold text-animated-gradient bg-clip-text text-transparent">
+              tribe
+            </span>
           </h2>
         </div>
       </div>

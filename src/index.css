@@ -44,6 +44,12 @@
     --gradient-purple: 239 76% 74%;
     --gradient-pink: 315 93% 60%;
     --gradient-yellow: 66 94% 60%;
+
+    /* Text gradient colors - optimized for light mode */
+    --text-gradient-purple: 262 83% 58%;
+    --text-gradient-blue: 217 91% 60%;
+    --text-gradient-cyan: 189 94% 43%;
+    --text-gradient-emerald: 160 84% 39%;
   }
 
   .dark {
@@ -85,6 +91,12 @@
     --gradient-purple: 239 76% 74%;
     --gradient-pink: 315 93% 60%;
     --gradient-yellow: 66 94% 60%;
+
+    /* Text gradient colors - brighter for dark mode */
+    --text-gradient-purple: 262 83% 70%;
+    --text-gradient-blue: 217 91% 75%;
+    --text-gradient-cyan: 189 94% 60%;
+    --text-gradient-emerald: 160 84% 55%;
   }
 
   .monochrome {
@@ -255,6 +267,21 @@
     100% {
       background-position: 0% 50%;
     }
+  }
+  .text-animated-gradient {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--text-gradient-purple)),
+      hsl(var(--text-gradient-blue)),
+      hsl(var(--text-gradient-cyan)),
+      hsl(var(--text-gradient-emerald))
+    );
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: animatedgradient 6s ease-in-out alternate infinite;
+    background-size: 300% 300%;
   }
   mark {
     color: hsl(var(--accent-foreground));
