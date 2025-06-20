@@ -37,7 +37,13 @@ function Names({ pubkeys }: { pubkeys: string[] }) {
   ));
 }
 
-export function Group({ group, className }: { group: Group; className?: string }) {
+export function Group({
+  group,
+  className,
+}: {
+  group: Group;
+  className?: string;
+}) {
   const navigate = useNavigate();
   const name = useGroupName(group);
   const picture = useGroupPicture(group);
@@ -45,7 +51,7 @@ export function Group({ group, className }: { group: Group; className?: string }
   const { admins, members } = useGroupParticipants(group);
   const { t } = useTranslation();
   return (
-    <div className={`rounded-md border w-full min-w-0 ${className || ''}`}>
+    <div className={`rounded-md border w-full min-w-0 ${className || ""}`}>
       {admins && admins.length > 0 ? (
         <div className="flex flex-row flex-wrap gap-1 items-center py-1 px-2 text-sm rounded-t-md bg-accent">
           {t("group.hosted.by")}

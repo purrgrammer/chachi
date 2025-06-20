@@ -17,7 +17,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ContentKinds, SupportedKinds, ContentCategoryGroups } from "@/lib/constants/kinds";
+import {
+  ContentKinds,
+  SupportedKinds,
+  ContentCategoryGroups,
+} from "@/lib/constants/kinds";
 import type { NDKKind } from "@nostr-dev-kit/ndk";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
@@ -55,12 +59,14 @@ export function FeedControls({
   onSaveFilters,
 }: FeedControlsProps) {
   const { t } = useTranslation();
-  
+
   // Use external state if provided, otherwise use internal state
   const [internalTempKinds, setInternalTempKinds] = useState<NDKKind[]>(kinds);
   const [internalFilterChanged, setInternalFilterChanged] = useState(false);
   const [internalIsPopoverOpen, setInternalIsPopoverOpen] = useState(false);
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["text", "social"]));
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
+    new Set(["text", "social"]),
+  );
 
   const tempKinds = externalTempKinds ?? internalTempKinds;
   const filterChanged = externalFilterChanged ?? internalFilterChanged;
@@ -119,7 +125,7 @@ export function FeedControls({
   };
 
   const toggleCategory = (categoryId: string) => {
-    setExpandedCategories(prev => {
+    setExpandedCategories((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(categoryId)) {
         newSet.delete(categoryId);
@@ -131,12 +137,16 @@ export function FeedControls({
   };
 
   const handleSelectAllInCategory = (categoryKinds: NDKKind[]) => {
-    const availableCategoryKinds = categoryKinds.filter(kind => supportedKinds.includes(kind));
-    const newKinds = Array.from(new Set([...tempKinds, ...availableCategoryKinds]));
-    
+    const availableCategoryKinds = categoryKinds.filter((kind) =>
+      supportedKinds.includes(kind),
+    );
+    const newKinds = Array.from(
+      new Set([...tempKinds, ...availableCategoryKinds]),
+    );
+
     if (onKindToggle) {
       // For external state, we need to handle this differently
-      availableCategoryKinds.forEach(kind => {
+      availableCategoryKinds.forEach((kind) => {
         if (!tempKinds.includes(kind)) {
           onKindToggle(kind, true);
         }
@@ -147,11 +157,11 @@ export function FeedControls({
   };
 
   const handleClearCategory = (categoryKinds: NDKKind[]) => {
-    const newKinds = tempKinds.filter(kind => !categoryKinds.includes(kind));
-    
+    const newKinds = tempKinds.filter((kind) => !categoryKinds.includes(kind));
+
     if (onKindToggle) {
       // For external state, we need to handle this differently
-      categoryKinds.forEach(kind => {
+      categoryKinds.forEach((kind) => {
         if (tempKinds.includes(kind)) {
           onKindToggle(kind, false);
         }
@@ -203,27 +213,40 @@ export function FeedControls({
               <ScrollArea className="h-[400px] pr-3">
                 <div className="space-y-2">
                   {ContentCategoryGroups.map((category) => {
-                    const availableCategoryKinds = category.kinds.filter(kind => supportedKinds.includes(kind));
+                    const availableCategoryKinds = category.kinds.filter(
+                      (kind) => supportedKinds.includes(kind),
+                    );
                     if (availableCategoryKinds.length === 0) return null;
-                    
+
                     const isExpanded = expandedCategories.has(category.id);
-                    const selectedInCategory = availableCategoryKinds.filter(kind => tempKinds.includes(kind));
-                    const allSelected = selectedInCategory.length === availableCategoryKinds.length;
+                    const selectedInCategory = availableCategoryKinds.filter(
+                      (kind) => tempKinds.includes(kind),
+                    );
+                    const allSelected =
+                      selectedInCategory.length ===
+                      availableCategoryKinds.length;
                     const someSelected = selectedInCategory.length > 0;
-                    
+
                     return (
                       <div key={category.id} className="border rounded-md">
-                        <div 
+                        <div
                           className="flex items-center justify-between p-2 cursor-pointer hover:bg-muted/50"
                           onClick={() => toggleCategory(category.id)}
                         >
                           <div className="flex items-center gap-2">
-                            {isExpanded ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
+                            {isExpanded ? (
+                              <ChevronDown className="size-4" />
+                            ) : (
+                              <ChevronRight className="size-4" />
+                            )}
                             {category.icon}
-                            <span className="text-base font-medium">{category.name}</span>
+                            <span className="text-base font-medium">
+                              {category.name}
+                            </span>
                             {someSelected && (
                               <Badge variant="secondary" className="text-xs">
-                                {selectedInCategory.length}/{availableCategoryKinds.length}
+                                {selectedInCategory.length}/
+                                {availableCategoryKinds.length}
                               </Badge>
                             )}
                           </div>
@@ -254,13 +277,15 @@ export function FeedControls({
                             )}
                           </div>
                         </div>
-                        
+
                         {isExpanded && (
                           <div className="px-4 pb-2 space-y-2 border-t bg-muted/20">
                             {availableCategoryKinds.map((kind) => {
-                              const kindInfo = ContentKinds.find(k => k.kind === kind);
+                              const kindInfo = ContentKinds.find(
+                                (k) => k.kind === kind,
+                              );
                               if (!kindInfo) return null;
-                              
+
                               return (
                                 <div
                                   key={kind}
@@ -323,7 +348,10 @@ interface ActiveFilterBadgesProps {
   onRemoveKind: (kind: NDKKind) => void;
 }
 
-export function ActiveFilterBadges({ kinds, onRemoveKind }: ActiveFilterBadgesProps) {
+export function ActiveFilterBadges({
+  kinds,
+  onRemoveKind,
+}: ActiveFilterBadgesProps) {
   const { t } = useTranslation();
 
   if (kinds.length === 0) return null;

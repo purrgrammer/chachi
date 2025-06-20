@@ -1,21 +1,14 @@
-import {
-  Navigate,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
-import {
-  Server,
-  Cog,
-  Users,
-  Contact,
-  Code,
-} from "lucide-react";
+import { Server, Cog, Users, Contact, Code } from "lucide-react";
 import { Header } from "@/components/header";
 import { isRelayURL, useRelayInfo } from "@/lib/relay";
 import { RelayIcon, RelayName } from "@/components/nostr/relay";
 import Feed from "@/components/nostr/feed";
-import { FeedControls, ActiveFilterBadges } from "@/components/nostr/feed-controls";
+import {
+  FeedControls,
+  ActiveFilterBadges,
+} from "@/components/nostr/feed-controls";
 import { User } from "@/components/nostr/user";
 import { useFeedFilters } from "@/hooks/use-feed-filters";
 import {
@@ -257,10 +250,7 @@ function RelayFeed({ relay }: { relay: string }) {
           onSelectAllKinds={handleSelectAllKinds}
           onSaveFilters={handleSaveFilters}
         />
-        <ActiveFilterBadges
-          kinds={kinds}
-          onRemoveKind={handleRemoveKind}
-        />
+        <ActiveFilterBadges kinds={kinds} onRemoveKind={handleRemoveKind} />
       </div>
 
       <Feed

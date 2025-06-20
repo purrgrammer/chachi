@@ -21,11 +21,11 @@ export function useFeedFilters({
     .getAll("kinds")
     .map(Number)
     .filter((k) => SupportedKinds.includes(k));
-  
+
   const urlLive = searchParams.get("live") === "true";
 
   const [kinds, setKinds] = useState<NDKKind[]>(
-    urlKinds.length > 0 ? urlKinds : defaultKinds
+    urlKinds.length > 0 ? urlKinds : defaultKinds,
   );
   const [tempKinds, setTempKinds] = useState<NDKKind[]>(kinds);
   const [live, setLive] = useState(urlLive);
@@ -51,7 +51,7 @@ export function useFeedFilters({
       },
       {
         replace: true,
-      }
+      },
     );
   };
 
@@ -81,12 +81,12 @@ export function useFeedFilters({
       },
       {
         replace: true,
-      }
+      },
     );
   };
 
   const handleRemoveKind = (kind: NDKKind) => {
-    const newKinds = kinds.filter(k => k !== kind);
+    const newKinds = kinds.filter((k) => k !== kind);
     setKinds(newKinds);
     setTempKinds(newKinds);
     setSearchParams(
@@ -96,7 +96,7 @@ export function useFeedFilters({
       },
       {
         replace: true,
-      }
+      },
     );
   };
 

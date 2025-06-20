@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { User as UserIcon, AtSign, LinkIcon, Users, Castle, Server } from "lucide-react";
+import {
+  User as UserIcon,
+  AtSign,
+  LinkIcon,
+  Users,
+  Castle,
+  Server,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { parseProfileIdentifier, resolveNip05 } from "@/lib/profile-identifier";
 import { useProfile, useRelayList, useAddress } from "@/lib/nostr";
@@ -26,7 +33,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import Feed from "@/components/nostr/feed";
-import { FeedControls, ActiveFilterBadges } from "@/components/nostr/feed-controls";
+import {
+  FeedControls,
+  ActiveFilterBadges,
+} from "@/components/nostr/feed-controls";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { useFeedFilters } from "@/hooks/use-feed-filters";
 
@@ -36,9 +46,13 @@ interface ProfileValidatorProps {
   onError: (error: string) => void;
 }
 
-function ProfileValidator({ identifier, onValidated, onError }: ProfileValidatorProps) {
+function ProfileValidator({
+  identifier,
+  onValidated,
+  onError,
+}: ProfileValidatorProps) {
   const { t } = useTranslation();
-  
+
   useEffect(() => {
     async function parseIdentifier() {
       if (!identifier) {
@@ -56,7 +70,12 @@ function ProfileValidator({ identifier, onValidated, onError }: ProfileValidator
         // Resolve NIP-05 to pubkey
         const resolvedPubkey = await resolveNip05(parsed.pubkey);
         if (!resolvedPubkey) {
-          onError(t("profile.error.nip05-resolve", "Could not resolve NIP-05 address"));
+          onError(
+            t(
+              "profile.error.nip05-resolve",
+              "Could not resolve NIP-05 address",
+            ),
+          );
           return;
         }
         onValidated(resolvedPubkey, []); // Use discovery relays for NIP-05
@@ -85,18 +104,24 @@ function ProfileHeader({ pubkey }: { pubkey: string }) {
             name: "text-lg font-normal line-clamp-1",
           }}
         />
-          <Tooltip>
-            <TooltipTrigger>
-              <UserIcon className="size-5 text-muted-foreground" />
-            </TooltipTrigger>
-            <TooltipContent>{t("user.profile", "Profile")}</TooltipContent>
-          </Tooltip>
-        </div>
+        <Tooltip>
+          <TooltipTrigger>
+            <UserIcon className="size-5 text-muted-foreground" />
+          </TooltipTrigger>
+          <TooltipContent>{t("user.profile", "Profile")}</TooltipContent>
+        </Tooltip>
+      </div>
     </Header>
   );
 }
 
-function ProfileWelcome({ pubkey, relays }: { pubkey: string; relays: string[] }) {
+function ProfileWelcome({
+  pubkey,
+  relays,
+}: {
+  pubkey: string;
+  relays: string[];
+}) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [isBannerLoaded, setIsBannerLoaded] = useState(false);
@@ -104,15 +129,15 @@ function ProfileWelcome({ pubkey, relays }: { pubkey: string; relays: string[] }
   const { data: profile } = useProfile(pubkey, relays);
   const { data: userRelays } = useRelayList(pubkey);
   const { data: userGroups = [] } = useUserGroups(pubkey);
-  
+
   // Filter to only show NIP-29 groups (exclude communities)
-  const nip29Groups = userGroups.filter(group => !group.isCommunity);
+  const nip29Groups = userGroups.filter((group) => !group.isCommunity);
 
   // Check if this user is a communikey (has COMMUNIKEY event)
   const { data: communikeyEvent } = useAddress({
     pubkey,
     kind: COMMUNIKEY,
-    relays: [...relays, ...(userRelays || [])]
+    relays: [...relays, ...(userRelays || [])],
   });
 
   const banner = profile?.banner || profile?.picture;
@@ -126,7 +151,9 @@ function ProfileWelcome({ pubkey, relays }: { pubkey: string; relays: string[] }
           className="w-full min-h-42 max-h-96 aspect-image object-cover"
           onLoad={() => setIsBannerLoaded(true)}
         />
-        <div className={`flex flex-row justify-between ${banner && isBannerLoaded ? "-mt-20" : ""}`}>
+        <div
+          className={`flex flex-row justify-between ${banner && isBannerLoaded ? "-mt-20" : ""}`}
+        >
           <div className="p-2 flex flex-col items-start gap-3">
             <div className="flex flex-col gap-2 items-start ml-3">
               <div className="flex flex-col gap-1">
@@ -178,7 +205,7 @@ function ProfileWelcome({ pubkey, relays }: { pubkey: string; relays: string[] }
           {/* Communikey Button - positioned like Join button in welcome page */}
           {communikeyEvent && (
             <div className="flex flex-row gap-2 mt-20 pt-2 pr-3">
-              <Button 
+              <Button
                 variant="outline"
                 size="sm"
                 onClick={() => navigate(`/c/${pubkey}`)}
@@ -210,7 +237,7 @@ function ProfileWelcome({ pubkey, relays }: { pubkey: string; relays: string[] }
               </div>
             </div>
           ) : null}
-          
+
           {/* NIP-29 Groups Section */}
           {nip29Groups.length > 0 ? (
             <div className="flex flex-col gap-2">
@@ -262,13 +289,11 @@ function ProfileFeed({ pubkey, relays }: { pubkey: string; relays: string[] }) {
   } = useFeedFilters({ defaultKinds: [NDKKind.Text] });
 
   const limit = 20;
-  const filter = [
-    {
-      authors: [pubkey],
-      kinds: kinds.length > 0 ? kinds : undefined,
-      limit,
-    },
-  ];
+  const filter = {
+    authors: [pubkey],
+    kinds: kinds.length > 0 ? kinds : undefined,
+    limit,
+  };
 
   return (
     <div className="flex flex-col gap-0 max-w-xl mx-auto">
@@ -286,14 +311,11 @@ function ProfileFeed({ pubkey, relays }: { pubkey: string; relays: string[] }) {
           onSelectAllKinds={handleSelectAllKinds}
           onSaveFilters={handleSaveFilters}
         />
-        <ActiveFilterBadges
-          kinds={kinds}
-          onRemoveKind={handleRemoveKind}
-        />
+        <ActiveFilterBadges kinds={kinds} onRemoveKind={handleRemoveKind} />
       </div>
       <Feed
         feedClassName="p-0"
-        key={`${pubkey}-${kinds.join(',')}-${live}`}
+        key={`${pubkey}-${kinds.join(",")}-${live}`}
         filter={filter}
         live={live}
         outboxRelays={relays}
@@ -313,7 +335,11 @@ interface ProfileContentProps {
   tab?: string;
 }
 
-function ProfileContent({ pubkey, relays, tab = "profile" }: ProfileContentProps) {
+function ProfileContent({
+  pubkey,
+  relays,
+  tab = "profile",
+}: ProfileContentProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { identifier } = useParams<{ identifier: string }>();
@@ -326,11 +352,18 @@ function ProfileContent({ pubkey, relays, tab = "profile" }: ProfileContentProps
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">{t("profile.not-found", "Profile Not Found")}</h1>
+          <h1 className="text-2xl font-bold mb-2">
+            {t("profile.not-found", "Profile Not Found")}
+          </h1>
           <p className="text-muted-foreground mb-4">
-            {t("profile.error.load-failed", "This user profile could not be loaded")}
+            {t(
+              "profile.error.load-failed",
+              "This user profile could not be loaded",
+            )}
           </p>
-          <Button onClick={() => navigate(-1)}>{t("profile.action.go-back", "Go Back")}</Button>
+          <Button onClick={() => navigate(-1)}>
+            {t("profile.action.go-back", "Go Back")}
+          </Button>
         </div>
       </div>
     );
@@ -355,8 +388,12 @@ function ProfileContent({ pubkey, relays, tab = "profile" }: ProfileContentProps
 md:w-[calc(100vw-18rem)]
 	  group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100vw-18rem)"
         >
-          <TabsTrigger value="profile">{t("user.profile", "Profile")}</TabsTrigger>
-          <TabsTrigger value="feed">{t("content.type.feed", "Feed")}</TabsTrigger>
+          <TabsTrigger value="profile">
+            {t("user.profile", "Profile")}
+          </TabsTrigger>
+          <TabsTrigger value="feed">
+            {t("content.type.feed", "Feed")}
+          </TabsTrigger>
         </TabsList>
         <TabsContent asChild value="profile">
           <ProfileWelcome pubkey={pubkey} relays={relays} />
@@ -377,7 +414,10 @@ export default function UserProfile({ tab = "profile" }: { tab?: string }) {
   const [relays, setRelays] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const handleValidated = (validatedPubkey: string, validatedRelays: string[]) => {
+  const handleValidated = (
+    validatedPubkey: string,
+    validatedRelays: string[],
+  ) => {
     setPubkey(validatedPubkey);
     setRelays(validatedRelays);
   };
@@ -391,9 +431,13 @@ export default function UserProfile({ tab = "profile" }: { tab?: string }) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">{t("profile.not-found", "Profile Not Found")}</h1>
+          <h1 className="text-2xl font-bold mb-2">
+            {t("profile.not-found", "Profile Not Found")}
+          </h1>
           <p className="text-muted-foreground mb-4">{error}</p>
-          <Button onClick={() => navigate(-1)}>{t("profile.action.go-back", "Go Back")}</Button>
+          <Button onClick={() => navigate(-1)}>
+            {t("profile.action.go-back", "Go Back")}
+          </Button>
         </div>
       </div>
     );
@@ -412,7 +456,9 @@ export default function UserProfile({ tab = "profile" }: { tab?: string }) {
 
   // Render profile content once we have a valid pubkey
   if (pubkey) {
-    return <ProfileContent key={pubkey} pubkey={pubkey} relays={relays} tab={tab} />;
+    return (
+      <ProfileContent key={pubkey} pubkey={pubkey} relays={relays} tab={tab} />
+    );
   }
 
   return null;

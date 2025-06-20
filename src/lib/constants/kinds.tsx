@@ -202,19 +202,40 @@ export const ContentCategoryGroups = [
     id: "text",
     name: "Text",
     icon: <Type size={16} />,
-    kinds: [NDKKind.Text, NDKKind.GroupChat, NDKKind.GroupNote, COMMENT, NDKKind.Article, BOOK, NDKKind.Highlight],
+    kinds: [
+      NDKKind.Text,
+      NDKKind.GroupChat,
+      NDKKind.GroupNote,
+      COMMENT,
+      NDKKind.Article,
+      BOOK,
+      NDKKind.Highlight,
+    ],
   },
   {
-    id: "media", 
+    id: "media",
     name: "Media",
     icon: <PlayCircle size={16} />,
-    kinds: [NDKKind.Image, NDKKind.VerticalVideo, NDKKind.HorizontalVideo, GIF_SET, NDKKind.EmojiSet],
+    kinds: [
+      NDKKind.Image,
+      NDKKind.VerticalVideo,
+      NDKKind.HorizontalVideo,
+      GIF_SET,
+      NDKKind.EmojiSet,
+    ],
   },
   {
     id: "social",
     name: "Social",
     icon: <UserPlus size={16} />,
-    kinds: [NDKKind.Reaction, NDKKind.Zap, NDKKind.Nutzap, FOLLOW_PACK, NDKKind.FollowSet, NDKKind.BadgeDefinition],
+    kinds: [
+      NDKKind.Reaction,
+      NDKKind.Zap,
+      NDKKind.Nutzap,
+      FOLLOW_PACK,
+      NDKKind.FollowSet,
+      NDKKind.BadgeDefinition,
+    ],
   },
   {
     id: "groups",
@@ -224,7 +245,7 @@ export const ContentCategoryGroups = [
   },
   {
     id: "interactive",
-    name: "Interactive", 
+    name: "Interactive",
     icon: <Gamepad2 size={16} />,
     kinds: [POLL, STREAM, CALENDAR_EVENT, GOAL],
   },
@@ -274,10 +295,14 @@ export const getKindInfo = (kind: number) => {
 /**
  * Get all kinds that are available for filtering (grouped)
  */
-export const getAvailableKindsFromGroups = (supportedKinds: NDKKind[] = SupportedKinds) => {
-  const allGroupKinds = ContentCategoryGroups.flatMap(group => group.kinds);
-  return ContentKinds.filter(kindInfo => 
-    allGroupKinds.includes(kindInfo.kind) && supportedKinds.includes(kindInfo.kind)
+export const getAvailableKindsFromGroups = (
+  supportedKinds: NDKKind[] = SupportedKinds,
+) => {
+  const allGroupKinds = ContentCategoryGroups.flatMap((group) => group.kinds);
+  return ContentKinds.filter(
+    (kindInfo) =>
+      allGroupKinds.includes(kindInfo.kind) &&
+      supportedKinds.includes(kindInfo.kind),
   );
 };
 
@@ -285,5 +310,5 @@ export const getAvailableKindsFromGroups = (supportedKinds: NDKKind[] = Supporte
  * Get category for a specific kind
  */
 export const getCategoryForKind = (kind: NDKKind) => {
-  return ContentCategoryGroups.find(group => group.kinds.includes(kind));
+  return ContentCategoryGroups.find((group) => group.kinds.includes(kind));
 };
