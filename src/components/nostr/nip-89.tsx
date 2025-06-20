@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ExternalLink, Code, Globe, Tags, Layers } from "lucide-react";
+import { Code, Globe, Tags, Layers } from "lucide-react";
+import { NDKKind } from "@nostr-dev-kit/ndk";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Avatar as NostrAvatar } from "@/components/nostr/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -8,85 +9,57 @@ import { ContentKinds } from "@/lib/constants/kinds";
 import { NostrEvent } from "nostr-tools";
 import { useTranslation } from "react-i18next";
 import { Name } from "./name";
+import { Address } from "@/components/nostr/event";
 
-export function AppRecommendation({ event }: { event: NostrEvent }) {
+export function AppRecommendation({
+  event,
+  relays,
+}: {
+  event: NostrEvent;
+  relays: string[];
+}) {
   const { t } = useTranslation();
-  const profile = useMemo(() => {
-    try {
-      return JSON.parse(event.content);
-    } catch (error) {
-      console.error(error);
-      return {};
-    }
-  }, [event]);
+  const appRef = event.tags.find(
+    (t) => t[0] === "a" && t[1]?.startsWith(`${NDKKind.AppHandler}:`),
+  )?.[1];
+  if (!appRef) {
+    return null;
+  }
+  const recommendedKindStr = event.tags.find((t) => t[0] === "d" && t[1])?.[1];
+  const recommendedKind = recommendedKindStr
+    ? ContentKinds.find((k) => k.kind === Number(recommendedKindStr))
+    : undefined;
+  const [kind, pubkey, id] = appRef.split(":");
 
-  const supportedKinds = (
-    event.tags.filter((t) => t[0] === "k").map((t) => Number(t[1])) || []
-  )
-    .map((kind) => ContentKinds.find((k) => k.kind === kind))
-    .filter(Boolean);
-
-  return profile?.name ? (
-    <div className="border rounded-md max-w-md">
-      {profile.banner ? (
-        <img
-          src={profile.banner}
-          alt="Banner"
-          className="h-40 aspect-image object-fit rounded-t-md"
-        />
+  return (
+    <div className="flex flex-col gap-2">
+      {recommendedKind ? (
+        <Badge
+          variant="secondary"
+          className="text-xs flex items-center gap-1 w-fit"
+        >
+          {recommendedKind.icon}
+          <span>{t(recommendedKind.translationKey)}</span>
+        </Badge>
       ) : (
-        <NostrAvatar
-          pubkey={event.pubkey}
-          className="rounded-none w-full h-40 aspect-image object-fit rounded-t-md"
-        />
+        <Badge
+          variant="secondary"
+          className="text-xs flex items-center gap-1 w-fit"
+        >
+          <Code className="size-3" />
+          <span>
+            {t("kinds.unknown", "Kind {{kind}}", { kind: recommendedKindStr })}
+          </span>
+        </Badge>
       )}
-      <div className="flex flex-col gap-4 px-4 py-2">
-        <div className="flex flex-row items-center gap-3">
-          {profile?.picture ? (
-            <Avatar className="size-14">
-              <AvatarImage src={profile.picture} />
-              <AvatarFallback>{profile.name?.slice(0, 2)}</AvatarFallback>
-            </Avatar>
-          ) : null}
-          <div className="flex flex-col gap-0">
-            <h3 className="text-lg font-semibold">
-              {profile.name || <Name pubkey={event.pubkey} />}
-            </h3>
-            {profile.about ? (
-              <p className="text-sm text-muted-foreground line-clamp-1">
-                {profile.about}
-              </p>
-            ) : null}
-          </div>
-        </div>
-        <div className="flex flex-col gap-2">
-          {profile.website ? (
-            <Link
-              to={profile.website}
-              target="_blank"
-              className="font-mono text-xs text-muted-foreground hover:underline hover:decoration-dotted"
-            >
-              <div className="flex flex-row items-center gap-1">
-                <ExternalLink className="size-3" />
-                {profile.website}
-              </div>
-            </Link>
-          ) : null}
-        </div>
-        <div className="flex flex-wrap gap-2 mt-1">
-          {supportedKinds.map((kindInfo) => (
-            <div
-              key={kindInfo!.kind}
-              className="flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 rounded-full"
-            >
-              {kindInfo!.icon}
-              <span>{t(kindInfo!.translationKey)}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <Address
+        pubkey={pubkey}
+        kind={Number(kind)}
+        identifier={id}
+        relays={relays || ["wss://relay.nostr.band"]}
+      />
     </div>
-  ) : null;
+  );
 }
 
 export function AppDefinition({ event }: { event: NostrEvent }) {

@@ -950,7 +950,8 @@
     "31923": "Calendar Event",
     "34550": "Moderated Community",
     "38172": "Cashu Mint",
-    "39000": "Group Metadata"
+    "39000": "Group Metadata",
+    "unknown": "Kind {{kind}}"
   },
   "nips": {
     "01": "Basic Protocol Flow",
@@ -1099,6 +1100,7 @@
     }
   },
   "app": {
+    "categories": "Categories",
     "supported_kinds": "Content Types"
   },
   "private-group": {
@@ -1267,5 +1269,8 @@
     "something-went-wrong": "Something went wrong",
     "report-problem": "Report Problem",
     "reload-page": "Reload Page"
+  },
+  "search": {
+    "placeholder": "Search..."
   }
 }
