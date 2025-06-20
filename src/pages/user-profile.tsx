@@ -261,11 +261,12 @@ function ProfileFeed({ pubkey, relays }: { pubkey: string; relays: string[] }) {
     handleRemoveKind,
   } = useFeedFilters({ defaultKinds: [NDKKind.Text] });
 
+  const limit = 20;
   const filter = [
     {
       authors: [pubkey],
       kinds: kinds.length > 0 ? kinds : undefined,
-      limit: 20,
+      limit,
     },
   ];
 
@@ -291,14 +292,16 @@ function ProfileFeed({ pubkey, relays }: { pubkey: string; relays: string[] }) {
         />
       </div>
       <Feed
+        feedClassName="p-0"
         key={`${pubkey}-${kinds.join(',')}-${live}`}
         filter={filter}
         live={live}
         outboxRelays={relays}
         onlyRelays={relays.length > 0}
+        slidingWindow={limit}
         loadingClassname="py-32"
         emptyClassname="py-32"
-        feedClassName="p-0"
+        loadOlder
       />
     </div>
   );
