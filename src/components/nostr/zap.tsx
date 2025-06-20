@@ -44,6 +44,7 @@ import { WalletSelector } from "@/components/wallet";
 import type { Group, Emoji as EmojiType } from "@/lib/types";
 import { useRelays } from "@/lib/nostr";
 import { usePubkey, useCanSign } from "@/lib/account";
+import { useNDKWallets, useCashuWallet } from "@/lib/wallet";
 import { cn } from "@/lib/utils";
 
 export function NewZapDialog({
@@ -86,6 +87,9 @@ export function NewZapDialog({
   const { data: profile } = useProfile(pubkey);
   const name = profile?.name || pubkey.slice(0, 6);
   const canSign = useCanSign();
+  const [ndkWallets] = useNDKWallets();
+  const cashuWallet = useCashuWallet();
+  const hasWallets = ndkWallets.length > 0 || Boolean(cashuWallet);
   const myRelays = useRelays();
   const { data: relayList } = useRelayList(pubkey);
   const { data: mintList } = useMintList(pubkey);
@@ -150,8 +154,8 @@ export function NewZapDialog({
     try {
       setIsZapping(true);
 
-      // If user cannot sign, fetch invoice instead of trying to create zap
-      if (!canSign) {
+      // If user cannot sign OR has no wallets configured, fetch invoice instead of trying to create zap
+      if (!canSign || !hasWallets) {
         await fetchInvoiceForPayment();
         return;
       }
