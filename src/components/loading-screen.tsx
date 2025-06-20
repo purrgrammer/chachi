@@ -21,7 +21,10 @@ export const LoadingScreen = () => {
         zIndex: 50,
       }}
     >
-      <img src="/favicon.png" className="w-32 h-32 rounded-full" />
+      <img
+        src="/favicon.png"
+        className="w-32 h-32 rounded-tl-full rounded-tr-full rounded-br-full"
+      />
     </motion.div>
   );
 };

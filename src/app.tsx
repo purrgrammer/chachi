@@ -10,6 +10,7 @@ import { PrivateRoute } from "@/components/private-route";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import { LoadingScreen } from "@/components/loading-screen";
+import { ErrorPage } from "@/components/error-page";
 import ndk, { nwcNdk, NDKContext } from "@/lib/ndk";
 import { queryClient } from "@/lib/query";
 
@@ -40,6 +41,7 @@ const router = createBrowserRouter([
         </Suspense>
       </AnimatePresence>
     ),
+    errorElement: <ErrorPage />,
     loader: async () => {
       console.log("CONNECTING NDK instances");
       await ndk.connect();

@@ -1262,5 +1262,10 @@
     "error.load-failed": "This user profile could not be loaded",
     "banner.alt": "Profile Banner",
     "action.go-back": "Go Back"
+  },
+  "error": {
+    "something-went-wrong": "Something went wrong",
+    "report-problem": "Report Problem",
+    "reload-page": "Reload Page"
   }
 }
