@@ -8,6 +8,7 @@ import {
   Zap,
   HandHeart,
   Castle,
+  User,
 } from "lucide-react";
 import { Login } from "@/components/nostr/login";
 import { Avatar } from "@/components/nostr/avatar";
@@ -112,6 +113,10 @@ export function NavUser() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate(`/p/${pubkey}`)}>
+                  <User className="text-muted-foreground size-4" />
+                  {t("user.profile", "Profile")}
+                </DropdownMenuItem>
                 {communikey && (
                   <DropdownMenuItem onClick={() => navigate(`/c/${pubkey}`)}>
                     <Castle className="text-muted-foreground size-4" />

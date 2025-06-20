@@ -113,14 +113,14 @@ function fetchCachedAddress(
   ndk: NDK,
   kind: number,
   pubkey: string,
-  identifier: string,
+  identifier?: string,
 ) {
   return ndk
     .fetchEvent(
       {
         kinds: [kind],
         authors: [pubkey],
-        ...(kind >= 30_000 && kind <= 40_000 ? { "#d": [identifier] } : {}),
+        ...(kind >= 30_000 && kind <= 40_000 && identifier ? { "#d": [identifier] } : {}),
       },
       {
         closeOnEose: true,
@@ -143,14 +143,14 @@ export function useAddress({
 }: {
   pubkey: string;
   kind: number;
-  identifier: string;
+  identifier?: string;
   relays: string[];
 }) {
   const ndk = useNDK();
 
   // todo: tweak staleTime, get latest
   return useQuery({
-    queryKey: [ADDRESS, `${kind}:${pubkey}:${identifier}`],
+    queryKey: [ADDRESS, `${kind}:${pubkey}:${identifier ? identifier : ""}`],
     queryFn: async () => {
       const cached = await fetchCachedAddress(ndk, kind, pubkey, identifier);
       if (cached) {
@@ -168,7 +168,7 @@ export function useAddress({
           {
             kinds: [kind],
             authors: [pubkey],
-            ...(kind >= 30_0000 && kind <= 40_000
+            ...(kind >= 30_0000 && kind <= 40_000 && identifier
               ? { "#d": [identifier] }
               : {}),
           },

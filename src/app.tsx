@@ -28,6 +28,7 @@ const Mint = lazy(() => import("@/pages/mint"));
 const Nutzaps = lazy(() => import("@/pages/nutzaps"));
 const Relay = lazy(() => import("@/pages/relay"));
 const Community = lazy(() => import("@/pages/community"));
+const UserProfile = lazy(() => import("@/pages/user-profile"));
 
 const router = createBrowserRouter([
   {
@@ -76,6 +77,14 @@ const router = createBrowserRouter([
       {
         path: "/c/:pubkey/e/:nlink",
         element: <CommunityEvent />,
+      },
+      {
+        path: "/p/:identifier",
+        element: <UserProfile />,
+      },
+      {
+        path: "/p/:identifier/feed",
+        element: <UserProfile tab="feed" />,
       },
       {
         path: "/posts/:host",

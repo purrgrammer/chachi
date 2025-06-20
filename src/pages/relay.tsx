@@ -2,14 +2,10 @@ import {
   Navigate,
   useNavigate,
   useParams,
-  useSearchParams,
 } from "react-router-dom";
 import { Link } from "react-router-dom";
 import {
   Server,
-  Filter,
-  Radio,
-  Save,
   Cog,
   Users,
   Contact,
@@ -18,31 +14,16 @@ import {
 import { Header } from "@/components/header";
 import { isRelayURL, useRelayInfo } from "@/lib/relay";
 import { RelayIcon, RelayName } from "@/components/nostr/relay";
-import { Button } from "@/components/ui/button";
 import Feed from "@/components/nostr/feed";
+import { FeedControls, ActiveFilterBadges } from "@/components/nostr/feed-controls";
 import { User } from "@/components/nostr/user";
-import {
-  SupportedKinds,
-  ContentKinds,
-  getKindInfo,
-} from "@/lib/constants/kinds";
-import { useState, useEffect } from "react";
+import { useFeedFilters } from "@/hooks/use-feed-filters";
 import {
   NDKKind,
   NDKRelaySet,
   NDKSubscriptionCacheUsage,
 } from "@nostr-dev-kit/ndk";
 import { GroupChat } from "@/components/nostr/groups/chat";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { t } from "i18next";
 import {
   Tooltip,
@@ -241,207 +222,45 @@ function RelayInfo({ relay }: { relay: string }) {
 
 function RelayFeed({ relay }: { relay: string }) {
   const limit = 20;
-  const [searchParams, setSearchParams] = useSearchParams({
-    kinds: [String(NDKKind.Text)],
-    live: "true",
-  });
-  const defaultKinds = searchParams
-    .getAll("kinds")
-    .map(Number)
-    .filter((k) => SupportedKinds.includes(k));
-  const defaultLive = searchParams.get("live") === "true";
-
-  const [kinds, setKinds] = useState<NDKKind[]>(defaultKinds);
-  const [tempKinds, setTempKinds] = useState<NDKKind[]>(defaultKinds);
-  const [live, setLive] = useState(defaultLive);
-  const [filterChanged, setFilterChanged] = useState(false);
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-
-  useEffect(() => {
-    setTempKinds(kinds);
-  }, [kinds]);
-
-  useEffect(() => {
-    const hasChanged =
-      JSON.stringify(tempKinds.sort()) !== JSON.stringify(kinds.sort());
-    setFilterChanged(hasChanged);
-  }, [tempKinds, kinds]);
+  const {
+    kinds,
+    tempKinds,
+    live,
+    filterChanged,
+    isPopoverOpen,
+    setIsPopoverOpen,
+    handleLiveChange,
+    handleKindToggle,
+    handleClearKinds,
+    handleSelectAllKinds,
+    handleSaveFilters,
+    handleRemoveKind,
+  } = useFeedFilters({ defaultKinds: [NDKKind.Text] });
 
   if (!relay) {
     return <Navigate to="/" />;
   }
 
-  function handleLiveChange(checked: boolean) {
-    setLive(checked);
-    setSearchParams(
-      {
-        kinds: kinds.map(String),
-        live: checked.toString(),
-      },
-      {
-        replace: true,
-      },
-    );
-  }
-
-  const handleKindToggle = (kind: NDKKind, checked: boolean) => {
-    if (checked) {
-      setTempKinds((prev) => [...prev, kind]);
-    } else {
-      setTempKinds((prev) => prev.filter((k) => k !== kind));
-    }
-  };
-
-  const handleClearKinds = () => {
-    setTempKinds([]);
-  };
-
-  const handleSelectAllKinds = () => {
-    setTempKinds(SupportedKinds);
-  };
-
-  const handleSaveFilters = () => {
-    setKinds(tempKinds);
-    setIsPopoverOpen(false);
-    setSearchParams(
-      {
-        kinds: tempKinds.map(String),
-        live: live.toString(),
-      },
-      {
-        replace: true,
-      },
-    );
-  };
-
   return (
     <div className="flex flex-col gap-0 max-w-xl mx-auto">
-      <div className="flex flex-row gap-4 items-start justify-between pt-2 w-full px-4 sm:px-8">
-        <div>
-          <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <Filter className="size-4" />
-                {kinds.length > 0 && (
-                  <Badge variant="counter" className="ml-1">
-                    {kinds.length}
-                  </Badge>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80">
-              <div className="flex flex-col gap-4">
-                <div className="flex justify-between items-center">
-                  <h4 className="font-medium">{t("feed.content-types")}</h4>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="destructive"
-                      size="tiny"
-                      onClick={handleClearKinds}
-                    >
-                      {t("feed.clear")}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="tiny"
-                      onClick={handleSelectAllKinds}
-                    >
-                      {t("feed.all")}
-                    </Button>
-                  </div>
-                </div>
-
-                <ScrollArea className="h-[300px] pr-3">
-                  <div className="flex flex-col gap-2">
-                    {ContentKinds.map((kindInfo) => (
-                      <div
-                        key={kindInfo.kind}
-                        className="flex items-center space-x-2"
-                      >
-                        <Checkbox
-                          id={`kind-${kindInfo.kind}`}
-                          checked={tempKinds.includes(kindInfo.kind)}
-                          onCheckedChange={(checked) =>
-                            handleKindToggle(kindInfo.kind, checked === true)
-                          }
-                        />
-                        <Label
-                          htmlFor={`kind-${kindInfo.kind}`}
-                          className="flex items-center gap-2 text-sm cursor-pointer"
-                        >
-                          <span className="text-muted-foreground">
-                            {kindInfo.icon}
-                          </span>
-                          {t(kindInfo.translationKey)}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-
-                <div className="flex justify-end">
-                  <Button
-                    onClick={handleSaveFilters}
-                    disabled={!filterChanged}
-                    size="sm"
-                  >
-                    <Save />
-                    {t("feed.save")}
-                  </Button>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          {kinds.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 w-full max-w-lg mx-auto mt-2 mb-4">
-              {kinds.map((kind) => {
-                const kindInfo = getKindInfo(kind);
-                return (
-                  <Badge
-                    key={kind}
-                    variant="outline"
-                    className="flex items-center gap-1.5 py-1"
-                  >
-                    {kindInfo ? (
-                      <>
-                        <span className="text-muted-foreground">
-                          {kindInfo.icon}
-                        </span>
-                        <span className="text-xs">
-                          {t(kindInfo.translationKey)}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-xs">{kind}</span>
-                    )}
-                  </Badge>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Label htmlFor="live-mode" className="flex items-center gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Radio className="size-5" />
-              </TooltipTrigger>
-              <TooltipContent>{t("feed.live-updates")}</TooltipContent>
-            </Tooltip>
-          </Label>
-          <Switch
-            aria-label={t("feed.live-updates")}
-            id="live-mode"
-            checked={live}
-            onCheckedChange={handleLiveChange}
-          />
-        </div>
+      <div className="mb-4">
+        <FeedControls
+          kinds={kinds}
+          tempKinds={tempKinds}
+          live={live}
+          filterChanged={filterChanged}
+          isPopoverOpen={isPopoverOpen}
+          setIsPopoverOpen={setIsPopoverOpen}
+          onLiveChange={handleLiveChange}
+          onKindToggle={handleKindToggle}
+          onClearKinds={handleClearKinds}
+          onSelectAllKinds={handleSelectAllKinds}
+          onSaveFilters={handleSaveFilters}
+        />
+        <ActiveFilterBadges
+          kinds={kinds}
+          onRemoveKind={handleRemoveKind}
+        />
       </div>
 
       <Feed

@@ -60,7 +60,7 @@ function CommunityHeader({
         <div className="flex flex-row items-center gap-2">
           <Tooltip>
             <TooltipTrigger>
-              <Castle className="size-3 text-muted-foreground" />
+              <Castle className="size-4 text-muted-foreground" />
             </TooltipTrigger>
             <TooltipContent>{t("group.metadata.community")}</TooltipContent>
           </Tooltip>

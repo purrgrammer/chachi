@@ -8,6 +8,7 @@
     "no-private-groups": "No private groups"
   },
   "user": {
+    "profile": "Profile",
     "community": "Community",
     "dms": "Private messages",
     "groups": "Groups",
@@ -410,6 +411,7 @@
       "post": "Post",
       "welcome": "Welcome",
       "posts": "Posts",
+      "feed": "Feed",
       "articles": "Articles",
       "poll": "Poll",
       "publication": "Targeted Publication",
@@ -1172,6 +1174,10 @@
     "clear": "Clear",
     "all": "All",
     "save": "Save",
+    "select-all": "Select All",
+    "apply-filters": "Apply Filters",
+    "live-on": "Live updates enabled",
+    "live-off": "Live updates disabled",
     "load-older": "Load older posts"
   },
   "stream": {
@@ -1242,5 +1248,18 @@
     "redeem-ecash": "Redeem ecash",
     "create-ecash": "Create ecash token",
     "toggle-visibility": "Toggle visibility"
+  },
+  "profile": {
+    "message": "Message",
+    "groups": "Groups",
+    "groups.none": "No groups found",
+    "relays": "Relays",
+    "not-found": "Profile Not Found",
+    "error.no-identifier": "No identifier provided",
+    "error.invalid-format": "Invalid identifier format",
+    "error.nip05-resolve": "Could not resolve NIP-05 address",
+    "error.load-failed": "This user profile could not be loaded",
+    "banner.alt": "Profile Banner",
+    "action.go-back": "Go Back"
   }
 }

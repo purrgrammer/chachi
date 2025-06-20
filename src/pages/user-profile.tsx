@@ -1,0 +1,416 @@
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { User as UserIcon, AtSign, LinkIcon, Users, Castle, Server } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { parseProfileIdentifier, resolveNip05 } from "@/lib/profile-identifier";
+import { useProfile, useRelayList, useAddress } from "@/lib/nostr";
+import { useUserGroups } from "@/lib/nostr/groups";
+import { COMMUNIKEY } from "@/lib/kinds";
+import { Header } from "@/components/header";
+import { User } from "@/components/nostr/user";
+import { RichText } from "@/components/rich-text";
+import { Nip05 } from "@/components/nostr/nip05";
+import { LoadingScreen } from "@/components/loading-screen";
+import { GroupItem } from "@/components/nostr/groups/group-item";
+import { RelayLink } from "@/components/nostr/relay";
+import { Button } from "@/components/ui/button";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/nav-tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import Feed from "@/components/nostr/feed";
+import { FeedControls, ActiveFilterBadges } from "@/components/nostr/feed-controls";
+import { NDKKind } from "@nostr-dev-kit/ndk";
+import { useFeedFilters } from "@/hooks/use-feed-filters";
+
+interface ProfileValidatorProps {
+  identifier: string;
+  onValidated: (pubkey: string, relays: string[]) => void;
+  onError: (error: string) => void;
+}
+
+function ProfileValidator({ identifier, onValidated, onError }: ProfileValidatorProps) {
+  const { t } = useTranslation();
+  
+  useEffect(() => {
+    async function parseIdentifier() {
+      if (!identifier) {
+        onError(t("profile.error.no-identifier", "No identifier provided"));
+        return;
+      }
+
+      const parsed = parseProfileIdentifier(identifier);
+      if (!parsed) {
+        onError(t("profile.error.invalid-format", "Invalid identifier format"));
+        return;
+      }
+
+      if (parsed.type === "nip05") {
+        // Resolve NIP-05 to pubkey
+        const resolvedPubkey = await resolveNip05(parsed.pubkey);
+        if (!resolvedPubkey) {
+          onError(t("profile.error.nip05-resolve", "Could not resolve NIP-05 address"));
+          return;
+        }
+        onValidated(resolvedPubkey, []); // Use discovery relays for NIP-05
+      } else {
+        onValidated(parsed.pubkey, parsed.relays);
+      }
+    }
+
+    parseIdentifier();
+  }, [identifier, onValidated, onError, t]);
+
+  return <LoadingScreen />;
+}
+
+function ProfileHeader({ pubkey }: { pubkey: string }) {
+  const { t } = useTranslation();
+
+  return (
+    <Header>
+      <div className="flex items-center w-full justify-between">
+        <User
+          notClickable
+          pubkey={pubkey}
+          classNames={{
+            avatar: "size-8 rounded-full",
+            name: "text-lg font-normal line-clamp-1",
+          }}
+        />
+          <Tooltip>
+            <TooltipTrigger>
+              <UserIcon className="size-5 text-muted-foreground" />
+            </TooltipTrigger>
+            <TooltipContent>{t("user.profile", "Profile")}</TooltipContent>
+          </Tooltip>
+        </div>
+    </Header>
+  );
+}
+
+function ProfileWelcome({ pubkey, relays }: { pubkey: string; relays: string[] }) {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const [isBannerLoaded, setIsBannerLoaded] = useState(false);
+
+  const { data: profile } = useProfile(pubkey, relays);
+  const { data: userRelays } = useRelayList(pubkey);
+  const { data: userGroups = [] } = useUserGroups(pubkey);
+  
+  // Filter to only show NIP-29 groups (exclude communities)
+  const nip29Groups = userGroups.filter(group => !group.isCommunity);
+
+  // Check if this user is a communikey (has COMMUNIKEY event)
+  const { data: communikeyEvent } = useAddress({
+    pubkey,
+    kind: COMMUNIKEY,
+    relays: [...relays, ...(userRelays || [])]
+  });
+
+  const banner = profile?.banner || profile?.picture;
+
+  return (
+    <div className="flex items-center justify-center">
+      <div className="flex flex-col relative w-full max-w-xl max-h-96">
+        <img
+          src={banner || profile?.picture || "/favicon.png"}
+          alt={t("profile.banner.alt", "Profile Banner")}
+          className="w-full min-h-42 max-h-96 aspect-image object-cover"
+          onLoad={() => setIsBannerLoaded(true)}
+        />
+        <div className={`flex flex-row justify-between ${banner && isBannerLoaded ? "-mt-20" : ""}`}>
+          <div className="p-2 flex flex-col items-start gap-3">
+            <div className="flex flex-col gap-2 items-start ml-3">
+              <div className="flex flex-col gap-1">
+                <User
+                  notClickable
+                  pubkey={pubkey}
+                  classNames={{
+                    avatar: "size-32 border-4 border-background",
+                    name: "text-4xl",
+                    wrapper: "flex-col gap-0 items-start",
+                  }}
+                />
+                {profile?.about && (
+                  <RichText
+                    tags={profile?.tags}
+                    className="text-balance text-muted-foreground"
+                  >
+                    {profile.about}
+                  </RichText>
+                )}
+              </div>
+            </div>
+            {(profile?.website || profile?.nip05) && (
+              <div className="px-2 flex flex-col items-start gap-1">
+                {profile?.website && (
+                  <a
+                    href={profile.website}
+                    className="font-mono text-xs px-2 hover:underline hover:decoration-dotted"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <div className="flex flex-row items-center gap-1">
+                      <LinkIcon className="size-3 text-muted-foreground" />
+                      {profile.website}
+                    </div>
+                  </a>
+                )}
+                {profile?.nip05 && (
+                  <span className="font-mono text-xs px-2">
+                    <div className="flex flex-row items-center gap-1">
+                      <AtSign className="size-3 text-muted-foreground" />
+                      <Nip05 pubkey={pubkey} />
+                    </div>
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+          {/* Communikey Button - positioned like Join button in welcome page */}
+          {communikeyEvent && (
+            <div className="flex flex-row gap-2 mt-20 pt-2 pr-3">
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/c/${pubkey}`)}
+              >
+                <Castle className="size-4" />
+                {t("user.community", "Community")}
+              </Button>
+            </div>
+          )}
+        </div>
+        <div className="px-6 pt-2 flex flex-col gap-4">
+          {/* User Relays Section */}
+          {userRelays && userRelays.length > 0 ? (
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-row items-center gap-1">
+                <Server className="size-4 text-muted-foreground" />
+                <h2 className="text-sm font-light uppercase text-muted-foreground">
+                  {t("profile.relays", "Relays")}
+                </h2>
+              </div>
+              <div className="flex flex-col gap-2">
+                {userRelays.map((relay) => (
+                  <RelayLink
+                    key={relay}
+                    relay={relay}
+                    classNames={{ icon: "size-4", name: "text-sm" }}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
+          
+          {/* NIP-29 Groups Section */}
+          {nip29Groups.length > 0 ? (
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-row items-center gap-1">
+                <Users className="size-4 text-muted-foreground" />
+                <h2 className="text-sm font-light uppercase text-muted-foreground">
+                  {t("profile.groups", "Groups")}
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 gap-1">
+                {nip29Groups.map((group) => (
+                  <GroupItem key={`${group.id}:${group.relay}`} group={group} />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-row items-center gap-1">
+                <Users className="size-4 text-muted-foreground" />
+                <h2 className="text-sm font-light uppercase text-muted-foreground">
+                  {t("profile.groups", "Groups")}
+                </h2>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {t("profile.groups.none", "No groups found")}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProfileFeed({ pubkey, relays }: { pubkey: string; relays: string[] }) {
+  const {
+    kinds,
+    tempKinds,
+    live,
+    filterChanged,
+    isPopoverOpen,
+    setIsPopoverOpen,
+    handleLiveChange,
+    handleKindToggle,
+    handleClearKinds,
+    handleSelectAllKinds,
+    handleSaveFilters,
+    handleRemoveKind,
+  } = useFeedFilters({ defaultKinds: [NDKKind.Text] });
+
+  const filter = [
+    {
+      authors: [pubkey],
+      kinds: kinds.length > 0 ? kinds : undefined,
+      limit: 20,
+    },
+  ];
+
+  return (
+    <div className="flex flex-col gap-0 max-w-xl mx-auto">
+      <div className="mb-4">
+        <FeedControls
+          kinds={kinds}
+          tempKinds={tempKinds}
+          live={live}
+          filterChanged={filterChanged}
+          isPopoverOpen={isPopoverOpen}
+          setIsPopoverOpen={setIsPopoverOpen}
+          onLiveChange={handleLiveChange}
+          onKindToggle={handleKindToggle}
+          onClearKinds={handleClearKinds}
+          onSelectAllKinds={handleSelectAllKinds}
+          onSaveFilters={handleSaveFilters}
+        />
+        <ActiveFilterBadges
+          kinds={kinds}
+          onRemoveKind={handleRemoveKind}
+        />
+      </div>
+      <Feed
+        key={`${pubkey}-${kinds.join(',')}-${live}`}
+        filter={filter}
+        live={live}
+        outboxRelays={relays}
+        onlyRelays={relays.length > 0}
+        loadingClassname="py-32"
+        emptyClassname="py-32"
+        feedClassName="p-0"
+      />
+    </div>
+  );
+}
+
+interface ProfileContentProps {
+  pubkey: string;
+  relays: string[];
+  tab?: string;
+}
+
+function ProfileContent({ pubkey, relays, tab = "profile" }: ProfileContentProps) {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { identifier } = useParams<{ identifier: string }>();
+
+  const { data: profile, isError: isProfileError } = useProfile(pubkey, relays);
+  const { data: userRelays } = useRelayList(pubkey);
+
+  // Show error only after we've tried to fetch the profile and it failed
+  if (!profile && isProfileError) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-2">{t("profile.not-found", "Profile Not Found")}</h1>
+          <p className="text-muted-foreground mb-4">
+            {t("profile.error.load-failed", "This user profile could not be loaded")}
+          </p>
+          <Button onClick={() => navigate(-1)}>{t("profile.action.go-back", "Go Back")}</Button>
+        </div>
+      </div>
+    );
+  }
+
+  const handleTabChange = (value: string) => {
+    if (value === "profile") {
+      navigate(`/p/${identifier}`);
+    } else {
+      navigate(`/p/${identifier}/${value}`);
+    }
+  };
+
+  return (
+    <div>
+      <ProfileHeader pubkey={pubkey} />
+      <Tabs value={tab} onValueChange={handleTabChange}>
+        <TabsList
+          className="
+          overflow-x-auto no-scrollbar 
+	  w-[100vw]
+md:w-[calc(100vw-18rem)]
+	  group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100vw-18rem)"
+        >
+          <TabsTrigger value="profile">{t("user.profile", "Profile")}</TabsTrigger>
+          <TabsTrigger value="feed">{t("content.type.feed", "Feed")}</TabsTrigger>
+        </TabsList>
+        <TabsContent asChild value="profile">
+          <ProfileWelcome pubkey={pubkey} relays={relays} />
+        </TabsContent>
+        <TabsContent asChild value="feed">
+          <ProfileFeed pubkey={pubkey} relays={userRelays || relays} />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+export default function UserProfile({ tab = "profile" }: { tab?: string }) {
+  const { identifier } = useParams<{ identifier: string }>();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const [pubkey, setPubkey] = useState<string | null>(null);
+  const [relays, setRelays] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleValidated = (validatedPubkey: string, validatedRelays: string[]) => {
+    setPubkey(validatedPubkey);
+    setRelays(validatedRelays);
+  };
+
+  const handleError = (errorMessage: string) => {
+    setError(errorMessage);
+  };
+
+  // Show error for identifier parsing errors
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-2">{t("profile.not-found", "Profile Not Found")}</h1>
+          <p className="text-muted-foreground mb-4">{error}</p>
+          <Button onClick={() => navigate(-1)}>{t("profile.action.go-back", "Go Back")}</Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading screen during identifier validation
+  if (!pubkey && !error) {
+    return (
+      <ProfileValidator
+        identifier={identifier || ""}
+        onValidated={handleValidated}
+        onError={handleError}
+      />
+    );
+  }
+
+  // Render profile content once we have a valid pubkey
+  if (pubkey) {
+    return <ProfileContent key={pubkey} pubkey={pubkey} relays={relays} tab={tab} />;
+  }
+
+  return null;
+}
