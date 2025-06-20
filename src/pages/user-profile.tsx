@@ -220,7 +220,7 @@ function ProfileWelcome({ pubkey, relays }: { pubkey: string; relays: string[] }
                   {t("profile.groups", "Groups")}
                 </h2>
               </div>
-              <div className="flex flex-wrap gap-4 justify-center sm:justify-start">
+              <div className="flex flex-col gap-4">
                 {nip29Groups.map((group) => (
                   <Group key={`${group.id}:${group.relay}`} group={group} />
                 ))}
