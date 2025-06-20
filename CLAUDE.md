@@ -106,3 +106,6 @@ src/
 ### Internationalization
 - Uses i18next with 30+ supported languages
 - Translation files located in `public/locales/`
+
+### Development Best Practices
+- Make sure you add translations to the canonical public/languages/en/common.json file
