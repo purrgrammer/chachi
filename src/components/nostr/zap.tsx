@@ -302,7 +302,7 @@ export function NewZapDialog({
             )}
             {invoice ? null : (
               <>
-                <WalletSelector />
+                <WalletSelector disabled={isZapping} />
                 <motion.div className="w-full">
                   <Button
                     disabled={!amount || isZapping || Number(amount) <= 0}

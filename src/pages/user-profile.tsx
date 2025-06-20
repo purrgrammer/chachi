@@ -7,10 +7,12 @@ import {
   Users,
   Castle,
   Server,
+  Zap,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { parseProfileIdentifier, resolveNip05 } from "@/lib/profile-identifier";
 import { useProfile, useRelayList, useAddress } from "@/lib/nostr";
+import { NewZapDialog } from "@/components/nostr/zap";
 import { useUserGroups } from "@/lib/nostr/groups";
 import { COMMUNIKEY } from "@/lib/kinds";
 import { Header } from "@/components/header";
@@ -202,9 +204,23 @@ function ProfileWelcome({
               </div>
             )}
           </div>
-          {/* Communikey Button - positioned like Join button in welcome page */}
-          {communikeyEvent && (
-            <div className="flex flex-row gap-2 mt-20 pt-2 pr-3">
+          {/* Action Buttons - positioned like Join button in welcome page */}
+          <div className="flex flex-row gap-2 mt-20 pt-2 pr-3">
+            {/* Zap Button - only show if user can receive zaps */}
+            {profile?.lud16 && (
+              <NewZapDialog
+                pubkey={pubkey}
+                zapType="nip-61"
+                trigger={
+                  <Button variant="default" size="sm">
+                    <Zap className="size-4" />
+                    {t("zap.action.zap", "Zap")}
+                  </Button>
+                }
+              />
+            )}
+            {/* Communikey Button */}
+            {communikeyEvent && (
               <Button
                 variant="outline"
                 size="sm"
@@ -213,10 +229,10 @@ function ProfileWelcome({
                 <Castle className="size-4" />
                 {t("user.community", "Community")}
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-        <div className="px-6 pt-2 flex flex-col gap-4">
+        <div className="px-6 pt-2 pb-8 flex flex-col gap-4">
           {/* User Relays Section */}
           {userRelays && userRelays.length > 0 ? (
             <div className="flex flex-col gap-2">

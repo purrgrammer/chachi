@@ -885,7 +885,7 @@ export function CustomWalletSelector({
   );
 }
 
-export function WalletSelector() {
+export function WalletSelector({ disabled = false }: { disabled?: boolean }) {
   const { t } = useTranslation();
   const [wallet, setWallet] = useNDKWallet();
   const [wallets] = useNDKWallets();
@@ -904,7 +904,7 @@ export function WalletSelector() {
         </h4>
       </div>
       <Select
-        disabled={wallets.length === 0}
+        disabled={disabled || wallets.length === 0}
         onValueChange={onWalletChange}
         defaultValue={wallet ? walletId(wallet) : undefined}
         value={wallet ? walletId(wallet) : undefined}
