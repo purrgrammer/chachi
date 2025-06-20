@@ -949,7 +949,8 @@
     "30315": "Status",
     "31923": "Calendar Event",
     "34550": "Moderated Community",
-    "38172": "Cashu Mint"
+    "38172": "Cashu Mint",
+    "39000": "Group Metadata"
   },
   "nips": {
     "01": "Basic Protocol Flow",

@@ -17,8 +17,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ContentKinds, SupportedKinds } from "@/lib/constants/kinds";
+import { ContentKinds, SupportedKinds, ContentCategoryGroups } from "@/lib/constants/kinds";
 import type { NDKKind } from "@nostr-dev-kit/ndk";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 interface FeedControlsProps {
   kinds: NDKKind[];
@@ -59,6 +60,7 @@ export function FeedControls({
   const [internalTempKinds, setInternalTempKinds] = useState<NDKKind[]>(kinds);
   const [internalFilterChanged, setInternalFilterChanged] = useState(false);
   const [internalIsPopoverOpen, setInternalIsPopoverOpen] = useState(false);
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["text", "social"]));
 
   const tempKinds = externalTempKinds ?? internalTempKinds;
   const filterChanged = externalFilterChanged ?? internalFilterChanged;
@@ -116,9 +118,48 @@ export function FeedControls({
     }
   };
 
-  const availableKinds = ContentKinds.filter((kindInfo) =>
-    supportedKinds.includes(kindInfo.kind)
-  );
+  const toggleCategory = (categoryId: string) => {
+    setExpandedCategories(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(categoryId)) {
+        newSet.delete(categoryId);
+      } else {
+        newSet.add(categoryId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAllInCategory = (categoryKinds: NDKKind[]) => {
+    const availableCategoryKinds = categoryKinds.filter(kind => supportedKinds.includes(kind));
+    const newKinds = Array.from(new Set([...tempKinds, ...availableCategoryKinds]));
+    
+    if (onKindToggle) {
+      // For external state, we need to handle this differently
+      availableCategoryKinds.forEach(kind => {
+        if (!tempKinds.includes(kind)) {
+          onKindToggle(kind, true);
+        }
+      });
+    } else {
+      setInternalTempKinds(newKinds);
+    }
+  };
+
+  const handleClearCategory = (categoryKinds: NDKKind[]) => {
+    const newKinds = tempKinds.filter(kind => !categoryKinds.includes(kind));
+    
+    if (onKindToggle) {
+      // For external state, we need to handle this differently
+      categoryKinds.forEach(kind => {
+        if (tempKinds.includes(kind)) {
+          onKindToggle(kind, false);
+        }
+      });
+    } else {
+      setInternalTempKinds(newKinds);
+    }
+  };
 
   return (
     <div className="flex flex-row gap-4 items-start justify-between pt-2 w-full px-4 sm:px-8">
@@ -159,29 +200,94 @@ export function FeedControls({
                   </Button>
                 </div>
               </div>
-              <ScrollArea className="h-[300px] pr-3">
-                <div className="space-y-3">
-                  {availableKinds.map((kindInfo) => (
-                    <div
-                      key={kindInfo.kind}
-                      className="flex items-center space-x-2"
-                    >
-                      <Checkbox
-                        id={`kind-${kindInfo.kind}`}
-                        checked={tempKinds.includes(kindInfo.kind)}
-                        onCheckedChange={(checked) =>
-                          handleKindToggle(kindInfo.kind, checked as boolean)
-                        }
-                      />
-                      <Label
-                        htmlFor={`kind-${kindInfo.kind}`}
-                        className="flex items-center gap-2 text-sm font-normal cursor-pointer"
-                      >
-                        {kindInfo.icon}
-                        {t(kindInfo.translationKey)}
-                      </Label>
-                    </div>
-                  ))}
+              <ScrollArea className="h-[400px] pr-3">
+                <div className="space-y-2">
+                  {ContentCategoryGroups.map((category) => {
+                    const availableCategoryKinds = category.kinds.filter(kind => supportedKinds.includes(kind));
+                    if (availableCategoryKinds.length === 0) return null;
+                    
+                    const isExpanded = expandedCategories.has(category.id);
+                    const selectedInCategory = availableCategoryKinds.filter(kind => tempKinds.includes(kind));
+                    const allSelected = selectedInCategory.length === availableCategoryKinds.length;
+                    const someSelected = selectedInCategory.length > 0;
+                    
+                    return (
+                      <div key={category.id} className="border rounded-md">
+                        <div 
+                          className="flex items-center justify-between p-2 cursor-pointer hover:bg-muted/50"
+                          onClick={() => toggleCategory(category.id)}
+                        >
+                          <div className="flex items-center gap-2">
+                            {isExpanded ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
+                            {category.icon}
+                            <span className="text-base font-medium">{category.name}</span>
+                            {someSelected && (
+                              <Badge variant="secondary" className="text-xs">
+                                {selectedInCategory.length}/{availableCategoryKinds.length}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex gap-1">
+                            {someSelected && !allSelected && (
+                              <Button
+                                variant="ghost"
+                                size="tiny"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSelectAllInCategory(category.kinds);
+                                }}
+                              >
+                                All
+                              </Button>
+                            )}
+                            {someSelected && (
+                              <Button
+                                variant="destructive"
+                                size="tiny"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleClearCategory(category.kinds);
+                                }}
+                              >
+                                Clear
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {isExpanded && (
+                          <div className="px-4 pb-2 space-y-2 border-t bg-muted/20">
+                            {availableCategoryKinds.map((kind) => {
+                              const kindInfo = ContentKinds.find(k => k.kind === kind);
+                              if (!kindInfo) return null;
+                              
+                              return (
+                                <div
+                                  key={kind}
+                                  className="flex items-center space-x-2 py-1"
+                                >
+                                  <Checkbox
+                                    id={`kind-${kind}`}
+                                    checked={tempKinds.includes(kind)}
+                                    onCheckedChange={(checked) =>
+                                      handleKindToggle(kind, checked as boolean)
+                                    }
+                                  />
+                                  <Label
+                                    htmlFor={`kind-${kind}`}
+                                    className="flex items-center gap-2 text-sm font-normal cursor-pointer"
+                                  >
+                                    {kindInfo.icon}
+                                    {t(kindInfo.translationKey)}
+                                  </Label>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </ScrollArea>
               <div className="flex justify-end">

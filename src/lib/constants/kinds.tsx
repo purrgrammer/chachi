@@ -26,6 +26,12 @@ import {
   AppWindow,
   Award,
   Users,
+  // New category icons
+  Type,
+  PlayCircle,
+  Gamepad2,
+  Settings,
+  UserPlus,
 } from "lucide-react";
 import {
   STREAM,
@@ -67,6 +73,11 @@ export const ContentKinds = [
     kind: NDKKind.GroupNote,
     translationKey: "kinds.11",
     icon: <Hash size={16} />,
+  },
+  {
+    kind: NDKKind.GroupMetadata,
+    translationKey: "kinds.39000",
+    icon: <Users size={16} />,
   },
   {
     kind: NDKKind.Image,
@@ -184,7 +195,67 @@ export const ContentKinds = [
 export const SupportedKinds = ContentKinds.map((k) => k.kind);
 
 /**
- * Content categories for grouping kinds
+ * Content categories for grouping kinds in the filter UI
+ */
+export const ContentCategoryGroups = [
+  {
+    id: "text",
+    name: "Text",
+    icon: <Type size={16} />,
+    kinds: [NDKKind.Text, NDKKind.GroupChat, NDKKind.GroupNote, COMMENT, NDKKind.Article, BOOK, NDKKind.Highlight],
+  },
+  {
+    id: "media", 
+    name: "Media",
+    icon: <PlayCircle size={16} />,
+    kinds: [NDKKind.Image, NDKKind.VerticalVideo, NDKKind.HorizontalVideo, GIF_SET, NDKKind.EmojiSet],
+  },
+  {
+    id: "social",
+    name: "Social",
+    icon: <UserPlus size={16} />,
+    kinds: [NDKKind.Reaction, NDKKind.Zap, NDKKind.Nutzap, FOLLOW_PACK, NDKKind.FollowSet, NDKKind.BadgeDefinition],
+  },
+  {
+    id: "groups",
+    name: "Groups",
+    icon: <Users size={16} />,
+    kinds: [NDKKind.GroupMetadata, COMMUNIKEY, MODERATED_COMMUNITY],
+  },
+  {
+    id: "interactive",
+    name: "Interactive", 
+    icon: <Gamepad2 size={16} />,
+    kinds: [POLL, STREAM, CALENDAR_EVENT, GOAL],
+  },
+  {
+    id: "development",
+    name: "Development",
+    icon: <Code size={16} />,
+    kinds: [CODE_SNIPPET, ISSUE, REPO],
+  },
+  {
+    id: "financial",
+    name: "Financial",
+    icon: <Bitcoin size={16} />,
+    kinds: [CASHU_MINT],
+  },
+  {
+    id: "apps",
+    name: "Apps",
+    icon: <AppWindow size={16} />,
+    kinds: [NDKKind.AppRecommendation, NDKKind.AppHandler],
+  },
+  {
+    id: "settings",
+    name: "Settings",
+    icon: <Settings size={16} />,
+    kinds: [NDKKind.RelayList],
+  },
+];
+
+/**
+ * Legacy content categories for backward compatibility
  */
 export const ContentCategories = {
   posts: [1, COMMENT, 11],
@@ -198,4 +269,21 @@ export const ContentCategories = {
  */
 export const getKindInfo = (kind: number) => {
   return ContentKinds.find((k) => k.kind === kind);
+};
+
+/**
+ * Get all kinds that are available for filtering (grouped)
+ */
+export const getAvailableKindsFromGroups = (supportedKinds: NDKKind[] = SupportedKinds) => {
+  const allGroupKinds = ContentCategoryGroups.flatMap(group => group.kinds);
+  return ContentKinds.filter(kindInfo => 
+    allGroupKinds.includes(kindInfo.kind) && supportedKinds.includes(kindInfo.kind)
+  );
+};
+
+/**
+ * Get category for a specific kind
+ */
+export const getCategoryForKind = (kind: NDKKind) => {
+  return ContentCategoryGroups.find(group => group.kinds.includes(kind));
 };

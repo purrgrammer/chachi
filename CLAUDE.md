@@ -109,3 +109,6 @@ src/
 
 ### Development Best Practices
 - Make sure you add translations to the canonical public/languages/en/common.json file
+
+## Commit Message Guidelines
+- Do not include Claude Code references in commit messages
