@@ -87,6 +87,9 @@ export function Invoice({
             {showQr ? <EyeClosed /> : <Eye />}
             {showQr ? t("ln.send.hide-qr") : t("ln.send.show-qr")}
           </Button>
+          <Button className="w-full" onClick={openWallet}>
+            <Wallet /> {t("zap.dialog.wallet")}
+          </Button>
           {showQr ? (
             <div className="h-[264px] qr-code">
               <QRCodeSVG

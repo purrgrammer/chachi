@@ -26,6 +26,8 @@ import {
   useIncreaseZapAmount,
   useNutzap,
   useZap,
+  useLNURLPay,
+  fetchInvoice,
 } from "@/lib/zap";
 import { useProfile, useRelayList } from "@/lib/nostr";
 import { useMintList } from "@/lib/cashu";
@@ -41,7 +43,7 @@ import { useGroup } from "@/lib/nostr/groups";
 import { WalletSelector } from "@/components/wallet";
 import type { Group, Emoji as EmojiType } from "@/lib/types";
 import { useRelays } from "@/lib/nostr";
-import { usePubkey } from "@/lib/account";
+import { usePubkey, useCanSign } from "@/lib/account";
 import { cn } from "@/lib/utils";
 
 export function NewZapDialog({
@@ -83,6 +85,7 @@ export function NewZapDialog({
   const [message, setMessage] = useState(reply || "");
   const { data: profile } = useProfile(pubkey);
   const name = profile?.name || pubkey.slice(0, 6);
+  const canSign = useCanSign();
   const myRelays = useRelays();
   const { data: relayList } = useRelayList(pubkey);
   const { data: mintList } = useMintList(pubkey);
@@ -101,6 +104,8 @@ export function NewZapDialog({
   );
   const sendNutzap = useNutzap(pubkey, relays, event);
   const sendZap = useZap(pubkey, relays, event);
+  const lud16 = profile?.lud16 || profile?.lud06;
+  const { data: lnurlParams } = useLNURLPay(lud16);
 
   function onOpenChange(open: boolean) {
     setIsOpen(open);
@@ -113,9 +118,44 @@ export function NewZapDialog({
     }
   }
 
+  async function fetchInvoiceForPayment() {
+    try {
+      // For both NIP-57 and NIP-61, we need to fetch a Lightning invoice
+      // The difference is in the metadata, but both result in a Lightning payment
+      if (!lnurlParams) {
+        throw new Error("No Lightning address found for this user");
+      }
+
+      const invoiceResponse = await fetchInvoice(
+        lnurlParams,
+        Number(amount),
+        // For invoice-only mode, we don't create a zap event
+        // The user will pay manually via Lightning
+        undefined,
+      );
+
+      if (invoiceResponse.pr) {
+        setInvoice(invoiceResponse.pr);
+        toast.success(t("zap.dialog.invoice-generated"));
+      } else {
+        throw new Error("Failed to generate invoice");
+      }
+    } catch (err) {
+      console.error("Invoice fetch error:", err);
+      toast.error(t("zap.dialog.invoice-error"));
+    }
+  }
+
   async function zap() {
     try {
       setIsZapping(true);
+
+      // If user cannot sign, fetch invoice instead of trying to create zap
+      if (!canSign) {
+        await fetchInvoiceForPayment();
+        return;
+      }
+
       if (zapType === "nip-57") {
         const tags = [
           ...(group ? [["h", group.id, group.relay]] : []),
@@ -208,7 +248,11 @@ export function NewZapDialog({
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <Invoice invoice={invoice} picture={profile?.picture} />
+                <Invoice
+                  invoice={invoice}
+                  picture={profile?.picture}
+                  showSummary
+                />
               </motion.div>
             ) : (
               <motion.div
@@ -252,20 +296,22 @@ export function NewZapDialog({
                 />
               </motion.div>
             )}
-            <WalletSelector />
             {invoice ? null : (
-              <motion.div className="w-full">
-                <Button
-                  disabled={!amount || isZapping || Number(amount) <= 0}
-                  onClick={zap}
-                  className="w-full mt-3"
-                >
-                  <Bitcoin className="text-muted-foreground" />
-                  {t("zap.dialog.tip", {
-                    amount: formatShortNumber(Number(amount)),
-                  })}
-                </Button>
-              </motion.div>
+              <>
+                <WalletSelector />
+                <motion.div className="w-full">
+                  <Button
+                    disabled={!amount || isZapping || Number(amount) <= 0}
+                    onClick={zap}
+                    className="w-full mt-3"
+                  >
+                    <Bitcoin className="text-muted-foreground" />
+                    {t("zap.dialog.tip", {
+                      amount: formatShortNumber(Number(amount)),
+                    })}
+                  </Button>
+                </motion.div>
+              </>
             )}
           </AnimatePresence>
         </div>

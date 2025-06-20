@@ -681,7 +681,9 @@
       "wallet-error": "Couldn't open wallet",
       "success": "Zapped {{ amount }} to {{ name }}",
       "fail": "Failed to zap",
-      "error": "Failed to zap {{ amount }} to {{ name }}"
+      "error": "Failed to zap {{ amount }} to {{ name }}",
+      "invoice-generated": "Invoice generated successfully",
+      "invoice-error": "Failed to generate invoice"
     }
   },
   "ecash": {
