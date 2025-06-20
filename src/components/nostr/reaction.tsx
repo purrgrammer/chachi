@@ -1,5 +1,4 @@
 import { NostrEvent } from "nostr-tools";
-import { User } from "@/components/nostr/user";
 import { Event } from "@/components/nostr/event";
 import type { Group } from "@/lib/types";
 import {
@@ -25,22 +24,21 @@ export default function Reaction({
     (t) => t[0] === "emoji" && t[1] === emojiName,
   )?.[2];
   return (
-    <div className="flex flex-col gap-1.5 pt-1">
-      <div className="flex flex-row items-center gap-2">
-        <User pubkey={event.pubkey} classNames={{ avatar: "size-5" }} />
-        {isCustomEmoji ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="w-5 h-5 place-content-center">
-                <img className="w-5 h-5" src={emojiImage} alt={content} />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>{emojiName}</TooltipContent>
-          </Tooltip>
-        ) : (
-          <span className="text-md">{content}</span>
-        )}
-      </div>
+    <div className="flex flex-row items-start justify-between gap-4">
+      {isCustomEmoji ? (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="size-10 place-content-center">
+              <img className="size-10" src={emojiImage} alt={content} />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>{emojiName}</TooltipContent>
+        </Tooltip>
+      ) : (
+        <span className="text-4xl line-clamp-1 flex-shrink-0">
+          {content || "👍"}
+        </span>
+      )}
       {eventId ? (
         <Event
           id={eventId}

@@ -56,11 +56,13 @@ export function Header({ event }: { event: NostrEvent }) {
       <User
         pubkey={author ?? event.pubkey}
         classNames={{ avatar: "size-9", name: "hidden" }}
+        clickAction="link"
       />
       <div className="flex flex-col gap-0">
         <User
           pubkey={author ?? event.pubkey}
           classNames={{ avatar: "hidden", name: "text-md font-normal" }}
+          clickAction="link"
         />
         {event.kind === TARGETED_PUBLICATION && hPubkeyTags.length > 0 ? (
           <CommunityList

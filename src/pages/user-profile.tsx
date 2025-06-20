@@ -414,6 +414,13 @@ export default function UserProfile({ tab = "profile" }: { tab?: string }) {
   const [relays, setRelays] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  // Reset state when identifier changes
+  useEffect(() => {
+    setPubkey(null);
+    setRelays([]);
+    setError(null);
+  }, [identifier]);
+
   const handleValidated = (
     validatedPubkey: string,
     validatedRelays: string[],

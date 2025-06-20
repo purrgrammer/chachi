@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+import { nip19 } from "nostr-tools";
 import { Avatar } from "@/components/nostr/avatar";
 import { Name } from "@/components/nostr/name";
 import { ProfileDrawer } from "@/components/nostr/profile";
@@ -14,9 +16,16 @@ interface UserProps {
   classNames?: UserClassNames;
   relays?: string[];
   notClickable?: boolean;
+  clickAction?: "drawer" | "link";
 }
 
-export function User({ pubkey, classNames, relays, notClickable }: UserProps) {
+export function User({
+  pubkey,
+  classNames,
+  relays,
+  notClickable,
+  clickAction = "drawer",
+}: UserProps) {
   const user = (
     <div
       className={cn("flex flex-row items-center gap-2", classNames?.wrapper)}
@@ -27,5 +36,11 @@ export function User({ pubkey, classNames, relays, notClickable }: UserProps) {
       </span>
     </div>
   );
-  return notClickable ? user : <ProfileDrawer trigger={user} pubkey={pubkey} />;
+  return notClickable ? (
+    user
+  ) : clickAction === "drawer" ? (
+    <ProfileDrawer trigger={user} pubkey={pubkey} />
+  ) : (
+    <Link to={`/p/${nip19.nprofileEncode({ pubkey, relays })}`}>{user}</Link>
+  );
 }

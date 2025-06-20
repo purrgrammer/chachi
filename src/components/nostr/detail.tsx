@@ -279,7 +279,6 @@ const eventDetails: Record<
     detail: CalendarEvent,
   },
   [NDKKind.Reaction]: {
-    noHeader: true,
     preview: Reaction,
     detail: Reaction,
   },
