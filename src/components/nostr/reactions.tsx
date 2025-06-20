@@ -20,6 +20,7 @@ import { cn, groupBy } from "@/lib/utils";
 import { CUSTOM_EMOJI_CONTENT_REGEX } from "@/lib/emoji";
 import { HUGE_AMOUNT } from "@/lib/zap";
 import { useMintList } from "@/lib/cashu";
+import { useTranslation } from "react-i18next";
 
 function Reacters({
   reactions,
@@ -80,6 +81,7 @@ function Reaction({
   )?.[2];
   const me = usePubkey();
   const iReacted = reactions.some((r) => r.pubkey === me);
+  const { t } = useTranslation();
 
   async function react(content: string) {
     try {
@@ -131,6 +133,7 @@ function Reaction({
           ? reactCustomEmoji(emojiName, emojiImage)
           : react(content)
       }
+      aria-label={`${t("chat.message.react.with")}${content}`}
     >
       <div className="flex flex-row items-center gap-1.5">
         {isCustomEmoji ? (

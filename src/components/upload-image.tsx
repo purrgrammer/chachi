@@ -48,6 +48,7 @@ export function UploadImage({ defaultImage, onUpload }: UploadImageProps) {
       className={`bg-accent hover:bg-accent hover:text-foreground size-24 rounded-full text-muted-foreground [&_svg]:size-10 ${image ? "p-0" : ""} gap-0`}
       onClick={handleClick}
       type="button"
+      aria-label={t("aria.upload-image")}
     >
       {image ? (
         <img src={image} className="object-cover rounded-full size-24" />

@@ -49,6 +49,7 @@ export function UploadVideo({ onUpload, ...props }: UploadVideoProps) {
         onClick={handleClick}
         size="huge"
         className="border"
+        aria-label={t("aria.upload-video")}
         {...props}
       >
         {isUploading ? <RotateCw className="animate-spin" /> : <FileVideo />}

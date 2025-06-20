@@ -625,6 +625,7 @@ function MessageContent({
                       variant="outline"
                       size="smallIcon"
                       onClick={() => setShowingEmojiPicker(true)}
+                      aria-label={t("aria.add-emoji")}
                     >
                       <SmilePlus />
                     </Button>

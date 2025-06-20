@@ -47,6 +47,7 @@ export function UploadFile({ onUpload, ...props }: UploadFileProps) {
       variant="action"
       size="icon"
       onClick={handleClick}
+      aria-label={t("aria.upload-file")}
       {...props}
     >
       {isUploading ? (
@@ -100,6 +101,7 @@ export function UploadEncryptedFile({ onUpload, ...props }: UploadFileProps) {
       variant="action"
       size="icon"
       onClick={handleClick}
+      aria-label={t("aria.upload-file")}
       {...props}
     >
       {isUploading ? (
