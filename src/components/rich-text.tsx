@@ -19,11 +19,12 @@ import type { Group } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { LazyCodeBlock } from "@/components/lazy-code-block";
 import { cashuRegex, cashuRequestRegex } from "@/lib/cashu";
+import { RelayLink } from "@/components/nostr/relay";
 
 // todo: blossom link fallbacks
 
 const urlRegex =
-  /((?:http|https?):\/?\/?(?:[\w+?.\w+])+(?:[\p{L}\p{N}~!@#$%^&*()_\-=+\\/?.:;',]*)?(?:[-a-z0-9+&@#/%=~()_|]))/iu;
+  /((?:http|https?|wss?):\/?\/?(?:[\w+?.\w+])+(?:[\p{L}\p{N}~!@#$%^&*()_\-=+\\/?.:;',]*)?(?:[-a-z0-9+&@#/%=~()_|]))/iu;
 
 const NostrPrefixRegex = /^nostr:/;
 
@@ -56,6 +57,11 @@ export type AddressFragment = {
 
 export type URLFragment = {
   type: "url";
+  url: string;
+};
+
+export type RelayFragment = {
+  type: "relay";
   url: string;
 };
 
@@ -131,6 +137,7 @@ export type InlineFragment =
   | EventFragment
   | AddressFragment
   | URLFragment
+  | RelayFragment
   | VideoFragment
   | YoutubeFragment
   | ImageFragment
@@ -251,6 +258,22 @@ function toNode(
       >
         {fragment.url}
       </a>
+    );
+  }
+
+  if (fragment.type === "relay") {
+    return (
+      <RelayLink
+        key={idx}
+        relay={fragment.url}
+        classNames={{
+          wrapper: cn(
+            "inline-flex items-baseline gap-1 break-all underline decoration-dotted",
+            classNames.urls,
+          ),
+          icon: "size-3",
+        }}
+      />
     );
   }
 
@@ -1105,6 +1128,12 @@ function extractURLs(
     //          ? parseNprofile(last)
     //          : parseAddress(last);
     //  return fragment;
+
+    // Check if it's a WebSocket URL (likely a Nostr relay)
+    if (url.startsWith("ws://") || url.startsWith("wss://")) {
+      return { type: "relay", url };
+    }
+
     if (isVideoLink(url) && options.video) {
       return { type: "video", url };
     }
