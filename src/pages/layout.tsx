@@ -46,7 +46,7 @@ function useUserEvents({
   onLogin,
   onLoginFailed,
 }: {
-  loginMethod?: string;
+  loginMethod: string | null;
   onLogin?: () => void;
   onLoginFailed?: () => void;
 }) {
@@ -467,6 +467,8 @@ function NostrSync({ children }: { children: ReactNode }) {
   const [isLoggingIn, setIsLoggingIn] = useState(
     loginMethod && loginMethod !== "null",
   );
+  const location = useLocation();
+  const pubkey = usePubkey();
   useUserEvents({
     loginMethod,
     onLogin: () => {
@@ -476,12 +478,10 @@ function NostrSync({ children }: { children: ReactNode }) {
       setIsLoggingIn(false);
     },
   });
-  const location = useLocation();
-  const pubkey = usePubkey();
   if (isLoggingIn) {
     return <LoadingScreen />;
   }
-  if (!pubkey) {
+  if (!pubkey && isAuthRoute(location.pathname)) {
     return <Landing />;
   }
   return children;

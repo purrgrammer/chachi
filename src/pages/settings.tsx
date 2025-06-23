@@ -87,10 +87,10 @@ export default function Settings() {
               <Appearance />
               <hr />
               <div className="flex flex-col gap-3">
-                <div className="flex flex-col gap-0 mb-2">
+                <div className="flex flex-col gap-0.5 mb-2">
                   <div className="flex flex-row items-center gap-1">
                     <HandHeart className="size-4 text-muted-foreground" />
-                    <h2 className="text-md font-light uppercase text-muted-foreground">
+                    <h2 className="text-sm font-light uppercase text-muted-foreground">
                       {t("settings.supporters.title", "Supporters")}
                     </h2>
                   </div>
