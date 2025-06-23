@@ -206,6 +206,21 @@ export function useERef(tag: string[]) {
   return useEvent({ id, relays: relay && isRelayURL(relay) ? [relay] : [] });
 }
 
+function aTagToFilter(aTag: string) {
+  const [kind, pubkey, identifier] = aTag.split(":");
+  return {
+    authors: [pubkey],
+    kinds: [Number(kind)],
+    "#d": [identifier],
+  };
+}
+
+export function useARefs(refs: string[], relays: string[]) {
+  // todo: combine filters?
+  const filter = refs.map(aTagToFilter);
+  return useRequest(filter, relays, true);
+}
+
 export function useARef(tag: string[]) {
   const [, aRef, aRelay] = tag;
   const [kind, pubkey, identifier] = aRef.split(":");
@@ -346,6 +361,7 @@ export function useStream(
 export function useRequest(
   filter: NDKFilter | NDKFilter[],
   relays: string[],
+  unique = false,
 ): NostrREQResult<NostrEvent> {
   const ndk = useNDK();
   const relaySet = useRelaySet(relays);
@@ -364,7 +380,27 @@ export function useRequest(
     );
 
     sub.on("event", (event) => {
+      const id = event.tagId();
       setEvents((events) => {
+        if (unique) {
+          const existingIndex = events.findIndex(
+            (ev) =>
+              ev.id === id ||
+              id ===
+                `${ev.kind}:${ev.pubkey}:${ev.tags.find((t) => t[0] === "d")?.[1]}`,
+          );
+          if (existingIndex > -1) {
+            const existing = events[existingIndex];
+            if (existing.created_at >= (event.created_at || 0)) {
+              return events;
+            }
+            // Create a new array with the updated event at the same position
+            const newEvents = [...events];
+            newEvents[existingIndex] = event.rawEvent() as NostrEvent;
+            return newEvents;
+          }
+          return events.concat([event.rawEvent() as NostrEvent]);
+        }
         return events.concat([event.rawEvent() as NostrEvent]);
       });
     });

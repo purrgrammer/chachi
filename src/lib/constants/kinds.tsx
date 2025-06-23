@@ -38,6 +38,7 @@ import {
   COMMENT,
   POLL,
   CALENDAR_EVENT,
+  CALENDAR,
   GIF_SET,
   COMMUNIKEY,
   BOOK,
@@ -135,6 +136,11 @@ export const ContentKinds = [
   {
     kind: CALENDAR_EVENT,
     translationKey: "kinds.31923",
+    icon: <Calendar size={16} />,
+  },
+  {
+    kind: CALENDAR,
+    translationKey: "kinds.31924",
     icon: <Calendar size={16} />,
   },
   {
@@ -247,7 +253,7 @@ export const ContentCategoryGroups = [
     id: "interactive",
     name: "Interactive",
     icon: <Gamepad2 size={16} />,
-    kinds: [POLL, STREAM, CALENDAR_EVENT, GOAL],
+    kinds: [POLL, STREAM, CALENDAR, CALENDAR_EVENT, GOAL],
   },
   {
     id: "development",
@@ -281,7 +287,7 @@ export const ContentCategoryGroups = [
 export const ContentCategories = {
   posts: [1, COMMENT, 11],
   media: [20, 21, GIF_SET],
-  interactive: [POLL, STREAM, CALENDAR_EVENT],
+  interactive: [POLL, STREAM, CALENDAR_EVENT, CALENDAR],
   monetization: [9735, 9321, GOAL, CASHU_MINT],
 };
 

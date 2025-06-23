@@ -74,7 +74,7 @@ import {
 } from "@/components/ui/context-menu";
 import { Emoji as PickerEmoji, EmojiPicker } from "@/components/emoji-picker";
 import { Poll, PollResults } from "@/components/nostr/poll";
-import { CalendarEvent } from "@/components/nostr/calendar";
+import { Calendar, CalendarEvent } from "@/components/nostr/calendar";
 import { ReplyDialog } from "@/components/nostr/reply";
 import { useMintList } from "@/lib/cashu";
 import { eventLink } from "@/lib/links";
@@ -91,6 +91,7 @@ import {
   COMMENT,
   GOAL,
   STREAM,
+  CALENDAR,
   CALENDAR_EVENT,
   GIF_SET,
   BOOK,
@@ -273,6 +274,10 @@ const eventDetails: Record<
   [FOLLOW_PACK]: {
     preview: People,
     detail: People,
+  },
+  [CALENDAR]: {
+    preview: Calendar,
+    detail: Calendar,
   },
   [CALENDAR_EVENT]: {
     preview: CalendarEvent,

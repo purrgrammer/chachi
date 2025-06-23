@@ -2,6 +2,12 @@
   "locale": {
     "today": "Today"
   },
+  "calendar": {
+    "calendar": "Calendar",
+    "upcoming-events": "Upcoming Events",
+    "past-events": "Past Events",
+    "no-events": "No events found"
+  },
   "home": "Home",
   "nav": {
     "no-groups": "No groups",
@@ -948,6 +954,7 @@
     "30311": "Stream",
     "30315": "Status",
     "31923": "Calendar Event",
+    "31924": "Calendar",
     "34550": "Moderated Community",
     "38172": "Cashu Mint",
     "39000": "Group Metadata",
