@@ -29,7 +29,6 @@ export function NutzapReply({
       group={group}
       animateGradient={false}
       showRef={false}
-      showTarget={false}
     />
   );
 }

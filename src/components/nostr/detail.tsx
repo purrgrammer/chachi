@@ -743,18 +743,32 @@ function DeleteGroupEventItem({
 function AsReply({
   event,
   group,
+  relays = [],
   className,
   onClick,
   asLink = false,
 }: {
   event: NostrEvent;
   group?: Group;
+  relays?: string[];
   className?: string;
   onClick?: (ev: NostrEvent) => void;
   asLink?: boolean;
 }) {
   const url = asLink ? eventLink(event, group) : undefined;
-  const content = (
+  const component = eventDetails[event.kind]?.reply;
+  const content = component ? (
+    <div
+      className={cn(
+        "p-1 pl-2 border-l-4 rounded-md mb-1 bg-background/80 border-background dark:bg-background/40 dark:border-background/60",
+        onClick || asLink ? "cursor-pointer" : "",
+        className,
+      )}
+      onClick={onClick ? () => onClick(event) : undefined}
+    >
+      {component({ event, group, relays })}
+    </div>
+  ) : (
     <div
       className={cn(
         "h-12 p-1 pl-2 border-l-4 rounded-md mb-1 bg-background/80 border-background dark:bg-background/40 dark:border-background/60",

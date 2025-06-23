@@ -11,7 +11,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
 import { useInView } from "framer-motion";
 import {
-  Coins,
   HandCoins,
   Reply as ReplyIcon,
   SmilePlus,
