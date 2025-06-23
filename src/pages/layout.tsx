@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue } from "jotai";
 import { NostrEvent } from "nostr-tools";
-import { ReactNode, useEffect } from "react";
+import { useState, ReactNode, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import NDK, {
   NDKUser,
@@ -41,7 +41,15 @@ import { discoveryRelays } from "@/lib/relay";
 import { useDirectMessages } from "@/lib/nostr/dm";
 import { usePubkey } from "@/lib/account";
 
-function useUserEvents() {
+function useUserEvents({
+  loginMethod,
+  onLogin,
+  onLoginFailed,
+}: {
+  loginMethod?: string;
+  onLogin?: () => void;
+  onLoginFailed?: () => void;
+}) {
   const ndk = useNDK();
   const [account, setAccount] = useAtom(accountAtom);
   const accounts = useAtomValue(accountsAtom);
@@ -60,7 +68,6 @@ function useUserEvents() {
 
   // Log in account
   useEffect(() => {
-    const loginMethod = localStorage.getItem("login-method");
     if (loginMethod === '"nip07"') {
       const signer = new NDKNip07Signer();
       signer
@@ -68,8 +75,10 @@ function useUserEvents() {
         .then((user) => {
           ndk.signer = signer;
           setAccount({ method: "nip07", pubkey: user.pubkey });
+          onLogin?.();
         })
         .catch((err) => {
+          onLoginFailed?.();
           console.error(err);
         });
     } else if (loginMethod === '"nip46"') {
@@ -93,17 +102,25 @@ function useUserEvents() {
           .then(() => {
             ndk.signer = signer;
             setAccount(nip46account);
+            onLogin?.();
           })
           .catch((err) => {
+            onLoginFailed?.();
             console.error(err);
           });
       }
     } else if (loginMethod === '"nsec"') {
-      const nsecaccount = accounts.find((a) => a.method === "nsec");
-      if (nsecaccount && nsecaccount.privkey) {
-        const signer = new NDKPrivateKeySigner(nsecaccount.privkey);
-        ndk.signer = signer;
-        setAccount(nsecaccount);
+      try {
+        const nsecaccount = accounts.find((a) => a.method === "nsec");
+        if (nsecaccount && nsecaccount.privkey) {
+          const signer = new NDKPrivateKeySigner(nsecaccount.privkey);
+          ndk.signer = signer;
+          setAccount(nsecaccount);
+          onLogin?.();
+        }
+      } catch (err) {
+        console.error(err);
+        onLoginFailed?.();
       }
     }
   }, []);
@@ -446,18 +463,26 @@ function isAuthRoute(pathname: string) {
 }
 
 function NostrSync({ children }: { children: ReactNode }) {
-  useUserEvents();
-  const location = useLocation();
   const loginMethod = localStorage.getItem("login-method");
+  const [isLoggingIn, setIsLoggingIn] = useState(
+    loginMethod && loginMethod !== "null",
+  );
+  useUserEvents({
+    loginMethod,
+    onLogin: () => {
+      setIsLoggingIn(false);
+    },
+    onLoginFailed: () => {
+      setIsLoggingIn(false);
+    },
+  });
+  const location = useLocation();
   const pubkey = usePubkey();
-  if (!loginMethod) {
-    return <Landing />;
+  if (isLoggingIn) {
+    return <LoadingScreen />;
   }
-  if (!pubkey && !loginMethod && isAuthRoute(location.pathname)) {
+  if (!pubkey) {
     return <Landing />;
-  }
-  if (!pubkey && loginMethod) {
-    return isAuthRoute(location.pathname) ? <Landing /> : <LoadingScreen />;
   }
   return children;
 }
