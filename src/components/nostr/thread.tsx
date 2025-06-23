@@ -91,7 +91,7 @@ export function Thread({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="flex flex-col h-[100vh] max-w-full w-full p-0 m-0 border-0 rounded-none"
+        className="flex flex-col h-[100dvh] max-w-full w-full p-0 m-0 border-0 rounded-none"
         hideClose
       >
         <div className="flex flex-col h-full overflow-hidden relative">

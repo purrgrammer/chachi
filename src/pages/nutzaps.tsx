@@ -283,7 +283,7 @@ function MyNutzaps() {
   const { t } = useTranslation();
   return (
     <div className="flex items-center justify-center p-2">
-      <div className="w-[calc(100vw-2rem)] sm:w-[420px] md:w-[510px]">
+      <div className="w-[calc(100dvw-2rem)] sm:w-[420px] md:w-[510px]">
         <Tabs defaultValue="recv">
           <TabsList className="w-full bg-background">
             <TabsTrigger value="recv">

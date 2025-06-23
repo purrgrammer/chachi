@@ -400,9 +400,9 @@ function ProfileContent({
         <TabsList
           className="
           overflow-x-auto no-scrollbar 
-	  w-[100vw]
-md:w-[calc(100vw-18rem)]
-	  group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100vw-18rem)"
+	  w-[100dvw]
+md:w-[calc(100dvw-18rem)]
+	  group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100dvw-18rem)"
         >
           <TabsTrigger value="profile">
             {t("user.profile", "Profile")}

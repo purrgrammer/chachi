@@ -74,7 +74,7 @@ const Feed = forwardRef(
           <AnimatePresence initial={false}>
             <div className={cn("flex flex-col gap-2 p-2", feedClassName)}>
               {newPost}
-              <div className="flex flex-col gap-1 w-[calc(100vw-2rem)] sm:w-[420px] md:w-[510px]">
+              <div className="flex flex-col gap-1 w-[calc(100dvw-2rem)] sm:w-[420px] md:w-[510px]">
                 {(slidingWindow ? events.slice(0, slidingWindow) : events).map(
                   (event) => (
                     <motion.div

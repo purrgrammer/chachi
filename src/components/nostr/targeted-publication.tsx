@@ -298,7 +298,7 @@ export function NewPublication({
           <Button
             variant="outline"
             className="w-full 
-         w-[calc(100vw-2rem)] sm:w-[420px] md:w-[510px] 
+         w-[calc(100dvw-2rem)] sm:w-[420px] md:w-[510px] 
           "
             disabled={!canSign}
           >

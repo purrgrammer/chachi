@@ -35,7 +35,7 @@ export const GroupPosts = forwardRef(
     const { t } = useTranslation();
     return (
       <Feed
-        style={{ height: `calc(100vh - 80px)` }}
+        style={{ height: `calc(100dvh - 80px)` }}
         filter={filter}
         ref={ref}
         className={className}

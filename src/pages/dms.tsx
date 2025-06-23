@@ -78,7 +78,7 @@ function GroupActivityList() {
   return (
     <Reorder.Group
       axis="x"
-      className="flex overflow-x-auto flex-row gap-1 items-center px-0 no-scrollbar w-[calc(100vw-1.5rem)] md:w-[calc(100vw-20rem)]"
+      className="flex overflow-x-auto flex-row gap-1 items-center px-0 no-scrollbar w-[calc(100dvw-1.5rem)] md:w-[calc(100dvw-20rem)]"
       values={sortedGroups}
       onReorder={() => console.log("reorder")}
     >

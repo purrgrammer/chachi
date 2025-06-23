@@ -797,7 +797,7 @@ function Tx({ tx }: { tx: Transaction }) {
   return e || a ? (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>{component}</DialogTrigger>
-      <DialogContent className="bg-transparent border-none outline-none flex items-center justify-center h-[calc(100vh-2rem)]">
+      <DialogContent className="bg-transparent border-none outline-none flex items-center justify-center h-[calc(100dvh-2rem)]">
         {e ? (
           <Event
             id={e}
@@ -944,7 +944,7 @@ function CashuWalletCoins({ wallet }: { wallet: NDKCashuWallet }) {
   }
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex flex-col gap-2 pr-0.5 h-[68vh] overflow-y-scroll pretty-scrollbar">
+      <div className="flex flex-col gap-2 pr-0.5 h-[68dvh] overflow-y-scroll pretty-scrollbar">
         <div className="flex items-center justify-center">
           <Button
             disabled={isSyncing}
@@ -977,7 +977,7 @@ function CashuWalletTransactions({
     return [...transactions].sort((a, b) => b.created_at - a.created_at);
   }, [transactions]);
   return (
-    <div className="flex flex-col gap-2 pr-0.5 h-[68vh] overflow-y-scroll pretty-scrollbar">
+    <div className="flex flex-col gap-2 pr-0.5 h-[68dvh] overflow-y-scroll pretty-scrollbar">
       {sorted.length === 0 ? (
         <div className="h-[28rem] flex items-center justify-center">
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
@@ -2334,7 +2334,7 @@ function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
   return (
     <>
       {isLoading || isError ? (
-        <div className="flex items-center justify-center w-full h-[73vh]">
+        <div className="flex items-center justify-center w-full h-[73dvh]">
           <div className="flex flex-col items-center justify-center text-muted-foreground">
             {isError ? (
               <ServerCrash className="size-5 text-destructive" />
@@ -2353,7 +2353,7 @@ function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col gap-2 pr-0.5 h-[73vh] overflow-y-scroll pretty-scrollbar">
+        <div className="flex flex-col gap-2 pr-0.5 h-[73dvh] overflow-y-scroll pretty-scrollbar">
           {transactions?.map((tx) => <Tx key={tx.id} tx={tx} />)}
         </div>
       )}

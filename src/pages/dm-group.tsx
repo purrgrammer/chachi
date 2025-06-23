@@ -65,7 +65,7 @@ function GroupChat({ id, group }: { id: string; group: PrivateGroup }) {
         group={group}
         style={
           {
-            height: `calc(100vh - ${nonChatHeight}px)`,
+            height: `calc(100dvh - ${nonChatHeight}px)`,
           } as React.CSSProperties
         }
         newMessage={sentMessage}

@@ -896,7 +896,7 @@ export const GroupChat = forwardRef(
           admins={admins}
           style={
             {
-              height: `calc(100vh - ${nonChatHeight}px)`,
+              height: `calc(100dvh - ${nonChatHeight}px)`,
             } as React.CSSProperties
           }
           newMessage={sentMessage}
@@ -1057,7 +1057,7 @@ export const CommunityChat = forwardRef(
           admins={[pubkey]}
           style={
             {
-              height: `calc(100vh - ${nonChatHeight}px)`,
+              height: `calc(100dvh - ${nonChatHeight}px)`,
             } as React.CSSProperties
           }
           newMessage={sentMessage}
