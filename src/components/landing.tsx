@@ -1,19 +1,10 @@
 import Logo from "@/components/logo";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-//import { Embed } from "@/components/nostr/detail";
 import { ChatBubble } from "./nostr/chat-bubble";
 import { Login } from "@/components/nostr/login";
-//import { Emoji } from "./emoji";
-import { useStream } from "@/lib/nostr";
-import { NDKKind } from "@nostr-dev-kit/ndk";
 import { CHACHI_PUBKEY, CHACHI_RELAYS } from "@/constants";
-import { validateZap } from "@/lib/nip-57";
-import { validateNutzap } from "@/lib/nip-61";
-import { User } from "@/components/nostr/user";
 import {
-  //Castle,
-  HandHeart,
   MessageCircleHeart,
   Rocket,
   Github,
@@ -24,10 +15,8 @@ import {
   DatabaseZap,
   HandCoins,
 } from "lucide-react";
-import { Donate } from "@/components/donate";
+import Supporters from "./supporters";
 import { Button } from "./ui/button";
-//import { COMMUNIKEY } from "@/lib/kinds";
-import { useMemo } from "react";
 
 const testimonials = [
   {
@@ -118,106 +107,6 @@ const testimonials = [
     sig: "449900d5c169cc2a3a3ebe10c22adec603035fac5318e632d87038bec0e1245bcd8bc25881370d107fd9b1e739c3f633a774663f10df4fb339ec05a9fd9d223b",
   },
 ];
-
-/*
-function Communities() {
-  const { events } = useStream(
-    {
-      kinds: [COMMUNIKEY],
-    },
-    ["wss://nos.lol"],
-  );
-  const { t } = useTranslation();
-  return (
-    <div className="flex flex-col items-center justify-center my-8 gap-8 my-12 px-8">
-      <div className="flex flex-col items-center gap-2">
-        <div className="flex flex-row items-end gap-3 mb-2">
-          <Castle className="size-10 text-muted-foreground" />
-          <h2 className="text-5xl font-semibold leading-none">
-            {t("landing.communities")}
-          </h2>
-        </div>
-        <p className="text-center text-balance text-lg text-muted-foreground">
-          {t("landing.communities-desc")}
-        </p>
-      </div>
-      <div className="flex flex-row gap-4">
-        {events.map((event) => (
-          <div key={event.id}>
-            <Embed event={event} relays={CHACHI_RELAYS} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-  */
-
-function Supporters() {
-  const { events } = useStream(
-    {
-      kinds: [NDKKind.Zap, NDKKind.Nutzap],
-      "#p": [CHACHI_PUBKEY],
-    },
-    CHACHI_RELAYS,
-  );
-  const { t } = useTranslation();
-  const zaps = events
-    .map((event) => {
-      return {
-        event,
-        zap:
-          event.kind === NDKKind.Zap
-            ? validateZap(event)
-            : validateNutzap(event),
-      };
-    })
-    .filter(({ zap }) => zap !== null);
-  const supporters = useMemo(() => {
-    const contributors = zaps.reduce(
-      (acc, zap) => {
-        if (zap.zap?.pubkey) {
-          acc[zap.zap?.pubkey] = (acc[zap.zap?.pubkey] || 0) + zap.zap?.amount;
-        }
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
-    const sortedContributors = Object.entries(contributors);
-    sortedContributors.sort((a, b) => {
-      const [, amountA] = a;
-      const [, amountB] = b;
-      return amountB - amountA;
-    });
-    return sortedContributors.map(([pubkey]) => pubkey);
-  }, [zaps]);
-
-  return (
-    <div className="flex flex-col items-center justify-center gap-8 py-12 px-8 w-full bg-accent/40">
-      <div className="flex flex-col items-center gap-2">
-        <div className="flex flex-row items-end gap-3 mb-2">
-          <HandHeart className="size-10 text-muted-foreground" />
-          <h2 className="text-5xl font-semibold leading-none">
-            {t("landing.supporters")}
-          </h2>
-        </div>
-        <p className="text-center text-balance text-lg text-muted-foreground">
-          {t("landing.supporters-desc")}
-        </p>
-      </div>
-      <div className="grid grid-cols-8 gap-4">
-        {supporters.map((pubkey) => (
-          <User
-            key={pubkey}
-            pubkey={pubkey}
-            classNames={{ avatar: "size-12", name: "hidden" }}
-          />
-        ))}
-      </div>
-      <Donate />
-    </div>
-  );
-}
 
 function Testimonials() {
   const { t } = useTranslation();
@@ -375,14 +264,6 @@ function GetStarted() {
 }
 
 export default function Landing() {
-  /*
-  const emojis = [
-    {
-      name: "MEOWDY",
-      image: "https://cdn.betterttv.net/emote/641b685809065320f4a2cf72/3x.webp",
-    },
-  ];
-  */
   return (
     <div className="flex flex-col items-center w-full min-h-screen">
       <div className="flex flex-col items-center justify-center py-20 text-center px-4 md:flex-row gap-6 md:gap-12">
@@ -406,19 +287,9 @@ export default function Landing() {
           </h2>
         </div>
       </div>
-      {/*
-      <marquee behavior="alternate" className="my-12">
-      {emojis.map((e) => (
-          <Emoji key={e.name} image={e.image} name={e.name} className="size-20" />
-      ))}
-     </marquee>
-*/}
       <Features />
       <Testimonials />
-      {/*
-      <Communities />
-      */}
-      <Supporters />
+      <Supporters pubkey={CHACHI_PUBKEY} relays={CHACHI_RELAYS} />
       <SourceCode />
       <footer className="bg-white text-black flex items-center justify-center text-background w-full py-12">
         <div className="flex flex-col max-w-xl">

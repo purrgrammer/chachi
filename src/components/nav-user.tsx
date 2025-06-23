@@ -6,7 +6,6 @@ import {
   LogOut,
   Settings,
   Zap,
-  HandHeart,
   Castle,
   User,
 } from "lucide-react";
@@ -123,13 +122,13 @@ export function NavUser() {
                     {t("user.community")}
                   </DropdownMenuItem>
                 )}
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate("/zaps")}>
                   <Zap className="text-muted-foreground size-4" />
                   {t("user.zaps")}
                 </DropdownMenuItem>
                 {wallets.length > 0 ? (
                   <>
-                    <DropdownMenuSeparator />
                     {wallets.map((wallet) => (
                       <DropdownMenuItem onClick={() => openWallet(wallet)}>
                         <WalletBalance wallet={wallet} />
@@ -141,10 +140,6 @@ export function NavUser() {
                 <DropdownMenuItem onClick={() => navigate("/settings")}>
                   <Settings className="text-muted-foreground size-4" />
                   {t("user.settings")}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setShowDonateDialog(true)}>
-                  <HandHeart className="text-muted-foreground size-4" />
-                  {t("user.donate")}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout}>
