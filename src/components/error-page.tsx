@@ -44,8 +44,8 @@ export const ErrorPage = () => {
       />
 
       <div className="flex items-center gap-2">
-        <AlertTriangle className="w-5 h-5 text-destructive" />
-        <span className="font-medium">{t("error.something-went-wrong")}</span>
+        <AlertTriangle className="w-5 h-5 text-muted-foreground" />
+        <span>{t("error.something-went-wrong")}</span>
       </div>
 
       <div className="flex gap-3">

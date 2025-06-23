@@ -154,6 +154,12 @@ export function useAddress({
   return useQuery({
     queryKey: [ADDRESS, `${kind}:${pubkey}:${identifier ? identifier : ""}`],
     queryFn: async () => {
+      const isParameterized = kind >= 30_000 && kind <= 40_000;
+      const filter = {
+        kinds: [kind],
+        authors: [pubkey],
+        ...(isParameterized && identifier ? { "#d": [identifier] } : {}),
+      };
       const cached = await fetchCachedAddress(ndk, kind, pubkey, identifier);
       if (cached) {
         return cached;
@@ -167,13 +173,7 @@ export function useAddress({
       const relaySet = NDKRelaySet.fromRelayUrls(relayList, ndk);
       return ndk
         .fetchEvent(
-          {
-            kinds: [kind],
-            authors: [pubkey],
-            ...(kind >= 30_0000 && kind <= 40_000 && identifier
-              ? { "#d": [identifier] }
-              : {}),
-          },
+          filter,
           {
             closeOnEose: true,
             cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
