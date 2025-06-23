@@ -536,7 +536,7 @@ function ChatNutzap({
                       pubkey={event.pubkey}
                       classNames={{ avatar: "size-7" }}
                     />
-                  ) : (
+                  ) : !isMine ? (
                     <ProfileDrawer
                       group={group}
                       pubkey={event.pubkey}
@@ -544,7 +544,7 @@ function ChatNutzap({
                         <Avatar pubkey={event.pubkey} className="size-7" />
                       }
                     />
-                  )}
+                  ) : null}
                   {isShownInline ? (
                     <div className="flex flex-row items-center gap-3">
                       <div className="flex flex-row items-center gap-0">
