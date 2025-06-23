@@ -531,17 +531,12 @@ function ChatNutzap({
               className={`z-0 border-none my-1 ${isShownInline ? "" : "max-w-[19rem] sm:max-w-sm md:max-w-md"}`}
             >
               <div className="flex flex-col gap-0">
-                <div
-                  className={`flex flex-row gap-2 items-end ${isShownInline ? "gap-0" : ""}`}
-                >
-                  {isMine ? null : isShownInline ? (
-                    <div className="flex flex-row gap-2 items-center">
-                      <Coins className="size-5 text-muted-foreground" />
-                      <User
-                        pubkey={event.pubkey}
-                        classNames={{ avatar: "size-7" }}
-                      />
-                    </div>
+                <div className="flex flex-row gap-2 items-end">
+                  {isShownInline ? (
+                    <User
+                      pubkey={event.pubkey}
+                      classNames={{ avatar: "size-7" }}
+                    />
                   ) : (
                     <ProfileDrawer
                       group={group}
@@ -552,7 +547,7 @@ function ChatNutzap({
                     />
                   )}
                   {isShownInline ? (
-                    <>
+                    <div className="flex flex-row items-center gap-3">
                       <div className="flex flex-row items-center gap-0">
                         {unit === "eur" ? (
                           <Euro className="size-5 text-muted-foreground" />
@@ -566,7 +561,7 @@ function ChatNutzap({
                         </span>
                       </div>
                       <User pubkey={target} classNames={{ avatar: "size-7" }} />
-                    </>
+                    </div>
                   ) : (
                     <div
                       className={cn(
