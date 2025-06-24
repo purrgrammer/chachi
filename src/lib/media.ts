@@ -4,6 +4,7 @@ import { BlossomClient, BlobDescriptor } from "blossom-client-sdk";
 import { getEventHash, EventTemplate } from "nostr-tools";
 import { mediaServersAtom } from "@/app/store";
 import { useAccount } from "@/lib/account";
+import { getHost } from "@/lib/hooks";
 import { useNDK } from "@/lib/ndk";
 import { useTranslation } from "react-i18next";
 
@@ -99,13 +100,17 @@ export function useUpload() {
     for (const server of servers) {
       try {
         const blob = await BlossomClient.uploadBlob(server, file, auth);
-        toast.success(t("settings.media.upload-success", { server }));
+        toast.success(
+          t("settings.media.upload-success", { server: getHost(server) }),
+        );
         const type = blob.type?.replace("quicktime", "mov") || "";
         const extension = type ? `${type.split("/")[1]}` : "";
         return { ...blob, type, extension };
       } catch (err) {
         console.error(err);
-        toast.error(t("settings.media.upload-error", { server }));
+        toast.error(
+          t("settings.media.upload-error", { server: getHost(server) }),
+        );
       }
     }
     throw new Error(t("settings.media.upload-panic"));

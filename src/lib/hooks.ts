@@ -20,14 +20,16 @@ export function useCopy(): [boolean, (text: string) => Promise<void>] {
   return [copied, copy];
 }
 
+export function getHost(url: string): string {
+  try {
+    return new URL(url).host;
+  } catch {
+    return url;
+  }
+}
+
 export function useHost(url: string) {
-  return useMemo(() => {
-    try {
-      return new URL(url).host;
-    } catch {
-      return url;
-    }
-  }, [url]);
+  return useMemo(() => getHost(url), [url]);
 }
 
 export function useFavicon(server: string) {
