@@ -40,7 +40,12 @@ export default function GroupPage({ tab = "chat" }: { tab?: GroupTab }) {
     <>
       <GroupHeader group={group} />
       <Tabs value={tab} onValueChange={onValueChange}>
-        <TabsList>
+        <TabsList
+          className="
+          overflow-x-auto no-scrollbar 
+	  w-full
+	  group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100dvw-18rem)"
+        >
           <TabsTrigger value="chat">{t("content.type.chat")}</TabsTrigger>
           <TabsTrigger value="posts">{t("content.type.posts")}</TabsTrigger>
           <TabsTrigger value="videos">{t("content.type.videos")}</TabsTrigger>

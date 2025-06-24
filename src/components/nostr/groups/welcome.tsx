@@ -9,6 +9,7 @@ import {
   CloudUpload,
   Landmark,
   MapPin,
+  Zap,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -19,6 +20,7 @@ import { useRecommendedApps } from "@/lib/nip-89";
 import { RichText } from "@/components/rich-text";
 import { Nip05 } from "@/components/nostr/nip05";
 import { Login } from "@/components/nostr/login";
+import { NewZapDialog } from "@/components/nostr/zap";
 import { usePinnedPosts } from "@/lib/nip-51";
 import { useProfile, useRelayList, useTag } from "@/lib/nostr";
 import { Community } from "@/lib/types";
@@ -33,6 +35,7 @@ import { useState, useMemo } from "react";
 import { usePubkey } from "@/lib/account";
 import { toast } from "sonner";
 import { useBookmarkGroup } from "./bookmark";
+import { ProfileColor } from "@/components/nostr/profile";
 import Geohash from "latlon-geohash";
 
 function PinnedPost({ tag, relays }: { tag: string[]; relays: string[] }) {
@@ -47,7 +50,6 @@ export default function Welcome({ community }: { community: Community }) {
   const { data: profile } = useProfile(community.pubkey);
   const { data: userRelays } = useRelayList(community.pubkey);
   const myGroups = useMyGroups();
-  const [isBannerLoaded, setIsBannerLoaded] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const pubkey = usePubkey();
   const isMember = myGroups.some(
@@ -119,119 +121,153 @@ export default function Welcome({ community }: { community: Community }) {
   };
 
   return (
-    <div className="flex items-center justify-center">
-      <div className="flex flex-col relative w-full max-w-4xl max-h-96">
-        {banner && (
-          <img
-            src={banner}
-            alt="Banner"
-            className="w-full min-h-42 max-h-96 aspect-image object-cover"
-            onLoad={() => setIsBannerLoaded(true)}
-          />
-        )}
-        <div
-          className={`flex flex-row justify-between ${isBannerLoaded ? "-mt-20" : ""}`}
-        >
-          <div className="p-2 flex flex-col items-start gap-3">
-            <div className="flex flex-col gap-2 items-start ml-3">
-              <div className="flex flex-col gap-1">
-                <User
-                  notClickable
-                  pubkey={community.pubkey}
-                  classNames={{
-                    avatar: "size-32 border-4 border-background",
-                    name: "text-4xl",
-                    wrapper: "flex-col gap-0 items-start",
-                  }}
-                />
-                {description ? (
-                  <RichText
-                    tags={profile?.tags}
-                    className="text-balance text-muted-foreground"
-                  >
-                    {description}
-                  </RichText>
-                ) : null}
-              </div>
-              {allKinds.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                  {allKinds.map((kind) => {
-                    const kindInfo = ContentKinds.find((k) => k.kind === kind);
-                    return kindInfo ? (
-                      <Badge
-                        key={kind}
-                        variant="secondary"
-                        className="text-xs flex items-center gap-1"
-                      >
-                        {kindInfo.icon}
-                        <span>{t(kindInfo.translationKey)}</span>
-                      </Badge>
-                    ) : null;
-                  })}
-                </div>
-              )}
-            </div>
-            {profile?.website ||
-            profile?.nip05 ||
-            community.location ||
-            community.geohash ? (
-              <div className="px-2 flex flex-col items-start gap-1">
-                {mapUrl ? (
-                  <Link
-                    to={mapUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-xs px-2 hover:underline hover:decoration-dotted"
-                  >
-                    <div className="flex flex-row items-center gap-1">
-                      <MapPin className="size-3 text-muted-foreground" />
-                      {community.location ? (
-                        <span className="font-mono">{community.location}</span>
-                      ) : (
-                        <span className="font-mono">{community.geohash}</span>
-                      )}
-                    </div>
-                  </Link>
-                ) : null}
-                {profile?.website ? (
-                  <Link
-                    to={profile.website}
-                    className="font-mono text-xs px-2 hover:underline hover:decoration-dotted"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <div className="flex flex-row items-center gap-1">
-                      <LinkIcon className="size-3 text-muted-foreground" />
-                      {profile.website}
-                    </div>
-                  </Link>
-                ) : null}
-                {profile?.nip05 ? (
-                  <span className="font-mono text-xs px-2">
-                    <div className="flex flex-row items-center gap-1">
-                      <AtSign className="size-3 text-muted-foreground" />
-                      <Nip05 pubkey={profile.pubkey} />
-                    </div>
-                  </span>
-                ) : null}
-              </div>
-            ) : null}
+    <div className="flex items-center justify-center px-1">
+      <div className="flex flex-col relative w-full max-w-lg">
+        <img
+          src={banner || profile?.picture || "/favicon.png"}
+          alt="Banner"
+          className="rounded-bl-md rounded-br-md w-full h-[18em] aspect-image object-cover"
+        />
+
+        {/* Banner, Avatar and Action Buttons Section */}
+        <div className="flex flex-row justify-between items-center -mt-16">
+          <div className="pl-2 flex items-end">
+            <User
+              notClickable
+              pubkey={community.pubkey}
+              classNames={{
+                avatar: "size-32 border-4 border-background",
+                name: "hidden",
+                wrapper: "flex-row gap-3 items-end",
+              }}
+            />
           </div>
-          <div className="flex flex-row gap-2 mt-20 pt-2 pr-3">
+
+          {/* Action Buttons - now positioned independently */}
+          <div className="flex flex-row gap-2 -mb-11">
+            {/* Zap Button - only show if community can receive zaps */}
+            {profile?.lud16 && (
+              <NewZapDialog
+                pubkey={community.pubkey}
+                zapType="nip-61"
+                trigger={
+                  <Button variant="default" size="sm">
+                    <Zap className="size-4" />
+                    <span className="hidden sm:inline ml-2">
+                      {t("zap.action.zap", "Zap")}
+                    </span>
+                  </Button>
+                }
+              />
+            )}
+            {/* Join/Joined Button */}
             {isMember ? (
               <Button disabled variant="outline" size="sm">
                 <Check className="size-4 text-green-500 dark:text-green-400" />
-                {t("groups.welcome.joined")}
+                <span className="hidden sm:inline ml-2">
+                  {t("groups.welcome.joined")}
+                </span>
               </Button>
             ) : (
               <Button variant="outline" size="sm" onClick={handleJoinClick}>
                 <MessageSquare className="size-4" />
-                {t("groups.welcome.join")}
+                <span className="hidden sm:inline ml-2">
+                  {t("groups.welcome.join")}
+                </span>
               </Button>
             )}
           </div>
         </div>
-        <div className="px-6 pt-2 flex flex-col gap-4">
+
+        {/* Name, Description, Content Types Section */}
+        <div className="px-2 pb-2 flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-0">
+              <User
+                notClickable
+                pubkey={community.pubkey}
+                classNames={{
+                  avatar: "hidden",
+                  name: "text-4xl",
+                  wrapper: "flex-col gap-0 items-start",
+                }}
+              />
+              <ProfileColor pubkey={community.pubkey} relays={relays} />
+            </div>
+            {description && (
+              <RichText
+                tags={profile?.tags}
+                className="text-balance text-muted-foreground mt-2"
+              >
+                {description}
+              </RichText>
+            )}
+            {allKinds.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {allKinds.map((kind) => {
+                  const kindInfo = ContentKinds.find((k) => k.kind === kind);
+                  return kindInfo ? (
+                    <Badge
+                      key={kind}
+                      variant="secondary"
+                      className="text-xs flex items-center gap-1"
+                    >
+                      {kindInfo.icon}
+                      <span>{t(kindInfo.translationKey)}</span>
+                    </Badge>
+                  ) : null;
+                })}
+              </div>
+            )}
+          </div>
+
+          {(profile?.website ||
+            profile?.nip05 ||
+            community.location ||
+            community.geohash) && (
+            <div className="flex flex-col items-start gap-1">
+              {mapUrl && (
+                <Link
+                  to={mapUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="break-all font-mono text-xs px-2 hover:underline hover:decoration-dotted"
+                >
+                  <div className="flex flex-row items-center gap-1">
+                    <MapPin className="flex-shrink-0 size-3 text-muted-foreground" />
+                    {community.location ? (
+                      <span className="font-mono">{community.location}</span>
+                    ) : (
+                      <span className="font-mono">{community.geohash}</span>
+                    )}
+                  </div>
+                </Link>
+              )}
+              {profile?.website && (
+                <Link
+                  to={profile.website}
+                  className="break-all font-mono text-xs px-2 hover:underline hover:decoration-dotted"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div className="flex flex-row items-center gap-1">
+                    <LinkIcon className="flex-shrink-0 size-3 text-muted-foreground" />
+                    {profile.website}
+                  </div>
+                </Link>
+              )}
+              {profile?.nip05 && (
+                <span className="font-mono text-xs px-2">
+                  <div className="flex flex-row items-center gap-1">
+                    <AtSign className="size-3 text-muted-foreground" />
+                    <Nip05 pubkey={profile.pubkey} />
+                  </div>
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="px-2 pt-2 pb-8 flex flex-col gap-4">
           {pinned.length > 0 ? (
             <div className="flex flex-col gap-2">
               <div className="flex flex-row items-center gap-1">
@@ -240,7 +276,7 @@ export default function Welcome({ community }: { community: Community }) {
                   {t("groups.welcome.pinned-posts")}
                 </h2>
               </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+              <div className="flex flex-col gap-2">
                 {pinned.map((tag) => (
                   <PinnedPost key={tag[1]} tag={tag} relays={relays} />
                 ))}
@@ -255,7 +291,7 @@ export default function Welcome({ community }: { community: Community }) {
                   {t("groups.welcome.apps")}
                 </h2>
               </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+              <div className="flex flex-col gap-2">
                 {apps.map(({ address }) => (
                   <ARef
                     key={address}

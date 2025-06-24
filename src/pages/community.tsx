@@ -129,8 +129,7 @@ function CommunityContent({ pubkey }: { pubkey: string }) {
         <TabsList
           className="
           overflow-x-auto no-scrollbar 
-	  w-[100dvw]
-md:w-[calc(100dvw-18rem)]
+	  w-full
 	  group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100dvw-18rem)"
         >
           {community ? (

@@ -98,7 +98,7 @@ export function ProfileColor({
 
   return (
     <div
-      className={`flex flex-row items-center gap-1 max-w-[210px] ${isCopying ? "pointer-none" : "cursor-copy"}`}
+      className={`flex flex-row items-center gap-1 max-w-[210px] ${isCopying ? "pointer-events-none" : "cursor-copy"}`}
       onClick={() => copy(nprofile)}
     >
       <div
