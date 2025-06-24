@@ -41,6 +41,7 @@ import {
 } from "@/components/nostr/feed-controls";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { useFeedFilters } from "@/hooks/use-feed-filters";
+import { ProfileColor } from "@/components/nostr/profile";
 
 interface ProfileValidatorProps {
   identifier: string;
@@ -126,7 +127,6 @@ function ProfileWelcome({
 }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [isBannerLoaded, setIsBannerLoaded] = useState(false);
 
   const { data: profile } = useProfile(pubkey, relays);
   const { data: userRelays } = useRelayList(pubkey);
@@ -145,67 +145,30 @@ function ProfileWelcome({
   const banner = profile?.banner || profile?.picture;
 
   return (
-    <div className="flex items-center justify-center">
-      <div className="flex flex-col relative w-full max-w-xl max-h-96">
+    <div className="flex items-center justify-center px-1">
+      <div className="flex flex-col relative w-full max-w-lg">
         <img
           src={banner || profile?.picture || "/favicon.png"}
           alt={t("profile.banner.alt", "Profile Banner")}
-          className="w-full min-h-42 max-h-96 aspect-image object-cover"
-          onLoad={() => setIsBannerLoaded(true)}
+          className="rounded-bl-md rounded-br-md h-[18em] aspect-image object-cover"
         />
-        <div
-          className={`flex flex-row justify-between ${banner && isBannerLoaded ? "-mt-20" : ""}`}
-        >
-          <div className="p-2 flex flex-col items-start gap-3">
-            <div className="flex flex-col gap-2 items-start ml-3">
-              <div className="flex flex-col gap-1">
-                <User
-                  notClickable
-                  pubkey={pubkey}
-                  classNames={{
-                    avatar: "size-32 border-4 border-background",
-                    name: "text-4xl",
-                    wrapper: "flex-col gap-0 items-start",
-                  }}
-                />
-                {profile?.about && (
-                  <RichText
-                    tags={profile?.tags}
-                    className="text-balance text-muted-foreground"
-                  >
-                    {profile.about}
-                  </RichText>
-                )}
-              </div>
-            </div>
-            {(profile?.website || profile?.nip05) && (
-              <div className="px-2 flex flex-col items-start gap-1">
-                {profile?.website && (
-                  <a
-                    href={profile.website}
-                    className="font-mono text-xs px-2 hover:underline hover:decoration-dotted"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <div className="flex flex-row items-center gap-1">
-                      <LinkIcon className="size-3 text-muted-foreground" />
-                      {profile.website}
-                    </div>
-                  </a>
-                )}
-                {profile?.nip05 && (
-                  <span className="font-mono text-xs px-2">
-                    <div className="flex flex-row items-center gap-1">
-                      <AtSign className="size-3 text-muted-foreground" />
-                      <Nip05 pubkey={pubkey} />
-                    </div>
-                  </span>
-                )}
-              </div>
-            )}
+
+        {/* Banner, Avatar and Action Buttons Section */}
+        <div className="flex flex-row justify-between items-center -mt-16">
+          <div className="pl-2 flex items-end">
+            <User
+              notClickable
+              pubkey={pubkey}
+              classNames={{
+                avatar: `size-32 border-4 border-background`,
+                name: "hidden",
+                wrapper: "flex-row gap-3 items-end",
+              }}
+            />
           </div>
-          {/* Action Buttons - positioned like Join button in welcome page */}
-          <div className="flex flex-row gap-2 mt-20 pt-2 pr-3">
+
+          {/* Action Buttons - now positioned independently */}
+          <div className="flex flex-row gap-2 -mb-11">
             {/* Zap Button - only show if user can receive zaps */}
             {profile?.lud16 && (
               <NewZapDialog
@@ -214,7 +177,9 @@ function ProfileWelcome({
                 trigger={
                   <Button variant="default" size="sm">
                     <Zap className="size-4" />
-                    {t("zap.action.zap", "Zap")}
+                    <span className="hidden sm:inline ml-2">
+                      {t("zap.action.zap", "Zap")}
+                    </span>
                   </Button>
                 }
               />
@@ -227,12 +192,66 @@ function ProfileWelcome({
                 onClick={() => navigate(`/c/${pubkey}`)}
               >
                 <Castle className="size-4" />
-                {t("user.community", "Community")}
+                <span className="hidden sm:inline ml-2">
+                  {t("user.community", "Community")}
+                </span>
               </Button>
             )}
           </div>
         </div>
-        <div className="px-6 pt-2 pb-8 flex flex-col gap-4">
+
+        {/* Name, Description, Website Section */}
+        <div className="px-2 pb-2 flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-0">
+              <User
+                notClickable
+                pubkey={pubkey}
+                classNames={{
+                  avatar: "hidden",
+                  name: "text-4xl",
+                  wrapper: "flex-col gap-0 items-start",
+                }}
+              />
+              <ProfileColor pubkey={pubkey} relays={relays} />
+            </div>
+            {profile?.about && (
+              <RichText
+                tags={profile?.tags}
+                className="text-balance text-muted-foreground mt-2"
+              >
+                {profile.about}
+              </RichText>
+            )}
+          </div>
+
+          {(profile?.website || profile?.nip05) && (
+            <div className="flex flex-col items-start gap-1">
+              {profile?.website && (
+                <a
+                  href={profile.website}
+                  className="break-all font-mono text-xs px-2 hover:underline hover:decoration-dotted"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div className="flex flex-row items-center gap-1">
+                    <LinkIcon className="flex-shrink-0 size-3 text-muted-foreground" />
+                    {profile.website}
+                  </div>
+                </a>
+              )}
+              {profile?.nip05 && (
+                <span className="font-mono text-xs px-2">
+                  <div className="flex flex-row items-center gap-1">
+                    <AtSign className="size-3 text-muted-foreground" />
+                    <Nip05 pubkey={pubkey} />
+                  </div>
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="px-2 pt-1 pb-6 flex flex-col gap-4">
           {/* User Relays Section */}
           {userRelays && userRelays.length > 0 ? (
             <div className="flex flex-col gap-2">
@@ -400,8 +419,7 @@ function ProfileContent({
         <TabsList
           className="
           overflow-x-auto no-scrollbar 
-	  w-[100dvw]
-md:w-[calc(100dvw-18rem)]
+	  w-full
 	  group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100dvw-18rem)"
         >
           <TabsTrigger value="profile">

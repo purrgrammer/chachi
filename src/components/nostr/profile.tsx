@@ -1,20 +1,19 @@
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
-  DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { nip19 } from "nostr-tools";
-import { Avatar } from "@/components/nostr/avatar";
-import { Name } from "@/components/nostr/name";
+import { User } from "@/components/nostr/user";
 import { useProfile, useRelayList } from "@/lib/nostr";
-import { InputCopy } from "@/components/ui/input-copy";
 import { RichText } from "@/components/rich-text";
 import { LnAddress } from "@/components/ln";
 import type { Group as GroupType } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useCopy } from "@/lib/hooks";
+import { pubkeyToHslString } from "@/lib/color";
 
 function ProfileDrawerContent({
   pubkey,
@@ -29,21 +28,22 @@ function ProfileDrawerContent({
   return (
     <div className="flex flex-col gap-4 mx-auto w-full max-w-sm mb-8">
       <DrawerHeader className="flex flex-col items-center gap-3">
-        <Avatar pubkey={pubkey} className="size-16" />
-        <DrawerTitle>
-          <Name pubkey={pubkey} />
-        </DrawerTitle>
+        <div className="flex flex-col gap-0 items-center justify-center">
+          <User
+            pubkey={pubkey}
+            classNames={{
+              avatar: "size-16",
+              name: "font-semibold text-lg",
+              wrapper: "flex-col gap-0",
+            }}
+            clickAction="link"
+          />
+          <ProfileColor pubkey={pubkey} relays={relays || []} />
+        </div>
         {profile?.lud16 ? (
           <LnAddress pubkey={pubkey} address={profile.lud16} />
         ) : null}
 
-        <InputCopy
-          value={
-            relays && relays.length > 0
-              ? nip19.nprofileEncode({ pubkey, relays: relays.slice(0, 3) })
-              : nip19.npubEncode(pubkey)
-          }
-        />
         {about ? (
           <RichText
             group={group}
@@ -77,5 +77,37 @@ export function ProfileDrawer({
         <ProfileDrawerContent pubkey={pubkey} group={group} />
       </DrawerContent>
     </Drawer>
+  );
+}
+
+export function ProfileColor({
+  pubkey,
+  relays,
+}: {
+  pubkey: string;
+  relays: string[];
+}) {
+  const [isCopying, copy] = useCopy();
+
+  const color = useMemo(() => {
+    return pubkeyToHslString(pubkey);
+  }, [pubkey]);
+  const nprofile = useMemo(() => {
+    return nip19.nprofileEncode({ pubkey, relays });
+  }, [pubkey, relays]);
+
+  return (
+    <div
+      className={`flex flex-row items-center gap-1 max-w-[210px] ${isCopying ? "pointer-none" : "cursor-copy"}`}
+      onClick={() => copy(nprofile)}
+    >
+      <div
+        className={`rounded-full size-3 flex-shrink-0`}
+        style={{ background: color }}
+      ></div>
+      <span className="font-light text-xs font-mono text-muted-foreground overflow-hidden text-ellipsis">
+        {nprofile}
+      </span>
+    </div>
   );
 }
