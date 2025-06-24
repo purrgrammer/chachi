@@ -147,7 +147,7 @@ interface MediaServers {
   servers: string[];
 }
 
-const defaultMediaServers = ["https://files.v0l.io", "https://nostr.build"];
+const defaultMediaServers = ["https://nostr.download"];
 export const mediaServerListAtom = atomWithStorage<MediaServers>(
   "media-servers",
   {
