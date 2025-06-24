@@ -546,3 +546,10 @@ export async function fetchLatest(
     return acc;
   }, events[0]);
 }
+
+export function useNprofile(pubkey: string, relays: string[]): string {
+  const nprofile = useMemo(() => {
+    return nip19.nprofileEncode({ pubkey, relays });
+  }, [pubkey, relays]);
+  return nprofile;
+}

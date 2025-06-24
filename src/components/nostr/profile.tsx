@@ -5,7 +5,6 @@ import {
   DrawerHeader,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { nip19 } from "nostr-tools";
 import { User } from "@/components/nostr/user";
 import { useProfile, useRelayList } from "@/lib/nostr";
 import { RichText } from "@/components/rich-text";
@@ -13,6 +12,7 @@ import { LnAddress } from "@/components/ln";
 import type { Group as GroupType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useCopy } from "@/lib/hooks";
+import { useNprofile } from "@/lib/nostr";
 import { pubkeyToHslString } from "@/lib/color";
 
 function ProfileDrawerContent({
@@ -80,6 +80,13 @@ export function ProfileDrawer({
   );
 }
 
+export function useProfileColor(pubkey: string) {
+  const color = useMemo(() => {
+    return pubkeyToHslString(pubkey);
+  }, [pubkey]);
+  return color;
+}
+
 export function ProfileColor({
   pubkey,
   relays,
@@ -88,13 +95,8 @@ export function ProfileColor({
   relays: string[];
 }) {
   const [isCopying, copy] = useCopy();
-
-  const color = useMemo(() => {
-    return pubkeyToHslString(pubkey);
-  }, [pubkey]);
-  const nprofile = useMemo(() => {
-    return nip19.nprofileEncode({ pubkey, relays });
-  }, [pubkey, relays]);
+  const color = useProfileColor(pubkey);
+  const nprofile = useNprofile(pubkey, relays);
 
   return (
     <div
