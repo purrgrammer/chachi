@@ -40,6 +40,7 @@ import { ProfileColor } from "@/components/nostr/profile";
 import { useSupporters } from "@/lib/nostr/zaps";
 import Geohash from "latlon-geohash";
 import Amount from "@/components/amount";
+import Banner from "@/components/banner";
 
 function PinnedPost({ tag, relays }: { tag: string[]; relays: string[] }) {
   const { data: post } = useTag(tag);
@@ -163,11 +164,7 @@ export default function Welcome({ community }: { community: Community }) {
   return (
     <div className="flex items-center justify-center px-1">
       <div className="flex flex-col relative w-full max-w-lg">
-        <img
-          src={banner || profile?.picture || "/favicon.png"}
-          alt="Banner"
-          className="rounded-bl-md rounded-br-md w-full h-[18em] aspect-image object-cover"
-        />
+        <Banner imgSrc={banner} />
 
         {/* Banner, Avatar and Action Buttons Section */}
         <div className="flex flex-row justify-between items-center -mt-16">

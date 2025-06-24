@@ -42,6 +42,7 @@ import {
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { useFeedFilters } from "@/hooks/use-feed-filters";
 import { ProfileColor } from "@/components/nostr/profile";
+import Banner from "@/components/banner";
 
 interface ProfileValidatorProps {
   identifier: string;
@@ -147,11 +148,7 @@ function ProfileWelcome({
   return (
     <div className="flex items-center justify-center px-1">
       <div className="flex flex-col relative w-full max-w-lg">
-        <img
-          src={banner || profile?.picture || "/favicon.png"}
-          alt={t("profile.banner.alt", "Profile Banner")}
-          className="rounded-bl-md rounded-br-md h-[18em] aspect-image object-cover"
-        />
+        <Banner imgSrc={banner} />
 
         {/* Banner, Avatar and Action Buttons Section */}
         <div className="flex flex-row justify-between items-center -mt-16">
