@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { NameList } from "@/components/nostr/name-list";
 import { Appearance, Wallet, Media, Privacy } from "@/components/settings";
 import { Header } from "@/components/header";
 import { useSupporters } from "@/components/supporters";
@@ -106,14 +107,14 @@ export default function Settings() {
                     <User
                       pubkey={OPENSATS_PUBKEY}
                       classNames={{
-                        avatar: "size-6",
-                        name: "text-lg font-normal hover:underline hover:decoration-dotted",
+                        avatar: "size-5",
+                        name: "text-md font-normal hover:underline hover:decoration-dotted",
                       }}
                       clickAction="link"
                     />
                     <Amount amount={21_000} currency="USD" />
                   </div>
-                  {supporters.map(([pk, amount]) => (
+                  {supporters.slice(0, 3).map(([pk, amount]) => (
                     <div
                       key={pk}
                       className="flex flex-row items-center justify-between"
@@ -121,17 +122,38 @@ export default function Settings() {
                       <User
                         pubkey={pk}
                         classNames={{
-                          avatar: "size-6",
-                          name: "font-normal text-lg hover:underline hover:decoration-dotted",
+                          avatar: "size-5",
+                          name: "font-normal text-md hover:underline hover:decoration-dotted",
                         }}
                         clickAction="link"
                       />
                       <Amount amount={amount} currency="sat" />
                     </div>
                   ))}
+                  {supporters.length > 3 ? (
+                    <div
+                      key="rest-of-supporters"
+                      className="flex flex-row items-center justify-between"
+                    >
+                      <NameList
+                        pubkeys={supporters.slice(3).map(([pk]) => pk)}
+                        textClassName="font-normal text-sm"
+                        userClassnames={{
+                          avatar: "size-5",
+                          name: "font-normal text-sm hover:underline hover:decoration-dotted",
+                        }}
+                      />
+                      <Amount
+                        amount={supporters
+                          .slice(3)
+                          .reduce((acc, [, input]) => acc + input, 0)}
+                        currency="sat"
+                      />
+                    </div>
+                  ) : null}
                 </div>
               </div>
-              <Donate />
+              <Donate size="sm" variant="secondary" />
             </div>
           </TabsContent>
           <TabsContent value="privacy" className="max-w-96">

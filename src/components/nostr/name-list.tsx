@@ -11,6 +11,7 @@ export function NameList({
   className,
   avatarClassName,
   textClassName,
+  userClassnames,
   max = 3,
   notClickable = false,
 }: {
@@ -18,6 +19,11 @@ export function NameList({
   suffix?: string;
   className?: string;
   avatarClassName?: string;
+  userClassnames?: {
+    avatar?: string;
+    wrapper?: string;
+    name?: string;
+  };
   textClassName?: string;
   max?: number;
   notClickable?: boolean;
@@ -36,11 +42,16 @@ export function NameList({
                 notClickable={notClickable}
                 key={pubkey}
                 pubkey={pubkey}
-                classNames={{
-                  wrapper: cn("flex items-center gap-0", className),
-                  avatar: cn("size-5 mr-1 inline-block", avatarClassName),
-                  name: cn("font-semibold", textClassName),
-                }}
+                classNames={
+                  userClassnames
+                    ? userClassnames
+                    : {
+                        wrapper: cn("flex items-center gap-0", className),
+                        avatar: cn("size-5 mr-1 inline-block", avatarClassName),
+                        name: cn("font-semibold", textClassName),
+                      }
+                }
+                clickAction="link"
               />
               {idx < max - 1 ? (
                 <span className={textClassName}>{t("names.comma")}</span>
@@ -57,11 +68,16 @@ export function NameList({
                 notClickable={notClickable}
                 key={pubkey}
                 pubkey={pubkey}
-                classNames={{
-                  wrapper: cn("flex items-center gap-0", className),
-                  avatar: cn("size-5 mr-1 inline-block", avatarClassName),
-                  name: cn("font-semibold", textClassName),
-                }}
+                classNames={
+                  userClassnames
+                    ? userClassnames
+                    : {
+                        wrapper: cn("flex items-center gap-0", className),
+                        avatar: cn("size-5 mr-1 inline-block", avatarClassName),
+                        name: cn("font-semibold", textClassName),
+                      }
+                }
+                clickAction="link"
               />
               {idx < deduped.length - 2 ? (
                 <span className={textClassName}>{t("names.comma")}</span>

@@ -3,10 +3,10 @@ import { NewZapDialog } from "./nostr/zap";
 import { useTranslation } from "react-i18next";
 import { CHACHI_PUBKEY, CHACHI_GROUP } from "@/constants";
 import { toast } from "sonner";
-import { Button } from "./ui/button";
+import { Button, ButtonProps } from "./ui/button";
 import { HandHeart } from "lucide-react";
 
-export function Donate() {
+export function Donate({ size = "lg", ...props }: ButtonProps) {
   const [showDonateDialog, setShowDonateDialog] = useState(false);
   const { t } = useTranslation();
 
@@ -16,9 +16,9 @@ export function Donate() {
   }
   return (
     <>
-      <Button onClick={() => setShowDonateDialog(true)} size="lg">
+      <Button onClick={() => setShowDonateDialog(true)} size={size} {...props}>
         <HandHeart />
-        <span className="text-xl font-normal">{t("user.donate")}</span>
+        <span className="font-normal">{t("user.donate")}</span>
       </Button>
       {showDonateDialog ? (
         <NewZapDialog

@@ -48,7 +48,7 @@ function UserInfo({ pubkey }: { pubkey: string }) {
   return (
     <div
       className="flex gap-2 items-center py-1.5 px-1 text-sm text-left"
-      style={{ "--pubkey-color": color  } as CSSProperties}
+      style={{ "--pubkey-color": color } as CSSProperties}
     >
       <Avatar
         pubkey={pubkey}
