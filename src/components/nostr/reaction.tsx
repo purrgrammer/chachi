@@ -36,7 +36,13 @@ export default function Reaction({
         </Tooltip>
       ) : (
         <span className="text-4xl line-clamp-1 flex-shrink-0">
-          {content || "👍"}
+          {content === "+"
+            ? "👍"
+            : content === "-"
+              ? "👎"
+              : content
+                ? content
+                : "👍"}
         </span>
       )}
       {eventId ? (
