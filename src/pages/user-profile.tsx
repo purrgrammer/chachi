@@ -414,12 +414,7 @@ function ProfileContent({
     <div>
       <ProfileHeader pubkey={pubkey} />
       <Tabs value={tab} onValueChange={handleTabChange}>
-        <TabsList
-          className="
-          overflow-x-auto no-scrollbar 
-	  w-full
-	  group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100dvw-18rem)"
-        >
+        <TabsList>
           <TabsTrigger value="profile">
             {t("user.profile", "Profile")}
           </TabsTrigger>

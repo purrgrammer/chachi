@@ -126,12 +126,7 @@ function CommunityContent({ pubkey }: { pubkey: string }) {
     <div>
       <CommunityHeader pubkey={pubkey} community={community} />
       <Tabs defaultValue={userPubkey ? "chat" : community ? "welcome" : "chat"}>
-        <TabsList
-          className="
-          overflow-x-auto no-scrollbar 
-	  w-full
-	  group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100dvw-18rem)"
-        >
+        <TabsList>
           {community ? (
             <TabsTrigger value="welcome">
               {t("content.type.welcome")}

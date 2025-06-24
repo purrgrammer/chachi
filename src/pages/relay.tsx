@@ -315,12 +315,7 @@ function RelayPage({ relay, tab = "info" }: { relay: string; tab?: RelayTab }) {
         </div>
       </Header>
       <Tabs value={tab} onValueChange={onValueChange}>
-        <TabsList
-          className="
-          overflow-x-auto no-scrollbar 
-	  w-full
-	  group-has-[[data-collapsible=icon]]/sidebar-wrapper:w-[calc(100dvw-18rem)"
-        >
+        <TabsList>
           <TabsTrigger value="info">{t("relay.info")}</TabsTrigger>
           <TabsTrigger value="feed">{t("relay.feed")}</TabsTrigger>
           <TabsTrigger value="chat">{t("relay.chat")}</TabsTrigger>
