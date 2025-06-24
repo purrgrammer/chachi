@@ -15,14 +15,18 @@ export function deriveColorFromPubkey(pubkey: string): {
   // Determine RGB values based on hue sector
   const sector = Math.floor(h);
   const [r, g, b] = [
-    [c, x, 0], [x, c, 0], [0, c, x],
-    [0, x, c], [x, 0, c], [c, 0, x]
+    [c, x, 0],
+    [x, c, 0],
+    [0, c, x],
+    [0, x, c],
+    [x, 0, c],
+    [c, 0, x],
   ][sector] || [c, 0, x];
 
   return {
     red: Math.round((r + m) * 255),
     green: Math.round((g + m) * 255),
-    blue: Math.round((b + m) * 255)
+    blue: Math.round((b + m) * 255),
   };
 }
 
@@ -40,18 +44,29 @@ export function pubkeyToHslString(pubkey: string): string {
   if (diff === 0) return `hsl(0, 0%, ${Math.round(l * 100)}%)`;
 
   const s = diff / (1 - Math.abs(2 * l - 1));
-  let h = max === r ? ((g - b) / diff) % 6 :
-          max === g ? (b - r) / diff + 2 :
-                      (r - g) / diff + 4;
-  
+  let h =
+    max === r
+      ? ((g - b) / diff) % 6
+      : max === g
+        ? (b - r) / diff + 2
+        : (r - g) / diff + 4;
+
   h = Math.round(h * 60);
   if (h < 0) h += 360;
 
   return `hsl(${h}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
 }
 
-export function rgbToHex({ red, green, blue }: { red: number; green: number; blue: number }): string {
-  return `#${[red, green, blue].map(c => c.toString(16).padStart(2, "0")).join("")}`;
+export function rgbToHex({
+  red,
+  green,
+  blue,
+}: {
+  red: number;
+  green: number;
+  blue: number;
+}): string {
+  return `#${[red, green, blue].map((c) => c.toString(16).padStart(2, "0")).join("")}`;
 }
 
 export function pubkeyToHex(pubkey: string): string {

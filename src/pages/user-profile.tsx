@@ -230,13 +230,14 @@ function ProfileWelcome({
               {profile?.website && (
                 <a
                   href={profile.website}
-                  className="break-all font-mono text-xs px-2 hover:underline hover:decoration-dotted"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <div className="flex flex-row items-center gap-1">
+                  <div className="flex flex-row items-center gap-1 px-2">
                     <LinkIcon className="flex-shrink-0 size-3 text-muted-foreground" />
-                    {profile.website}
+                    <span className="break-all line-clamp-1 font-mono text-xs hover:underline hover:decoration-dotted">
+                      {profile.website}
+                    </span>
                   </div>
                 </a>
               )}

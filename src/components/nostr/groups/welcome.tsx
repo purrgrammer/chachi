@@ -5,6 +5,7 @@ import {
   LinkIcon,
   MessageSquare,
   Pin,
+  HandHeart,
   Server,
   CloudUpload,
   Landmark,
@@ -36,12 +37,51 @@ import { usePubkey } from "@/lib/account";
 import { toast } from "sonner";
 import { useBookmarkGroup } from "./bookmark";
 import { ProfileColor } from "@/components/nostr/profile";
+import { useSupporters } from "@/lib/nostr/zaps";
 import Geohash from "latlon-geohash";
+import Amount from "@/components/amount";
 
 function PinnedPost({ tag, relays }: { tag: string[]; relays: string[] }) {
   const { data: post } = useTag(tag);
   return post ? (
     <Embed event={post} relays={relays} showReactions={false} />
+  ) : null;
+}
+
+function Supporters({
+  community,
+  relays,
+}: {
+  community: Community;
+  relays: string[];
+}) {
+  const { t } = useTranslation();
+  const supporters = useSupporters(community.pubkey, relays);
+  return supporters.length > 0 ? (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-row items-center gap-1">
+        <HandHeart className="size-4 text-muted-foreground" />
+        <h2 className="text-sm font-light uppercase text-muted-foreground">
+          {t("groups.welcome.supporters")}
+        </h2>
+      </div>
+      <div className="flex flex-col gap-0">
+        {supporters.slice(0, 3).map(([pk, amount]) => (
+          <div className="flex w-full flex-row items-center justify-between">
+            <User
+              key={pk}
+              pubkey={pk}
+              classNames={{
+                avatar: "size-5",
+                name: "text-md font-normal hover:underline hover:decoration-dotted",
+              }}
+              clickAction="link"
+            />
+            <Amount amount={amount} currency="sat" />
+          </div>
+        ))}
+      </div>
+    </div>
   ) : null;
 }
 
@@ -268,6 +308,9 @@ export default function Welcome({ community }: { community: Community }) {
           )}
         </div>
         <div className="px-2 pt-2 pb-8 flex flex-col gap-4">
+          {userRelays ? (
+            <Supporters community={community} relays={userRelays} />
+          ) : null}
           {pinned.length > 0 ? (
             <div className="flex flex-col gap-2">
               <div className="flex flex-row items-center gap-1">

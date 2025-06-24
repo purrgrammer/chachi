@@ -1103,7 +1103,8 @@
       "joined": "Joined",
       "relays": "Relays",
       "blossom": "Media Servers",
-      "mint": "Mint"
+      "mint": "Mint",
+      "supporters": "Supporters"
     }
   },
   "app": {

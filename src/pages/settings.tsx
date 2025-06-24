@@ -13,7 +13,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { NameList } from "@/components/nostr/name-list";
 import { Appearance, Wallet, Media, Privacy } from "@/components/settings";
 import { Header } from "@/components/header";
-import { useSupporters } from "@/components/supporters";
+import { useSupporters } from "@/lib/nostr/zaps";
 import { OPENSATS_PUBKEY, CHACHI_PUBKEY, CHACHI_RELAYS } from "@/constants";
 import { User } from "@/components/nostr/user";
 import { Donate } from "@/components/donate";
@@ -31,7 +31,9 @@ const tabs: Tab[] = ["ui", "wallet", "media", "privacy"];
 export default function Settings() {
   const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>("ui");
-  const supporters = useSupporters(CHACHI_PUBKEY, CHACHI_RELAYS);
+  const supporters = useSupporters(CHACHI_PUBKEY, CHACHI_RELAYS, {
+    waitForEose: false,
+  });
   const tabConfig: Record<Tab, TabSpec> = {
     ui: {
       text: t("settings.ui.title"),

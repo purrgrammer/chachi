@@ -1,56 +1,9 @@
 import { useTranslation } from "react-i18next";
-import { useStream } from "@/lib/nostr";
-import { NDKKind } from "@nostr-dev-kit/ndk";
-import { validateZap } from "@/lib/nip-57";
-import { validateNutzap } from "@/lib/nip-61";
 import { User } from "@/components/nostr/user";
 import { HandHeart } from "lucide-react";
 import { Donate } from "@/components/donate";
 import { OPENSATS_PUBKEY } from "@/constants";
-import { useMemo } from "react";
-
-export function useSupporters(
-  pubkey: string,
-  relays: string[],
-): [string, number][] {
-  const { events } = useStream(
-    {
-      kinds: [NDKKind.Zap, NDKKind.Nutzap],
-      "#p": [pubkey],
-    },
-    relays,
-  );
-  const zaps = events
-    .map((event) => {
-      return {
-        event,
-        zap:
-          event.kind === NDKKind.Zap
-            ? validateZap(event)
-            : validateNutzap(event),
-      };
-    })
-    .filter(({ zap }) => zap !== null);
-  const supporters = useMemo(() => {
-    const contributors = zaps.reduce(
-      (acc, zap) => {
-        if (zap.zap?.pubkey) {
-          acc[zap.zap?.pubkey] = (acc[zap.zap?.pubkey] || 0) + zap.zap?.amount;
-        }
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
-    const sortedContributors = Object.entries(contributors);
-    sortedContributors.sort((a, b) => {
-      const [, amountA] = a;
-      const [, amountB] = b;
-      return amountB - amountA;
-    });
-    return sortedContributors;
-  }, [zaps]);
-  return supporters;
-}
+import { useSupporters } from "@/lib/nostr/zaps";
 
 export default function Supporters({
   pubkey,
