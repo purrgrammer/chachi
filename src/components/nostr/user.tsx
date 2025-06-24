@@ -17,6 +17,7 @@ interface UserProps {
   relays?: string[];
   notClickable?: boolean;
   clickAction?: "drawer" | "link";
+  linkRoot?: string;
 }
 
 export function User({
@@ -25,6 +26,7 @@ export function User({
   relays,
   notClickable,
   clickAction = "drawer",
+  linkRoot = "/p",
 }: UserProps) {
   const user = (
     <div
@@ -41,6 +43,8 @@ export function User({
   ) : clickAction === "drawer" ? (
     <ProfileDrawer trigger={user} pubkey={pubkey} />
   ) : (
-    <Link to={`/p/${nip19.nprofileEncode({ pubkey, relays })}`}>{user}</Link>
+    <Link to={`${linkRoot}/${nip19.nprofileEncode({ pubkey, relays })}`}>
+      {user}
+    </Link>
   );
 }

@@ -27,7 +27,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { TabContainer, TabItem } from "@/components/ui/tab-container";
 import {
   CommunityForm,
   CommunityFormValues,
@@ -53,7 +53,7 @@ interface ContentSection {
 // todo: optional location (human readable string)
 // todo: optional coordinates (geohash)
 
-export function CommunityEdit({
+export function CommunityEditor({
   pubkey,
   community,
 }: {
@@ -62,9 +62,7 @@ export function CommunityEdit({
 }) {
   const { t } = useTranslation();
   const ndk = useNDK();
-  const [showDialog, setShowDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("settings");
   const userRelays = useRelays();
   const userRelaysFiltered = userRelays.filter((r) => isRelayURL(r));
   const communityRelays = [
@@ -125,10 +123,6 @@ export function CommunityEdit({
     }
   }, [showAddSection]);
 
-  function onOpenChange(open: boolean) {
-    setShowDialog(open);
-  }
-
   function extractFormValues(
     community?: Community,
   ): Partial<CommunityFormValues> {
@@ -161,7 +155,6 @@ export function CommunityEdit({
       const ndkEvent = new NDKEvent(ndk, event as NostrEvent);
       await ndkEvent.publish(relaySet);
       toast.success(t("community.edit.success"));
-      setShowDialog(false);
     } catch (err) {
       console.error(err);
       toast.error(t("community.edit.error"));
@@ -327,310 +320,132 @@ export function CommunityEdit({
     }
   }
 
-  return (
-    <>
-      <Dialog open={showDialog} onOpenChange={onOpenChange}>
-        <DialogTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-7 w-7">
-            <Settings className="h-3.5 w-3.5" />
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>{t("community.edit.title")}</DialogTitle>
-          </DialogHeader>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList>
-              <TabsTrigger value="metadata" className="flex items-center gap-2">
-                <Info className="h-4 w-4" />
-                {t("community.edit.metadata.tab")}
-              </TabsTrigger>
-              <TabsTrigger value="settings" className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                {t("community.edit.settings")}
-              </TabsTrigger>
-              <TabsTrigger value="content" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                {t("community.edit.content")}
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="metadata">
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">
-                      {t("community.edit.metadata.description")} (
-                      {t("community.edit.metadata.optional")})
-                    </label>
-                    <Textarea
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder={t(
-                        "community.edit.metadata.description_placeholder",
-                      )}
-                      className="min-h-[100px]"
-                    />
-                  </div>
+  const tabs: TabItem[] = [
+    {
+      id: "metadata",
+      name: t("community.edit.metadata.tab"),
+      icon: <Info className="h-4 w-4" />,
+      children: (
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <div>
+              <label className="text-sm font-medium mb-1 block">
+                {t("community.edit.metadata.description")} (
+                {t("community.edit.metadata.optional")})
+              </label>
+              <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder={t(
+                  "community.edit.metadata.description_placeholder",
+                )}
+                className="min-h-[100px]"
+              />
+            </div>
 
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">
-                      {t("community.edit.metadata.location")} (
-                      {t("community.edit.metadata.optional")})
-                    </label>
-                    <Input
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      placeholder={t(
-                        "community.edit.metadata.location_placeholder",
-                      )}
-                    />
-                  </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">
+                {t("community.edit.metadata.location")} (
+                {t("community.edit.metadata.optional")})
+              </label>
+              <Input
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder={t("community.edit.metadata.location_placeholder")}
+              />
+            </div>
 
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">
-                      {t("community.edit.metadata.coordinates")} (
-                      {t("community.edit.metadata.optional")})
-                    </label>
-                    <div className="flex gap-2">
-                      <Input
-                        value={geohash}
-                        readOnly
-                        placeholder={t(
-                          "community.edit.metadata.coordinates_placeholder",
-                        )}
-                        className={geohash ? "bg-muted" : ""}
-                      />
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setShowMapPicker(true)}
-                      >
-                        <MapPin className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    {geohash && (
-                      <div className="my-2">
-                        <PigeonMiniMap geohash={geohash} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-
+            <div>
+              <label className="text-sm font-medium mb-1 block">
+                {t("community.edit.metadata.coordinates")} (
+                {t("community.edit.metadata.optional")})
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  value={geohash}
+                  readOnly
+                  placeholder={t(
+                    "community.edit.metadata.coordinates_placeholder",
+                  )}
+                  className={geohash ? "bg-muted" : ""}
+                />
                 <Button
-                  className="w-full"
-                  onClick={handleSaveMetadata}
-                  disabled={isMetadataLoading}
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setShowMapPicker(true)}
                 >
-                  {isMetadataLoading
-                    ? t("community.edit.metadata.saving")
-                    : t("community.edit.metadata.save")}
+                  <MapPin className="h-4 w-4" />
                 </Button>
               </div>
-            </TabsContent>
-            <TabsContent value="settings">
-              <CommunityForm
-                onSubmit={handleSubmit}
-                isLoading={isLoading}
-                initialValues={extractFormValues(community)}
-                submitLabel={t("community.edit.submit")}
-              />
-            </TabsContent>
-            <TabsContent value="content" className="pt-2">
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                  <h3 className="text-sm font-medium">
-                    {t("community.edit.content_section.sections")}
-                  </h3>
-                  <ScrollArea className="h-[300px]">
-                    <div className="flex flex-col gap-2">
-                      {contentSections.length > 0 ? (
-                        <Reorder.Group
-                          axis="y"
-                          values={contentSections}
-                          onReorder={setContentSections}
-                          className="flex flex-col gap-2"
-                        >
-                          {contentSections.map((section) => (
-                            <Reorder.Item
-                              key={section.name}
-                              value={section}
-                              as="div"
-                              className="border rounded-lg p-3 flex flex-col gap-2"
-                            >
-                              {editingSection?.name === section.name ? (
-                                <div className="flex flex-col gap-3">
-                                  <div>
-                                    <label className="text-sm font-medium mb-1 block">
-                                      {t("community.edit.content_section.name")}
-                                    </label>
-                                    <Input
-                                      value={editSectionName}
-                                      onChange={(e) =>
-                                        setEditSectionName(e.target.value)
-                                      }
-                                      placeholder={t(
-                                        "community.edit.content_section.name_placeholder",
-                                      )}
-                                    />
-                                  </div>
+              {geohash && (
+                <div className="my-2">
+                  <PigeonMiniMap geohash={geohash} />
+                </div>
+              )}
+            </div>
+          </div>
 
-                                  <div>
-                                    <label className="text-sm font-medium mb-1 block">
-                                      {t("community.edit.content_section.fee")}{" "}
-                                      (
-                                      {t(
-                                        "community.edit.content_section.optional",
-                                      )}
-                                      )
-                                    </label>
-                                    <Input
-                                      value={editSectionFee}
-                                      onChange={(e) =>
-                                        setEditSectionFee(e.target.value)
-                                      }
-                                      placeholder={t(
-                                        "community.edit.content_section.fee_placeholder",
-                                      )}
-                                      type="number"
-                                    />
-                                  </div>
-
-                                  <div>
-                                    <label className="text-sm font-medium mb-1 block">
-                                      {t(
-                                        "community.edit.content_section.kinds",
-                                      )}
-                                    </label>
-                                    <div className="flex flex-wrap gap-2 mt-1">
-                                      {ContentKinds.map((kind) => (
-                                        <Badge
-                                          key={kind.kind}
-                                          variant={
-                                            editSectionKinds.includes(kind.kind)
-                                              ? "default"
-                                              : "outline"
-                                          }
-                                          className="cursor-pointer flex items-center gap-1"
-                                          onClick={() =>
-                                            toggleEditKindSelection(kind.kind)
-                                          }
-                                        >
-                                          {kind.icon}
-                                          <span>{t(kind.translationKey)}</span>
-                                        </Badge>
-                                      ))}
-                                    </div>
-                                  </div>
-
-                                  <div className="flex justify-end gap-2">
-                                    <Button
-                                      variant="outline"
-                                      onClick={() => setEditingSection(null)}
-                                    >
-                                      {t("community.edit.cancel")}
-                                    </Button>
-                                    <Button
-                                      onClick={handleSaveEdit}
-                                      disabled={
-                                        !editSectionName.trim() ||
-                                        editSectionKinds.length === 0
-                                      }
-                                    >
-                                      {t("community.edit.save")}
-                                    </Button>
-                                  </div>
-                                </div>
-                              ) : (
-                                <>
-                                  <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-2">
-                                      <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
-                                      <h4 className="font-medium">
-                                        {section.name}
-                                      </h4>
-                                    </div>
-                                    <div className="flex gap-1">
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() =>
-                                          handleEditSection(section)
-                                        }
-                                        className="h-6 w-6"
-                                      >
-                                        <Pencil className="h-4 w-4" />
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() =>
-                                          removeContentSection(section.name)
-                                        }
-                                        className="h-6 w-6 text-destructive"
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                  {section.fee !== undefined && (
-                                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                      <DollarSign className="h-3.5 w-3.5" />
-                                      <span>{section.fee}</span>
-                                    </div>
-                                  )}
-                                  <div className="flex flex-wrap gap-1.5 mt-1">
-                                    {section.kinds.map((kind) => {
-                                      const kindInfo = ContentKinds.find(
-                                        (k) => k.kind === kind,
-                                      );
-                                      return (
-                                        <Badge
-                                          key={kind}
-                                          variant="secondary"
-                                          className="text-xs"
-                                        >
-                                          {kindInfo?.icon}
-                                          <span className="ml-1">
-                                            {t(kindInfo?.translationKey || "")}
-                                          </span>
-                                        </Badge>
-                                      );
-                                    })}
-                                  </div>
-                                </>
-                              )}
-                            </Reorder.Item>
-                          ))}
-                        </Reorder.Group>
-                      ) : (
-                        <div className="text-center py-8 text-muted-foreground">
-                          {t("community.edit.content_section.empty")}
-                        </div>
-                      )}
-
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => setShowAddSection(true)}
+          <Button
+            className="w-full"
+            onClick={handleSaveMetadata}
+            disabled={isMetadataLoading}
+          >
+            {isMetadataLoading
+              ? t("community.edit.metadata.saving")
+              : t("community.edit.metadata.save")}
+          </Button>
+        </div>
+      ),
+    },
+    {
+      id: "settings",
+      name: t("community.edit.settings"),
+      icon: <Settings className="h-4 w-4" />,
+      children: (
+        <CommunityForm
+          onSubmit={handleSubmit}
+          isLoading={isLoading}
+          initialValues={extractFormValues(community)}
+          submitLabel={t("community.edit.submit")}
+        />
+      ),
+    },
+    {
+      id: "content",
+      name: t("community.edit.content"),
+      icon: <FileText className="h-4 w-4" />,
+      children: (
+        <div className="flex flex-col gap-4 pt-2">
+          <div className="flex flex-col gap-2">
+            <h3 className="text-sm font-medium">
+              {t("community.edit.content_section.sections")}
+            </h3>
+            <ScrollArea className="h-[300px]">
+              <div className="flex flex-col gap-2">
+                {contentSections.length > 0 ? (
+                  <Reorder.Group
+                    axis="y"
+                    values={contentSections}
+                    onReorder={setContentSections}
+                    className="flex flex-col gap-2"
+                  >
+                    {contentSections.map((section) => (
+                      <Reorder.Item
+                        key={section.name}
+                        value={section}
+                        as="div"
+                        className="border rounded-lg p-3 flex flex-col gap-2"
                       >
-                        <Plus className="h-4 w-4 mr-2" />
-                        {t("community.edit.content_section.add")}
-                      </Button>
-
-                      {showAddSection && (
-                        <div
-                          ref={addSectionRef}
-                          className="border rounded-lg p-4"
-                        >
+                        {editingSection?.name === section.name ? (
                           <div className="flex flex-col gap-3">
                             <div>
                               <label className="text-sm font-medium mb-1 block">
                                 {t("community.edit.content_section.name")}
                               </label>
                               <Input
-                                value={newSectionName}
+                                value={editSectionName}
                                 onChange={(e) =>
-                                  setNewSectionName(e.target.value)
+                                  setEditSectionName(e.target.value)
                                 }
                                 placeholder={t(
                                   "community.edit.content_section.name_placeholder",
@@ -644,9 +459,9 @@ export function CommunityEdit({
                                 {t("community.edit.content_section.optional")})
                               </label>
                               <Input
-                                value={newSectionFee}
+                                value={editSectionFee}
                                 onChange={(e) =>
-                                  setNewSectionFee(e.target.value)
+                                  setEditSectionFee(e.target.value)
                                 }
                                 placeholder={t(
                                   "community.edit.content_section.fee_placeholder",
@@ -664,13 +479,13 @@ export function CommunityEdit({
                                   <Badge
                                     key={kind.kind}
                                     variant={
-                                      newSectionKinds.includes(kind.kind)
+                                      editSectionKinds.includes(kind.kind)
                                         ? "default"
                                         : "outline"
                                     }
                                     className="cursor-pointer flex items-center gap-1"
                                     onClick={() =>
-                                      toggleKindSelection(kind.kind)
+                                      toggleEditKindSelection(kind.kind)
                                     }
                                   >
                                     {kind.icon}
@@ -683,49 +498,197 @@ export function CommunityEdit({
                             <div className="flex justify-end gap-2">
                               <Button
                                 variant="outline"
-                                onClick={() => {
-                                  setShowAddSection(false);
-                                  setNewSectionName("");
-                                  setNewSectionKinds([]);
-                                  setNewSectionFee("");
-                                }}
+                                onClick={() => setEditingSection(null)}
                               >
                                 {t("community.edit.cancel")}
                               </Button>
                               <Button
-                                onClick={() => {
-                                  addContentSection();
-                                  setShowAddSection(false);
-                                }}
+                                onClick={handleSaveEdit}
                                 disabled={
-                                  !newSectionName.trim() ||
-                                  newSectionKinds.length === 0
+                                  !editSectionName.trim() ||
+                                  editSectionKinds.length === 0
                                 }
                               >
-                                {t("community.edit.add_button")}
+                                {t("community.edit.save")}
                               </Button>
                             </div>
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  </ScrollArea>
-                </div>
+                        ) : (
+                          <>
+                            <div className="flex justify-between items-center">
+                              <div className="flex items-center gap-2">
+                                <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
+                                <h4 className="font-medium">{section.name}</h4>
+                              </div>
+                              <div className="flex gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleEditSection(section)}
+                                  className="h-6 w-6"
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() =>
+                                    removeContentSection(section.name)
+                                  }
+                                  className="h-6 w-6 text-destructive"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                            {section.fee !== undefined && (
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <DollarSign className="h-3.5 w-3.5" />
+                                <span>{section.fee}</span>
+                              </div>
+                            )}
+                            <div className="flex flex-wrap gap-1.5 mt-1">
+                              {section.kinds.map((kind) => {
+                                const kindInfo = ContentKinds.find(
+                                  (k) => k.kind === kind,
+                                );
+                                return (
+                                  <Badge
+                                    key={kind}
+                                    variant="secondary"
+                                    className="text-xs"
+                                  >
+                                    {kindInfo?.icon}
+                                    <span className="ml-1">
+                                      {t(kindInfo?.translationKey || "")}
+                                    </span>
+                                  </Badge>
+                                );
+                              })}
+                            </div>
+                          </>
+                        )}
+                      </Reorder.Item>
+                    ))}
+                  </Reorder.Group>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    {t("community.edit.content_section.empty")}
+                  </div>
+                )}
 
                 <Button
+                  variant="outline"
                   className="w-full"
-                  onClick={handleSaveContentSections}
-                  disabled={contentSections.length === 0 || isContentLoading}
+                  onClick={() => setShowAddSection(true)}
                 >
-                  {isContentLoading
-                    ? t("community.edit.content_section.saving")
-                    : t("community.edit.content_section.save")}
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t("community.edit.content_section.add")}
                 </Button>
+
+                {showAddSection && (
+                  <div ref={addSectionRef} className="border rounded-lg p-4">
+                    <div className="flex flex-col gap-3">
+                      <div>
+                        <label className="text-sm font-medium mb-1 block">
+                          {t("community.edit.content_section.name")}
+                        </label>
+                        <Input
+                          value={newSectionName}
+                          onChange={(e) => setNewSectionName(e.target.value)}
+                          placeholder={t(
+                            "community.edit.content_section.name_placeholder",
+                          )}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium mb-1 block">
+                          {t("community.edit.content_section.fee")} (
+                          {t("community.edit.content_section.optional")})
+                        </label>
+                        <Input
+                          value={newSectionFee}
+                          onChange={(e) => setNewSectionFee(e.target.value)}
+                          placeholder={t(
+                            "community.edit.content_section.fee_placeholder",
+                          )}
+                          type="number"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium mb-1 block">
+                          {t("community.edit.content_section.kinds")}
+                        </label>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {ContentKinds.map((kind) => (
+                            <Badge
+                              key={kind.kind}
+                              variant={
+                                newSectionKinds.includes(kind.kind)
+                                  ? "default"
+                                  : "outline"
+                              }
+                              className="cursor-pointer flex items-center gap-1"
+                              onClick={() => toggleKindSelection(kind.kind)}
+                            >
+                              {kind.icon}
+                              <span>{t(kind.translationKey)}</span>
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setShowAddSection(false);
+                            setNewSectionName("");
+                            setNewSectionKinds([]);
+                            setNewSectionFee("");
+                          }}
+                        >
+                          {t("community.edit.cancel")}
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            addContentSection();
+                            setShowAddSection(false);
+                          }}
+                          disabled={
+                            !newSectionName.trim() ||
+                            newSectionKinds.length === 0
+                          }
+                        >
+                          {t("community.edit.add_button")}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            </TabsContent>
-          </Tabs>
-        </DialogContent>
-      </Dialog>
+            </ScrollArea>
+          </div>
+
+          <Button
+            className="w-full"
+            onClick={handleSaveContentSections}
+            disabled={contentSections.length === 0 || isContentLoading}
+          >
+            {isContentLoading
+              ? t("community.edit.content_section.saving")
+              : t("community.edit.content_section.save")}
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <>
+      <TabContainer tabs={tabs} defaultTab="settings" className="mb-2" />
 
       <MapPicker
         open={showMapPicker}
@@ -734,5 +697,36 @@ export function CommunityEdit({
         initialGeohash={geohash}
       />
     </>
+  );
+}
+
+export function CommunityEdit({
+  pubkey,
+  community,
+}: {
+  pubkey: string;
+  community?: Community;
+}) {
+  const { t } = useTranslation();
+  const [showDialog, setShowDialog] = useState(false);
+
+  function onOpenChange(open: boolean) {
+    setShowDialog(open);
+  }
+
+  return (
+    <Dialog open={showDialog} onOpenChange={onOpenChange}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-7 w-7">
+          <Settings className="h-3.5 w-3.5" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{t("community.edit.title")}</DialogTitle>
+        </DialogHeader>
+        <CommunityEditor pubkey={pubkey} community={community} />
+      </DialogContent>
+    </Dialog>
   );
 }

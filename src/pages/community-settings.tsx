@@ -1,33 +1,19 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { Castle, Settings } from "lucide-react";
+import { Castle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/header";
 import { User } from "@/components/nostr/user";
-import { Button } from "@/components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/nav-tabs";
-import { CommunityChat } from "@/components/nostr/groups/chat";
 import { useCommunity } from "@/lib/nostr/groups";
-import type { Community, Group } from "@/lib/types";
-import { GroupInfo } from "@/components/nostr/groups/info";
-import Feed from "@/components/nostr/feed";
-import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { BookmarkGroup } from "@/components/nostr/groups/bookmark";
+import { CommunityEditor } from "@/components/nostr/groups/community-edit";
 import { usePubkey } from "@/lib/account";
-import Welcome from "@/components/nostr/groups/welcome";
-import { NewPublication } from "@/components/nostr/targeted-publication";
-import { TARGETED_PUBLICATION } from "@/lib/kinds";
+import { Button } from "@/components/ui/button";
 import { LoadingScreen } from "@/components/loading-screen";
 import { parseProfileIdentifier, resolveNip05 } from "@/lib/profile-identifier";
 
@@ -60,7 +46,6 @@ function CommunityValidator({
       }
 
       if (parsed.type === "nip05") {
-        // Resolve NIP-05 to pubkey
         const resolvedPubkey = await resolveNip05(parsed.pubkey);
         if (!resolvedPubkey) {
           onError(
@@ -71,7 +56,7 @@ function CommunityValidator({
           );
           return;
         }
-        onValidated(resolvedPubkey, []); // Use discovery relays for NIP-05
+        onValidated(resolvedPubkey, []);
       } else {
         onValidated(parsed.pubkey, parsed.relays);
       }
@@ -83,35 +68,19 @@ function CommunityValidator({
   return <LoadingScreen />;
 }
 
-function CommunityHeader({
-  pubkey,
-  community,
-}: {
-  pubkey: string;
-  community?: Community;
-}) {
-  const group = community
-    ? {
-        id: pubkey,
-        relay: community.relay,
-        isCommunity: true,
-      }
-    : null;
+function CommunityHeader({ pubkey }: { pubkey: string }) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const userPubkey = usePubkey();
-  const isOwner = userPubkey === pubkey;
-
   return (
     <Header>
       <div className="flex items-center w-full justify-between">
         <User
-          notClickable
           pubkey={pubkey}
           classNames={{
             avatar: "size-8 rounded-full",
             name: "text-lg font-normal line-clamp-1",
           }}
+          clickAction="link"
+          linkRoot="/c"
         />
         <div className="flex flex-row items-center gap-2">
           <Tooltip>
@@ -120,119 +89,33 @@ function CommunityHeader({
             </TooltipTrigger>
             <TooltipContent>{t("group.metadata.community")}</TooltipContent>
           </Tooltip>
-          <Separator orientation="vertical" className="ml-3 h-4" />
-          {isOwner && community ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={() => navigate(`/c/${pubkey}/settings`)}
-            >
-              <Settings className="h-3.5 w-3.5" />
-            </Button>
-          ) : null}
-          {group ? <BookmarkGroup group={group} /> : null}
-          {group ? <GroupInfo group={group} /> : null}
         </div>
       </div>
     </Header>
   );
 }
 
-function Section({ group, kinds }: { group: Group; kinds: number[] }) {
-  const filter = [
-    {
-      kinds: kinds,
-      authors: [group.id],
-      limit: 20,
-    },
-    {
-      kinds: [TARGETED_PUBLICATION],
-      "#k": kinds.map((k) => k.toString()),
-      "#h": [group.id],
-      limit: 20,
-    },
-    {
-      kinds: kinds,
-      "#h": [group.id],
-      limit: 20,
-    },
-  ];
-  return (
-    <div className="flex flex-col items-center justify-center gap-0 p-2 h-full">
-      <NewPublication group={group} />
-      <Feed
-        group={group}
-        filter={filter}
-        live
-        onlyRelays
-        loadingClassname="py-32"
-        emptyClassname="py-32"
-      />
-    </div>
-  );
-}
-
-function CommunityContent({ pubkey }: { pubkey: string }) {
+function CommunitySettingsContent({ pubkey }: { pubkey: string }) {
   const community = useCommunity(pubkey);
-  const { t } = useTranslation();
   const userPubkey = usePubkey();
-  const group = community
-    ? {
-        id: pubkey,
-        relay: community.relay,
-        isCommunity: true,
-      }
-    : null;
+  const isOwner = userPubkey === pubkey;
+  if (!isOwner) {
+    return <Navigate to={`/c/${pubkey}`} replace />;
+  }
 
   return (
     <div>
-      <CommunityHeader pubkey={pubkey} community={community} />
-      <Tabs defaultValue={userPubkey ? "chat" : community ? "welcome" : "chat"}>
-        <TabsList>
-          {community ? (
-            <TabsTrigger value="welcome">
-              {t("content.type.welcome")}
-            </TabsTrigger>
-          ) : null}
-          <TabsTrigger value="chat">{t("content.type.chat")}</TabsTrigger>
-          {community && group ? (
-            <>
-              {community.sections?.map((section) => (
-                <TabsTrigger key={section.name} value={section.name}>
-                  {section.name}
-                </TabsTrigger>
-              ))}
-            </>
-          ) : null}
-        </TabsList>
-        {community ? (
-          <TabsContent asChild value="welcome">
-            <Welcome key={community.pubkey} community={community} />
-          </TabsContent>
-        ) : null}
-        <TabsContent asChild value="chat">
-          <CommunityChat pubkey={pubkey} />
-        </TabsContent>
-        {community && group ? (
-          <>
-            {community.sections?.map((section) => (
-              <TabsContent key={section.name} value={section.name}>
-                <Section
-                  key={section.name}
-                  group={group}
-                  kinds={section.kinds}
-                />
-              </TabsContent>
-            ))}
-          </>
-        ) : null}
-      </Tabs>
+      <CommunityHeader pubkey={pubkey} />
+      {community && isOwner ? (
+        <div className="p-2 sm:pl-12">
+          <CommunityEditor pubkey={pubkey} community={community} />
+        </div>
+      ) : null}
     </div>
   );
 }
 
-export default function Community() {
+export default function CommunitySettings() {
   const { identifier } = useParams<{ identifier: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -292,9 +175,9 @@ export default function Community() {
     );
   }
 
-  // Render community content once we have a valid pubkey
+  // Render community settings content once we have a valid pubkey
   if (pubkey) {
-    return <CommunityContent key={pubkey} pubkey={pubkey} />;
+    return <CommunitySettingsContent key={pubkey} pubkey={pubkey} />;
   }
 
   return null;
