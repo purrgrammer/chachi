@@ -37,7 +37,7 @@ import { useNDK } from "@/lib/ndk";
 import { useRelays, useRelaySet } from "@/lib/nostr";
 import { isRelayURL } from "@/lib/relay";
 import type { Community } from "@/lib/types";
-import { ContentKinds } from "@/lib/constants/kinds";
+import { ContentKinds, ContentCategoryGroups } from "@/lib/constants/kinds";
 import { COMMUNIKEY } from "@/lib/kinds";
 import { MapPicker } from "@/components/map-picker";
 import { PigeonMiniMap } from "@/components/map-pigeon-minimap";
@@ -474,23 +474,44 @@ export function CommunityEditor({
                               <label className="text-sm font-medium mb-1 block">
                                 {t("community.edit.content_section.kinds")}
                               </label>
-                              <div className="flex flex-wrap gap-2 mt-1">
-                                {ContentKinds.map((kind) => (
-                                  <Badge
-                                    key={kind.kind}
-                                    variant={
-                                      editSectionKinds.includes(kind.kind)
-                                        ? "default"
-                                        : "outline"
-                                    }
-                                    className="cursor-pointer flex items-center gap-1"
-                                    onClick={() =>
-                                      toggleEditKindSelection(kind.kind)
-                                    }
+                              <div className="flex flex-col gap-3 mt-1">
+                                {ContentCategoryGroups.map((category) => (
+                                  <div
+                                    key={category.id}
+                                    className="flex flex-col gap-2"
                                   >
-                                    {kind.icon}
-                                    <span>{t(kind.translationKey)}</span>
-                                  </Badge>
+                                    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                                      {category.icon}
+                                      <span>{category.name}</span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2 ml-6">
+                                      {category.kinds.map((kind) => {
+                                        const kindInfo = ContentKinds.find(
+                                          (k) => k.kind === kind,
+                                        );
+                                        if (!kindInfo) return null;
+                                        return (
+                                          <Badge
+                                            key={kind}
+                                            variant={
+                                              editSectionKinds.includes(kind)
+                                                ? "default"
+                                                : "outline"
+                                            }
+                                            className="cursor-pointer flex items-center gap-1"
+                                            onClick={() =>
+                                              toggleEditKindSelection(kind)
+                                            }
+                                          >
+                                            {kindInfo.icon}
+                                            <span>
+                                              {t(kindInfo.translationKey)}
+                                            </span>
+                                          </Badge>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
                                 ))}
                               </div>
                             </div>
@@ -621,21 +642,40 @@ export function CommunityEditor({
                         <label className="text-sm font-medium mb-1 block">
                           {t("community.edit.content_section.kinds")}
                         </label>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {ContentKinds.map((kind) => (
-                            <Badge
-                              key={kind.kind}
-                              variant={
-                                newSectionKinds.includes(kind.kind)
-                                  ? "default"
-                                  : "outline"
-                              }
-                              className="cursor-pointer flex items-center gap-1"
-                              onClick={() => toggleKindSelection(kind.kind)}
+                        <div className="flex flex-col gap-3 mt-1">
+                          {ContentCategoryGroups.map((category) => (
+                            <div
+                              key={category.id}
+                              className="flex flex-col gap-2"
                             >
-                              {kind.icon}
-                              <span>{t(kind.translationKey)}</span>
-                            </Badge>
+                              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                                {category.icon}
+                                <span>{category.name}</span>
+                              </div>
+                              <div className="flex flex-wrap gap-2 ml-6">
+                                {category.kinds.map((kind) => {
+                                  const kindInfo = ContentKinds.find(
+                                    (k) => k.kind === kind,
+                                  );
+                                  if (!kindInfo) return null;
+                                  return (
+                                    <Badge
+                                      key={kind}
+                                      variant={
+                                        newSectionKinds.includes(kind)
+                                          ? "default"
+                                          : "outline"
+                                      }
+                                      className="cursor-pointer flex items-center gap-1"
+                                      onClick={() => toggleKindSelection(kind)}
+                                    >
+                                      {kindInfo.icon}
+                                      <span>{t(kindInfo.translationKey)}</span>
+                                    </Badge>
+                                  );
+                                })}
+                              </div>
+                            </div>
                           ))}
                         </div>
                       </div>
