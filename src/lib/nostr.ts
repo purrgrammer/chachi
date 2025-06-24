@@ -15,7 +15,7 @@ import { relaysAtom } from "@/app/store";
 import { useNDK } from "@/lib/ndk";
 import { isRelayURL, discoveryRelays, fallbackRelays } from "@/lib/relay";
 import { EVENT, ADDRESS, PROFILE, RELAY_LIST } from "@/lib/query";
-import db from "@/lib/db";
+import db, { cache } from "@/lib/db";
 
 interface NostrREQResult<A> {
   events: A[];
@@ -417,8 +417,12 @@ export function useRequest(
 
 // Users
 
-export function fetchProfile(ndk: NDK, pubkey: string, relays: string[]) {
+export async function fetchProfile(ndk: NDK, pubkey: string, relays: string[]) {
   // todo: use NDK helpers to fech profile
+  const cached = await cache.fetchProfile(pubkey);
+  if (cached) {
+    return cached;
+  }
   return ndk
     .fetchEvent(
       {

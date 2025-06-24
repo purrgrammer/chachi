@@ -139,10 +139,10 @@ export default function Settings() {
                     >
                       <NameList
                         pubkeys={supporters.slice(3).map(([pk]) => pk)}
-                        textClassName="font-normal text-sm"
+                        textClassName="font-normal text-md"
                         userClassnames={{
                           avatar: "size-5",
-                          name: "font-normal text-sm hover:underline hover:decoration-dotted",
+                          name: "font-normal text-md hover:underline hover:decoration-dotted",
                         }}
                       />
                       <Amount
