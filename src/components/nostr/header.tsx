@@ -8,7 +8,7 @@ import { ModeratedCommunityName } from "@/components/nostr/moderated-communities
 import { validateZap } from "@/lib/nip-57";
 import { User } from "@/components/nostr/user";
 import { CommunityList } from "@/components/nostr/community-list";
-import { useRelays, useAddress } from "@/lib/nostr";
+import { useRelays, useA } from "@/lib/nostr";
 import { MODERATED_COMMUNITY, TARGETED_PUBLICATION } from "@/lib/kinds";
 import { useAppDefinition } from "@/lib/nip-89";
 import { GroupLink } from "@/components/nostr/group-link";
@@ -51,13 +51,7 @@ function ViaApp({ event }: { event: NostrEvent }) {
 
 function Via({ address }: { address: string }) {
   const relays = useRelays();
-  const [kind, pubkey, identifier] = address.split(":");
-  const { data: event } = useAddress({
-    pubkey,
-    kind: Number(kind),
-    identifier,
-    relays,
-  });
+  const { data: event } = useA(address, relays);
   if (!event) return null;
   return <ViaApp event={event} />;
 }

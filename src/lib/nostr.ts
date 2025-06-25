@@ -232,6 +232,16 @@ export function useARef(tag: string[]) {
   });
 }
 
+export function useA(aRef: string, relays: string[]) {
+  const [kind, pubkey, identifier] = aRef.split(":");
+  return useAddress({
+    pubkey,
+    kind: Number(kind),
+    identifier,
+    relays,
+  });
+}
+
 const nostrLinkOptions = {
   closeOnEose: true,
   cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,

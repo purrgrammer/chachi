@@ -548,6 +548,8 @@
   },
   "share-in": "Share in ",
   "action-open": "Open",
+  "action-open-with": "Open in {{ client }}",
+  "action-apps": "Open in",
   "action-zap": "Zap",
   "media": {
     "reveal": "Reveal"

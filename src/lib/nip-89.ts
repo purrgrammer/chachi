@@ -6,6 +6,8 @@ import {
   NDKSubscriptionCacheUsage,
 } from "@nostr-dev-kit/ndk";
 import { useQuery } from "@tanstack/react-query";
+import { usePubkey } from "@/lib/account";
+import { useRelays } from "@/lib/nostr";
 import { useNDK } from "@/lib/ndk";
 import { Profile } from "@/lib/types";
 
@@ -34,11 +36,20 @@ export function mergeAppRecommendations(
   }));
 }
 
-export function useRecommendedApps(pubkey: string, relays: string[]) {
+export function useMyRecommendedApps() {
+  const pubkey = usePubkey();
+  const relays = useRelays();
+  return useRecommendedApps(pubkey, relays);
+}
+
+export function useRecommendedApps(pubkey?: string, relays: string[] = []) {
   const ndk = useNDK();
   return useQuery({
-    queryKey: ["recommended-apps", pubkey],
+    queryKey: ["recommended-apps", pubkey ? pubkey : "anonymous"],
     queryFn: async () => {
+      if (!pubkey) {
+        return [];
+      }
       const apps = Array.from(
         await ndk.fetchEvents(
           {

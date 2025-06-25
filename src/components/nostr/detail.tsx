@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import CodeSnippet from "@/components/nostr/code-snippet";
@@ -12,17 +12,16 @@ import {
   Ellipsis,
   MessageSquareShare,
   Ban,
+  ExternalLink,
 } from "lucide-react";
-import { NewZapDialog } from "@/components/nostr/zap";
-import { NDKRelaySet } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
+import { NDKRelaySet, NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
+import { NewZapDialog } from "@/components/nostr/zap";
 // todo: lazily load components
 import { Empty } from "@/components/empty";
 import { Name } from "@/components/nostr/name";
 import Badge from "@/components/nostr/badge";
 import { Loading } from "@/components/loading";
-import { useNavigate } from "react-router-dom";
-import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import {
   RichText,
   RichTextOptions,
@@ -79,7 +78,7 @@ import { ReplyDialog } from "@/components/nostr/reply";
 import { useMintList } from "@/lib/cashu";
 import { eventLink } from "@/lib/links";
 import { useNDK } from "@/lib/ndk";
-import { useRelaySet, useRelays } from "@/lib/nostr";
+import { useRelaySet, useRelays, useA } from "@/lib/nostr";
 import { useDirectReplies, useReplies } from "@/lib/nostr/comments";
 import { useGroupAdminsList } from "@/lib/nostr/groups";
 import { useOpenGroup, groupId } from "@/lib/groups";
@@ -137,8 +136,10 @@ import { LazyCodeBlock } from "@/components/lazy-code-block";
 import { NameList } from "@/components/nostr//name-list";
 import { ZapGoal } from "./zap-goal";
 import { Workout } from "./workout";
+import { useMyRecommendedApps } from "@/lib/nip-89";
 //import { WorkoutTemplate } from "./workout-template";
 import { AppDefinition, AppRecommendation } from "@/components/nostr/nip-89";
+import { useAppDefinition } from "@/lib/nip-89";
 import RelayList from "./relay-list";
 
 type EventComponent = (props: {
@@ -539,6 +540,58 @@ function useEmoji(event: NostrEvent, group?: Group) {
   };
 }
 
+function OpenWithClient({
+  event,
+  app,
+}: {
+  event: NostrEvent;
+  app: NostrEvent;
+}) {
+  const ndk = useNDK();
+  const profile = useAppDefinition(app);
+  const clientName = profile?.display_name || profile?.name || app.pubkey;
+  const kindSectionIndex = app.tags.findIndex(
+    (t) => t[0] === "k" && t[1] === String(event.kind),
+  );
+  if (kindSectionIndex === -1) {
+    return null;
+  }
+
+  const modifier =
+    event.kind >= 30_000 && event.kind <= 40_000 ? "naddr" : "nevent";
+  const urlTemplate = app.tags
+    .slice(kindSectionIndex + 1)
+    .find((t) => t[2] === modifier)?.[1];
+
+  function onClick() {
+    if (!urlTemplate) return;
+    const ndkEvent = new NDKEvent(ndk, event);
+    const url = urlTemplate.replace("<bech32>", ndkEvent.encode());
+    window.open(url, "_blank", "noopener noreferrer");
+  }
+
+  if (!clientName || !urlTemplate) {
+    return null;
+  }
+  return (
+    <DropdownMenuItem onClick={onClick}>
+      {profile?.picture ? (
+        <img src={profile.picture} className="size-4 rounded-sm object-cover" />
+      ) : (
+        <ExternalLink />
+      )}
+      <span>{clientName}</span>
+    </DropdownMenuItem>
+  );
+}
+
+function OpenWith({ event, address }: { event: NostrEvent; address: string }) {
+  const relays = useRelays();
+  const { data: app } = useA(address, relays);
+  if (!app) return null;
+  return <OpenWithClient event={event} app={app} />;
+}
+
 function EventMenu({
   event,
   group,
@@ -569,6 +622,10 @@ function EventMenu({
     onEmojiSelect,
     openEmojiPicker,
   } = useEmoji(event, group);
+  const { data: appRecommendations } = useMyRecommendedApps();
+  const recommendations = appRecommendations?.filter((a) =>
+    a.kinds.includes(event.kind),
+  );
 
   function showDetail() {
     const url = eventLink(event, group);
@@ -634,12 +691,19 @@ function EventMenu({
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
           <DropdownMenuGroup>
-            {canOpen ? (
+            {canOpen || (recommendations && recommendations.length > 0) ? (
               <>
                 <DropdownMenuItem onClick={showDetail}>
                   <Maximize />
                   <span>{t("action-open")}</span>
                 </DropdownMenuItem>
+                {recommendations?.map((recommendation) => (
+                  <OpenWith
+                    key={recommendation.address}
+                    event={event}
+                    address={recommendation.address}
+                  />
+                ))}
                 <DropdownMenuSeparator />
               </>
             ) : null}
