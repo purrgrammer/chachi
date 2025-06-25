@@ -13,7 +13,9 @@ export default function Supporters({
   relays: string[];
 }) {
   const { t } = useTranslation();
-  const supporters = useSupporters(pubkey, relays);
+  const supporters = useSupporters(pubkey, relays, {
+    waitForEose: false,
+  });
   return (
     <div className="flex flex-col items-center justify-center gap-8 py-12 px-8 w-full bg-accent/40">
       <div className="flex flex-col items-center gap-2">
