@@ -148,9 +148,12 @@ export function Nutzap({
         className,
       )}
     >
-      <div className="flex flex-row gap-4 items-center justify-between">
+      <div className="flex flex-row gap-10 items-center justify-between">
         {showAuthor ? (
-          <User pubkey={zap.pubkey} classNames={{ avatar: "size-4" }} />
+          <User
+            pubkey={zap.pubkey}
+            classNames={{ name: "hidden sm:block", avatar: "size-4" }}
+          />
         ) : null}
         <div className="flex items-center">
           <span className="text-muted-foreground">
@@ -174,7 +177,7 @@ export function Nutzap({
             classNames={{
               wrapper: "gap-1.5",
               avatar: "size-4",
-              name: "text-md font-normal",
+              name: "hidden sm:block text-md font-normal",
             }}
           />
         ) : null}
