@@ -269,7 +269,7 @@ function MessageContent({
   setScrollTo,
   isUnpublished = false,
   retryButton,
-  showReactions,
+  showReactions = true,
 }: {
   group?: Group;
   event: NostrEvent;

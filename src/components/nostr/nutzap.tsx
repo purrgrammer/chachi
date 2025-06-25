@@ -148,7 +148,7 @@ export function Nutzap({
         className,
       )}
     >
-      <div className="flex flex-row gap-10 items-center justify-between">
+      <div className="flex flex-row gap-4 items-center justify-between">
         {showAuthor ? (
           <User pubkey={zap.pubkey} classNames={{ avatar: "size-4" }} />
         ) : null}

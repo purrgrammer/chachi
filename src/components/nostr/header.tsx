@@ -12,6 +12,7 @@ import { useRelays, useA } from "@/lib/nostr";
 import { MODERATED_COMMUNITY, TARGETED_PUBLICATION } from "@/lib/kinds";
 import { useAppDefinition } from "@/lib/nip-89";
 import { GroupLink } from "@/components/nostr/group-link";
+import { isRelayURL } from "@/lib/relay";
 
 function ViaApp({ event }: { event: NostrEvent }) {
   const { t } = useTranslation();
@@ -49,9 +50,9 @@ function ViaApp({ event }: { event: NostrEvent }) {
   ) : null;
 }
 
-function Via({ address }: { address: string }) {
+function Via({ address, relay }: { address: string; relay: string | null }) {
   const relays = useRelays();
-  const { data: event } = useA(address, relays);
+  const { data: event } = useA(address, relay ? [relay] : relays);
   if (!event) return null;
   return <ViaApp event={event} />;
 }
@@ -74,6 +75,8 @@ export function Header({ event }: { event: NostrEvent }) {
     : clientTag?.[2]?.startsWith(`${NDKKind.AppHandler}:`)
       ? clientTag?.[2]
       : null;
+  const clientRelay =
+    clientTag?.[3] && isRelayURL(clientTag[3]) ? clientTag[3] : null;
   const author = host
     ? host
     : event.kind === NDKKind.Zap
@@ -125,7 +128,7 @@ export function Header({ event }: { event: NostrEvent }) {
               {t("header.client", { client: clientName })}
             </span>
           ) : clientAddress ? (
-            <Via address={clientAddress} />
+            <Via address={clientAddress} relay={clientRelay} />
           ) : null}
         </div>
         {event.kind === TARGETED_PUBLICATION && hPubkeyTags.length > 0 ? (
