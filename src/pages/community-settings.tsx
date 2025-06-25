@@ -107,7 +107,7 @@ function CommunitySettingsContent({ pubkey }: { pubkey: string }) {
     <div>
       <CommunityHeader pubkey={pubkey} />
       {community && isOwner ? (
-        <div className="p-2 sm:pl-12">
+        <div className="p-2 sm:pl-12 max-w-xl">
           <CommunityEditor pubkey={pubkey} community={community} />
         </div>
       ) : null}
