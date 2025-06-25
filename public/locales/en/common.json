@@ -555,7 +555,9 @@
   "header": {
     "public": "Public",
     "private": "Private",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "client": "via {{ client }}",
+    "via": "via"
   },
   "book": {
     "by": "by {{ author }}",

@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+import { NostrEvent } from "nostr-tools";
 import {
   NDKKind,
   NDKRelaySet,
@@ -5,9 +7,11 @@ import {
 } from "@nostr-dev-kit/ndk";
 import { useQuery } from "@tanstack/react-query";
 import { useNDK } from "@/lib/ndk";
+import { Profile } from "@/lib/types";
 
 export type AppRecommendation = {
   address: string;
+  platform?: "android" | "ios" | "web";
   kinds: number[];
 };
 
@@ -51,10 +55,27 @@ export function useRecommendedApps(pubkey: string, relays: string[]) {
       );
       const recommendations = apps.map((a) => ({
         address: a.tags.find((t) => t[0] === "a")?.[1] || "",
+        platform: a.tags.find((t) => t[0] === "a")?.[3] as
+          | "android"
+          | "ios"
+          | "web"
+          | undefined,
         kinds: a.tags.filter((t) => t[0] === "d").map((t) => Number(t[1])),
       }));
 
       return mergeAppRecommendations(recommendations);
     },
   });
+}
+
+export function useAppDefinition(event: NostrEvent): Profile | null {
+  const profile = useMemo(() => {
+    try {
+      return { pubkey: event.pubkey, ...JSON.parse(event.content) };
+    } catch (error) {
+      console.error("Failed to parse app definition content:", error);
+      return null;
+    }
+  }, [event]);
+  return profile;
 }

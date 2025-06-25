@@ -46,8 +46,9 @@ function CommunityEventPageContent({
 }
 
 export default function CommunityEventPage() {
-  const { pubkey, nlink } = useParams();
+  // todo: support multiple identifiers: npub/nprofile/nip-05
   // todo: validate pubkey and nlink
+  const { identifier: pubkey, nlink } = useParams();
   return nlink && pubkey ? (
     <CommunityEventPageContent pubkey={pubkey} nlink={nlink} />
   ) : (

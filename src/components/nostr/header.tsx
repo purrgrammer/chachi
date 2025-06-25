@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Globe, MessageCircleQuestion } from "lucide-react";
+import { Link } from "react-router-dom";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { formatRelativeTime } from "@/lib/time";
@@ -7,8 +8,59 @@ import { ModeratedCommunityName } from "@/components/nostr/moderated-communities
 import { validateZap } from "@/lib/nip-57";
 import { User } from "@/components/nostr/user";
 import { CommunityList } from "@/components/nostr/community-list";
+import { useRelays, useAddress } from "@/lib/nostr";
 import { MODERATED_COMMUNITY, TARGETED_PUBLICATION } from "@/lib/kinds";
+import { useAppDefinition } from "@/lib/nip-89";
 import { GroupLink } from "@/components/nostr/group-link";
+
+function ViaApp({ event }: { event: NostrEvent }) {
+  const { t } = useTranslation();
+  const profile = useAppDefinition(event);
+  if (!profile) return null;
+  const clientName = profile?.display_name || profile?.name;
+  const website = profile.website;
+  const picture = profile.picture;
+  const client = (
+    <div className="flex items-baseline gap-1">
+      {picture ? (
+        <img src={picture} className="size-3 rounded-full" alt={clientName} />
+      ) : null}
+      <span className="text-xs text-muted-foreground italic">{clientName}</span>
+    </div>
+  );
+  return clientName ? (
+    <div className="flex flex-row items-baseline gap-1">
+      <span className="text-xs text-muted-foreground italic">
+        {t("header.via")}
+      </span>
+      {website ? (
+        <Link
+          to={website}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:underline hover:decoration-dotted"
+        >
+          {client}
+        </Link>
+      ) : (
+        client
+      )}
+    </div>
+  ) : null;
+}
+
+function Via({ address }: { address: string }) {
+  const relays = useRelays();
+  const [kind, pubkey, identifier] = address.split(":");
+  const { data: event } = useAddress({
+    pubkey,
+    kind: Number(kind),
+    identifier,
+    relays,
+  });
+  if (!event) return null;
+  return <ViaApp event={event} />;
+}
 
 export function Header({ event }: { event: NostrEvent }) {
   const { t } = useTranslation();
@@ -19,6 +71,15 @@ export function Header({ event }: { event: NostrEvent }) {
   const [, group, relay] = groupTag ? groupTag : [];
   // todo: try harder to figure out the right relay if not present
   const host = event.tags.find((t) => t[0] === "p" && t[3] === "host")?.[1];
+  const clientTag = event.tags.find((t) => t[0] === "client");
+  const hasClientAddress =
+    clientTag?.[1] && clientTag[1].startsWith(`${NDKKind.AppHandler}:`);
+  const clientName = hasClientAddress ? null : clientTag?.[1];
+  const clientAddress = hasClientAddress
+    ? clientTag?.[1]
+    : clientTag?.[2]?.startsWith(`${NDKKind.AppHandler}:`)
+      ? clientTag?.[2]
+      : null;
   const author = host
     ? host
     : event.kind === NDKKind.Zap
@@ -59,11 +120,20 @@ export function Header({ event }: { event: NostrEvent }) {
         clickAction="link"
       />
       <div className="flex flex-col gap-0">
-        <User
-          pubkey={author ?? event.pubkey}
-          classNames={{ avatar: "hidden", name: "text-md font-normal" }}
-          clickAction="link"
-        />
+        <div className="flex flex-row items-baseline gap-1">
+          <User
+            pubkey={author ?? event.pubkey}
+            classNames={{ avatar: "hidden", name: "text-md font-normal" }}
+            clickAction="link"
+          />
+          {clientName ? (
+            <span className="text-xs text-muted-foreground italic">
+              {t("header.client", { client: clientName })}
+            </span>
+          ) : clientAddress ? (
+            <Via address={clientAddress} />
+          ) : null}
+        </div>
         {event.kind === TARGETED_PUBLICATION && hPubkeyTags.length > 0 ? (
           <CommunityList
             avatarClassName="size-3"
@@ -82,7 +152,7 @@ export function Header({ event }: { event: NostrEvent }) {
     </span>
   );
   return (
-    <div className="flex flex-row items-center gap-12 justify-between w-full">
+    <div className="flex flex-row items-center gap-8 justify-between w-full">
       {op}
       <div className="flex flex-row items-center gap-3">{time}</div>
     </div>

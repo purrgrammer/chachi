@@ -1,15 +1,16 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Code, Globe, Tags, Layers } from "lucide-react";
+import { NostrEvent } from "nostr-tools";
+import { useTranslation } from "react-i18next";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Avatar as NostrAvatar } from "@/components/nostr/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ContentKinds } from "@/lib/constants/kinds";
-import { NostrEvent } from "nostr-tools";
-import { useTranslation } from "react-i18next";
-import { Name } from "./name";
+import { Name } from "@/components/nostr/name";
 import { Address } from "@/components/nostr/event";
+import { useAppDefinition } from "@/lib/nip-89";
 
 export function AppRecommendation({
   event,
@@ -65,19 +66,12 @@ export function AppRecommendation({
 export function AppDefinition({ event }: { event: NostrEvent }) {
   const { t } = useTranslation();
   const [isBannerLoaded, setBannerLoaded] = useState(false);
-  const profile = useMemo(() => {
-    try {
-      return JSON.parse(event.content);
-    } catch (error) {
-      console.error("Failed to parse app definition content:", error);
-      return {};
-    }
-  }, [event]);
+  const profile = useAppDefinition(event);
 
   // Extract app details
   const appName =
-    profile?.name ||
     profile?.display_name ||
+    profile?.name ||
     (event.pubkey ? <Name pubkey={event.pubkey} /> : "Unknown App");
   const supportedKinds = event.tags
     .filter((t) => t[0] === "k")
@@ -92,7 +86,7 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
     .map((kind) => ContentKinds.find((k) => k.kind === kind))
     .filter(Boolean);
 
-  const banner = profile.banner;
+  const banner = profile?.banner;
 
   return (
     <div className="flex items-center justify-center">
@@ -110,9 +104,9 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
         >
           <div className="flex flex-col items-start gap-3">
             <div className="flex flex-col gap-1 items-start">
-              {profile.picture ? (
+              {profile?.picture ? (
                 <Avatar className="size-32 border-4 border-background">
-                  <AvatarImage src={profile.picture} alt={appName} />
+                  <AvatarImage src={profile.picture} />
                   <AvatarFallback>
                     {typeof appName === "string"
                       ? appName.slice(0, 2).toUpperCase()
@@ -127,7 +121,7 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
               ) : null}
               <div className="flex flex-col gap-0 mt-2">
                 <h2 className="text-2xl font-bold">{appName}</h2>
-                {profile.about && (
+                {profile?.about && (
                   <p className="text-balance text-muted-foreground line-clamp-1">
                     {profile.about}
                   </p>
@@ -135,7 +129,7 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
               </div>
             </div>
             <div className="flex flex-col items-start gap-0.5 pb-2">
-              {profile.website && (
+              {profile?.website && (
                 <Link
                   to={profile.website}
                   className="font-mono text-xs px-2 hover:underline hover:decoration-dotted"

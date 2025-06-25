@@ -31,6 +31,8 @@ export interface Profile {
   picture?: string;
   display_name?: string;
   lud16?: string;
+  banner?: string;
+  website?: string;
 }
 
 export interface NativeEmoji {
