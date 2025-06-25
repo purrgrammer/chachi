@@ -456,10 +456,12 @@ function useUserEvents({
   useDirectMessages();
 }
 
-const authRoutes = ["/", "/dm", "/wallet", "/settings", "/zaps"];
+const authRoutes = ["/dm", "/wallet", "/settings", "/zaps"];
 
 function isAuthRoute(pathname: string) {
-  return authRoutes.some((route) => pathname.startsWith(route));
+  return (
+    pathname === "/" || authRoutes.some((route) => pathname.startsWith(route))
+  );
 }
 
 function NostrSync({ children }: { children: ReactNode }) {
