@@ -6,7 +6,6 @@ import {
   LinkIcon,
   Users,
   Castle,
-  Server,
   Zap,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -21,7 +20,6 @@ import { RichText } from "@/components/rich-text";
 import { Nip05 } from "@/components/nostr/nip05";
 import { LoadingScreen } from "@/components/loading-screen";
 import { Group } from "@/components/nostr/group";
-import { RelayLink } from "@/components/nostr/relay";
 import { Button } from "@/components/ui/button";
 import {
   Tabs,
@@ -250,27 +248,7 @@ function ProfileWelcome({
           )}
         </div>
         <div className="px-2 pt-1 pb-6 flex flex-col gap-4">
-          {/* User Relays Section */}
-          {userRelays && userRelays.length > 0 ? (
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row items-center gap-1">
-                <Server className="size-4 text-muted-foreground" />
-                <h2 className="text-sm font-light uppercase text-muted-foreground">
-                  {t("profile.relays", "Relays")}
-                </h2>
-              </div>
-              <div className="flex flex-col gap-2">
-                {userRelays.map((relay) => (
-                  <RelayLink
-                    key={relay}
-                    relay={relay}
-                    classNames={{ icon: "size-4", name: "text-sm" }}
-                  />
-                ))}
-              </div>
-            </div>
-          ) : null}
-
+          {/* TODO: communikeys section */}
           {/* NIP-29 Groups Section */}
           {nip29Groups.length > 0 ? (
             <div className="flex flex-col gap-2">
