@@ -59,14 +59,12 @@ export default defineConfig({
             '@radix-ui/react-dialog',
             '@radix-ui/react-dropdown-menu',
             '@radix-ui/react-hover-card',
-            '@radix-ui/react-label',
             '@radix-ui/react-popover',
             '@radix-ui/react-progress',
             '@radix-ui/react-radio-group',
             '@radix-ui/react-scroll-area',
             '@radix-ui/react-select',
             '@radix-ui/react-separator',
-            '@radix-ui/react-slot',
             '@radix-ui/react-switch',
             '@radix-ui/react-tabs',
             '@radix-ui/react-toast',
@@ -95,7 +93,9 @@ export default defineConfig({
             '@hookform/resolvers',
             'zod',
             'dexie',
-            'dexie-react-hooks'
+            'dexie-react-hooks',
+            '@radix-ui/react-slot',
+            '@radix-ui/react-label'
           ],
           // Text processing and rendering
           'text-processing': [
