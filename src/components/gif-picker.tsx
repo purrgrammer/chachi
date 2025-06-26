@@ -17,6 +17,10 @@ import { useTranslation } from "react-i18next";
 
 const API_KEY = import.meta.env.VITE_TENOR_API_KEY;
 
+// Validate API key exists and is not a placeholder
+const isValidApiKey =
+  API_KEY && API_KEY !== "your_tenor_api_key_here" && API_KEY.length > 20;
+
 interface MediaFormats {
   tinywebp: { url: string };
   tinygif: { url: string };
@@ -139,7 +143,7 @@ export function GIFPicker({ onPick }: { onPick: (gif: GIF) => void }) {
     }
   }
 
-  return API_KEY ? (
+  return isValidApiKey ? (
     <Dialog open={showPicker} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button

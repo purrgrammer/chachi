@@ -256,7 +256,7 @@ export function PayCashuRequest({
 }
 
 function CashuRequestDetails({ request }: { request: PaymentRequest }) {
-  const nostrTarget = request.transport.find((t) => t.type === "nostr");
+  const nostrTarget = request.transport?.find((t) => t.type === "nostr");
   const pubkey = nostrTarget?.target;
   const description = request.description;
   const amount = request.amount;
@@ -289,7 +289,7 @@ export function CashuRequest({
   const { t } = useTranslation();
   const [req, setReq] = useState<PaymentRequest | null>(null);
   const amount = req?.amount;
-  const nostrTarget = req?.transport.find((t) => t.type === "nostr");
+  const nostrTarget = req?.transport?.find((t) => t.type === "nostr");
   const unit = req?.unit;
   const pubkey = nostrTarget?.target;
   const mints = req?.mints;

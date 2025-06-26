@@ -53,14 +53,11 @@ export function MintIcon({
   const { data: info } = useMintInfo(url);
   const host = useHost(url);
   const is0xChat = host.endsWith("0xchat.com");
-  const icon =
-    // @ts-expect-error the cashu-ts type lacks this field
-    info?.icon_url
-      ? // @ts-expect-error the cashu-ts type lacks this field
-        info.icon_url
-      : is0xChat
-        ? `https://0xchat.com/favicon1.png`
-        : null;
+  const icon = info?.icon_url
+    ? info.icon_url
+    : is0xChat
+      ? `https://0xchat.com/favicon1.png`
+      : null;
   return icon ? (
     <img
       src={icon}
