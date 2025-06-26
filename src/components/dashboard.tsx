@@ -6,12 +6,7 @@ import { CommunitySummary } from "@/components/nostr/groups/metadata";
 import { AvatarList } from "@/components/nostr/avatar-list";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import {
-  useSortedGroups,
-  useUnreadMessages,
-  useUnreadMentions,
-  useUnreads,
-} from "@/lib/messages";
+import { useUnreadMentions, useUnreads } from "@/lib/messages";
 import { Input } from "@/components/ui/input";
 import { Highlight } from "@/components/highlight";
 import { useRequest } from "@/lib/nostr";
@@ -97,8 +92,7 @@ function Communities() {
 
 // Activity
 
-function GroupMessages({ group }: { group: Group }) {
-  const unread = useUnreadMessages(group);
+function GroupMessages({ group, count }: { group: Group; count: number }) {
   const unreadMentions = useUnreadMentions(group);
   const mentions = (unreadMentions || 0) as number;
   const name = useGroupName(group);
@@ -106,7 +100,7 @@ function GroupMessages({ group }: { group: Group }) {
   const openGroup = useOpenGroup(group);
   const { t } = useTranslation();
 
-  return unread && unread > 0 ? (
+  return (
     <Reorder.Item dragListener={false} key={groupId(group)} value={group}>
       <Button
         variant="ghost"
@@ -121,11 +115,9 @@ function GroupMessages({ group }: { group: Group }) {
           <h3 className="text-lg">{name}</h3>
           <div className="flex flex-col gap-1 items-center text-xs">
             <div
-              className={`flex flex-row gap-1 ${unread === 0 ? "opacity-50" : ""}`}
+              className={`flex flex-row gap-1 ${count === 0 ? "opacity-50" : ""}`}
             >
-              <span className="font-mono">
-                {unread >= 100 ? "99+" : unread}
-              </span>
+              <span className="font-mono">{count >= 100 ? "99+" : count}</span>
               <span className="text-muted-foreground">
                 {t("dashboard.activity.unread")}
               </span>
@@ -144,20 +136,23 @@ function GroupMessages({ group }: { group: Group }) {
         </div>
       </Button>
     </Reorder.Item>
-  ) : null;
+  );
 }
 
-function GroupActivityList() {
-  const sortedGroups = useSortedGroups();
+function GroupActivityList({
+  unreads,
+}: {
+  unreads: { group: Group; count: number }[];
+}) {
   return (
     <Reorder.Group
       axis="x"
       className="flex overflow-x-auto flex-row gap-1 items-center px-0 no-scrollbar w-[calc(100dvw-1.5rem)] md:w-[calc(100dvw-20rem)]"
-      values={sortedGroups}
+      values={unreads}
       onReorder={() => console.log("reorder")}
     >
-      {sortedGroups.map((group) => (
-        <GroupMessages key={groupId(group)} group={group} />
+      {unreads.map(({ group, count }) => (
+        <GroupMessages key={groupId(group)} group={group} count={count} />
       ))}
     </Reorder.Group>
   );
@@ -174,7 +169,7 @@ function GroupsActivity() {
         text={t("dashboard.activity.heading")}
       />
       {myGroups.length > 0 && unreads.length > 0 ? (
-        <GroupActivityList />
+        <GroupActivityList unreads={unreads} />
       ) : (
         <span className="text-sm text-muted-foreground">
           {t("dashboard.activity.none")}
