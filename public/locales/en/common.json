@@ -547,6 +547,7 @@
     }
   },
   "share-in": "Share in ",
+  "open-in": "Open in",
   "action-open": "Open",
   "action-open-with": "Open in {{ client }}",
   "action-apps": "Open in",

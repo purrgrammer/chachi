@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import CodeSnippet from "@/components/nostr/code-snippet";
 import {
+  SquareArrowOutUpRight,
   Maximize,
   Bitcoin,
   Reply,
@@ -13,6 +14,9 @@ import {
   MessageSquareShare,
   Ban,
   ExternalLink,
+  Globe,
+  Bot,
+  Apple,
 } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { NDKRelaySet, NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
@@ -140,7 +144,10 @@ import { LazyCodeBlock } from "@/components/lazy-code-block";
 import { NameList } from "@/components/nostr//name-list";
 import { ZapGoal } from "./zap-goal";
 import { Workout } from "./workout";
-import { useMyRecommendedApps } from "@/lib/nip-89";
+import {
+  useMyRecommendedApps,
+  useAppRecommendationsForKind,
+} from "@/lib/nip-89";
 //import { WorkoutTemplate } from "./workout-template";
 import { AppDefinition, AppRecommendation } from "@/components/nostr/nip-89";
 import { useAppDefinition } from "@/lib/nip-89";
@@ -557,15 +564,17 @@ function OpenWithClient({
   const kindSectionIndex = app.tags.findIndex(
     (t) => t[0] === "k" && t[1] === String(event.kind),
   );
-  if (kindSectionIndex === -1) {
-    return null;
-  }
+  // Detect all supported platforms from tags
+  const isWeb = app.tags.some((t) => t[0] === "web");
+  const isAndroid = app.tags.some((t) => t[0] === "android");
+  const isIOS = app.tags.some((t) => t[0] === "ios");
 
   const modifier =
     event.kind >= 30_000 && event.kind <= 40_000 ? "naddr" : "nevent";
-  const urlTemplate = app.tags
-    .slice(kindSectionIndex + 1)
-    .find((t) => t[2] === modifier)?.[1];
+  const urlTemplate =
+    app.tags.slice(kindSectionIndex + 1).find((t) => t[2] === modifier)?.[1] ||
+    app.tags.find((t) => t[2] === modifier)?.[1] ||
+    app.tags.find((t) => t[1]?.includes("<bech32>"))?.[1];
 
   function onClick() {
     if (!urlTemplate) return;
@@ -577,6 +586,7 @@ function OpenWithClient({
   if (!clientName || !urlTemplate) {
     return null;
   }
+
   return (
     <DropdownMenuItem onClick={onClick}>
       {profile?.picture ? (
@@ -584,7 +594,12 @@ function OpenWithClient({
       ) : (
         <ExternalLink />
       )}
-      <span>{clientName}</span>
+      <span className="flex-1">{clientName}</span>
+      <div className="flex gap-1 ml-4">
+        {isWeb && <Globe className="size-3 text-muted-foreground" />}
+        {isAndroid && <Bot className="size-3 text-muted-foreground" />}
+        {isIOS && <Apple className="size-3 text-muted-foreground" />}
+      </div>
     </DropdownMenuItem>
   );
 }
@@ -629,6 +644,21 @@ function EventMenu({
   const { data: appRecommendations } = useMyRecommendedApps();
   const recommendations = appRecommendations?.filter((a) =>
     a.kinds.includes(event.kind),
+  );
+
+  // Get app recommendations from follows for this event kind
+  const { data: followBasedRecommendations } = useAppRecommendationsForKind(
+    event.kind,
+  );
+
+  // Filter out user's own recommended apps from follow-based recommendations
+  const ownAppAddresses = new Set(recommendations?.map((r) => r.address) || []);
+  const filteredFollowBasedRecommendations = followBasedRecommendations?.filter(
+    ({ app }) => {
+      const dTag = app.tags.find((tag) => tag[0] === "d")?.[1] || "";
+      const address = `31990:${app.pubkey}:${dTag}`;
+      return !ownAppAddresses.has(address);
+    },
   );
 
   function showDetail() {
@@ -706,6 +736,26 @@ function EventMenu({
                     address={recommendation.address}
                   />
                 ))}
+                {filteredFollowBasedRecommendations &&
+                  filteredFollowBasedRecommendations.length > 0 && (
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger className="gap-2">
+                        <SquareArrowOutUpRight className="size-4" />
+                        <span>{t("open-in")}</span>
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent>
+                          {filteredFollowBasedRecommendations.map(({ app }) => (
+                            <OpenWithClient
+                              app={app}
+                              event={event}
+                              key={app.id}
+                            />
+                          ))}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                  )}
                 <DropdownMenuSeparator />
               </>
             ) : null}
@@ -726,11 +776,10 @@ function EventMenu({
               <DropdownMenuItem onClick={() => shareIn(group)}>
                 <MessageSquareShare />
                 {group ? (
-                  <div className="flex flex-row items-center gap-1.5 line-clamp-1">
-                    {t("share-in")}
+                  <div className="flex flex-row items-center gap-1.5">
                     <div className="flex flex-row items-center gap-1">
                       <GroupPicture group={group} className="size-4" />{" "}
-                      <GroupName group={group} />
+                      <GroupName group={group} className="line-clamp-1" />
                     </div>
                   </div>
                 ) : (
