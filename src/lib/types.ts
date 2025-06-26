@@ -29,6 +29,14 @@ export interface GroupRoles extends Group {
   roles: GroupRole[];
 }
 
+export interface GroupInviteCode {
+  code: string;
+  createdAt?: number;
+  expiresAt?: number;
+  isExpired: boolean;
+  pubkey: string;
+}
+
 export interface Relay {
   url: string;
 }

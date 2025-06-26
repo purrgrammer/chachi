@@ -32,6 +32,7 @@ const Community = lazy(() => import("@/pages/community"));
 const CommunitySettings = lazy(() => import("@/pages/community-settings"));
 const GroupSettings = lazy(() => import("@/pages/group-settings"));
 const UserProfile = lazy(() => import("@/pages/user-profile"));
+const Join = lazy(() => import("@/pages/join"));
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Home />,
+      },
+      {
+        path: "/join/:code/:relay/:groupId",
+        element: <Join />,
       },
       {
         path: "/dm",

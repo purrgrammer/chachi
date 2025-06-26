@@ -2,6 +2,7 @@ import { useAtomValue } from "jotai";
 import { nip19 } from "nostr-tools";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { groupId } from "@/lib/groups";
+import { randomCode } from "@/lib/id";
 import NDK, {
   NDKEvent,
   NDKRelaySet,
@@ -29,6 +30,7 @@ import type {
   GroupMembers,
   GroupMetadata,
   GroupRole,
+  GroupInviteCode,
   Community,
   ContentSection,
 } from "@/lib/types";
@@ -49,7 +51,7 @@ import {
   getCommunity,
 } from "@/lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 export function useUserGroups(pubkey: string) {
   const ndk = useNDK();
@@ -504,11 +506,18 @@ export function useRequestedToJoin(group: Group, pubkey: string) {
 export function useJoinRequest(group: Group) {
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
-  return async () => {
+  return async (inviteCode?: string) => {
+    const tags = [["h", group.id]];
+
+    // Add invite code if provided
+    if (inviteCode) {
+      tags.push(["code", inviteCode]);
+    }
+
     const event = new NDKEvent(ndk, {
       kind: NDKKind.GroupAdminRequestJoin,
       content: "",
-      tags: [["h", group.id]],
+      tags,
     } as NostrEvent);
     await event.publish(relaySet);
     return event.rawEvent() as NostrEvent;
@@ -579,6 +588,136 @@ export function useDeleteEvent(group: Group) {
     await event.publish(relaySet);
     return event.rawEvent() as NostrEvent;
   };
+}
+
+// Invite code management functions following NIP-29
+
+export function useCreateInviteCode(group: Group) {
+  const ndk = useNDK();
+  const relaySet = useRelaySet([group.relay]);
+  return async (expiresAt?: number): Promise<string> => {
+    const code = randomCode();
+    const event = new NDKEvent(ndk, {
+      kind: 9009 as NDKKind,
+      content: "",
+      tags: [
+        ["h", group.id, group.relay],
+        ["code", code],
+        ...(expiresAt ? [["expiration", expiresAt.toString()]] : []),
+      ],
+    } as NostrEvent);
+    await event.publish(relaySet);
+    return code;
+  };
+}
+
+export function useValidateInviteCode(group: Group) {
+  const ndk = useNDK();
+  const relaySet = useRelaySet([group.relay]);
+  return async (code: string): Promise<boolean> => {
+    try {
+      const inviteEvents = await ndk.fetchEvents(
+        {
+          kinds: [9009 as NDKKind],
+          "#h": [group.id],
+          "#code": [code],
+        },
+        {
+          closeOnEose: true,
+          cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+        },
+        relaySet,
+      );
+
+      if (inviteEvents.size === 0) return false;
+
+      const inviteEvent = Array.from(inviteEvents)[0];
+      const expirationTag = inviteEvent.tags.find((t) => t[0] === "expiration");
+
+      if (expirationTag) {
+        const expiresAt = parseInt(expirationTag[1]);
+        if (Date.now() / 1000 > expiresAt) {
+          return false; // Expired
+        }
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error validating invite code:", error);
+      return false;
+    }
+  };
+}
+
+export function useRevokeInviteCode(group: Group) {
+  const ndk = useNDK();
+  const relaySet = useRelaySet([group.relay]);
+  return async (code: string): Promise<NostrEvent> => {
+    const event = new NDKEvent(ndk, {
+      kind: 5 as NDKKind, // deletion event
+      content: `Revoked invite code: ${code}`,
+      tags: [
+        ["h", group.id],
+        ["code", code],
+      ],
+    } as NostrEvent);
+    await event.publish(relaySet);
+    return event.rawEvent() as NostrEvent;
+  };
+}
+
+export function useGroupInviteCodes(group: Group) {
+  const inviteEvents = useStream(
+    {
+      kinds: [9009 as NDKKind],
+      "#h": [group.id],
+    },
+    [group.relay],
+  );
+
+  const deletionEvents = useStream(
+    {
+      kinds: [5 as NDKKind], // deletion events
+      "#h": [group.id],
+    },
+    [group.relay],
+  );
+
+  // Get codes that have been deleted
+  const deletedCodes = useMemo(() => {
+    return deletionEvents.events
+      .map((event) => {
+        const codeTag = event.tags.find((t) => t[0] === "code");
+        return codeTag ? codeTag[1] : null;
+      })
+      .filter(Boolean);
+  }, [deletionEvents.events]);
+
+  // Filter and process invite codes
+  const inviteCodes = useMemo(() => {
+    return inviteEvents.events
+      .map((event) => {
+        const codeTag = event.tags.find((t) => t[0] === "code");
+        const code = codeTag ? codeTag[1] : null;
+        const expirationTag = event.tags.find((t) => t[0] === "expiration");
+        const expiresAt = expirationTag
+          ? parseInt(expirationTag[1])
+          : undefined;
+        const isExpired = expiresAt ? Date.now() / 1000 > expiresAt : false;
+
+        return {
+          code,
+          createdAt: event.created_at,
+          expiresAt,
+          isExpired,
+          pubkey: event.pubkey,
+        } as GroupInviteCode;
+      })
+      .filter((invite) => invite.code && !deletedCodes.includes(invite.code)) // Filter out deleted codes
+      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)); // Sort by newest first
+  }, [inviteEvents.events, deletedCodes]);
+
+  return { data: inviteCodes };
 }
 
 // Admin management functions following NIP-29

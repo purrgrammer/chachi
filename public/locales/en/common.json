@@ -396,6 +396,50 @@
           "success": "Admins added successfully",
           "error": "Failed to add some admins"
         }
+      },
+      "invite_codes": {
+        "title": "Invite Codes",
+        "description": "Create invite codes to allow specific users to join your group.",
+        "create": "Create Invite Code",
+        "creating": "Creating...",
+        "active": "Active Invite Codes",
+        "none": "No active invite codes",
+        "expires": "Expires:",
+        "copy_code": "Copy code",
+        "copy_url": "Copy URL",
+        "revoke": "Revoke",
+        "dialog": {
+          "title": "Create Invite Code",
+          "description": "Choose when this invite code should expire. The code will be automatically revoked after the expiration date.",
+          "created_title": "Invite Code Created",
+          "created_description": "Your invite code has been created successfully. Share this code with users you want to invite to the group.",
+          "your_code": "Invite Code",
+          "invite_url": "Invite URL",
+          "share_hint": "Share the code or URL with users you want to invite to your group",
+          "expiration": "Expiration",
+          "1week": "1 Week",
+          "1month": "1 Month",
+          "1year": "1 Year",
+          "never": "Never (No Expiry)",
+          "done": "Done",
+          "cancel": "Cancel"
+        },
+        "create": {
+          "success": "Invite code created successfully",
+          "error": "Failed to create invite code"
+        },
+        "revoke": {
+          "success": "Invite code revoked successfully",
+          "error": "Failed to revoke invite code"
+        },
+        "copy": {
+          "success": "Invite code copied to clipboard",
+          "error": "Failed to copy invite code"
+        },
+        "copy_url": {
+          "success": "Invite URL copied to clipboard",
+          "error": "Failed to copy invite URL"
+        }
       }
     },
     "error": {
@@ -471,6 +515,14 @@
     "debug": "Debug"
   },
   "join": {
+    "title": "Join Group",
+    "description": "You've been invited to join a group",
+    "group_info": "Group Information",
+    "group_id": "Group ID",
+    "relay": "Relay",
+    "invite_code": "Invite Code",
+    "placeholder": "Join functionality will be implemented here",
+    "go_back": "Go Back",
     "request": {
       "send": {
         "success": "Join request sent",

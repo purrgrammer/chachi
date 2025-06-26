@@ -3,7 +3,6 @@ import {
   Info,
   Shield,
   Users,
-  Crown,
   UserRoundPlus,
   ImagePlus,
   RotateCw,
@@ -11,6 +10,10 @@ import {
   X,
   Search,
   UserCheck,
+  Ticket,
+  Copy,
+  Trash2,
+  Link,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -19,9 +22,19 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TabContainer, TabItem } from "@/components/ui/tab-container";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { InputCopy } from "@/components/ui/input-copy";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Avatar } from "@/components/nostr/avatar";
 import { Name } from "@/components/nostr/name";
 import { usePubkey, useCanSign } from "@/lib/account";
@@ -34,6 +47,9 @@ import {
   useAddAdmin,
   useRemoveAdmin,
   useEditGroup,
+  useCreateInviteCode,
+  useGroupInviteCodes,
+  useRevokeInviteCode,
 } from "@/lib/nostr/groups";
 import { saveGroupEvent } from "@/lib/messages";
 import { useUpload } from "@/lib/media";
@@ -41,7 +57,8 @@ import {
   useProfileAutocomplete,
   getProfileDisplayName,
 } from "@/lib/hooks/useProfileAutocomplete";
-import type { Group, GroupMetadata } from "@/lib/types";
+import type { Group, GroupMetadata, GroupInviteCode } from "@/lib/types";
+import { getRelayHost } from "@/lib/relay";
 
 export function GroupEditor({
   group,
@@ -92,6 +109,17 @@ export function GroupEditor({
   const removeAdmin = useRemoveAdmin(group);
   const editGroup = useEditGroup();
   const allGroupMembers = [...admins, ...members];
+
+  // Invite codes management
+  const createInviteCode = useCreateInviteCode(group);
+  const revokeInviteCode = useRevokeInviteCode(group);
+  const { data: inviteCodes } = useGroupInviteCodes(group);
+  const [isCreatingCode, setIsCreatingCode] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedExpiration, setSelectedExpiration] = useState<string>("never");
+  const [createdInviteCode, setCreatedInviteCode] = useState<string | null>(
+    null,
+  );
 
   // Profile autocomplete for adding admins
   const {
@@ -289,6 +317,122 @@ export function GroupEditor({
       toast.error(
         t("group.settings.admins.batch_add.error", "Failed to add some admins"),
       );
+    }
+  }
+
+  function getExpirationTimestamp(duration: string): number | undefined {
+    const now = Math.floor(Date.now() / 1000);
+    switch (duration) {
+      case "1week":
+        return now + 7 * 24 * 60 * 60;
+      case "1month":
+        return now + 30 * 24 * 60 * 60;
+      case "1year":
+        return now + 365 * 24 * 60 * 60;
+      case "never":
+      default:
+        return undefined;
+    }
+  }
+
+  async function handleCreateInviteCode() {
+    try {
+      setIsCreatingCode(true);
+      const expiresAt = getExpirationTimestamp(selectedExpiration);
+      const code = await createInviteCode(expiresAt);
+      setCreatedInviteCode(code);
+      toast.success(
+        t(
+          "group.settings.invite_codes.create.success",
+          "Invite code created successfully",
+        ),
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error(
+        t(
+          "group.settings.invite_codes.create.error",
+          "Failed to create invite code",
+        ),
+      );
+    } finally {
+      setIsCreatingCode(false);
+    }
+  }
+
+  async function handleRevokeInviteCode(code: string) {
+    try {
+      await revokeInviteCode(code);
+      toast.success(
+        t(
+          "group.settings.invite_codes.revoke.success",
+          "Invite code revoked successfully",
+        ),
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error(
+        t(
+          "group.settings.invite_codes.revoke.error",
+          "Failed to revoke invite code",
+        ),
+      );
+    }
+  }
+
+  function generateInviteUrl(code: string): string {
+    const baseUrl = window.location.origin;
+    const relayHost = getRelayHost(group.relay);
+    return `${baseUrl}/join/${code}/${relayHost}/${group.id}`;
+  }
+
+  async function handleCopyInviteCode(code: string) {
+    try {
+      await navigator.clipboard.writeText(code);
+      toast.success(
+        t(
+          "group.settings.invite_codes.copy.success",
+          "Invite code copied to clipboard",
+        ),
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error(
+        t(
+          "group.settings.invite_codes.copy.error",
+          "Failed to copy invite code",
+        ),
+      );
+    }
+  }
+
+  async function handleCopyInviteUrl(code: string) {
+    try {
+      const inviteUrl = generateInviteUrl(code);
+      await navigator.clipboard.writeText(inviteUrl);
+      toast.success(
+        t(
+          "group.settings.invite_codes.copy_url.success",
+          "Invite URL copied to clipboard",
+        ),
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error(
+        t(
+          "group.settings.invite_codes.copy_url.error",
+          "Failed to copy invite URL",
+        ),
+      );
+    }
+  }
+
+  function handleCloseDialog(openOrEvent?: boolean | React.MouseEvent) {
+    const open = typeof openOrEvent === "boolean" ? openOrEvent : false;
+    setIsDialogOpen(open);
+    if (!open) {
+      setSelectedExpiration("never");
+      setCreatedInviteCode(null);
     }
   }
 
@@ -617,48 +761,298 @@ export function GroupEditor({
             </div>
           )}
 
-          {/* Members List Section */}
-          <div>
-            <div className="space-y-4">
-              {/* Admins Section */}
-              {admins && admins.length > 0 && (
-                <div>
-                  <h4 className="text-xs font-medium text-muted-foreground mb-2 uppercase">
-                    {t("group.info.admins", "Admins ({{adminsLength}})", {
-                      adminsLength: admins.length,
-                    })}
+          {/* Invite Codes Section */}
+          {isAdmin && canSign && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Ticket className="h-5 w-5" />
+                <h3 className="text-sm font-medium">
+                  {t("group.settings.invite_codes.title", "Invite Codes")}
+                </h3>
+              </div>
+
+              <p className="text-sm text-muted-foreground">
+                {t(
+                  "group.settings.invite_codes.description",
+                  "Create invite codes to allow specific users to join your group.",
+                )}
+              </p>
+
+              {/* Create Invite Code Dialog */}
+              <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
+                <DialogTrigger asChild>
+                  <Button className="w-full">
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t(
+                      "group.settings.invite_codes.create",
+                      "Create Invite Code",
+                    )}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {createdInviteCode
+                        ? t(
+                            "group.settings.invite_codes.dialog.created_title",
+                            "Invite Code Created",
+                          )
+                        : t(
+                            "group.settings.invite_codes.dialog.title",
+                            "Create Invite Code",
+                          )}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {createdInviteCode
+                        ? t(
+                            "group.settings.invite_codes.dialog.created_description",
+                            "Your invite code has been created successfully. Share this code with users you want to invite to the group.",
+                          )
+                        : t(
+                            "group.settings.invite_codes.dialog.description",
+                            "Choose when this invite code should expire. The code will be automatically revoked after the expiration date.",
+                          )}
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  {createdInviteCode ? (
+                    // Show created code and URL
+                    <div className="space-y-6 py-4">
+                      {/* Invite Code Section */}
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">
+                          {t(
+                            "group.settings.invite_codes.dialog.your_code",
+                            "Invite Code",
+                          )}
+                        </Label>
+                        <InputCopy value={createdInviteCode} />
+                      </div>
+
+                      {/* Invite URL Section */}
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">
+                          {t(
+                            "group.settings.invite_codes.dialog.invite_url",
+                            "Invite URL",
+                          )}
+                        </Label>
+                        <InputCopy
+                          value={generateInviteUrl(createdInviteCode)}
+                        />
+                      </div>
+
+                      <p className="text-xs text-muted-foreground text-center">
+                        {t(
+                          "group.settings.invite_codes.dialog.share_hint",
+                          "Share the code or URL with users you want to invite to your group",
+                        )}
+                      </p>
+                    </div>
+                  ) : (
+                    // Show creation form
+                    <div className="space-y-6 py-4">
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">
+                          {t(
+                            "group.settings.invite_codes.dialog.expiration",
+                            "Expiration",
+                          )}
+                        </Label>
+                        <RadioGroup
+                          value={selectedExpiration}
+                          onValueChange={setSelectedExpiration}
+                          className="space-y-3"
+                        >
+                          {[
+                            {
+                              value: "1week",
+                              label: t(
+                                "group.settings.invite_codes.dialog.1week",
+                                "1 Week",
+                              ),
+                            },
+                            {
+                              value: "1month",
+                              label: t(
+                                "group.settings.invite_codes.dialog.1month",
+                                "1 Month",
+                              ),
+                            },
+                            {
+                              value: "1year",
+                              label: t(
+                                "group.settings.invite_codes.dialog.1year",
+                                "1 Year",
+                              ),
+                            },
+                            {
+                              value: "never",
+                              label: t(
+                                "group.settings.invite_codes.dialog.never",
+                                "Never (No Expiry)",
+                              ),
+                            },
+                          ].map((option) => (
+                            <div
+                              key={option.value}
+                              className="flex items-center space-x-3"
+                            >
+                              <RadioGroupItem
+                                value={option.value}
+                                id={option.value}
+                              />
+                              <Label
+                                htmlFor={option.value}
+                                className="text-sm font-normal cursor-pointer"
+                              >
+                                {option.label}
+                              </Label>
+                            </div>
+                          ))}
+                        </RadioGroup>
+                      </div>
+                    </div>
+                  )}
+
+                  <DialogFooter className="gap-3 pt-4">
+                    {createdInviteCode ? (
+                      <Button onClick={handleCloseDialog} className="w-full">
+                        {t("group.settings.invite_codes.dialog.done", "Done")}
+                      </Button>
+                    ) : (
+                      <>
+                        <Button
+                          variant="outline"
+                          onClick={handleCloseDialog}
+                          disabled={isCreatingCode}
+                        >
+                          {t(
+                            "group.settings.invite_codes.dialog.cancel",
+                            "Cancel",
+                          )}
+                        </Button>
+                        <Button
+                          onClick={handleCreateInviteCode}
+                          disabled={isCreatingCode}
+                        >
+                          {isCreatingCode ? (
+                            <RotateCw className="h-4 w-4 mr-2 animate-spin" />
+                          ) : (
+                            <Plus className="h-4 w-4 mr-2" />
+                          )}
+                          {isCreatingCode
+                            ? t(
+                                "group.settings.invite_codes.creating",
+                                "Creating...",
+                              )
+                            : t("group.settings.invite_codes.create", "Create")}
+                        </Button>
+                      </>
+                    )}
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+
+              {/* Active Invite Codes List */}
+              {inviteCodes && inviteCodes.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium mb-3">
+                    {t(
+                      "group.settings.invite_codes.active",
+                      "Active Invite Codes",
+                    )}{" "}
+                    ({inviteCodes.length})
                   </h4>
-                  <div className="space-y-1">
-                    {admins.map((pubkey) => (
+
+                  <div className="space-y-2">
+                    {inviteCodes.map((invite: GroupInviteCode) => (
                       <div
-                        key={pubkey}
-                        className="flex items-center justify-between py-2"
+                        key={invite.code}
+                        className="flex items-center justify-between p-3 border rounded-lg"
                       >
-                        <div className="flex items-center gap-3">
-                          <Avatar pubkey={pubkey} className="size-8" />
-                          <Name pubkey={pubkey} />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
+                              {invite.code}
+                            </code>
+                            {invite.expiresAt && (
+                              <span className="text-xs text-muted-foreground">
+                                {t(
+                                  "group.settings.invite_codes.expires",
+                                  "Expires:",
+                                )}{" "}
+                                {new Date(
+                                  invite.expiresAt * 1000,
+                                ).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <Badge variant="secondary" className="text-xs">
-                          <Crown className="h-3 w-3 mr-1" />
-                          {t("group.info.admin", "Admin")}
-                        </Badge>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleCopyInviteCode(invite.code)}
+                            title={t(
+                              "group.settings.invite_codes.copy_code",
+                              "Copy code",
+                            )}
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleCopyInviteUrl(invite.code)}
+                            title={t(
+                              "group.settings.invite_codes.copy_url",
+                              "Copy URL",
+                            )}
+                          >
+                            <Link className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleRevokeInviteCode(invite.code)}
+                            title={t(
+                              "group.settings.invite_codes.revoke",
+                              "Revoke",
+                            )}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Regular Members Section */}
-              {nonAdminMembers.length === 0 &&
-              (!admins || admins.length === 0) ? (
+              {inviteCodes && inviteCodes.length === 0 && (
+                <p className="text-sm text-muted-foreground py-4 text-center">
+                  {t(
+                    "group.settings.invite_codes.none",
+                    "No active invite codes",
+                  )}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Members List Section */}
+          <div>
+            <div className="space-y-4">
+              {nonAdminMembers.length === 0 ? (
                 <div className="py-4 text-center">
                   <p className="text-sm text-muted-foreground">
                     {t("group.info.no-members", "No members")}
                   </p>
                 </div>
-              ) : nonAdminMembers.length > 0 ? (
+              ) : (
                 <div>
-                  <h4 className="text-xs font-medium text-muted-foreground mb-2 uppercase">
+                  <h4 className="text-sm font-medium mb-3">
                     {t("group.info.members", "Members ({{membersLength}})", {
                       membersLength: nonAdminMembers.length,
                     })}
@@ -675,7 +1069,7 @@ export function GroupEditor({
                     ))}
                   </div>
                 </div>
-              ) : null}
+              )}
             </div>
           </div>
         </div>
@@ -688,14 +1082,7 @@ export function GroupEditor({
       children: (
         <div className="flex flex-col gap-4">
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <UserCheck className="h-5 w-5" />
-              <h3 className="text-sm font-medium">
-                {t("group.settings.admins.title", "Group Administrators")}
-              </h3>
-            </div>
-
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs">
               {t(
                 "group.settings.admins.description",
                 "Administrators have special permissions to manage the group, including adding/removing members and moderating content.",
@@ -704,7 +1091,7 @@ export function GroupEditor({
 
             {/* Current Admins List */}
             <div className="space-y-3">
-              <h4 className="text-sm font-medium">
+              <h4 className="text-sm font-medium mb-3">
                 {t("group.settings.admins.current", "Current Administrators")} (
                 {admins.length})
               </h4>
@@ -732,10 +1119,6 @@ export function GroupEditor({
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="text-xs">
-                          <Crown className="h-3 w-3 mr-1" />
-                          {t("group.info.admin", "Admin")}
-                        </Badge>
                         {isAdmin && canSign && pubkey !== userPubkey && (
                           <Button
                             variant="destructive"
@@ -755,24 +1138,24 @@ export function GroupEditor({
             {/* Add New Admins Section */}
             {isAdmin && canSign && (
               <div className="space-y-3 border-t pt-4">
-                <h4 className="text-sm font-medium">
+                <h4 className="text-sm font-medium mb-3">
                   {t("group.settings.admins.add_new", "Add New Administrators")}
                 </h4>
 
                 {/* Search Input */}
                 <div className="space-y-3">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      value={adminSearchQuery}
-                      onChange={(e) => setAdminSearchQuery(e.target.value)}
-                      placeholder={t(
-                        "group.settings.admins.search_placeholder",
-                        "Search members to add as admin...",
-                      )}
-                      className="pl-10"
-                    />
-                  </div>
+                  <Input
+                    value={adminSearchQuery}
+                    onChange={(e) => setAdminSearchQuery(e.target.value)}
+                    placeholder={t(
+                      "group.settings.admins.search_placeholder",
+                      "Search members to add as admin...",
+                    )}
+                    className="ml-2"
+                    leftIcon={
+                      <Search className="h-4 w-4 text-muted-foreground" />
+                    }
+                  />
 
                   {/* Selected New Admins */}
                   {selectedNewAdmins.length > 0 && (
