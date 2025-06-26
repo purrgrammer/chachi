@@ -43,7 +43,7 @@ interface MessageEvent {
 
 function PaymentPreview({ group, zap }: { group: Group; zap: Zap | Nutzap }) {
   return (
-    <div className="flex flex-row items-baseline gap-1 text-xs line-clamp-1 text-muted-foreground">
+    <div className="flex flex-row items-start gap-1 text-xs line-clamp-1 text-muted-foreground">
       <span className="font-semibold">
         <Name pubkey={zap.pubkey} short />
       </span>
