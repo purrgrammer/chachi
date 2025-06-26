@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { useInView } from "framer-motion";
 import {
   HandCoins,
+  Crown,
   Reply as ReplyIcon,
   SmilePlus,
   Bitcoin,
@@ -789,7 +790,22 @@ function UserActivity({
 }) {
   const member = event.tags.find((t) => t[0] === "p")?.[1];
   const { t } = useTranslation();
-  return member ? (
+  const role = event.tags.find((t) => t[0] === "p")?.[2];
+  return member && role && action === "join" ? (
+    <div className="flex justify-center my-0.5 w-full">
+      <Badge variant="outline" className="self-center">
+        <div className="flex gap-1">
+          <ProfileDrawer
+            group={group}
+            pubkey={member}
+            trigger={<Name pubkey={member} />}
+          />
+          <span>{t("group.chat.user.admin", { role })}</span>
+          {role === "admin" ? <Crown className="size-4" /> : null}
+        </div>
+      </Badge>
+    </div>
+  ) : member ? (
     <div className="flex justify-center my-0.5 w-full">
       <Badge variant="outline" className="self-center">
         <div className="flex gap-1">

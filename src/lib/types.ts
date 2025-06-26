@@ -20,6 +20,15 @@ export interface GroupMembers extends GroupMetadata {
   members: string[];
 }
 
+export interface GroupRole {
+  name: string;
+  description?: string;
+}
+
+export interface GroupRoles extends Group {
+  roles: GroupRole[];
+}
+
 export interface Relay {
   url: string;
 }

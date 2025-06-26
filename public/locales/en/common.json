@@ -260,7 +260,8 @@
     "chat": {
       "user": {
         "joined": "joined",
-        "left": "left"
+        "left": "left",
+        "admin": "is now {{ role }}"
       },
       "event": {
         "delete": {
@@ -271,6 +272,9 @@
     },
     "metadata": {
       "community": "This is a profile based community",
+      "group": "Group",
+      "private": "Private",
+      "closed": "Closed",
       "visibility": {
         "private": {
           "trigger": "Members only",
@@ -308,6 +312,99 @@
       "admins": "Admins ({{adminsLength}})",
       "members": "Members ({{membersLength}})",
       "no-members": "No members"
+    },
+    "settings": {
+      "title": "Group Settings",
+      "access-denied": "Access Denied",
+      "admin-only": "Only group administrators can access settings.",
+      "optional": "Optional",
+      "information": {
+        "tab": "Information",
+        "picture": "Group Image",
+        "picture_placeholder": "https://example.com/image.jpg",
+        "name": "Group Name",
+        "name_placeholder": "Enter group name",
+        "about": "About",
+        "about_placeholder": "Describe what this group is about...",
+        "upload_image": "Upload Image",
+        "uploading": "Uploading...",
+        "remove_image": "Remove",
+        "or_enter_url": "Or enter image URL",
+        "image_uploaded": "Image uploaded successfully",
+        "image_upload_error": "Failed to upload image",
+        "save": "Save Information",
+        "saving": "Saving...",
+        "success": "Group information updated successfully",
+        "error": "Failed to update group information"
+      },
+      "privacy": {
+        "tab": "Privacy",
+        "visibility": "Visibility",
+        "access": "Access Control",
+        "public": "Public",
+        "public_description": "Anyone can see the group and its content",
+        "private": "Private", 
+        "private_description": "Only members can see the group content",
+        "open": "Open",
+        "open_description": "Anyone can join the group",
+        "closed": "Closed",
+        "closed_description": "Members must be approved to join",
+        "save": "Save Privacy Settings",
+        "saving": "Saving...",
+        "success": "Group privacy settings updated successfully",
+        "error": "Failed to update group privacy settings"
+      },
+      "members": {
+        "tab": "Members",
+        "join_requests": "Join Requests",
+        "no_requests": "No pending join requests",
+        "list": "Group Members"
+      },
+      "roles": {
+        "tab": "Roles",
+        "title": "Group Roles",
+        "description": "Roles define what permissions members have within this group. These are configured by the relay and cannot be modified here.",
+        "no_roles": "No custom roles defined for this group.",
+        "default_note": "The group uses default member and admin permissions.",
+        "no_description": "No description provided for this role.",
+        "note_title": "Note:",
+        "note_content": "Role permissions are managed by the relay administrator. Contact the relay operator to request changes to role definitions or assignments."
+      },
+      "admins": {
+        "tab": "Admins",
+        "title": "Group Administrators",
+        "description": "Administrators have special permissions to manage the group, including adding/removing members and moderating content.",
+        "current": "Current Administrators",
+        "none": "No administrators found",
+        "you": "You",
+        "add_new": "Add New Administrators",
+        "search_placeholder": "Search members to add as admin...",
+        "selected": "Selected to add",
+        "clear": "Clear",
+        "add_selected": "Add Selected as Admins",
+        "more_results": "{{count}} more results...",
+        "no_results": "No members found matching your search",
+        "add": {
+          "success": "Admin added successfully",
+          "error": "Failed to add admin"
+        },
+        "remove": {
+          "success": "Admin removed successfully",
+          "error": "Failed to remove admin"
+        },
+        "batch_add": {
+          "success": "Admins added successfully",
+          "error": "Failed to add some admins"
+        }
+      }
+    },
+    "error": {
+      "no-host": "No host provided",
+      "no-metadata": "Could not load group information"
+    },
+    "not-found": "Group Not Found",
+    "action": {
+      "go-back": "Go Back"
     }
   },
   "chat": {

@@ -28,6 +28,7 @@ import type {
   Group,
   GroupMembers,
   GroupMetadata,
+  GroupRole,
   Community,
   ContentSection,
 } from "@/lib/types";
@@ -39,6 +40,7 @@ import {
   GROUP_METADATA,
   GROUP_MEMBERS,
   GROUP_ADMINS,
+  GROUP_ROLES,
 } from "@/lib/query";
 import {
   getGroupInfo,
@@ -205,7 +207,7 @@ export function useGroup(group?: Group) {
   const ndk = useNDK();
   return useQuery({
     enabled: Boolean(group),
-    queryKey: [GROUP_METADATA, group?.id, group?.relay],
+    queryKey: [GROUP_METADATA, group ? groupId(group) : 'undefined'],
     queryFn: async () => {
       if (!group) throw new Error("Group not found");
       const cached = await getGroupInfo(group);
@@ -431,21 +433,37 @@ export function useEditGroup() {
     if (!account || account.isReadOnly) throw new Error("Can't edit group");
     const { id, relay } = metadata;
     const relaySet = NDKRelaySet.fromRelayUrls([relay], ndk);
-    const access = new NDKEvent(ndk, {
-      kind: NDKKind.GroupAdminEditStatus,
-      content: "",
-      tags: [["h", id], [metadata.visibility], [metadata.access]],
-    } as NostrEvent);
-    await access.publish(relaySet);
+
+    // Create a single edit-metadata event with all fields (kind 9002)
     const edit = new NDKEvent(ndk, {
       kind: NDKKind.GroupAdminEditMetadata,
       content: "",
       tags: [["h", id]],
     } as NostrEvent);
+
+    // Add metadata fields
     if (metadata.name) edit.tags.push(["name", metadata.name]);
     if (metadata.about) edit.tags.push(["about", metadata.about]);
     if (metadata.picture) edit.tags.push(["picture", metadata.picture]);
+
+    // Add visibility and access as single-element tags per NIP-29 spec
+    if (metadata.visibility === "private") {
+      edit.tags.push(["private"]);
+    } else {
+      edit.tags.push(["public"]);
+    }
+
+    if (metadata.access === "closed") {
+      edit.tags.push(["closed"]);
+    } else {
+      edit.tags.push(["open"]);
+    }
+
     await edit.publish(relaySet);
+    
+    // Store the updated group info in the database
+    await saveGroupInfo({ id, relay }, metadata);
+    
     queryClient.invalidateQueries({ queryKey: [GROUP_METADATA, id, relay] });
   };
 }
@@ -563,6 +581,51 @@ export function useDeleteEvent(group: Group) {
   };
 }
 
+// Admin management functions following NIP-29
+
+export function useAddAdmin(group: Group) {
+  const ndk = useNDK();
+  const relaySet = useRelaySet([group.relay]);
+  return async (
+    pubkey: string,
+    role: string = "admin",
+  ): Promise<NostrEvent> => {
+    const event = new NDKEvent(ndk, {
+      kind: 9000 as NDKKind, // put-user moderation event
+      content: "",
+      tags: [
+        ["h", group.id],
+        ["p", pubkey, role],
+      ],
+    } as NostrEvent);
+    await event.publish(relaySet);
+    queryClient.invalidateQueries({
+      queryKey: [GROUP_ADMINS, group.id, group.relay],
+    });
+    return event.rawEvent() as NostrEvent;
+  };
+}
+
+export function useRemoveAdmin(group: Group) {
+  const ndk = useNDK();
+  const relaySet = useRelaySet([group.relay]);
+  return async (pubkey: string): Promise<NostrEvent> => {
+    const event = new NDKEvent(ndk, {
+      kind: 9001 as NDKKind, // remove-user moderation event
+      content: "",
+      tags: [
+        ["h", group.id],
+        ["p", pubkey],
+      ],
+    } as NostrEvent);
+    await event.publish(relaySet);
+    queryClient.invalidateQueries({
+      queryKey: [GROUP_ADMINS, group.id, group.relay],
+    });
+    return event.rawEvent() as NostrEvent;
+  };
+}
+
 export function useGroupName(group: Group) {
   const { id, relay } = group;
   const { data: metadata } = useGroup({ id, relay });
@@ -585,6 +648,55 @@ export function useGroupDescription(group: Group) {
   const { data: relayInfo } = useRelayInfo(relay);
   const isRelayGroup = id === "_";
   return isRelayGroup ? relayInfo?.description : metadata?.about;
+}
+
+export function useGroupRoles(group: Group) {
+  const ndk = useNDK();
+  return useQuery({
+    queryKey: [GROUP_ROLES, group.id, group.relay],
+    queryFn: async () => {
+      const roles = await fetchGroupRoles(ndk, group);
+      return roles;
+    },
+    staleTime: Infinity,
+    gcTime: 0,
+  });
+}
+
+export async function fetchGroupRoles(
+  ndk: NDK,
+  group: Group,
+): Promise<GroupRole[]> {
+  try {
+    const rolesEvent = await ndk.fetchEvent(
+      {
+        kinds: [39003 as NDKKind], // NIP-29 group roles event kind
+        "#d": [group.id],
+      },
+      {
+        closeOnEose: true,
+        cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST,
+      },
+      NDKRelaySet.fromRelayUrls([group.relay], ndk),
+    );
+
+    if (!rolesEvent) {
+      return [];
+    }
+
+    const roles: GroupRole[] = rolesEvent.tags
+      .filter((tag) => tag[0] === "role")
+      .map((tag) => ({
+        name: tag[1] || "",
+        description: tag[2] || undefined,
+      }))
+      .filter((role) => role.name); // Filter out roles without names
+
+    return roles;
+  } catch (error) {
+    console.error("Error fetching group roles:", error);
+    return [];
+  }
 }
 
 export async function fetchCommunity(ndk: NDK, pubkey: string) {

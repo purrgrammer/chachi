@@ -30,6 +30,7 @@ const Nutzaps = lazy(() => import("@/pages/nutzaps"));
 const Relay = lazy(() => import("@/pages/relay"));
 const Community = lazy(() => import("@/pages/community"));
 const CommunitySettings = lazy(() => import("@/pages/community-settings"));
+const GroupSettings = lazy(() => import("@/pages/group-settings"));
 const UserProfile = lazy(() => import("@/pages/user-profile"));
 
 const router = createBrowserRouter([
@@ -112,6 +113,14 @@ const router = createBrowserRouter([
       {
         path: ":host/e/:nlink",
         element: <Event />,
+      },
+      {
+        path: ":host/settings",
+        element: <GroupSettings />,
+      },
+      {
+        path: ":host/:id/settings",
+        element: <GroupSettings />,
       },
       {
         path: ":host/:id",

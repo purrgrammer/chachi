@@ -123,14 +123,21 @@ const LastMessagePreview = ({
   if (lastMessage.kind === NDKKind.GroupAdminAddUser) {
     const pubkey =
       lastMessage.tags.find((t) => t[0] === "p")?.[1] || lastMessage.pubkey;
+    const role = lastMessage.tags.find((t) => t[0] === "p")?.[2];
     return (
       <div className="flex flex-row items-baseline text-xs line-clamp-1 gap-1 text-muted-foreground italic">
         <span className="font-semibold">
           <Name pubkey={pubkey} short />
         </span>
-        <span className="text-muted-foreground">
-          {t("group.chat.user.joined")}
-        </span>
+        {role ? (
+          <span className="text-xs text-muted-foreground">
+            {t("group.chat.user.admin", { role })}
+          </span>
+        ) : (
+          <span className="text-muted-foreground">
+            {t("group.chat.user.joined")}
+          </span>
+        )}
       </div>
     );
   }

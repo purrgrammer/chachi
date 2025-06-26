@@ -1,13 +1,20 @@
-import { BookLock, BookOpen, Castle, Shield, ShieldOff } from "lucide-react";
+import {
+  BookLock,
+  BookOpen,
+  Castle,
+  Shield,
+  ShieldOff,
+  Settings,
+} from "lucide-react";
 import { useGroup, useGroupParticipants } from "@/lib/nostr/groups";
 import { GroupInfo } from "@/components/nostr/groups/info";
 import { BookmarkGroup } from "@/components/nostr/groups/bookmark";
-import { EditGroup } from "@/components/nostr/groups/edit";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import { Header } from "@/components/header";
-import { usePubkey } from "@/lib/account";
+import { usePubkey, useCanSign } from "@/lib/account";
 import { groupId } from "@/lib/groups";
-import { JoinRequests } from "@/components/nostr/groups/join-requests";
+import { Link } from "react-router-dom";
 import {
   Tooltip,
   TooltipContent,
@@ -21,6 +28,7 @@ export function GroupHeader({ group }: { group: Group }) {
   const { data: metadata } = useGroup(group);
   const { admins } = useGroupParticipants(group);
   const pubkey = usePubkey();
+  const canSign = useCanSign();
   const name = metadata?.name;
   const isRelayGroup = group.id === "_";
   const { t } = useTranslation();
@@ -135,11 +143,16 @@ export function GroupHeader({ group }: { group: Group }) {
           {isRelayGroup ? null : (
             <Separator orientation="vertical" className="ml-3 h-4" />
           )}
-          {!isRelayGroup && metadata?.access === "closed" ? (
-            <JoinRequests group={group} />
-          ) : null}
-          {!isRelayGroup && metadata && pubkey && admins?.includes(pubkey) ? (
-            <EditGroup group={metadata} />
+          {!isRelayGroup &&
+          metadata &&
+          pubkey &&
+          admins?.includes(pubkey) &&
+          canSign ? (
+            <Link to={`/${new URL(group.relay).hostname}/${group.id}/settings`}>
+              <Button aria-label="Group settings" variant="ghost" size="icon">
+                <Settings className="size-6" />
+              </Button>
+            </Link>
           ) : null}
           <BookmarkGroup group={group} />
           {!isRelayGroup ? <GroupInfo group={group} /> : null}
