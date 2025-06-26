@@ -37,7 +37,8 @@ import { useCommunity, useGroupParticipants } from "@/lib/nostr/groups";
 import { Zap } from "@/components/nostr/zap";
 import { validateZap } from "@/lib/nip-57";
 import { ChatInput } from "@/components/nostr/chat/input";
-import { Emoji as EmojiType, EmojiPicker } from "@/components/emoji-picker";
+import type { Emoji as EmojiType } from "@/components/emoji-picker";
+import { LazyEmojiPicker } from "@/components/lazy/LazyEmojiPicker";
 import { Chat } from "@/components/nostr/chat/chat";
 import { New } from "@/components/nostr/new";
 import { NewZapDialog } from "@/components/nostr/zap";
@@ -356,13 +357,11 @@ function ChatZap({
           ) : null}
         </ContextMenuContent>
       </ContextMenu>
-      {showingEmojiPicker ? (
-        <EmojiPicker
-          open={showingEmojiPicker}
-          onOpenChange={(open) => setShowingEmojiPicker(open)}
-          onEmojiSelect={react}
-        />
-      ) : null}
+      <LazyEmojiPicker
+        open={showingEmojiPicker}
+        onOpenChange={(open) => setShowingEmojiPicker(open)}
+        onEmojiSelect={react}
+      />
       {showingZapDialog ? (
         <NewZapDialog
           open
@@ -727,13 +726,11 @@ function ChatNutzap({
           ) : null}
         </ContextMenuContent>
       </ContextMenu>
-      {showingEmojiPicker ? (
-        <EmojiPicker
-          open={showingEmojiPicker}
-          onOpenChange={(open) => setShowingEmojiPicker(open)}
-          onEmojiSelect={react}
-        />
-      ) : null}
+      <LazyEmojiPicker
+        open={showingEmojiPicker}
+        onOpenChange={(open) => setShowingEmojiPicker(open)}
+        onEmojiSelect={react}
+      />
       {showingZapDialog ? (
         <NewZapDialog
           open

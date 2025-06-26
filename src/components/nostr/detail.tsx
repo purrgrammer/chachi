@@ -71,7 +71,8 @@ import {
   ContextMenuTrigger,
   ContextMenuShortcut,
 } from "@/components/ui/context-menu";
-import { Emoji as PickerEmoji, EmojiPicker } from "@/components/emoji-picker";
+import type { Emoji as PickerEmoji } from "@/components/emoji-picker";
+import { LazyEmojiPicker } from "@/components/lazy/LazyEmojiPicker";
 import { Poll, PollResults } from "@/components/nostr/poll";
 import { Calendar, CalendarEvent } from "@/components/nostr/calendar";
 import { ReplyDialog } from "@/components/nostr/reply";
@@ -676,13 +677,11 @@ function EventMenu({
           />
         </ReplyDialog>
       ) : null}
-      {showEmojiPicker ? (
-        <EmojiPicker
-          open={showEmojiPicker}
-          onOpenChange={setShowEmojiPicker}
-          onEmojiSelect={onEmojiSelect}
-        />
-      ) : null}
+      <LazyEmojiPicker
+        open={showEmojiPicker}
+        onOpenChange={setShowEmojiPicker}
+        onEmojiSelect={onEmojiSelect}
+      />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="smallIcon">
@@ -1158,13 +1157,11 @@ export function ReplyEmbed({
             zapType={zapType}
           />
         ) : null}
-        {showEmojiPicker && canSign ? (
-          <EmojiPicker
-            open={showEmojiPicker}
-            onOpenChange={setShowEmojiPicker}
-            onEmojiSelect={onEmojiSelect}
-          />
-        ) : null}
+        <LazyEmojiPicker
+          open={showEmojiPicker && !!canSign}
+          onOpenChange={setShowEmojiPicker}
+          onEmojiSelect={onEmojiSelect}
+        />
         {showReplyDialog && canSign ? (
           <ReplyDialog
             group={group}
@@ -1435,13 +1432,11 @@ export function FeedEmbed({
           zapType={zapType}
         />
       ) : null}
-      {showEmojiPicker && canSign ? (
-        <EmojiPicker
-          open={showEmojiPicker}
-          onOpenChange={setShowEmojiPicker}
-          onEmojiSelect={onEmojiSelect}
-        />
-      ) : null}
+      <LazyEmojiPicker
+        open={showEmojiPicker && !!canSign}
+        onOpenChange={setShowEmojiPicker}
+        onEmojiSelect={onEmojiSelect}
+      />
       {showReplyDialog && canSign ? (
         <ReplyDialog
           group={group}

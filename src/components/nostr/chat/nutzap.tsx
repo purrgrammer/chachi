@@ -26,7 +26,8 @@ import { useNDK } from "@/lib/ndk";
 import { Avatar } from "@/components/nostr/avatar";
 import { useRelaySet } from "@/lib/nostr";
 import { usePubkey, useCanSign } from "@/lib/account";
-import { Emoji as EmojiType, EmojiPicker } from "@/components/emoji-picker";
+import type { Emoji as EmojiType } from "@/components/emoji-picker";
+import { LazyEmojiPicker } from "@/components/lazy/LazyEmojiPicker";
 import { saveGroupEvent, saveLastSeen } from "@/lib/messages";
 import { useSettings } from "@/lib/settings";
 import type { Group } from "@/lib/types";
@@ -407,13 +408,11 @@ export function ChatNutzap({
           ) : null}
         </ContextMenuContent>
       </ContextMenu>
-      {showingEmojiPicker ? (
-        <EmojiPicker
-          open={showingEmojiPicker}
-          onOpenChange={(open) => setShowingEmojiPicker(open)}
-          onEmojiSelect={react}
-        />
-      ) : null}
+      <LazyEmojiPicker
+        open={showingEmojiPicker}
+        onOpenChange={(open) => setShowingEmojiPicker(open)}
+        onEmojiSelect={react}
+      />
       {showingZapDialog ? (
         <NewZapDialog
           open

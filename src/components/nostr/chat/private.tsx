@@ -45,7 +45,8 @@ import { useNDK } from "@/lib/ndk";
 import { Avatar } from "@/components/nostr/avatar";
 import { usePubkey, useCanSign } from "@/lib/account";
 import { useEvent } from "@/lib/nostr/dm";
-import { Emoji as EmojiType, EmojiPicker } from "@/components/emoji-picker";
+import type { Emoji as EmojiType } from "@/components/emoji-picker";
+import { LazyEmojiPicker } from "@/components/lazy/LazyEmojiPicker";
 import { useSettings } from "@/lib/settings";
 import type { PrivateGroup as Group } from "@/lib/types";
 import { giftWrap } from "@/lib/nip-59";
@@ -464,13 +465,11 @@ export function ChatMessage({
                   onClose={() => setShowingZapDialog(false)}
                 />
               ) : null}
-              {showingEmojiPicker ? (
-                <EmojiPicker
-                  open={showingEmojiPicker}
-                  onOpenChange={(open) => setShowingEmojiPicker(open)}
-                  onEmojiSelect={react}
-                />
-              ) : null}
+              <LazyEmojiPicker
+                open={showingEmojiPicker}
+                onOpenChange={(open) => setShowingEmojiPicker(open)}
+                onEmojiSelect={react}
+              />
               {showMessageActions && canReact ? (
                 <div className="flex absolute bottom-0 -right-7 flex-col gap-1">
                   <Button

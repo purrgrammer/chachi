@@ -1,4 +1,4 @@
-import { CSSProperties, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useNavigate } from "@/lib/navigation";
 import {
@@ -41,18 +41,15 @@ import { useNDKWallets } from "@/lib/wallet";
 import { CHACHI_PUBKEY, CHACHI_GROUP } from "@/constants";
 import { useAtomValue } from "jotai";
 import { communikeyAtom } from "@/app/store";
-import { useProfileColor } from "@/components/nostr/profile";
 
 function UserInfo({ pubkey }: { pubkey: string }) {
-  const color = useProfileColor(pubkey);
   return (
     <div
       className="flex gap-2 items-center py-1.5 px-1 text-sm text-left"
-      style={{ "--pubkey-color": color } as CSSProperties}
     >
       <Avatar
         pubkey={pubkey}
-        className="w-8 h-8 rounded-lg border-2 border-[var(--pubkey-color)]"
+        className="w-8 h-8 rounded-lg"
       />
       <div className="grid flex-1 text-sm leading-tight text-left">
         <span className="font-semibold truncate">
@@ -102,7 +99,7 @@ export function NavUser() {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                  className="data-[state=closed]:hover:bg-background data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
                   <UserInfo pubkey={pubkey} />
                   <ChevronsUpDown className="ml-auto size-4" />

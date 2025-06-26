@@ -48,7 +48,8 @@ import { useNDK } from "@/lib/ndk";
 import { Avatar } from "@/components/nostr/avatar";
 import { useEvent, useRelaySet } from "@/lib/nostr";
 import { usePubkey, useCanSign } from "@/lib/account";
-import { Emoji as EmojiType, EmojiPicker } from "@/components/emoji-picker";
+import type { Emoji as EmojiType } from "@/components/emoji-picker";
+import { LazyEmojiPicker } from "@/components/lazy/LazyEmojiPicker";
 import { saveLastSeen, saveGroupEvent } from "@/lib/messages";
 import { useSettings } from "@/lib/settings";
 import { useIsUnpublished, useRetryUnpublishedEvent } from "@/lib/unpublished";
@@ -612,13 +613,11 @@ function MessageContent({
                     zapType="nip-57"
                   />
                 ) : null}
-                {showingEmojiPicker ? (
-                  <EmojiPicker
-                    open={showingEmojiPicker}
-                    onOpenChange={(open) => setShowingEmojiPicker(open)}
-                    onEmojiSelect={react}
-                  />
-                ) : null}
+                <LazyEmojiPicker
+                  open={showingEmojiPicker}
+                  onOpenChange={(open) => setShowingEmojiPicker(open)}
+                  onEmojiSelect={react}
+                />
                 {showMessageActions && canReact ? (
                   <div className="flex absolute bottom-0 -right-7 flex-col gap-1">
                     <Button
