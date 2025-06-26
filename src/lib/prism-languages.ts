@@ -7,11 +7,11 @@ import { Prism } from "prism-react-renderer";
 // See: https://github.com/FormidableLabs/prism-react-renderer#custom-language-support
 (typeof global !== "undefined" ? global : window).Prism = Prism;
 
-// We need to define languages directly rather than using dynamic imports
-// to ensure they're available synchronously before components render
+// Language definitions loaded lazily to reduce initial bundle size
+const languageDefinitions = new Map();
 
-// Import JSON language definition
-Prism.languages.json = {
+// Define language patterns
+const jsonLanguage = {
   property: {
     pattern: /(^|[^\\])"(?:\\.|[^\\"\r\n])*"(?=\s*:)/,
     lookbehind: true,
@@ -33,8 +33,7 @@ Prism.languages.json = {
   },
 };
 
-// Ruby language definition
-Prism.languages.ruby = {
+const rubyLanguage = {
   comment: [/#.*/, /^=begin\s[\s\S]*?^=end/m],
   string: [
     {
@@ -82,5 +81,19 @@ Prism.languages.ruby = {
     /(?:\.{2}|\+\+|--|~|&&|\|\||<<|>>|[=!<>]=?|[+\-*/%^&|]=?|\b(?:and|not|or)\b)/,
   punctuation: /[.,;()[\]{}]/,
 };
+
+// Store language definitions
+languageDefinitions.set("json", jsonLanguage);
+languageDefinitions.set("ruby", rubyLanguage);
+
+// Load essential languages immediately
+Prism.languages.json = jsonLanguage;
+
+// Function to load language on demand
+export function loadLanguage(lang: string) {
+  if (!Prism.languages[lang] && languageDefinitions.has(lang)) {
+    Prism.languages[lang] = languageDefinitions.get(lang);
+  }
+}
 
 export default Prism;
