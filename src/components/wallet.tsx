@@ -106,7 +106,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { EcashToken } from "@/components/cashu";
-import { cn, once } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { cashuRegex } from "@/lib/cashu";
 
 function Relay({

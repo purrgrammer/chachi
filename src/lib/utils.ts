@@ -30,18 +30,6 @@ export function groupBy<T>(arr: T[], callback: (t: T) => string) {
   );
 }
 
-export function once<A, B>(fn: (v: A) => B) {
-  let called = false;
-  return function (...args: A[]) {
-    if (called) return;
-    called = true;
-    if (args.length === 1) {
-      return fn.apply(window, args as [v: A]);
-    }
-    throw new Error("Wrong number of arguments");
-  };
-}
-
 // Map common language names to Prism language identifiers
 export function getPrismLanguage(language: string | undefined): string {
   if (!language) return "text";

@@ -113,3 +113,6 @@ src/
 
 ## Commit Message Guidelines
 - Do not include Claude Code references in commit messages
+
+## Code Documentation and Samples
+- use context7 to check for code documentation and samples
