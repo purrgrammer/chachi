@@ -2,10 +2,10 @@ import { lazy, Suspense } from "react";
 import { Loading } from "@/components/loading";
 import type { Emoji } from "@/components/emoji-picker";
 
-const EmojiPicker = lazy(() => 
-  import("@/components/emoji-picker").then(module => ({
-    default: module.EmojiPicker
-  }))
+const EmojiPicker = lazy(() =>
+  import("@/components/emoji-picker").then((module) => ({
+    default: module.EmojiPicker,
+  })),
 );
 
 interface LazyEmojiPickerProps {

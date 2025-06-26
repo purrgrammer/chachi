@@ -28,7 +28,10 @@ import {
   RichTextClassnames,
 } from "@/components/rich-text";
 import { Button } from "@/components/ui/button";
-import { ChatBubble, ChatBubbleDetail } from "@/components/nostr/chat-bubble";
+import {
+  LazyChatBubble,
+  LazyChatBubbleDetail,
+} from "@/components/lazy/LazyChatBubble";
 import { Header } from "@/components/nostr/header";
 import { Reactions } from "@/components/nostr/reactions";
 import { Book, BookContent } from "@/components/nostr/book";
@@ -185,8 +188,8 @@ const eventDetails: Record<
     noHeader: true,
     className: "border-none",
     innerClassname: "pt-2 pb-0 px-2",
-    preview: ChatBubble,
-    detail: ChatBubbleDetail,
+    preview: LazyChatBubble,
+    detail: LazyChatBubbleDetail,
   },
   [NDKKind.GroupReply]: {
     preview: Post,

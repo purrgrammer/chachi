@@ -44,13 +44,8 @@ import { communikeyAtom } from "@/app/store";
 
 function UserInfo({ pubkey }: { pubkey: string }) {
   return (
-    <div
-      className="flex gap-2 items-center py-1.5 px-1 text-sm text-left"
-    >
-      <Avatar
-        pubkey={pubkey}
-        className="w-8 h-8 rounded-lg"
-      />
+    <div className="flex gap-2 items-center py-1.5 px-1 text-sm text-left">
+      <Avatar pubkey={pubkey} className="w-8 h-8 rounded-lg" />
       <div className="grid flex-1 text-sm leading-tight text-left">
         <span className="font-semibold truncate">
           <Name pubkey={pubkey} />

@@ -2,7 +2,7 @@ import { Bookmark, MessageSquarePlus, Users } from "lucide-react";
 import { Reorder } from "framer-motion";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { RichText } from "@/components/rich-text";
+import { LazyRichText } from "@/components/lazy/LazyRichText";
 import { Badge } from "@/components/ui/badge";
 import { Name } from "@/components/nostr/name";
 import { NameList } from "@/components/nostr/name-list";
@@ -150,7 +150,7 @@ function GroupItem({ group }: { group: PrivateGroup }) {
             )}
           </h3>
           {lastMessage ? (
-            <RichText
+            <LazyRichText
               className="text-xs text-muted-foreground leading-none line-clamp-1"
               options={{
                 inline: true,
@@ -172,7 +172,7 @@ function GroupItem({ group }: { group: PrivateGroup }) {
               tags={lastMessage.tags}
             >
               {lastMessage.content}
-            </RichText>
+            </LazyRichText>
           ) : null}
         </div>
       </div>

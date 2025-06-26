@@ -1084,8 +1084,10 @@
       "payments-desc": "Send and receive payments seamlessly",
       "files": "Files",
       "files-desc": "Upload and share files",
-      "selfhost": "Own your data",
-      "selfhost-desc": "Self-host your messages and files"
+      "selfhost": "Sovereignity",
+      "selfhost-desc": "Self-host your messages and files",
+      "content-types": "Content types",
+      "content-types-desc": "Text, images, videos, polls, code snippets and much more!"
     },
     "testimonials": "Testimonials",
     "testimonials-desc": "What people are saying about us",

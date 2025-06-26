@@ -1,7 +1,7 @@
 import Logo from "@/components/logo";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ChatBubble } from "./nostr/chat-bubble";
+import { TestimonialBubble } from "./testimonial-bubble";
 import { Login } from "@/components/nostr/login";
 import { CHACHI_PUBKEY, CHACHI_RELAYS } from "@/constants";
 import {
@@ -11,7 +11,7 @@ import {
   Code,
   WandSparkles,
   MessageCircle,
-  CloudUpload,
+  Drum,
   DatabaseZap,
   HandCoins,
 } from "lucide-react";
@@ -106,6 +106,15 @@ const testimonials = [
     content: "Chachi is great, don't get discouraged",
     sig: "449900d5c169cc2a3a3ebe10c22adec603035fac5318e632d87038bec0e1245bcd8bc25881370d107fd9b1e739c3f633a774663f10df4fb339ec05a9fd9d223b",
   },
+  {
+    id: "9cfc54aee4f5dc447a580c3fded115d95f2a28f94927178e0be51549a8d7e81c",
+    pubkey: "3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d",
+    created_at: 1750852951,
+    kind: 1,
+    tags: [],
+    content: "https://chachi.chat/",
+    sig: "967bb58333b8e5fe90fc89ea2535e0f47c7ce1ad0395676cffb5cc3cdfd5b16583e34e953e4c8debfaf44e852a14967c8c0d872765ce2d8846f6e999c5f9cde9",
+  },
 ];
 
 function Testimonials() {
@@ -113,9 +122,9 @@ function Testimonials() {
   return (
     <div className="flex flex-col gap-12 w-full px-4 bg-accent/30 py-12 flex items-center justify-center">
       <div className="flex flex-col items-center gap-2">
-        <div className="flex flex-row items-end gap-3 mb-2">
+        <div className="flex flex-col md:flex-row items-center md:items-end gap-2 md:gap-3 mb-2">
           <MessageCircleHeart className="size-10 text-muted-foreground" />
-          <h2 className="text-5xl font-semibold leading-none">
+          <h2 className="text-5xl font-semibold leading-none text-center md:text-left">
             {t("landing.testimonials")}
           </h2>
         </div>
@@ -125,12 +134,11 @@ function Testimonials() {
       </div>
       <div className="flex items-center justify-center w-full max-w-xl">
         <div className="flex flex-col gap-6 items-center justify-center">
-          {testimonials.map((testimonial) => (
-            <ChatBubble
+          {testimonials.map((testimonial, index) => (
+            <TestimonialBubble
               key={testimonial.id}
               event={testimonial}
-              showReply={false}
-              showReactions={false}
+              avatarSide={index % 2 === 0 ? "left" : "right"}
             />
           ))}
         </div>
@@ -146,9 +154,9 @@ function SourceCode() {
   return (
     <div className="flex flex-col items-center justify-center my-8 gap-8 my-12 px-8 w-full">
       <div className="flex flex-col items-center gap-2 max-w-xl">
-        <div className="flex flex-row items-end gap-3 mb-2">
+        <div className="flex flex-col md:flex-row items-center md:items-end gap-2 md:gap-3 mb-2">
           <Code className="size-10 text-muted-foreground" />
-          <h2 className="text-5xl font-semibold leading-none">
+          <h2 className="text-5xl font-semibold leading-none text-center md:text-left">
             {t("landing.source-code")}
           </h2>
         </div>
@@ -200,10 +208,10 @@ function Features() {
       icon: <HandCoins className="size-6 text-muted-foreground" />,
     },
     {
-      key: "files",
-      title: t("landing.features.files"),
-      description: t("landing.features.files-desc"),
-      icon: <CloudUpload className="size-6 text-muted-foreground" />,
+      key: "content",
+      title: t("landing.features.content-types"),
+      description: t("landing.features.content-types-desc"),
+      icon: <Drum className="size-6 text-muted-foreground" />,
     },
     {
       key: "selfhost",
@@ -215,9 +223,9 @@ function Features() {
   return (
     <div className="flex flex-col items-center justify-center gap-8 py-12 px-8 w-full bg-accent/10">
       <div className="flex flex-col items-center gap-2">
-        <div className="flex flex-row items-end gap-3 mb-2">
+        <div className="flex flex-col md:flex-row items-center md:items-end gap-2 md:gap-3 mb-2">
           <WandSparkles className="size-10 text-muted-foreground" />
-          <h2 className="text-5xl font-semibold leading-none">
+          <h2 className="text-5xl font-semibold leading-none text-center md:text-left">
             {t("landing.features.title")}
           </h2>
         </div>

@@ -2,22 +2,22 @@ import { lazy, Suspense } from "react";
 import { Loading } from "@/components/loading";
 import type { UploadedBlob } from "@/lib/media";
 
-const UploadImage = lazy(() => 
-  import("@/components/upload-image").then(module => ({
-    default: module.UploadImage
-  }))
+const UploadImage = lazy(() =>
+  import("@/components/upload-image").then((module) => ({
+    default: module.UploadImage,
+  })),
 );
 
-const UploadVideo = lazy(() => 
-  import("@/components/upload-video").then(module => ({
-    default: module.UploadVideo
-  }))
+const UploadVideo = lazy(() =>
+  import("@/components/upload-video").then((module) => ({
+    default: module.UploadVideo,
+  })),
 );
 
-const UploadFile = lazy(() => 
-  import("@/components/upload-file").then(module => ({
-    default: module.UploadFile
-  }))
+const UploadFile = lazy(() =>
+  import("@/components/upload-file").then((module) => ({
+    default: module.UploadFile,
+  })),
 );
 
 interface LazyUploadImageProps {

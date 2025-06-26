@@ -7,7 +7,7 @@ import { Avatar as NostrAvatar } from "@/components/nostr/avatar";
 import { useSortedGroups } from "@/lib/messages";
 import { useTranslation } from "react-i18next";
 import { groupId } from "@/lib/groups";
-import { RichText } from "@/components/rich-text";
+import { LazyRichText } from "@/components/lazy/LazyRichText";
 import { Name } from "@/components/nostr/name";
 import { CreateGroup } from "@/components/nostr/groups/create";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -43,13 +43,13 @@ interface MessageEvent {
 
 function PaymentPreview({ group, zap }: { group: Group; zap: Zap | Nutzap }) {
   return (
-    <div className="flex flex-row items-start gap-1 text-xs line-clamp-1 text-muted-foreground">
+    <div className="flex flex-row items-baseline gap-1 text-xs line-clamp-1 text-muted-foreground">
       <span className="font-semibold">
         <Name pubkey={zap.pubkey} short />
       </span>
       {zap.content ? (
         <>
-          <RichText
+          <LazyRichText
             group={group}
             className="leading-none line-clamp-1"
             options={{
@@ -75,7 +75,7 @@ function PaymentPreview({ group, zap }: { group: Group; zap: Zap | Nutzap }) {
             tags={zap.tags}
           >
             {zap.content}
-          </RichText>
+          </LazyRichText>
         </>
       ) : (
         <div className="flex flex-row items-center gap-1">
@@ -124,7 +124,7 @@ const LastMessagePreview = ({
     const pubkey =
       lastMessage.tags.find((t) => t[0] === "p")?.[1] || lastMessage.pubkey;
     return (
-      <div className="flex flex-row items-start text-xs line-clamp-1 gap-1 text-muted-foreground italic">
+      <div className="flex flex-row items-baseline text-xs line-clamp-1 gap-1 text-muted-foreground italic">
         <span className="font-semibold">
           <Name pubkey={pubkey} short />
         </span>
@@ -139,7 +139,7 @@ const LastMessagePreview = ({
     const pubkey =
       lastMessage.tags.find((t) => t[0] === "p")?.[1] || lastMessage.pubkey;
     return (
-      <div className="flex flex-row items-start text-xs line-clamp-1 gap-1 text-muted-foreground italic">
+      <div className="flex flex-row items-baseline text-xs line-clamp-1 gap-1 text-muted-foreground italic">
         <span className="font-semibold">
           <Name pubkey={pubkey} short />
         </span>
@@ -161,12 +161,12 @@ const LastMessagePreview = ({
   // todo: relationship
 
   return (
-    <div className="flex flex-row items-start text-xs line-clamp-1 text-muted-foreground">
+    <div className="flex flex-row items-baseline text-xs line-clamp-1 text-muted-foreground">
       <span className="font-semibold">
         <Name pubkey={lastMessage.pubkey} short />
       </span>
       <span className="mr-1">:</span>
-      <RichText
+      <LazyRichText
         group={group}
         className="leading-none line-clamp-1"
         options={{
@@ -192,7 +192,7 @@ const LastMessagePreview = ({
         tags={lastMessage.tags}
       >
         {lastMessage.content}
-      </RichText>
+      </LazyRichText>
     </div>
   );
 };

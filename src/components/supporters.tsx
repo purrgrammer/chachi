@@ -19,9 +19,9 @@ export default function Supporters({
   return (
     <div className="flex flex-col items-center justify-center gap-8 py-12 px-8 w-full bg-accent/40">
       <div className="flex flex-col items-center gap-2">
-        <div className="flex flex-row items-end gap-3 mb-2">
+        <div className="flex flex-col md:flex-row items-center md:items-end gap-2 md:gap-3 mb-2">
           <HandHeart className="size-10 text-muted-foreground" />
-          <h2 className="text-5xl font-semibold leading-none">
+          <h2 className="text-5xl font-semibold leading-none text-center md:text-left">
             {t("landing.supporters")}
           </h2>
         </div>
