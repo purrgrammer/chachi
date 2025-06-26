@@ -573,17 +573,12 @@ export function ConnectWallet() {
       });
       setWallets((ws) => [...ws, { type: "nwc", connection: connectString }]);
       setNDKWallets((ws) => [...ws, nwc]);
-      nwc.on(
-        "ready",
-        once(() => {
-          setIsConnecting(false);
-          setIsOpen(false);
-          toast.success(t("wallet.dialog.nwc-connected"));
-        }),
-      );
+      setIsOpen(false);
+      toast.success(t("wallet.dialog.nwc-connected"));
     } catch (e) {
       console.error(e);
       toast.error(t("wallet.dialog.nwc-error"));
+      setIsConnecting(false);
     }
   }
 
@@ -605,6 +600,7 @@ export function ConnectWallet() {
 
         <div className="flex flex-col gap-2">
           <Input
+            type="password"
             disabled={isConnecting || isLoadingWebln}
             placeholder="nostr+walletconnect://"
             value={connectString}
