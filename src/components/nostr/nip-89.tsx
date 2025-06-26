@@ -95,7 +95,7 @@ export function AppDefinition({ event }: { event: NostrEvent }) {
           <img
             src={banner}
             alt={`${appName} banner`}
-            className="w-full min-h-42 max-h-96 aspect-image object-cover rounded-t-lg"
+            className="w-full aspect-auto max-h-[210px] object-cover"
             onLoad={() => setBannerLoaded(true)}
           />
         )}
