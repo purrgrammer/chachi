@@ -112,7 +112,7 @@ export default function Amount({
   };
 
   return (
-    <div className={cn("flex flex-row items-center gap-0", className)}>
+    <div className={cn("flex flex-row items-center gap-0.5", className)}>
       {getCurrencyIcon()}
       <span className={cn("font-mono", text)}>
         {mode === "short" ? formatShortNumber(amount) : amount}

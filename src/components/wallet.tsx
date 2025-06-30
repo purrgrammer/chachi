@@ -2430,14 +2430,16 @@ function Balance({
   unit = "sat",
   classNames,
   short = true,
+  size = "sm",
 }: {
   amount?: number;
   unit?: Unit;
   classNames?: BalanceClassnames;
   short?: boolean;
+  size?: "wallet-balance" | "sm";
 }) {
   if (amount === undefined) {
-    return <span className={cn("text-sm font-mono", classNames?.text)}>-</span>;
+    return <span className={cn("font-mono", classNames?.text)}>-</span>;
   }
 
   // For non-short display, we need to handle the formatting differently
@@ -2449,7 +2451,7 @@ function Balance({
           currency={
             unit.startsWith("msat") || unit.startsWith("sat") ? "sat" : unit
           }
-          size="sm"
+          size={size}
           showIcon={true}
           mode="long"
           className={classNames?.icon}
@@ -2457,27 +2459,17 @@ function Balance({
       </div>
     );
   }
-
-  return (
-    <Amount
-      amount={amount}
-      currency={unit}
-      size="sm"
-      className={
-        classNames?.text
-          ? cn("gap-0.5", { [`[&>span]:${classNames.text}`]: classNames.text })
-          : "gap-0.5"
-      }
-    />
-  );
+  return <Amount amount={amount} currency={unit} size={size} />;
 }
 
 function WebLNWalletBalance({
   wallet,
   short,
+  size = "sm",
 }: {
   wallet: NDKWebLNWallet;
   short?: boolean;
+  size?: "wallet-balance" | "sm";
 }) {
   const { data: balance } = useWebLNBalance(wallet);
   const { data: info } = useWebLNInfo(wallet);
@@ -2489,7 +2481,7 @@ function WebLNWalletBalance({
           {info?.node?.alias ? info.node.alias : "WebLN"}
         </span>
       </div>
-      <Balance short={short} amount={balance} unit="sat" />
+      <Balance short={short} amount={balance} unit="sat" size={size} />
     </div>
   );
 }
@@ -2515,21 +2507,32 @@ export function NWCWalletBalanceAmount({
   wallet,
   classNames,
   short,
+  size = "sm",
 }: {
   wallet: NDKNWCWallet;
   classNames?: BalanceClassnames;
   short?: boolean;
+  size?: "wallet-balance" | "sm";
 }) {
   const { data: amount } = useNWCBalance(wallet);
-  return <Balance short={short} amount={amount} classNames={classNames} />;
+  return (
+    <Balance
+      short={short}
+      amount={amount}
+      classNames={classNames}
+      size={size}
+    />
+  );
 }
 
 function NWCWalletBalance({
   wallet,
   short,
+  size,
 }: {
   wallet: NDKNWCWallet;
   short?: boolean;
+  size?: "wallet-balance" | "sm";
 }) {
   return (
     <div className="flex flex-row gap-6 w-full items-center justify-between">
@@ -2537,7 +2540,7 @@ function NWCWalletBalance({
         <PlugZap className="size-4 text-muted-foreground" />
         <NWCWalletName wallet={wallet} />
       </div>
-      <NWCWalletBalanceAmount wallet={wallet} short={short} />
+      <NWCWalletBalanceAmount wallet={wallet} short={short} size={size} />
     </div>
   );
 }
@@ -2546,10 +2549,12 @@ export function CashuWalletBalanceAmount({
   wallet,
   classNames,
   short,
+  size,
 }: {
   wallet: NDKCashuWallet;
   classNames?: BalanceClassnames;
   short?: boolean;
+  size?: "wallet-balance" | "sm";
 }) {
   const balance = useCashuBalance(wallet);
   return (
@@ -2559,6 +2564,7 @@ export function CashuWalletBalanceAmount({
       amount={balance}
       unit="sat"
       classNames={classNames}
+      size={size}
     />
   );
 }
@@ -2567,10 +2573,12 @@ export function WebLNWalletBalanceAmount({
   wallet,
   classNames,
   short,
+  size,
 }: {
   wallet: NDKWebLNWallet;
   classNames?: BalanceClassnames;
   short?: boolean;
+  size?: "wallet-balance" | "sm";
 }) {
   const { data: balance } = useWebLNBalance(wallet);
   return (
@@ -2579,6 +2587,7 @@ export function WebLNWalletBalanceAmount({
       amount={balance}
       unit="sat"
       classNames={classNames}
+      size={size}
     />
   );
 }
@@ -2600,9 +2609,11 @@ function CashuWalletName({ wallet }: { wallet: NDKCashuWallet }) {
 function CashuWalletBalance({
   wallet,
   short,
+  size = "sm",
 }: {
   wallet: NDKCashuWallet;
   short?: boolean;
+  size?: "wallet-balance" | "sm";
 }) {
   const balance = useCashuBalance(wallet);
   return (
@@ -2611,7 +2622,7 @@ function CashuWalletBalance({
         <WalletIcon className="size-4 text-muted-foreground" />
         <CashuWalletName wallet={wallet} />
       </div>
-      <Balance short={short} amount={balance} unit="sat" />
+      <Balance short={short} amount={balance} unit="sat" size={size} />
     </div>
   );
 }
@@ -2619,16 +2630,18 @@ function CashuWalletBalance({
 export function WalletBalance({
   wallet,
   short,
+  size = "wallet-balance",
 }: {
   wallet: NDKWallet;
   short?: boolean;
+  size?: "wallet-balance" | "sm";
 }) {
   if (wallet instanceof NDKCashuWallet) {
-    return <CashuWalletBalance wallet={wallet} short={short} />;
+    return <CashuWalletBalance wallet={wallet} short={short} size={size} />;
   } else if (wallet instanceof NDKWebLNWallet) {
-    return <WebLNWalletBalance wallet={wallet} short={short} />;
+    return <WebLNWalletBalance wallet={wallet} short={short} size={size} />;
   } else if (wallet instanceof NDKNWCWallet) {
-    return <NWCWalletBalance wallet={wallet} short={short} />;
+    return <NWCWalletBalance wallet={wallet} short={short} size={size} />;
   } else {
     return null;
   }

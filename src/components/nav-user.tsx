@@ -129,7 +129,7 @@ export function NavUser() {
                   <>
                     {wallets.map((wallet) => (
                       <DropdownMenuItem onClick={() => openWallet(wallet)}>
-                        <WalletBalance wallet={wallet} />
+                        <WalletBalance wallet={wallet} size="sm" />
                       </DropdownMenuItem>
                     ))}
                   </>

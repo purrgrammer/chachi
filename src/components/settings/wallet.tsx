@@ -196,18 +196,18 @@ function WalletSummary({
               {wallet.type === "nwc" && wallet instanceof NDKNWCWallet ? (
                 <NWCWalletBalanceAmount
                   wallet={wallet}
-                  classNames={{ icon: "size-12", text: "text-6xl font-light" }}
+		  size="wallet-balance"
                 />
               ) : wallet.type === "nip-60" &&
                 wallet instanceof NDKCashuWallet ? (
                 <CashuWalletBalanceAmount
                   wallet={wallet}
-                  classNames={{ icon: "size-12", text: "text-6xl font-light" }}
+		  size="wallet-balance"
                 />
               ) : wallet instanceof NDKWebLNWallet ? (
                 <WebLNWalletBalanceAmount
                   wallet={wallet}
-                  classNames={{ icon: "size-12", text: "text-6xl font-light" }}
+		  size="wallet-balance"
                 />
               ) : null}
             </div>
