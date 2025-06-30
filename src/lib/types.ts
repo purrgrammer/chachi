@@ -116,3 +116,5 @@ export interface Event {
   pubkey: string;
   tags: string[][];
 }
+
+export type Currency = "sat" | "USD" | "EUR" | string;

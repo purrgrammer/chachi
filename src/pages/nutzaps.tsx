@@ -1,11 +1,6 @@
 import { useMemo } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  Zap as ZapIcon,
-  Bitcoin,
-  ArrowDownRight,
-  ArrowUpRight,
-} from "lucide-react";
+import { Zap as ZapIcon, ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { E, A } from "@/components/nostr/event";
@@ -18,8 +13,8 @@ import {
 } from "@/components/rich-text";
 import { Emoji } from "@/components/emoji";
 import { User } from "@/components/nostr/user";
-import { formatShortNumber } from "@/lib/number";
 import { validateZap } from "@/lib/nip-57";
+import Amount from "@/components/amount";
 import type { Zap as ZapType } from "@/lib/nip-57";
 import { validateNutzap } from "@/lib/nip-61";
 import type { Nutzap as NutzapType } from "@/lib/nip-61";
@@ -174,12 +169,11 @@ function ZapItem({
                 }}
               />
               <div className="flex flex-col gap-0">
-                <div className="flex flex-row items-center gap-0">
-                  <Bitcoin className="size-6 text-muted-foreground" />
-                  <span className="text-2xl font-mono">
-                    {formatShortNumber(event.zap.amount)}
-                  </span>
-                </div>
+                <Amount
+                  amount={event.zap.amount}
+                  currency="sat"
+                  size="lg-compact"
+                />
               </div>
             </div>
           </div>

@@ -1,8 +1,7 @@
 import { validateNutzap, Nutzap as NutzapType } from "@/lib/nip-61";
-import { Bitcoin, Euro, DollarSign, Banknote } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { E, A } from "@/components/nostr/event";
-import { formatShortNumber } from "@/lib/number";
+import Amount from "@/components/amount";
 import { Emoji } from "@/components/emoji";
 import {
   useRichText,
@@ -155,22 +154,7 @@ export function Nutzap({
             classNames={{ name: "hidden sm:block", avatar: "size-4" }}
           />
         ) : null}
-        <div className="flex items-center">
-          <span className="text-muted-foreground">
-            {zap.unit === "sat" ? (
-              <Bitcoin className="size-5" />
-            ) : zap.unit === "eur" ? (
-              <Euro className="size-5" />
-            ) : zap.unit === "usd" ? (
-              <DollarSign className="size-5" />
-            ) : (
-              <Banknote className="size-5" />
-            )}
-          </span>
-          <span className="font-mono text-lg">
-            {formatShortNumber(zap.amount)}
-          </span>
-        </div>
+        <Amount amount={zap.amount} currency={zap.unit} size="md" />
         {showTarget && zap.p ? (
           <User
             pubkey={zap.p}

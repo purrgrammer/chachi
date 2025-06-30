@@ -1,26 +1,16 @@
 import { Link } from "react-router-dom";
-import { Goal, Link as LinkIcon, Bitcoin } from "lucide-react";
+import { Goal, Link as LinkIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { NostrEvent } from "nostr-tools";
 import { Progress } from "@/components/ui/progress";
 import { RichText } from "@/components/rich-text";
-import { formatShortNumber } from "@/lib/number";
 import { formatDateTime } from "@/lib/time";
+import Amount from "@/components/amount";
 import { validateZap } from "@/lib/nip-57";
 import { validateNutzap } from "@/lib/nip-61";
 import type { Group } from "@/lib/types";
 import { useReactions } from "@/lib/nostr";
 import { NDKKind } from "@nostr-dev-kit/ndk";
-
-//function zapLeaderboard(zaps: Zap[]): { pubkey: string; amount: number }[] {
-//  const contributions = zaps.reduce((acc, z) => {
-//    const n = acc[z.pubkey] || 0;
-//    return { ...acc, [z.pubkey]: n + z.amount };
-//  }, {});
-//  return Object.entries(contributions)
-//    .map(([pubkey, amount]) => ({ pubkey, amount }))
-//    .sort((a, b) => b.amount - a.amount);
-//}
 
 export function ZapGoal({
   event,
@@ -56,10 +46,7 @@ export function ZapGoal({
         <h3 className="text-lg font-semibold line-clamp-1">{title}</h3>
         <div className="flex flex-row gap-1 items-center">
           <Goal className="size-5 text-muted-foreground" />
-          <div className="flex flex-row items-center">
-            <span className="text-sm">{formatShortNumber(totalGoal)}</span>
-            <Bitcoin className="size-4 text-muted-foreground" />
-          </div>
+          <Amount amount={totalGoal} currency="sat" size="sm" />
         </div>
       </div>
       {description ? (
@@ -107,31 +94,6 @@ export function ZapGoal({
           </div>
         ) : null}
       </div>
-      {/*
-      <div className="flex flex-col gap-1.5 py-2 px-3">
-      <div className="flex flex-row gap-1 items-center">
-      <Medal className="size-3 text-muted-foreground" />
-      <h4 className="text-xs uppercase font-light text-muted-foreground">{t("goal.leaderboard")}</h4>
-      </div>
-      {leaderboard.slice(0, 3).map(({ pubkey, amount }, idx) => (
-        <div className="flex flex-row justify-between" key={pubkey}>
-          <div className="flex flex-row items-center gap-2">
-            <Trophy className={`size-5 ${idx === 0 ? 'text-yellow-500' : idx === 1 ? 'text-gray-500' : 'text-yellow-800'}`} />
-            <User
-              pubkey={pubkey}
-              classNames={{ avatar: "size-6", name: "text-lg" }}
-            />
-          </div>
-          <div className="flex flex-row items-center gap-2">
-            <span className="text-lg font-mono">
-              {formatShortNumber(amount)}
-            </span>
-            <Bitcoin className="size-5 text-muted-foreground" />
-          </div>
-        </div>
-      ))}
-      </div>
-      */}
     </div>
   );
 }

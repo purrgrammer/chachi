@@ -16,8 +16,6 @@ import {
   Reply as ReplyIcon,
   SmilePlus,
   Bitcoin,
-  Euro,
-  DollarSign,
   Copy,
   ShieldBan,
   Trash,
@@ -34,6 +32,7 @@ import { useSettings } from "@/lib/settings";
 import { formatShortNumber } from "@/lib/number";
 import { Badge } from "@/components/ui/badge";
 import { Name } from "@/components/nostr/name";
+import Amount from "@/components/amount";
 import { useCommunity, useGroupParticipants } from "@/lib/nostr/groups";
 import { Zap } from "@/components/nostr/zap";
 import { validateZap } from "@/lib/nip-57";
@@ -547,18 +546,11 @@ function ChatNutzap({
                   ) : null}
                   {isShownInline ? (
                     <div className="flex flex-row items-center gap-3">
-                      <div className="flex flex-row items-center gap-0">
-                        {unit === "eur" ? (
-                          <Euro className="size-5 text-muted-foreground" />
-                        ) : unit === "usd" ? (
-                          <DollarSign className="size-5 text-muted-foreground" />
-                        ) : (
-                          <Bitcoin className="size-5 text-muted-foreground" />
-                        )}
-                        <span className="font-mono text-lg">
-                          {formatShortNumber(Number(amount))}
-                        </span>
-                      </div>
+                      <Amount
+                        amount={Number(amount)}
+                        currency={unit}
+                        size="md"
+                      />
                       <User pubkey={target} classNames={{ avatar: "size-7" }} />
                     </div>
                   ) : (

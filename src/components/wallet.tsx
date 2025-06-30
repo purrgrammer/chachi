@@ -25,8 +25,6 @@ import {
   Landmark,
   Server,
   Bitcoin,
-  Euro,
-  DollarSign,
   Banknote,
   ArrowDownRight,
   ArrowUpRight,
@@ -56,7 +54,7 @@ import { Label } from "@/components/ui/label";
 import { Invoice } from "@/components/ln";
 import { useNDK, useNWCNDK } from "@/lib/ndk";
 import { useRelays, useEvent, useProfile } from "@/lib/nostr";
-import { formatShortNumber } from "@/lib/number";
+import Amount from "@/components/amount";
 import {
   useLnurl,
   fetchInvoice,
@@ -753,37 +751,13 @@ function Tx({ tx }: { tx: Transaction }) {
           ) : null}
         </div>
         <div className="flex flex-col gap-0 items-end">
-          <div className="flex flex-row gap-0.5 items-center">
-            {tx.unit === "msat" || tx.unit === "sat" ? (
-              <Bitcoin className="size-6 text-muted-foreground" />
-            ) : tx.unit === "eur" ? (
-              <Euro className="size-6 text-muted-foreground" />
-            ) : tx.unit === "usd" ? (
-              <DollarSign className="size-6 text-muted-foreground" />
-            ) : (
-              <Banknote className="size-6 text-muted-foreground" />
-            )}
-            <span className="font-mono text-3xl">
-              {formatShortNumber(amount)}
-            </span>
-          </div>
+          <Amount amount={amount} currency={tx.unit} size="wallet-display" />
           {fee ? (
             <div className="flex flex-row items-center gap-0.5">
               <span className="font-mono text-xs text-muted-foreground">
                 {t("ecash.fee")}
               </span>
-              {tx.unit === "msat" || tx.unit === "sat" ? (
-                <Bitcoin className="size-3 text-muted-foreground" />
-              ) : tx.unit === "eur" ? (
-                <Euro className="size-3 text-muted-foreground" />
-              ) : tx.unit === "usd" ? (
-                <DollarSign className="size-3 text-muted-foreground" />
-              ) : (
-                <Banknote className="size-3 text-muted-foreground" />
-              )}
-              <span className="font-mono text-xs">
-                {formatShortNumber(fee)}
-              </span>
+              <Amount amount={fee} currency={tx.unit} size="xs" />
             </div>
           ) : null}
         </div>
@@ -838,10 +812,7 @@ function Proof({ info }: { info: ProofInfo }) {
           url={info.mint}
           classNames={{ icon: "size-8", name: "text-md" }}
         />
-        <div className="flex flex-row gap-0.5 items-center">
-          <Bitcoin className="size-6 text-muted-foreground" />
-          <span className="text-2xl font-mono">{info.proof.amount}</span>
-        </div>
+        <Amount amount={info.proof.amount} currency="sat" size="lg-compact" />
       </div>
     </div>
   );
@@ -1951,6 +1922,7 @@ function AmountInput({
   setAmount: (amount: string) => void;
   max?: number;
 }) {
+  // todo: multi-currency, use users preferred unit
   return (
     <div className="flex flex-row gap-4 items-center mx-2">
       <Bitcoin className="size-14 text-muted-foreground" />
@@ -2214,10 +2186,12 @@ function CashuWallet({ wallet }: { wallet: NDKCashuWallet }) {
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-3">
         <div className="w-full flex items-center justify-center">
-          <div className="flex flex-row gap-0 items-center">
-            <Bitcoin className="size-12 text-muted-foreground" />
-            <span className="text-6xl font-mono">{balance}</span>
-          </div>
+          <Amount
+            amount={balance || 0}
+            currency="sat"
+            mode="long"
+            size="wallet-balance"
+          />
         </div>
         <WalletActions
           wallet={wallet}
@@ -2294,10 +2268,12 @@ function WebLNWallet({ wallet }: { wallet: NDKWebLNWallet }) {
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-3">
         <div className="w-full flex items-center justify-center">
-          <div className="flex flex-row gap-0 items-center">
-            <Bitcoin className="size-12 text-muted-foreground" />
-            <span className="text-6xl font-mono">{balance}</span>
-          </div>
+          <Amount
+            amount={balance || 0}
+            currency="sat"
+            mode="long"
+            size="wallet-balance"
+          />
         </div>
         <WalletActions
           wallet={wallet}
@@ -2377,12 +2353,24 @@ function NWCWallet({ wallet }: { wallet: NDKNWCWallet }) {
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-3">
         <div className="w-full flex items-center justify-center">
-          <div className="flex flex-row gap-0 items-center">
-            <Bitcoin className="size-12 text-muted-foreground" />
-            <span className="text-6xl font-mono">
-              {typeof amount === "number" ? amount : "-"}
-            </span>
-          </div>
+          {typeof amount === "number" ? (
+            <Amount
+              amount={amount}
+              currency="sat"
+              mode="long"
+              size="wallet-balance"
+            />
+          ) : (
+            <div className="flex flex-row gap-0 items-center">
+              <Amount
+                amount={0}
+                currency="sat"
+                size="wallet-balance"
+                showIcon={true}
+              />
+              <span className="text-6xl font-mono">-</span>
+            </div>
+          )}
         </div>
         <WalletActions
           wallet={wallet}
@@ -2448,29 +2436,39 @@ function Balance({
   classNames?: BalanceClassnames;
   short?: boolean;
 }) {
+  if (amount === undefined) {
+    return <span className={cn("text-sm font-mono", classNames?.text)}>-</span>;
+  }
+
+  // For non-short display, we need to handle the formatting differently
+  if (!short) {
+    return (
+      <div className="flex flex-row gap-0.5 items-center">
+        <Amount
+          amount={amount}
+          currency={
+            unit.startsWith("msat") || unit.startsWith("sat") ? "sat" : unit
+          }
+          size="sm"
+          showIcon={true}
+          mode="long"
+          className={classNames?.icon}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-row gap-0.5 items-center">
-      {unit.startsWith("msat") || unit.startsWith("sat") ? (
-        <Bitcoin
-          className={cn("size-4 text-muted-foreground", classNames?.icon)}
-        />
-      ) : unit === "eur" ? (
-        <Euro
-          className={cn("size-4 text-muted-foreground", classNames?.icon)}
-        />
-      ) : unit === "usd" ? (
-        <DollarSign
-          className={cn("size-4 text-muted-foreground", classNames?.icon)}
-        />
-      ) : (
-        <Banknote
-          className={cn("size-4 text-muted-foreground", classNames?.icon)}
-        />
-      )}
-      <span className={cn("text-sm font-mono", classNames?.text)}>
-        {amount ? (short ? formatShortNumber(amount) : amount) : "-"}
-      </span>
-    </div>
+    <Amount
+      amount={amount}
+      currency={unit}
+      size="sm"
+      className={
+        classNames?.text
+          ? cn("gap-0.5", { [`[&>span]:${classNames.text}`]: classNames.text })
+          : "gap-0.5"
+      }
+    />
   );
 }
 

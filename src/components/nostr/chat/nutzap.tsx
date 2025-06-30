@@ -9,8 +9,6 @@ import {
   ShieldBan,
   Bitcoin,
   Coins,
-  DollarSign,
-  Euro,
   Check,
   X,
   HandCoins,
@@ -37,6 +35,7 @@ import { useCashuWallet } from "@/lib/wallet";
 import { useNutzapStatus, saveNutzap } from "@/lib/nutzaps";
 import { formatShortNumber } from "@/lib/number";
 import { NewZapDialog } from "@/components/nostr/zap";
+import Amount from "@/components/amount";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -237,16 +236,11 @@ export function ChatNutzap({
                   {isShownInline ? (
                     <>
                       <div className="flex flex-row items-center gap-0">
-                        {unit === "eur" ? (
-                          <Euro className="size-5 text-muted-foreground" />
-                        ) : unit === "usd" ? (
-                          <DollarSign className="size-5 text-muted-foreground" />
-                        ) : (
-                          <Bitcoin className="size-5 text-muted-foreground" />
-                        )}
-                        <span className="font-mono text-lg">
-                          {formatShortNumber(Number(amount))}
-                        </span>
+                        <Amount
+                          amount={Number(amount)}
+                          currency={unit}
+                          size="md"
+                        />
                       </div>
                       <User pubkey={target} classNames={{ avatar: "size-7" }} />
                     </>

@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { Bitcoin } from "lucide-react";
 import { NDKRelaySet, NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { Avatar } from "@/components/nostr/avatar";
 import { RichText } from "@/components/rich-text";
 import { Button } from "@/components/ui/button";
 import { useReactions } from "@/lib/nostr";
-import { formatShortNumber } from "@/lib/number";
 import { useNDK } from "@/lib/ndk";
 import { usePubkey } from "@/lib/account";
 import {
@@ -21,6 +19,7 @@ import { CUSTOM_EMOJI_CONTENT_REGEX } from "@/lib/emoji";
 import { HUGE_AMOUNT } from "@/lib/zap";
 import { useMintList } from "@/lib/cashu";
 import { useTranslation } from "react-i18next";
+import Amount from "@/components/amount";
 
 function Reacters({
   reactions,
@@ -194,12 +193,7 @@ function NutzapReaction({ nutzap }: { nutzap: Nutzap }) {
             </TooltipContent>
           </Tooltip>
         ) : null}
-        <div className="flex flex-row items-center gap-0.5">
-          <Bitcoin className="size-4 text-muted-foreground" />
-          <span className="text-sm font-mono">
-            {formatShortNumber(nutzap.amount)}
-          </span>
-        </div>
+        <Amount amount={nutzap.amount} size="sm" />
         <Avatar pubkey={nutzap.pubkey} className="size-4" />
       </div>
     </div>
@@ -250,12 +244,7 @@ function ZapReaction({ zap }: { zap: Zap }) {
             </TooltipContent>
           </Tooltip>
         ) : null}
-        <div className="flex flex-row items-center gap-0.5">
-          <Bitcoin className="size-4 text-muted-foreground" />
-          <span className="text-sm font-mono">
-            {formatShortNumber(zap.amount)}
-          </span>
-        </div>
+        <Amount amount={zap.amount} size="sm" />
         <Avatar pubkey={zap.pubkey} className="size-4" />
       </div>
     </div>

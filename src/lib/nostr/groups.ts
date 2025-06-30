@@ -207,7 +207,7 @@ export function useGroup(group?: Group) {
   const ndk = useNDK();
   return useQuery({
     enabled: Boolean(group),
-    queryKey: [GROUP_METADATA, group ? groupId(group) : 'undefined'],
+    queryKey: [GROUP_METADATA, group ? groupId(group) : "undefined"],
     queryFn: async () => {
       if (!group) throw new Error("Group not found");
       const cached = await getGroupInfo(group);
@@ -460,10 +460,10 @@ export function useEditGroup() {
     }
 
     await edit.publish(relaySet);
-    
+
     // Store the updated group info in the database
     await saveGroupInfo({ id, relay }, metadata);
-    
+
     queryClient.invalidateQueries({ queryKey: [GROUP_METADATA, id, relay] });
   };
 }

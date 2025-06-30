@@ -2,14 +2,8 @@ import { useState, useMemo } from "react";
 import { decode } from "light-bolt11-decoder";
 import { QRCodeSVG } from "qrcode.react";
 import { useTranslation } from "react-i18next";
-import {
-  Eye,
-  EyeClosed,
-  HandCoins,
-  Coins,
-  Bitcoin,
-  ReceiptText,
-} from "lucide-react";
+import { Eye, EyeClosed, HandCoins, Coins, ReceiptText } from "lucide-react";
+import Amount from "@/components/amount";
 import { InputCopy } from "@/components/ui/input-copy";
 import { NewZapDialog } from "@/components/nostr/zap";
 import { toast } from "sonner";
@@ -61,12 +55,12 @@ export function Invoice({
                   {t("zap.dialog.amount")}
                 </h3>
               </div>
-              <div className="flex flex-row items-center gap-0">
-                <Bitcoin className="size-8 text-muted-foreground" />
-                <span className="font-mono text-4xl">
-                  {Number(amount) / 1000}
-                </span>
-              </div>
+              <Amount
+                amount={Number(amount) / 1000}
+                currency="sat"
+                size="xl"
+                className="text-4xl"
+              />
             </div>
           ) : null}
           <div className="flex w-full flex-row gap-10 justify-between">

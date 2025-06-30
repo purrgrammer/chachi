@@ -28,7 +28,7 @@ import { NDKKind } from "@nostr-dev-kit/ndk";
 import { validateZap, Zap } from "@/lib/nip-57";
 import { validateNutzap, Nutzap } from "@/lib/nip-61";
 import { useMemo } from "react";
-import { Bitcoin } from "lucide-react";
+import Amount from "@/components/amount";
 import { privateMessagesEnabledAtom } from "@/app/store";
 
 interface MessageEvent {
@@ -79,10 +79,7 @@ function PaymentPreview({ group, zap }: { group: Group; zap: Zap | Nutzap }) {
         </>
       ) : (
         <div className="flex flex-row items-center gap-1">
-          <div className="flex flex-row items-center gap-0">
-            <Bitcoin className="size-4" />
-            <span className="font-mono">{zap.amount}</span>
-          </div>
+          <Amount amount={zap.amount} size="sm" />
           <span className="font-semibold">
             <Name pubkey={zap.p!} short />
           </span>

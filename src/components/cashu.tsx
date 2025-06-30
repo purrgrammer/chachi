@@ -4,9 +4,6 @@ import {
   Copy,
   Check,
   HandCoins,
-  Bitcoin,
-  Euro,
-  DollarSign,
   RotateCw,
   ReceiptText,
   Banknote,
@@ -17,8 +14,8 @@ import { Token, getDecodedToken, PaymentRequest } from "@cashu/cashu-ts";
 import { User } from "@/components/nostr/user";
 import { Button } from "@/components/ui/button";
 import { usePubkey } from "@/lib/account";
-import { formatShortNumber } from "@/lib/number";
 import { cn } from "@/lib/utils";
+import Amount from "@/components/amount";
 import { HUGE_AMOUNT } from "@/lib/zap";
 import { useCopy } from "@/lib/hooks";
 import { useCashuWallet, useNDKWallet } from "@/lib/wallet";
@@ -117,7 +114,6 @@ export function CashuToken({
   const unit = ecash?.unit ?? "sat";
   const sum = ecash?.proofs.reduce((acc, t) => acc + t.amount, 0) ?? 0;
   const total = unit === "msat" ? sum / 1000 : sum;
-  const unitClassname = "size-5 text-muted-foreground";
 
   useEffect(() => {
     try {
@@ -146,16 +142,7 @@ export function CashuToken({
           sum >= HUGE_AMOUNT ? "border-animated-gradient" : "",
         )}
       >
-        <div className="flex flex-row items-center">
-          {unit === "sat" ? (
-            <Bitcoin className={unitClassname} />
-          ) : unit === "eur" ? (
-            <Euro className={unitClassname} />
-          ) : unit === "usd" ? (
-            <DollarSign className={unitClassname} />
-          ) : null}
-          <span className="font-mono text-lg">{formatShortNumber(total)}</span>
-        </div>
+        <Amount amount={total} currency={unit} size="md" />
       </div>
       {ecash.memo ? <p className="text-md line-clamp-2">{ecash.memo}</p> : null}
       {me ? <RedeemToken token={token} /> : null}
@@ -268,12 +255,7 @@ function CashuRequestDetails({ request }: { request: PaymentRequest }) {
         <p className="text-sm text-muted-foreground">{description}</p>
       ) : null}
       {amount ? (
-        <div className="flex flex-row items-center">
-          <Bitcoin className="size-7 text-muted-foreground" />
-          <span className="font-mono text-4xl">
-            {formatShortNumber(amount)}
-          </span>
-        </div>
+        <Amount amount={amount} currency="sat" size="large-display" />
       ) : null}
     </div>
   );
