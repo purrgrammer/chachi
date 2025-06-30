@@ -55,26 +55,27 @@ import { saveGroupEvent } from "@/lib/messages";
 import { DELETE_GROUP } from "@/lib/kinds";
 import { useTranslation } from "react-i18next";
 
-const formSchema = z.object({
-  name: z
-    .string({
-      // TODO add translation
-      required_error: "Please add a name",
-    })
-    .min(1)
-    .max(140),
-  picture: z.string().url().optional(),
-  about: z.string().min(0).max(500).optional(),
-  visibility: z.enum(["public", "private"]),
-  access: z.enum(["open", "closed"]),
-});
-
 export function EditGroup({ group }: { group: GroupMetadata }) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const canSign = useCanSign();
   const editGroup = useEditGroup();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const formSchema = z.object({
+    name: z
+      .string({
+        required_error: t("group.edit.form.name.required"),
+      })
+      .min(1)
+      .max(140),
+    picture: z.string().url().optional(),
+    about: z.string().min(0).max(500).optional(),
+    visibility: z.enum(["public", "private"]),
+    access: z.enum(["open", "closed"]),
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: group,
@@ -83,7 +84,6 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
   const { isBookmarked, unbookmarkGroup } = useBookmarkGroup(group);
   const relaySet = useRelaySet([group.relay]);
   const ndk = useNDK();
-  const { t } = useTranslation();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -216,7 +216,11 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
                         defaultValue={group.visibility}
                       >
                         <SelectTrigger className="w-64">
-                          <SelectValue placeholder="Choose visibility" />
+                          <SelectValue
+                            placeholder={t(
+                              "group.edit.form.visibility.placeholder",
+                            )}
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="public">
@@ -250,7 +254,11 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
                         defaultValue={group.access}
                       >
                         <SelectTrigger className="w-64">
-                          <SelectValue placeholder="Choose policy" />
+                          <SelectValue
+                            placeholder={t(
+                              "group.edit.form.access.placeholder",
+                            )}
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="open">

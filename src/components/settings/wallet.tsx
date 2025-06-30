@@ -194,20 +194,17 @@ function WalletSummary({
           <div className="flex flex-col gap-0 items-center justify-center">
             <div className="flex items-center justify-center">
               {wallet.type === "nwc" && wallet instanceof NDKNWCWallet ? (
-                <NWCWalletBalanceAmount
-                  wallet={wallet}
-		  size="wallet-balance"
-                />
+                <NWCWalletBalanceAmount wallet={wallet} size="wallet-balance" />
               ) : wallet.type === "nip-60" &&
                 wallet instanceof NDKCashuWallet ? (
                 <CashuWalletBalanceAmount
                   wallet={wallet}
-		  size="wallet-balance"
+                  size="wallet-balance"
                 />
               ) : wallet instanceof NDKWebLNWallet ? (
                 <WebLNWalletBalanceAmount
                   wallet={wallet}
-		  size="wallet-balance"
+                  size="wallet-balance"
                 />
               ) : null}
             </div>

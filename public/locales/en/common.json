@@ -179,12 +179,14 @@
           "label": "Visibility",
           "anyone": "Anyone",
           "members-only": "Members only",
-          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay.",
+          "placeholder": "Choose visibility"
         },
         "access": {
           "label": "Access",
           "anyone": "Anyone",
-          "invite-only": "Invite only"
+          "invite-only": "Invite only",
+          "placeholder": "Choose policy"
         },
         "submit": {
           "trigger": "Create",
@@ -199,7 +201,8 @@
         "name": {
           "label": "Name",
           "placeholder": "My Group",
-          "description": "This is the group's name"
+          "description": "This is the group's name",
+          "required": "Please add a name"
         },
         "about": {
           "label": "About",
@@ -210,13 +213,15 @@
           "label": "Visibility",
           "anyone": "Anyone",
           "members-only": "Members only",
-          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay.",
+          "placeholder": "Choose visibility"
         },
         "access": {
           "label": "Access",
           "anyone": "Anyone",
           "invite-only": "Invite only",
-          "description": "Anyone can join an open group. Closed groups require approval"
+          "description": "Anyone can join an open group. Closed groups require approval",
+          "placeholder": "Choose policy"
         },
         "submit": {
           "trigger": "Save",
@@ -400,7 +405,7 @@
       "invite_codes": {
         "title": "Invite Codes",
         "description": "Create invite codes to allow specific users to join your group.",
-        "create": "Create Invite Code",
+        "create_button": "Create Invite Code",
         "creating": "Creating...",
         "active": "Active Invite Codes",
         "none": "No active invite codes",

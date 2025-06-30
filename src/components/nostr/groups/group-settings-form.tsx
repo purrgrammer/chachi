@@ -784,7 +784,7 @@ export function GroupEditor({
                   <Button className="w-full">
                     <Plus className="h-4 w-4 mr-2" />
                     {t(
-                      "group.settings.invite_codes.create",
+                      "group.settings.invite_codes.create_button",
                       "Create Invite Code",
                     )}
                   </Button>
@@ -946,7 +946,10 @@ export function GroupEditor({
                                 "group.settings.invite_codes.creating",
                                 "Creating...",
                               )
-                            : t("group.settings.invite_codes.create", "Create")}
+                            : t(
+                                "group.settings.invite_codes.create_button",
+                                "Create",
+                              )}
                         </Button>
                       </>
                     )}

@@ -385,7 +385,11 @@ export function CreateGroup({
                         defaultValue={"public"}
                       >
                         <SelectTrigger className="w-32">
-                          <SelectValue placeholder="Choose visibility" />
+                          <SelectValue
+                            placeholder={t(
+                              "group.create.form.visibility.placeholder",
+                            )}
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="public">
@@ -419,7 +423,11 @@ export function CreateGroup({
                         defaultValue={"open"}
                       >
                         <SelectTrigger className="w-32">
-                          <SelectValue placeholder="Choose policy" />
+                          <SelectValue
+                            placeholder={t(
+                              "group.create.form.access.placeholder",
+                            )}
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="open">
