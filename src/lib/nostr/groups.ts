@@ -466,7 +466,7 @@ export function useEditGroup() {
     // Store the updated group info in the database
     await saveGroupInfo({ id, relay }, metadata);
 
-    queryClient.invalidateQueries({ queryKey: [GROUP_METADATA, id, relay] });
+    queryClient.invalidateQueries({ queryKey: [GROUP_METADATA, groupId(metadata) ] });
   };
 }
 
