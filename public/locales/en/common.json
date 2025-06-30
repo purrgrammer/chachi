@@ -348,7 +348,7 @@
         "access": "Access Control",
         "public": "Public",
         "public_description": "Anyone can see the group and its content",
-        "private": "Private", 
+        "private": "Private",
         "private_description": "Only members can see the group content",
         "open": "Open",
         "open_description": "Anyone can join the group",
@@ -411,8 +411,6 @@
         "none": "No active invite codes",
         "expires": "Expires:",
         "copy_code": "Copy code",
-        "copy_url": "Copy URL",
-        "revoke": "Revoke",
         "dialog": {
           "title": "Create Invite Code",
           "description": "Choose when this invite code should expire. The code will be automatically revoked after the expiration date.",

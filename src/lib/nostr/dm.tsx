@@ -22,7 +22,6 @@ import NDK, {
 import { giftUnwrap } from "@/lib/nip-59";
 import { useRelaySet } from "@/lib/nostr";
 import { useNDK } from "@/lib/ndk";
-import { useRelays } from "@/lib/nostr";
 import { discoveryRelays } from "@/lib/relay";
 import { usePubkey, useFollows, useDMRelays } from "@/lib/account";
 import { PrivateGroup as Group, PrivateGroup } from "@/lib/types";
@@ -78,11 +77,11 @@ function useStreamMap(
   useEffect(() => {
     if (!pubkey) return;
     if (!enabled) return;
-    console.log("REQ.GIFT", filter, relaySet.relays);
 
     const sub = ndk.subscribe(
       filter,
       {
+        subId: "gift-wrap",
         cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
         closeOnEose: false,
         skipOptimisticPublishEvent: true,
@@ -100,6 +99,7 @@ function useStreamMap(
 }
 
 export async function fetchDirectMessageRelays(ndk: NDK, pubkey: string) {
+  // todo: look also in the users outbox relays
   const relaySet = NDKRelaySet.fromRelayUrls(discoveryRelays, ndk);
   const dmFilter = {
     kinds: [NDKKind.DirectMessageReceiveRelayList],
@@ -171,12 +171,8 @@ export function useDirectMessages() {
   const pubkey = usePubkey();
   const dmRelays = useDMRelays();
   const onWebRTCSignal = useOnWebRTCSignal();
-  const relays = useRelays();
-  const allRelays = Array.from(
-    new Set(relays.concat(dmRelays.dm || dmRelays.fallback)),
-  );
   const privateMessagesEnabled = useAtomValue(privateMessagesEnabledAtom);
-  const relaySet = useRelaySet(allRelays);
+  const relaySet = useRelaySet(dmRelays.dm || dmRelays.fallback);
   // todo: sync from latest - 2 weeks
   const filter = {
     kinds: [NDKKind.GiftWrap],
