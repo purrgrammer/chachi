@@ -155,6 +155,7 @@ function UserMessage({
   className,
   scrollTo,
   setScrollTo,
+  showReactions,
 }: {
   group?: Group;
   event: NostrEvent;
@@ -175,6 +176,7 @@ function UserMessage({
   className?: string;
   scrollTo?: NostrEvent;
   setScrollTo?: (ev?: NostrEvent) => void;
+  showReactions?: boolean;
 }) {
   return (
     <>
@@ -202,6 +204,7 @@ function UserMessage({
         className={className}
         scrollTo={scrollTo}
         setScrollTo={setScrollTo}
+        showReactions={showReactions}
       />
     </>
   );
@@ -230,6 +233,7 @@ function MessageContent({
   className,
   scrollTo,
   setScrollTo,
+  showReactions = true,
 }: {
   group?: Group;
   event: NostrEvent;
@@ -252,6 +256,7 @@ function MessageContent({
   className?: string;
   scrollTo?: NostrEvent;
   setScrollTo?: (ev?: NostrEvent) => void;
+  showReactions?: boolean;
 }) {
   const { t } = useTranslation();
   const [settings] = useSettings();
@@ -545,7 +550,7 @@ function MessageContent({
                     {content}
                   </RichText>
                 )}
-                {isDeleted ? null : (
+                {isDeleted ? null : showReactions ? (
                   <Reactions
                     className="pt-1"
                     event={event}
@@ -553,7 +558,7 @@ function MessageContent({
                     kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
                     live={isInView}
                   />
-                )}
+                ) : null}
                 {showingZapDialog && group ? (
                   <NewZapDialog
                     open
@@ -722,6 +727,7 @@ export function ChatMessage(props: {
   className?: string;
   scrollTo?: NostrEvent;
   setScrollTo?: (ev?: NostrEvent) => void;
+  showReactions?: boolean;
 }) {
   const { event, isMine } = props;
   const me = usePubkey();
@@ -776,6 +782,7 @@ interface ChatProps extends MotionProps {
   showTimestamps?: boolean;
   lastSeen?: { ref: string };
   deleteEvents: NostrEvent[];
+  showReactions?: boolean;
 }
 
 export function Chat({
@@ -795,6 +802,7 @@ export function Chat({
   lastSeen,
   scrollTo,
   setScrollTo,
+  showReactions = true,
 }: ChatProps) {
   // todo: check admin events against relay pubkey
   const groupedMessages = groupByDay(events);
@@ -848,6 +856,7 @@ export function Chat({
                 showRootReply={showRootReply}
                 scrollTo={scrollTo}
                 setScrollTo={setScrollTo}
+                showReactions={showReactions}
               />
             ) : Component ? (
               <Component
