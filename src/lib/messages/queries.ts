@@ -125,7 +125,12 @@ export async function getGroupMentionsAfter(
 
 export async function getUnreadMentions(group: Group, pubkey: string) {
   const lastSeen = await getLastSeen(group);
-  return getGroupMentionsAfter(group, pubkey, lastSeen?.created_at || 0);
+  let baseline = lastSeen?.created_at || 0;
+  const lastUserMessage = await getLastUserMessage(group, pubkey);
+  if (lastUserMessage) {
+    baseline = Math.max(baseline, lastUserMessage.created_at);
+  }
+  return getGroupMentionsAfter(group, pubkey, baseline);
 }
 
 export async function getUnreadMessages(
