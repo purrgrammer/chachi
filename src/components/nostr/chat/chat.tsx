@@ -10,7 +10,6 @@ import {
   Ban,
   ShieldBan,
   Bitcoin,
-  RotateCcw,
 } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { Button } from "@/components/ui/button";
@@ -52,7 +51,7 @@ import type { Emoji as EmojiType } from "@/components/emoji-picker";
 import { LazyEmojiPicker } from "@/components/lazy/LazyEmojiPicker";
 import { saveLastSeen, saveGroupEvent } from "@/lib/messages";
 import { useSettings } from "@/lib/settings";
-import { useIsUnpublished, useRetryUnpublishedEvent } from "@/lib/unpublished";
+//import { useIsUnpublished, useRetryUnpublishedEvent } from "@/lib/unpublished";
 import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import { groupByDay, formatDay } from "@/lib/chat";
@@ -179,22 +178,6 @@ function UserMessage({
   setScrollTo?: (ev?: NostrEvent) => void;
   showReactions?: boolean;
 }) {
-  const { t } = useTranslation();
-  const isUnpublished = useIsUnpublished(event.id);
-  const { retryEvent } = useRetryUnpublishedEvent();
-  const [isRetrying, setIsRetrying] = useState(false);
-
-  const handleRetry = async () => {
-    if (isRetrying) return;
-
-    setIsRetrying(true);
-    try {
-      await retryEvent(event.id);
-    } finally {
-      setIsRetrying(false);
-    }
-  };
-
   return (
     <>
       <MessageContent
@@ -221,23 +204,6 @@ function UserMessage({
         className={className}
         scrollTo={scrollTo}
         setScrollTo={setScrollTo}
-        isUnpublished={isUnpublished}
-        retryButton={
-          isUnpublished ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6"
-              onClick={handleRetry}
-              disabled={isRetrying}
-            >
-              <RotateCcw
-                className={`h-4 w-4 ${isRetrying ? "animate-spin" : ""}`}
-              />
-              <span className="sr-only">{t("chat.message.retry.action")}</span>
-            </Button>
-          ) : null
-        }
         showReactions={showReactions}
       />
     </>
@@ -267,8 +233,6 @@ function MessageContent({
   className,
   scrollTo,
   setScrollTo,
-  isUnpublished = false,
-  retryButton,
   showReactions = true,
 }: {
   group?: Group;
@@ -292,8 +256,6 @@ function MessageContent({
   className?: string;
   scrollTo?: NostrEvent;
   setScrollTo?: (ev?: NostrEvent) => void;
-  isUnpublished?: boolean;
-  retryButton?: React.ReactNode;
   showReactions?: boolean;
 }) {
   const { t } = useTranslation();
@@ -491,9 +453,6 @@ function MessageContent({
           `flex flex-row gap-2 items-end ${isLast ? "mb-0" : isChain ? "mb-0.5" : "mb-2"} ${isMine ? "ml-auto" : ""} transition-colors ${isFocused ? "bg-accent/30 rounded-lg" : ""}`,
           className,
         )}
-        style={{
-          opacity: isUnpublished ? 0.6 : 1,
-        }}
       >
         {isMine || isChain ? null : (
           <ProfileDrawer
@@ -505,7 +464,6 @@ function MessageContent({
         <ContextMenu>
           <ContextMenuTrigger asChild>
             <div className="flex flex-row gap-2 items-center">
-              {retryButton}
               <motion.div
                 // Drag controls
                 drag={isMobile && !isMine && canSign ? "x" : false}
