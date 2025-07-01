@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { NostrEvent } from "nostr-tools";
 import { Bitcoin } from "lucide-react";
-import Amount from "@/components/amount";
+import Amount, { CurrencyIcon } from "@/components/amount";
 import { Invoice } from "@/components/ln";
 import { Button } from "@/components/ui/button";
 import { A, E } from "@/components/nostr/event";
@@ -275,7 +275,7 @@ export function NewZapDialog({
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                   />
-                  <Amount amount={Number(amount)} size="3xl" showIcon={true} />
+                  <CurrencyIcon size="3xl" />
                 </div>
                 <div className="flex flex-row flex-wrap gap-1.5">
                   {amounts.map((a) => (
@@ -310,8 +310,9 @@ export function NewZapDialog({
                     onClick={zap}
                     className="w-full mt-3"
                   >
-                    <Amount amount={Number(amount)} size="md" showIcon={true} />
-                    {t("zap.dialog.tip")}
+                    {t("zap.dialog.tip", {
+                      amount: formatShortNumber(Number(amount)),
+                    })}
                   </Button>
                 </motion.div>
               </>

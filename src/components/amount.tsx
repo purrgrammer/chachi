@@ -57,13 +57,26 @@ const sizes = {
   },
 };
 
-function CurrencyIcon({
+export function CurrencyIcon({
   currency = "sat",
-  className,
+  size = "md",
 }: {
   currency?: Currency;
-  className?: string;
+  size?:
+    | "xs"
+    | "sm"
+    | "md"
+    | "lg"
+    | "xl"
+    | "2xl"
+    | "3xl"
+    | "menu"
+    | "lg-compact"
+    | "wallet-display"
+    | "wallet-balance"
+    | "large-display";
 }) {
+  const { icon: className } = sizes[size] || sizes.md;
   switch (currency.toLowerCase()) {
     case "sat":
       return <Bitcoin className={cn("text-muted-foreground", className)} />;
@@ -103,12 +116,12 @@ export default function Amount({
   showIcon?: boolean;
   mode?: "short" | "long";
 }) {
-  const { icon, text } = sizes[size] || sizes.md;
+  const { text } = sizes[size] || sizes.md;
 
   const getCurrencyIcon = () => {
     if (!showIcon) return null;
 
-    return <CurrencyIcon currency={currency} className={icon} />;
+    return <CurrencyIcon currency={currency} size={size} />;
   };
 
   return (
