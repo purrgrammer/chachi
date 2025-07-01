@@ -14,8 +14,15 @@ import NDK, {
 import { relaysAtom } from "@/app/store";
 import { useNDK } from "@/lib/ndk";
 import { isRelayURL, discoveryRelays, fallbackRelays } from "@/lib/relay";
-import { EVENT, ADDRESS, PROFILE, RELAY_LIST } from "@/lib/query";
+import {
+  IMMUTABLE_CACHE_CONFIG,
+  EVENT,
+  ADDRESS,
+  PROFILE,
+  RELAY_LIST,
+} from "@/lib/query";
 import db, { cache } from "@/lib/db";
+import { Profile } from "./types";
 
 interface NostrREQResult<A> {
   events: A[];
@@ -45,7 +52,7 @@ async function fetchCachedEvent(ndk: NDK, id: string) {
       {
         closeOnEose: true,
         cacheUsage: NDKSubscriptionCacheUsage.ONLY_CACHE,
-      },
+      }
     )
     .then((ev) => {
       if (ev) {
@@ -95,7 +102,7 @@ export function useEvent({
             closeOnEose: true,
             cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST,
           },
-          relaySet,
+          relaySet
         )
         .then((ev) => {
           if (ev) {
@@ -104,8 +111,7 @@ export function useEvent({
           return null;
         });
     },
-    staleTime: Infinity,
-    gcTime: 0,
+    ...IMMUTABLE_CACHE_CONFIG,
   });
 }
 
@@ -113,7 +119,7 @@ function fetchCachedAddress(
   ndk: NDK,
   kind: number,
   pubkey: string,
-  identifier?: string,
+  identifier?: string
 ) {
   return ndk
     .fetchEvent(
@@ -127,7 +133,7 @@ function fetchCachedAddress(
       {
         closeOnEose: true,
         cacheUsage: NDKSubscriptionCacheUsage.ONLY_CACHE,
-      },
+      }
     )
     .then((ev) => {
       if (ev) {
@@ -178,7 +184,7 @@ export function useAddress({
             closeOnEose: true,
             cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
           },
-          relaySet,
+          relaySet
         )
         .then((ev) => {
           if (ev) {
@@ -272,7 +278,7 @@ export function useNostrLink(nlink: string) {
               ids: [decoded.data.id],
             },
             nostrLinkOptions,
-            NDKRelaySet.fromRelayUrls(relays, ndk),
+            NDKRelaySet.fromRelayUrls(relays, ndk)
           )
           .then((ev) => {
             if (ev) {
@@ -290,7 +296,7 @@ export function useNostrLink(nlink: string) {
               "#d": [decoded.data.identifier],
             },
             nostrLinkOptions,
-            NDKRelaySet.fromRelayUrls(relays, ndk),
+            NDKRelaySet.fromRelayUrls(relays, ndk)
           )
           .then((ev) => {
             if (ev) {
@@ -306,7 +312,7 @@ export function useNostrLink(nlink: string) {
               ids: [decoded.data],
             },
             nostrLinkOptions,
-            NDKRelaySet.fromRelayUrls(relays, ndk),
+            NDKRelaySet.fromRelayUrls(relays, ndk)
           )
           .then((ev) => {
             if (ev) {
@@ -327,7 +333,7 @@ export function useStream(
   filter: NDKFilter | NDKFilter[],
   relays: string[],
   live = true,
-  onlyRelays = true,
+  onlyRelays = true
 ): NostrREQResult<NostrEvent> {
   const ndk = useNDK();
   const relaySet = useRelaySet(relays);
@@ -346,7 +352,7 @@ export function useStream(
         skipOptimisticPublishEvent: true,
         closeOnEose: !live,
       },
-      relaySet,
+      relaySet
     );
 
     sub.on("event", (event) => {
@@ -371,7 +377,7 @@ export function useStream(
 export function useRequest(
   filter: NDKFilter | NDKFilter[],
   relays: string[],
-  unique = false,
+  unique = false
 ): NostrREQResult<NostrEvent> {
   const ndk = useNDK();
   const relaySet = useRelaySet(relays);
@@ -386,7 +392,7 @@ export function useRequest(
         skipOptimisticPublishEvent: true,
         cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
       },
-      relaySet,
+      relaySet
     );
 
     sub.on("event", (event) => {
@@ -397,7 +403,7 @@ export function useRequest(
             (ev) =>
               ev.id === id ||
               id ===
-                `${ev.kind}:${ev.pubkey}:${ev.tags.find((t) => t[0] === "d")?.[1]}`,
+                `${ev.kind}:${ev.pubkey}:${ev.tags.find((t) => t[0] === "d")?.[1]}`
           );
           if (existingIndex > -1) {
             const existing = events[existingIndex];
@@ -442,8 +448,8 @@ export async function fetchProfile(ndk: NDK, pubkey: string, relays: string[]) {
       { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY },
       NDKRelaySet.fromRelayUrls(
         relays.length > 0 ? relays : discoveryRelays,
-        ndk,
-      ),
+        ndk
+      )
     )
     .then((ev) => {
       if (ev) {
@@ -464,9 +470,16 @@ export function useProfiles(pubkeys: string[]) {
       return {
         queryKey: [PROFILE, pubkey],
         queryFn: () => fetchProfile(ndk, pubkey, discoveryRelays),
-        staleTime: Infinity,
-        gcTime: 0,
+        ...IMMUTABLE_CACHE_CONFIG,
       };
+    }),
+    combine: (results) => ({
+      profiles: results.reduce((acc, result) => {
+        if (result.data) acc.push(result.data);
+        return acc;
+      }, [] as Profile[]),
+      isLoading: results.some((r) => r.isLoading),
+      errors: results.filter((r) => r.error).map((r) => r.error),
     }),
   });
 }
@@ -481,8 +494,7 @@ export function useProfile(pubkey?: string, relays: string[] = []) {
     queryFn: () => {
       return pubkey ? fetchProfile(ndk, pubkey, relays) : null;
     },
-    staleTime: Infinity,
-    gcTime: 0,
+    ...IMMUTABLE_CACHE_CONFIG,
   });
 }
 
@@ -494,7 +506,7 @@ export async function fetchRelayList(ndk: NDK, pubkey: string) {
         authors: [pubkey],
       },
       { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY },
-      NDKRelaySet.fromRelayUrls(discoveryRelays, ndk),
+      NDKRelaySet.fromRelayUrls(discoveryRelays, ndk)
     )
     .then((ev) => {
       if (ev) {
@@ -509,8 +521,7 @@ export function useRelayList(pubkey: string) {
   return useQuery({
     queryKey: [RELAY_LIST, pubkey],
     queryFn: () => fetchRelayList(ndk, pubkey),
-    staleTime: Infinity,
-    gcTime: 0,
+    ...IMMUTABLE_CACHE_CONFIG,
   });
 }
 
@@ -520,7 +531,7 @@ export function useReactions(
   event: NostrEvent,
   kinds: NDKKind[] = [NDKKind.Reaction],
   relays: string[],
-  live = true,
+  live = true
 ) {
   const ndk = useNDK();
   const filter = {
@@ -540,7 +551,7 @@ export function useRelays() {
 export async function fetchLatest(
   ndk: NDK,
   filter: NDKFilter,
-  relaySet: NDKRelaySet,
+  relaySet: NDKRelaySet
 ) {
   const events = Array.from(
     await ndk.fetchEvents(
@@ -550,8 +561,8 @@ export async function fetchLatest(
         closeOnEose: true,
         cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
       },
-      relaySet,
-    ),
+      relaySet
+    )
   );
   if (events.length === 0) return null;
   return events.reduce((acc, ev) => {

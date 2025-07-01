@@ -28,9 +28,8 @@ export function NameList({
   max?: number;
   notClickable?: boolean;
 }) {
-  const q = useProfiles(pubkeys);
+  const { profiles } = useProfiles(pubkeys);
   const { t } = useTranslation();
-  const profiles = q.map((q) => q.data).filter(Boolean);
   const deduped = Array.from(new Set(profiles.map((p) => p.pubkey)));
   const isMoreThanMax = deduped.length > max;
   return (

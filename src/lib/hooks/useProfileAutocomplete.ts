@@ -33,10 +33,7 @@ export function useProfileAutocomplete({
   const [selectedPubkeys, setSelectedPubkeys] = useState<string[]>([]);
 
   const currentUserPubkey = usePubkey();
-  const profileQueries = useProfiles(pubkeys);
-  const profiles = profileQueries
-    .map((query) => query.data)
-    .filter(Boolean) as Profile[];
+  const { profiles } = useProfiles(pubkeys);
 
   // Filter profiles based on search query and exclusions
   const filteredProfiles = useMemo(() => {

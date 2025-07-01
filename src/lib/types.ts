@@ -50,6 +50,7 @@ export interface Profile {
   lud16?: string;
   banner?: string;
   website?: string;
+  nip05?: string;
 }
 
 export interface NativeEmoji {

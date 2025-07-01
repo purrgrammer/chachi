@@ -1,21 +1,15 @@
 import { useMemo } from "react";
 import { useProfiles } from "@/lib/nostr";
 import { usePubkey } from "@/lib/account";
-import type { Profile } from "@/lib/types";
 
 export function useProfileSearch(pubkeys: string[], searchQuery: string = "") {
-  const profiles = useProfiles(pubkeys);
+  const { profiles } = useProfiles(pubkeys);
   const currentUserPubkey = usePubkey();
 
   return useMemo(() => {
-    // Extract profile data from query results and filter out null values
-    const profileList = profiles
-      .map((p) => p.data)
-      .filter(Boolean) as Profile[];
-
     // If there's no search query, return profiles excluding current user
     if (!searchQuery) {
-      return profileList
+      return profiles
         .filter((p) => p.pubkey !== currentUserPubkey)
         .sort((a, b) => {
           // Sort by name for better UX
@@ -26,7 +20,7 @@ export function useProfileSearch(pubkeys: string[], searchQuery: string = "") {
     }
 
     // Filter profiles based on search query
-    return profileList
+    return profiles
       .filter((p) => {
         // Exclude current user
         if (p.pubkey === currentUserPubkey) return false;

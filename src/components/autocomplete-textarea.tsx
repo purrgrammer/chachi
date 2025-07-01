@@ -138,13 +138,12 @@ export function AutocompleteTextarea({
   const [autocompleteTerm, setAutocompleteTerm] = useState("");
   const [autocompleteEmojiTerm, setAutocompleteEmojiTerm] = useState("");
 
-  const profiles = useProfiles(
-    group && members ? members : pubkeys ? pubkeys : follows ? follows : [],
+  const { profiles } = useProfiles(
+    group && members ? members : pubkeys ? pubkeys : follows ? follows : []
   );
-  const profileList = profiles.map((p) => p.data).filter(Boolean);
   const autocompleteProfiles =
     autocompleteTerm && isAutocompleting
-      ? profileList
+      ? profiles
           .filter((p: Profile) => {
             return (
               p.pubkey !== me &&
@@ -164,7 +163,7 @@ export function AutocompleteTextarea({
               return 1;
             return 0;
           })
-      : profileList
+      : profiles
           .filter((p) => p.pubkey !== me)
           .sort((a: Profile, b: Profile) => {
             if (admins.includes(a.pubkey)) return -1;
@@ -184,7 +183,7 @@ export function AutocompleteTextarea({
   const autocompleteEmojis = (
     autocompleteEmojiTerm && isAutocompletingEmoji
       ? allEmojis.filter((e) =>
-          e.name.toLowerCase().includes(autocompleteEmojiTerm.toLowerCase()),
+          e.name.toLowerCase().includes(autocompleteEmojiTerm.toLowerCase())
         )
       : allEmojis
   ).slice(0, 21);
@@ -205,7 +204,7 @@ export function AutocompleteTextarea({
   function autocompleteProfile(p: Profile) {
     // todo: nprofile if possible
     setMessage(
-      message.replace(autocompleteRegex, `nostr:${npubEncode(p.pubkey)} `),
+      message.replace(autocompleteRegex, `nostr:${npubEncode(p.pubkey)} `)
     );
     onProfileAutocomplete?.(p);
     setIsAutocompleting(false);
@@ -292,7 +291,7 @@ export function AutocompleteTextarea({
         ref={ref}
         className={cn(
           `text-md focus-visible:outline-none focus:ring-ring focus-visible:ring-ring w-full p-1 px-3 resize-none ${isAutocompleting || isAutocompletingEmoji || reply ? "rounded-b-xl rounded-t-none ring ring-ring ring-1" : "rounded-xl"}`,
-          className,
+          className
         )}
         minRows={1}
         maxRows={3}

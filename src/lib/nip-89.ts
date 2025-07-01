@@ -108,7 +108,7 @@ export function useAppRecommendationsForKind(eventKind: number) {
   const currentUserPubkey = usePubkey();
 
   return useQuery({
-    queryKey: ["app-recommendations-for-kind", eventKind, follows.length],
+    queryKey: ["app-recommendations-for-kind", eventKind],
     queryFn: async (): Promise<AppRecommendationWithScore[]> => {
       // Step 1: Fetch recommendation events for this kind (kind 31989)
       const recommendationEvents = Array.from(

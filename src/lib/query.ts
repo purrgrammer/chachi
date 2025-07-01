@@ -1,5 +1,13 @@
 import { QueryClient } from "@tanstack/react-query";
 
+// Immutable Data
+export const IMMUTABLE_CACHE_CONFIG = {
+  staleTime: Infinity,
+  gcTime: 0,
+  refetchOnWindowFocus: false,
+  refetchOnMount: false,
+};
+
 export const queryClient = new QueryClient();
 
 export const EVENT = "event";
