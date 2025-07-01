@@ -166,16 +166,17 @@ export function useLastSeen(group: Group) {
 }
 
 export function useUnreads(groups: Group[]) {
+  const me = usePubkey();
   return useLiveQuery(
     async () => {
       const unreads = await Promise.all(
-        groups.map((g) => getUnreadMessages(g)),
+        groups.map((g) => getUnreadMessages(g, me)),
       );
       return groups
-        .map((g, idx) => ({ group: g, count: unreads[idx] }))
+        .map((group, idx) => ({ group, count: unreads[idx] }))
         .filter((u) => u.count > 0);
     },
-    [],
+    [groups, me],
     [],
   );
 }

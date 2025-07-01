@@ -526,6 +526,7 @@
     "invite_code": "Invite Code",
     "placeholder": "Join functionality will be implemented here",
     "go_back": "Go Back",
+    "onboard": "Get Started",
     "request": {
       "send": {
         "success": "Join request sent",

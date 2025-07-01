@@ -19,6 +19,7 @@ import {
   dmRelaysAtom,
 } from "@/app/store";
 import { useRelays } from "@/lib/nostr";
+import { useCallback } from "react";
 
 export function useAccount(): Account | null {
   const account = useAtomValue(accountAtom);
@@ -182,4 +183,22 @@ export function useDMRelays() {
   } else {
     return { dm: [], fallback: outboxRelays };
   }
+}
+
+export function useNstart(path?: string) {
+  const createAccount = useCallback(() => {
+    const query = new URLSearchParams();
+    query.append("an", "chachi"); // app name
+    query.append("at", "web"); // app type
+    query.append(
+      "ac",
+      path ? `https://chachi.chat${path}` : "https://chachi.chat",
+    ); // app callback url
+    query.append("asb", "yes"); // skip bunker
+    query.append("aa", "6d29d9"); // accent color
+    const nstart = `https://nstart.me?${query.toString()}`;
+    window.location.href = nstart;
+  }, [path]);
+
+  return { createAccount };
 }

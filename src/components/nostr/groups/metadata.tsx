@@ -44,6 +44,27 @@ export function GroupPicture({
   );
 }
 
+export function GroupAvatar({
+  group,
+  className,
+}: {
+  group: Group;
+  className?: string;
+}) {
+  const { id, relay } = group;
+  const { data: metadata } = useGroup({ id, relay });
+  const { data: relayInfo } = useRelayInfo(relay);
+  const isRelayGroup = id === "_";
+  const img = isRelayGroup ? relayInfo?.icon : metadata?.picture;
+  const name = isRelayGroup ? relayInfo?.name : metadata?.name;
+  return (
+    <Avatar className={cn("size-10 rounded-full", className)}>
+      <AvatarImage src={img} className="object-cover" />
+      <AvatarFallback>{name || id}</AvatarFallback>
+    </Avatar>
+  );
+}
+
 export function GroupName({
   group,
   className,

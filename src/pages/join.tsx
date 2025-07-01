@@ -1,4 +1,6 @@
-import { useParams } from "react-router-dom";
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Egg, MessageSquare, RotateCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   Card,
@@ -8,10 +10,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Ticket, Users } from "lucide-react";
+import { GroupAvatar, GroupName } from "@/components/nostr/groups/metadata";
+import { useNstart, useCanSign } from "@/lib/account";
+import { useJoinRequest } from "@/lib/nostr/groups";
+import { useBookmarkGroup } from "@/components/nostr/groups/bookmark";
+import { groupURL } from "@/lib/groups";
+import { toast } from "sonner";
+import type { Group } from "@/lib/types";
 
 export default function Join() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const canSign = useCanSign();
+  const [isJoining, setIsJoining] = useState(false);
+  const { createAccount } = useNstart(window.location.pathname);
+
   const { code, relay, groupId } = useParams<{
     code: string;
     relay: string;
@@ -19,14 +32,44 @@ export default function Join() {
   }>();
 
   const fullRelayUrl = relay ? `wss://${relay}` : "";
+  const group: Group = {
+    id: groupId || "",
+    relay: fullRelayUrl,
+  };
+
+  const joinRequest = useJoinRequest(group);
+  const { bookmarkGroup } = useBookmarkGroup(group);
+
+  function onboard() {
+    createAccount();
+  }
+
+  async function joinGroup() {
+    if (!code || !groupId) {
+      toast.error(
+        t("join.error.missing_params", "Missing invite code or group ID"),
+      );
+      return;
+    }
+
+    try {
+      setIsJoining(true);
+      await joinRequest(code);
+      await bookmarkGroup();
+      navigate(groupURL(group), { replace: true });
+      toast.success(t("join.success", "Successfully joined group"));
+    } catch (error) {
+      console.error("Error joining group:", error);
+      toast.error(t("join.error.failed", "Failed to join group"));
+    } finally {
+      setIsJoining(false);
+    }
+  }
 
   return (
     <div className="container max-w-2xl mx-auto p-6">
       <Card>
         <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-            <Ticket className="w-6 h-6 text-primary" />
-          </div>
           <CardTitle className="text-2xl">
             {t("join.title", "Join Group")}
           </CardTitle>
@@ -36,66 +79,35 @@ export default function Join() {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {/* Group Info Section */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-muted-foreground" />
-              <h3 className="text-lg font-medium">
-                {t("join.group_info", "Group Information")}
-              </h3>
-            </div>
-
-            <div className="bg-muted/50 rounded-lg p-4 space-y-3">
-              <div>
-                <span className="text-sm font-medium text-muted-foreground">
-                  {t("join.group_id", "Group ID")}:
-                </span>
-                <code className="ml-2 text-sm font-mono bg-muted px-2 py-1 rounded">
-                  {groupId}
-                </code>
-              </div>
-
-              <div>
-                <span className="text-sm font-medium text-muted-foreground">
-                  {t("join.relay", "Relay")}:
-                </span>
-                <code className="ml-2 text-sm font-mono bg-muted px-2 py-1 rounded">
-                  {fullRelayUrl}
-                </code>
-              </div>
-
-              <div>
-                <span className="text-sm font-medium text-muted-foreground">
-                  {t("join.invite_code", "Invite Code")}:
-                </span>
-                <code className="ml-2 text-sm font-mono bg-muted px-2 py-1 rounded">
-                  {code}
-                </code>
-              </div>
-            </div>
+          <div className="flex flex-col items-center gap-2">
+            <GroupAvatar group={group} className="size-32" />
+            <GroupName group={group} className="text-2xl" />
           </div>
 
-          {/* Action Area - Placeholder for now */}
-          <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8">
-            <div className="text-center text-muted-foreground">
-              <p className="text-sm">
-                {t(
-                  "join.placeholder",
-                  "Join functionality will be implemented here",
-                )}
-              </p>
-            </div>
-          </div>
-
-          {/* Navigation Button */}
-          <div className="pt-4">
+          <div className="flex flex-col gap-1.5">
             <Button
-              variant="outline"
               className="w-full"
-              onClick={() => window.history.back()}
+              onClick={joinGroup}
+              disabled={!canSign || isJoining}
             >
-              {t("join.go_back", "Go Back")}
+              {isJoining ? (
+                <RotateCw className="animate-spin" />
+              ) : (
+                <MessageSquare />
+              )}
+              {t("join.join_group", "Join Group")}
             </Button>
+            {!canSign ? (
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={onboard}
+                disabled={isJoining}
+              >
+                {isJoining ? <RotateCw className="animate-spin" /> : <Egg />}
+                {t("join.onboard", "Get Started")}
+              </Button>
+            ) : null}
           </div>
         </CardContent>
       </Card>

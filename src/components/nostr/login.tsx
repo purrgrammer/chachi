@@ -13,7 +13,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useNip07Login, useNip46Login, useNsecLogin } from "@/lib/account";
+import {
+  useNip07Login,
+  useNip46Login,
+  useNsecLogin,
+  useNstart,
+} from "@/lib/account";
 import { useTranslation } from "react-i18next";
 import { nip19 } from "nostr-tools";
 
@@ -29,6 +34,7 @@ export function Login({
   const [privkey, setPrivkey] = useState("");
   const hash = window.location.hash;
   const navigate = useNavigate();
+  const { createAccount } = useNstart();
 
   const nip07 = useNip07Login();
   const nip46 = useNip46Login();
@@ -82,17 +88,6 @@ export function Login({
     } finally {
       setIsLoggingIn(false);
     }
-  }
-
-  function createAccount() {
-    const query = new URLSearchParams();
-    query.append("an", "chachi"); // app name
-    query.append("at", "web"); // app type
-    query.append("ac", "https://chachi.chat"); // app callback url
-    query.append("asb", "yes"); // skip bunker
-    query.append("aa", "6d29d9"); // accent color
-    const nstart = `https://start.njump.me?${query.toString()}`;
-    window.location.href = nstart;
   }
 
   function onOpenChange(open: boolean) {
