@@ -193,8 +193,10 @@ export function AutocompleteTextarea({
       setMessage(message.replace(emojiAutocompleteRegex, `${e.native} `));
     } else if (e.image) {
       setMessage(message.replace(emojiAutocompleteRegex, `:${e.name}: `));
-      setCustomEmojis([...customEmojis, e]);
-      onCustomEmojisChange?.([...customEmojis, e]);
+      // Include the address if this is a custom emoji from an emoji set
+      const emojiWithAddress = { ...e, address: e.address };
+      setCustomEmojis([...customEmojis, emojiWithAddress]);
+      onCustomEmojisChange?.([...customEmojis, emojiWithAddress]);
     }
     setIsAutocompletingEmoji(false);
     setAutocompleteEmojiTerm("");

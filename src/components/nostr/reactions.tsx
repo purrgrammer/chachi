@@ -75,9 +75,11 @@ function Reaction({
   const [isReacting, setIsReacting] = useState(false);
   const isCustomEmoji = CUSTOM_EMOJI_CONTENT_REGEX.test(content);
   const emojiName = content.slice(1, -1);
-  const emojiImage = reactions[0].tags.find(
+  const emojiTag = reactions[0].tags.find(
     (t) => t[0] === "emoji" && t[1] === emojiName,
-  )?.[2];
+  );
+  const emojiImage = emojiTag?.[2];
+  const emojiAddress = emojiTag?.[3];
   const me = usePubkey();
   const iReacted = reactions.some((r) => r.pubkey === me);
   const { t } = useTranslation();
@@ -101,15 +103,22 @@ function Reaction({
     }
   }
 
-  async function reactCustomEmoji(emoji: string, img: string) {
+  async function reactCustomEmoji(
+    emoji: string,
+    img: string,
+    address?: string,
+  ) {
     try {
       setIsReacting(true);
       if (ndk) {
         const relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
+        const emojiTag = address
+          ? ["emoji", emoji, img, address]
+          : ["emoji", emoji, img];
         const e = new NDKEvent(ndk, {
           kind: NDKKind.Reaction,
           content: `:${emoji}:`,
-          tags: [["emoji", emoji, img]],
+          tags: [emojiTag],
         } as NostrEvent);
         e.tag(new NDKEvent(ndk, event));
         await e.publish(relaySet);
@@ -129,7 +138,7 @@ function Reaction({
       className={iReacted ? "ring ring-primary ring-1 ring-offset-0" : ""}
       onClick={() =>
         isCustomEmoji && emojiName && emojiImage
-          ? reactCustomEmoji(emojiName, emojiImage)
+          ? reactCustomEmoji(emojiName, emojiImage, emojiAddress)
           : react(content)
       }
       aria-label={`${t("chat.message.react.with")}${content}`}

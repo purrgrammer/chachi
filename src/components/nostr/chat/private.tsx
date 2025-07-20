@@ -292,7 +292,11 @@ export function ChatMessage({
       } as NostrEvent);
       ev.tag(new NDKEvent(ndk, event));
       if (e.src) {
-        ev.tags.push(["emoji", e.name, e.src]);
+        if (e.address) {
+          ev.tags.push(["emoji", e.name, e.src, e.address]);
+        } else {
+          ev.tags.push(["emoji", e.name, e.src]);
+        }
       }
       await ev.sign();
       await Promise.all(
@@ -428,6 +432,7 @@ export function ChatMessage({
                     key={singleCustomEmoji.name}
                     name={singleCustomEmoji.name}
                     image={singleCustomEmoji.image}
+                    address={singleCustomEmoji.address}
                     className={`w-32 h-32 aspect-auto rounded-md`}
                   />
                 </div>

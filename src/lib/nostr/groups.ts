@@ -140,7 +140,13 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
                 relays ? NDKRelaySet.fromRelayUrls(relays, ndk) : undefined,
               )
               .then(async (ev: NDKEvent | null) => {
-                if (!ev) throw new Error("Can't find group metadata");
+                if (!ev) {
+                  console.log("SYNC.GROUP.METADATA>CAN'T_FIND_GROUP_METADATA", {
+                    group,
+                    relays,
+                  });
+                  throw new Error("Can't find group metadata");
+                }
                 const profile = await fetchProfile(ndk, group.id, []);
                 const relay = ev.tags.find((t) => t[0] === "r")?.[1];
                 if (!relay) throw new Error("Can't find community relay");
@@ -165,6 +171,10 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
                 } as GroupMetadata;
               });
           } else {
+            console.log("SYNC.GROUP.METADATA>CAN'T_FIND_GROUP_METADATA", {
+              group,
+              ev,
+            });
             throw new Error("Can't find group metadata");
           }
         }
@@ -209,12 +219,16 @@ export function useGroup(group: Group) {
   return useQuery({
     queryKey: [GROUP_METADATA, groupId(group)],
     queryFn: async () => {
+      console.log("SYNC.GROUP.METADATA>GET", { group });
       const cached = await getGroupInfo(group);
       if (cached) {
+        console.log("SYNC.GROUP.METADATA>FOUND_IN_CACHE", { group, cached });
         return cached;
       }
       const metadata = await fetchGroupMetadata(ndk, group);
+      console.log("SYNC.GROUP.METADATA>FETCHED", { group, metadata });
       if (metadata) {
+        console.log("SYNC.GROUP.METADATA>SAVING", { group, metadata });
         saveGroupInfo(group, metadata);
       }
       return metadata;
@@ -304,7 +318,7 @@ export function useGroups(groups: Group[]) {
           }
         }
 
-	return getGroupInfo(group)
+        return getGroupInfo(group);
       },
       staleTime: Infinity,
       gcTime: 0,

@@ -61,6 +61,7 @@ function ZapContent({
       key={singleCustomEmoji.name}
       name={singleCustomEmoji.name}
       image={singleCustomEmoji.image}
+      address={singleCustomEmoji.address}
       className={cn(
         `w-32 h-32 aspect-auto rounded-md`,
         classNames?.singleCustomEmoji,

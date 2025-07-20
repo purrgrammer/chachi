@@ -195,7 +195,11 @@ export function ChatInput({
       if (customEmojis.length > 0) {
         customEmojis.forEach((e) => {
           if (e.image) {
-            event.tags.push(["emoji", e.name, e.image]);
+            if (e.address) {
+              event.tags.push(["emoji", e.name, e.image, e.address]);
+            } else {
+              event.tags.push(["emoji", e.name, e.image]);
+            }
           }
         });
       }

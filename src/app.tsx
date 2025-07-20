@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import { Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { Provider } from "jotai";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -27,7 +28,6 @@ const NWCWallet = lazy(() => import("@/pages/wallet/nwc"));
 const WebLNWallet = lazy(() => import("@/pages/wallet/webln"));
 const Settings = lazy(() => import("@/pages/settings"));
 const Mint = lazy(() => import("@/pages/mint"));
-const Nutzaps = lazy(() => import("@/pages/nutzaps"));
 const Relay = lazy(() => import("@/pages/relay"));
 const Community = lazy(() => import("@/pages/community"));
 const CommunitySettings = lazy(() => import("@/pages/community-settings"));
@@ -176,9 +176,10 @@ const router = createBrowserRouter([
         path: "/mint/:url",
         element: <Mint />,
       },
+      // todo: remove this route, zaps will be on the notifications page
       {
         path: "/zaps",
-        element: <Nutzaps />,
+        element: <Navigate to="/" replace />,
       },
       {
         path: "/relay/:relay",

@@ -63,6 +63,7 @@ export interface CustomEmoji {
   name: string;
   shortcodes: string;
   image: string;
+  address: string;
 }
 
 export type Emoji = {
@@ -70,12 +71,15 @@ export type Emoji = {
   native?: string;
   shortcodes: string;
   image?: string;
+  address?: string;
 };
 
 export interface EmojiSet {
   name: string;
   identifier: string;
   pubkey: string;
+  address: string;
+  created_at: number;
   emojis: CustomEmoji[];
 }
 

@@ -89,8 +89,7 @@ export type EmojiFragment = {
   type: "emoji";
   name: string;
   image: string;
-  //todo: emoji collection
-  //collection?: string;
+  address?: string;
 };
 
 export type HashtagFragment = {
@@ -195,6 +194,7 @@ function toNode(
         key={idx}
         name={fragment.name}
         image={fragment.image}
+        address={fragment.address}
         className={classNames.emojis}
       />
     );
@@ -612,9 +612,11 @@ function toFragments(
   if (options?.emojis !== false && tags && tags.length > 0) {
     const emojiRegex = /:([^:\s]+):/g;
     processedText = processedText.replace(emojiRegex, (match, code) => {
-      const image = tags.find((t) => t[0] === "emoji" && t[1] === code)?.[2];
+      const emojiTag = tags.find((t) => t[0] === "emoji" && t[1] === code);
+      const image = emojiTag?.[2];
+      const address = emojiTag?.[3];
       if (image) {
-        return `<emoji data-name="${code}" data-image="${image}"></emoji>`;
+        return `<emoji data-name="${code}" data-image="${image}"${address ? ` data-address="${address}"` : ""}></emoji>`;
       }
       return match;
     });
@@ -625,7 +627,8 @@ function toFragments(
     if (!text) return [];
 
     const nodes: InlineFragment[] = [];
-    const emojiRegex = /<emoji data-name="(.*?)" data-image="(.*?)"><\/emoji>/g;
+    const emojiRegex =
+      /<emoji data-name="(.*?)" data-image="(.*?)"(?: data-address="(.*?)")?><\/emoji>/g;
     let lastIndex = 0;
     let match;
 
@@ -641,6 +644,7 @@ function toFragments(
         type: "emoji",
         name: match[1],
         image: match[2],
+        address: match[3],
       });
 
       lastIndex = match.index + match[0].length;
@@ -797,7 +801,7 @@ function toFragments(
 
     // Process all formatting tags and emojis in one pass
     const formattingRegex =
-      /<(bold|italic|monospace|emoji)(?: data-name="(.*?)" data-image="(.*?)")?>([\s\S]*?)<\/\1>/g;
+      /<(bold|italic|monospace|emoji)(?: data-name="(.*?)" data-image="(.*?)"(?: data-address="(.*?)")?)?>([\s\S]*?)<\/\1>/g;
     while ((matchResult = formattingRegex.exec(processedContent)) !== null) {
       // Add text before the match
       if (matchResult.index > lastIndex) {
@@ -821,9 +825,10 @@ function toFragments(
           type: "emoji",
           name: matchResult[2],
           image: matchResult[3],
+          address: matchResult[4],
         });
       } else {
-        const content = matchResult[4] || ""; // Content is in group 4 for text formatting
+        const content = matchResult[5] || ""; // Content is in group 5 for text formatting
         if (tagType === "bold") {
           nodes.push({ type: "bold", text: content });
         } else if (tagType === "italic") {

@@ -453,7 +453,7 @@ export function CodeBlock({
           >
             <code className="px-4 block">
               {tokens.map((line, i) => {
-                const lineProps = getLineProps({ line, key: i });
+                const lineProps = getLineProps({ line });
                 return (
                   <div key={i} {...lineProps}>
                     {line.map((token, key) => (

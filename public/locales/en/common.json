@@ -16,6 +16,7 @@
   "user": {
     "profile": "Profile",
     "community": "Community",
+    "wallets": "Wallets",
     "dms": "Private messages",
     "groups": "Groups",
     "donate": "Donate",
@@ -659,6 +660,10 @@
     "set": {
       "bookmark": {
         "error": "Failed to bookmark emoji set"
+      },
+      "dialog": {
+        "title": "Emoji Set",
+        "click-to-view": "Click to view set"
       }
     }
   },

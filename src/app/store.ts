@@ -2,7 +2,7 @@ import { atom, useAtom } from "jotai";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import { NostrEvent } from "nostr-tools";
 import { discoveryRelays } from "@/lib/relay";
-import type { LoginMethod, Account, Group, Relay, EmojiSet } from "@/lib/types";
+import type { LoginMethod, Account, Group, Relay } from "@/lib/types";
 
 // todo: navigation history
 // todo: notifications
@@ -188,12 +188,6 @@ export const emojiListAtom = atomWithStorage<EmojiList>(
     emojis: [],
   },
   createJSONStorage<EmojiList>(() => localStorage),
-  { getOnInit: true },
-);
-export const emojiSetsAtom = atomWithStorage<EmojiSet[]>(
-  "emoji-sets",
-  [],
-  createJSONStorage<EmojiSet[]>(() => localStorage),
   { getOnInit: true },
 );
 

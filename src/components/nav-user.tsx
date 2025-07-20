@@ -1,14 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useNavigate } from "@/lib/navigation";
-import {
-  ChevronsUpDown,
-  LogOut,
-  Settings,
-  Zap,
-  Castle,
-  User,
-} from "lucide-react";
+import { ChevronsUpDown, LogOut, Settings, Castle, User } from "lucide-react";
 import { Login } from "@/components/nostr/login";
 import { Avatar } from "@/components/nostr/avatar";
 import { Name } from "@/components/nostr/name";
@@ -120,13 +113,10 @@ export function NavUser() {
                     {t("user.community")}
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/zaps")}>
-                  <Zap className="text-muted-foreground size-4" />
-                  {t("user.zaps")}
-                </DropdownMenuItem>
                 {wallets.length > 0 ? (
                   <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel>{t("user.wallets")}</DropdownMenuLabel>
                     {wallets.map((wallet) => (
                       <DropdownMenuItem onClick={() => openWallet(wallet)}>
                         <WalletBalance wallet={wallet} size="sm" />

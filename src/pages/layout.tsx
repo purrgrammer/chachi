@@ -23,8 +23,6 @@ import {
   groupListAtom,
   contactListAtom,
   mediaServerListAtom,
-  emojiListAtom,
-  emojiSetsAtom,
   communikeyAtom,
 } from "@/app/store";
 import { isRelayURL } from "@/lib/relay";
@@ -34,7 +32,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { fetchCommunity, useGroups } from "@/lib/nostr/groups";
 import { useGroupMessages } from "@/lib/nostr/chat";
-import { fetchCustomEmojis } from "@/lib/nostr/emojis";
+import { useSyncEmojiSets } from "@/lib/nostr/emojis";
 import { useChachiWallet } from "@/lib/wallet";
 import { RELATIONSHIP, COMMUNIKEY } from "@/lib/kinds";
 import { discoveryRelays } from "@/lib/relay";
@@ -63,8 +61,6 @@ function useUserEvents({
   const [dmRelayList, setDmRelayList] = useAtom(dmRelayListAtom);
   const [contactList, setContactList] = useAtom(contactListAtom);
   const [mediaServerList, setMediaServerList] = useAtom(mediaServerListAtom);
-  const [emojiList, setEmojiList] = useAtom(emojiListAtom);
-  const [, setEmojiSets] = useAtom(emojiSetsAtom);
 
   // Log in account
   useEffect(() => {
@@ -272,7 +268,7 @@ function useUserEvents({
     return () => sub.stop();
   }, [pubkey]);
 
-  // Groups, contacts, media server and emoji list
+  // Groups, contacts, media server, etc
   useEffect(() => {
     if (pubkey && relays.length > 0) {
       const filters = [
@@ -295,11 +291,6 @@ function useUserEvents({
           kinds: [NDKKind.BlossomList],
           authors: [pubkey],
           since: mediaServerList.created_at,
-        },
-        {
-          kinds: [NDKKind.EmojiList],
-          authors: [pubkey],
-          since: emojiList.created_at,
         },
       ];
       const sub = ndk.subscribe(
@@ -412,18 +403,6 @@ function useUserEvents({
               setMediaServerList({ created_at: event.created_at, servers });
             }
           }
-        } else if (event.kind === NDKKind.EmojiList) {
-          if (
-            event.created_at &&
-            event.created_at > (emojiList.created_at || 0)
-          ) {
-            const emojiSetRefs =
-              event.tags.filter((t) => t[0] === "a").map((t) => t[1]) ?? [];
-            setEmojiList({
-              created_at: event.created_at,
-              emojis: emojiSetRefs,
-            });
-          }
         }
       });
 
@@ -431,25 +410,11 @@ function useUserEvents({
     }
   }, [pubkey, relays]);
 
-  // Emoji sets
-  useEffect(() => {
-    fetchCustomEmojis(
-      ndk,
-      emojiList.emojis,
-      NDKRelaySet.fromRelayUrls(
-        relays.map((r) => r.url),
-        ndk,
-      ),
-    )
-      .then((emojiSets) => {
-        setEmojiSets(emojiSets);
-      })
-      .catch((err) => console.error(err));
-  }, [emojiList]);
-
   // Groups and messages
   useGroups(groupList.groups);
   useGroupMessages(groupList.groups);
+  // Emoji sets
+  useSyncEmojiSets();
   // Wallet
   useChachiWallet();
   // DMs

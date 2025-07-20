@@ -78,6 +78,7 @@ import { useNutzapStatus } from "@/lib/nutzaps";
 import { saveNutzap } from "@/lib/nutzaps";
 import { eventLink } from "@/lib/links";
 import { cn } from "@/lib/utils";
+import { useReact } from "@/lib/nostr/react";
 
 interface ChatZapProps {
   event: NostrEvent;
@@ -120,6 +121,7 @@ function ChatZap({
   const isMobile = useIsMobile();
   const canSign = useCanSign();
   const isFocused = scrollTo?.id === zap?.id;
+  const react = useReact(event, group, t("chat.message.react.error"));
 
   useEffect(() => {
     if (isFocused && ref.current) {
@@ -132,22 +134,11 @@ function ChatZap({
 
   if (!zap) return null;
 
-  // todo: extract to hook
-  async function react(e: EmojiType) {
+  async function onEmojiSelect(e: EmojiType) {
     try {
-      const ev = new NDKEvent(ndk, {
-        kind: NDKKind.Reaction,
-        content: e.native ? e.native : e.shortcodes,
-        tags: [["h", group.id, group.relay]],
-      } as NostrEvent);
-      ev.tag(new NDKEvent(ndk, event));
-      if (e.src) {
-        ev.tags.push(["emoji", e.name, e.src]);
-      }
-      await ev.publish(relaySet);
+      await react(e);
     } catch (err) {
       console.error(err);
-      toast.error(t("chat.message.react.error"));
     } finally {
       setShowingEmojiPicker(false);
     }
@@ -360,7 +351,7 @@ function ChatZap({
       <LazyEmojiPicker
         open={showingEmojiPicker}
         onOpenChange={(open) => setShowingEmojiPicker(open)}
-        onEmojiSelect={react}
+        onEmojiSelect={onEmojiSelect}
       />
       {showingZapDialog ? (
         <NewZapDialog
@@ -414,6 +405,7 @@ function ChatNutzap({
   const unit = event.tags.find((t) => t[0] === "unit")?.[1];
   const target = event.tags.find((t) => t[0] === "p")?.[1];
   const isShownInline = event.content.trim() === "" && amount && target;
+  const react = useReact(event, group, t("chat.message.react.error"));
 
   useEffect(() => {
     if (isFocused && ref.current) {
@@ -424,21 +416,11 @@ function ChatNutzap({
     }
   }, [isFocused]);
 
-  // todo: extract to hook
-  async function react(e: EmojiType) {
+  async function onEmojiSelect(e: EmojiType) {
     try {
-      const ev = new NDKEvent(ndk, {
-        kind: NDKKind.Reaction,
-        content: e.native ? e.native : e.shortcodes,
-      } as NostrEvent);
-      ev.tag(new NDKEvent(ndk, event));
-      if (e.src) {
-        ev.tags.push(["emoji", e.name, e.src]);
-      }
-      await ev.publish(relaySet);
+      await react(e);
     } catch (err) {
       console.error(err);
-      toast.error(t("chat.message.react.error"));
     } finally {
       setShowingEmojiPicker(false);
     }
@@ -722,7 +704,7 @@ function ChatNutzap({
       <LazyEmojiPicker
         open={showingEmojiPicker}
         onOpenChange={(open) => setShowingEmojiPicker(open)}
-        onEmojiSelect={react}
+        onEmojiSelect={onEmojiSelect}
       />
       {showingZapDialog ? (
         <NewZapDialog

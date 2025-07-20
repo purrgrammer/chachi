@@ -1,11 +1,11 @@
 import Dexie, { Table } from "dexie";
 import NDKCacheAdapterDexie from "@nostr-dev-kit/ndk-cache-dexie";
 import { NDKCashuToken, NDKEvent } from "@nostr-dev-kit/ndk";
-import { Event, Group, GroupMetadata, Community } from "./types";
+import { Event, Group, GroupMetadata, Community, EmojiSet } from "./types";
 import { groupId } from "./groups";
 //import { Transaction } from "@/lib/wallet";
 
-// todo: tweak cache sizes
+// TODO: tweak cache sizes
 export const cache = new NDKCacheAdapterDexie({
   dbName: "ndk",
 });
@@ -88,10 +88,11 @@ class ChachiDatabase extends Dexie {
   nutzaps!: Table<Nutzap>;
   community!: Table<Community>;
   dms!: Table<PrivateEvent>;
+  emojiSets!: Table<EmojiSet>;
 
   constructor(name: string) {
     super(name);
-    this.version(13).stores({
+    this.version(14).stores({
       events:
         "&id,created_at,group,[group+kind],[group+kind+created_at],[group+created_at]",
       lastSeen: "[group+kind],created_at,[group+created_at]",
@@ -101,6 +102,7 @@ class ChachiDatabase extends Dexie {
       groupParticipants: "&group",
       community: "&pubkey",
       dms: "&id,gift,created_at,group,pubkey,[group+kind],[group+kind+created_at],[group+created_at],[group+pubkey]",
+      emojiSets: "&address",
     });
   }
 }
@@ -206,4 +208,12 @@ export function getGroupParticipants(group: Group) {
     };
   }
   return db.groupParticipants.get(id);
+}
+
+export function getEmojiSet(address: string) {
+  return db.emojiSets.get(address);
+}
+
+export function saveEmojiSet(emojiSet: EmojiSet) {
+  return db.emojiSets.put(emojiSet);
 }

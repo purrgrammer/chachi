@@ -55,6 +55,7 @@ import { useSettings } from "@/lib/settings";
 import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import { groupByDay, formatDay } from "@/lib/chat";
+import { useReact } from "@/lib/nostr/react";
 
 function Reply({
   group,
@@ -360,6 +361,7 @@ function MessageContent({
     (!isReplyingTo || !shouldShowReply) &&
     !isDeleted;
   const [, copy] = useCopy();
+  const react = useReact(event, group, t("chat.message.react.error"));
 
   useEffect(() => {
     if (isFocused && ref.current) {
@@ -392,20 +394,11 @@ function MessageContent({
     setShowMessageActions(true);
   }
 
-  async function react(e: EmojiType) {
+  async function onEmojiSelect(e: EmojiType) {
     try {
-      const ev = new NDKEvent(ndk, {
-        kind: NDKKind.Reaction,
-        content: e.native ? e.native : e.shortcodes,
-      } as NostrEvent);
-      ev.tag(new NDKEvent(ndk, event));
-      if (e.src) {
-        ev.tags.push(["emoji", e.name, e.src]);
-      }
-      await ev.publish(relaySet);
+      await react(e);
     } catch (err) {
       console.error(err);
-      toast.error(t("chat.message.react.error"));
     } finally {
       setShowingEmojiPicker(false);
       setShowMessageActions(false);
@@ -527,6 +520,7 @@ function MessageContent({
                       key={singleCustomEmoji.name}
                       name={singleCustomEmoji.name}
                       image={singleCustomEmoji.image}
+                      address={singleCustomEmoji.address}
                       className={`w-32 h-32 aspect-auto rounded-md`}
                     />
                   </div>
@@ -573,7 +567,7 @@ function MessageContent({
                 <LazyEmojiPicker
                   open={showingEmojiPicker}
                   onOpenChange={(open) => setShowingEmojiPicker(open)}
-                  onEmojiSelect={react}
+                  onEmojiSelect={onEmojiSelect}
                 />
                 {showMessageActions && canReact ? (
                   <div className="flex absolute bottom-0 -right-7 flex-col gap-1">

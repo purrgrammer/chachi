@@ -103,10 +103,10 @@ export default function Settings() {
       ),
     },
     {
-      id: "privacy",
-      name: t("settings.privacy.title"),
-      icon: <VenetianMask className="size-4 text-muted-foreground" />,
-      children: <Privacy />,
+      id: "media",
+      name: t("settings.media.title"),
+      icon: <CloudUpload className="size-4 text-muted-foreground" />,
+      children: <Media />,
     },
     {
       id: "wallet",
@@ -115,10 +115,10 @@ export default function Settings() {
       children: <Wallet />,
     },
     {
-      id: "media",
-      name: t("settings.media.title"),
-      icon: <CloudUpload className="size-4 text-muted-foreground" />,
-      children: <Media />,
+      id: "privacy",
+      name: t("settings.privacy.title"),
+      icon: <VenetianMask className="size-4 text-muted-foreground" />,
+      children: <Privacy />,
     },
   ];
 

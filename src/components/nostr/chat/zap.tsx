@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/context-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { useReact } from "@/lib/nostr/react";
 
 interface ChatZapProps {
   event: NostrEvent;
@@ -80,6 +81,7 @@ export function ChatZap({
   const isMobile = useIsMobile();
   const canSign = useCanSign();
   const isFocused = scrollTo?.id === zap?.id;
+  const react = useReact(event, group, t("chat.message.react.error"));
 
   useEffect(() => {
     if (isFocused && ref.current) {
@@ -92,22 +94,11 @@ export function ChatZap({
 
   if (!zap) return null;
 
-  // todo: extract to hook
-  async function react(e: EmojiType) {
+  async function onEmojiSelect(e: EmojiType) {
     try {
-      const ev = new NDKEvent(ndk, {
-        kind: NDKKind.Reaction,
-        content: e.native ? e.native : e.shortcodes,
-        tags: group ? [["h", group?.id, group?.relay]] : [],
-      } as NostrEvent);
-      ev.tag(new NDKEvent(ndk, event));
-      if (e.src) {
-        ev.tags.push(["emoji", e.name, e.src]);
-      }
-      await ev.publish(relaySet);
+      await react(e);
     } catch (err) {
       console.error(err);
-      toast.error(t("chat.message.react.error"));
     } finally {
       setShowingEmojiPicker(false);
     }
@@ -312,7 +303,7 @@ export function ChatZap({
       <LazyEmojiPicker
         open={showingEmojiPicker}
         onOpenChange={(open) => setShowingEmojiPicker(open)}
-        onEmojiSelect={react}
+        onEmojiSelect={onEmojiSelect}
       />
       {showingZapDialog ? (
         <NewZapDialog

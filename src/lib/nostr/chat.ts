@@ -9,20 +9,9 @@ import {
 import { useNDK } from "@/lib/ndk";
 import { deleteGroupEvent, saveGroupEvent } from "@/lib/messages";
 import { getLastGroupMessage } from "@/lib/messages/queries";
-import { useStream } from "@/lib/nostr";
 import type { Group } from "@/lib/types";
 import { groupId } from "@/lib/groups";
 import { DELETE_GROUP, RELATIONSHIP } from "@/lib/kinds";
-
-export function useDeletions(group: Group) {
-  return useStream(
-    {
-      kinds: [NDKKind.EventDeletion, 9005 as NDKKind],
-      "#h": [group.id],
-    },
-    [group.relay],
-  );
-}
 
 export function useGroupMessages(groups: Group[]) {
   const ndk = useNDK();
