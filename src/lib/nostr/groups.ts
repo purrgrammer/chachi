@@ -122,7 +122,7 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
         { kinds: [NDKKind.GroupMetadata], "#d": [group.id] },
         {
           closeOnEose: true,
-          cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST,
+          cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
         },
         NDKRelaySet.fromRelayUrls([group.relay], ndk),
       )
@@ -303,6 +303,8 @@ export function useGroups(groups: Group[]) {
             console.error("Error fetching group participants:", error);
           }
         }
+
+	return getGroupInfo(group)
       },
       staleTime: Infinity,
       gcTime: 0,
