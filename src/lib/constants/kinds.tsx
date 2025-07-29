@@ -32,6 +32,7 @@ import {
   Gamepad2,
   Settings,
   UserPlus,
+  Mic,
 } from "lucide-react";
 import {
   STREAM,
@@ -49,6 +50,7 @@ import {
   REPO,
   FOLLOW_PACK,
   MODERATED_COMMUNITY,
+  AUDIO_NOTE,
 } from "@/lib/kinds";
 
 /**
@@ -104,6 +106,11 @@ export const ContentKinds = [
     kind: NDKKind.HorizontalVideo,
     translationKey: "kinds.34235",
     icon: <Video size={16} />,
+  },
+  {
+    kind: AUDIO_NOTE,
+    translationKey: "kinds.1222",
+    icon: <Mic size={16} />,
   },
   {
     kind: NDKKind.Article,
@@ -226,6 +233,7 @@ export const ContentCategoryGroups = [
       NDKKind.Image,
       NDKKind.VerticalVideo,
       NDKKind.HorizontalVideo,
+      AUDIO_NOTE,
       GIF_SET,
       NDKKind.EmojiSet,
     ],

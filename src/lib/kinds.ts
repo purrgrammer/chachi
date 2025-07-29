@@ -21,6 +21,7 @@ export const WORKOUT = 1301 as NDKKind;
 export const WORKOUT_TEMPLATE = 33401 as NDKKind;
 export const WEBRTC_SIGNAL = 25050 as NDKKind;
 export const FOLLOW_PACK = 39089 as NDKKind;
+export const AUDIO_NOTE = 1222 as NDKKind;
 // Communikeys
 export const COMMUNIKEY = 10_222 as NDKKind;
 export const RELATIONSHIP = 30_382 as NDKKind;

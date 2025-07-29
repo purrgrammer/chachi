@@ -27,6 +27,7 @@ export interface Imeta {
   type?: string;
   alt?: string;
   fallback?: string;
+  waveform?: string;
 }
 
 export function parseImeta(imeta: string[]): Imeta | null {
@@ -44,6 +45,7 @@ export function parseImeta(imeta: string[]): Imeta | null {
       x: getImetaValue(imeta, "x"),
       type: getImetaValue(imeta, "m"),
       alt: getImetaValue(imeta, "alt"),
+      waveform: getImetaValue(imeta, "waveform"),
       // todo: more than one fallback
       fallback: getImetaValue(imeta, "fallback"),
     };

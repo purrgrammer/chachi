@@ -109,6 +109,7 @@ import {
   TARGETED_PUBLICATION,
   FOLLOW_PACK,
   MODERATED_COMMUNITY,
+  AUDIO_NOTE,
 } from "@/lib/kinds";
 import {
   Dialog,
@@ -140,6 +141,7 @@ import { useSortedGroups, saveGroupEvent } from "@/lib/messages";
 import { usePubkey, useCanSign } from "@/lib/account";
 import type { Group, Emoji as EmojiType } from "@/lib/types";
 import { useTranslation } from "react-i18next";
+import AudioNote from "@/components/nostr/audio-note";
 import { LazyCodeBlock } from "@/components/lazy-code-block";
 import { NameList } from "@/components/nostr//name-list";
 import { ZapGoal } from "./zap-goal";
@@ -349,6 +351,10 @@ const eventDetails: Record<
     preview: ModeratedCommunitiesPreview,
     detail: ModeratedCommunitiesPreview,
     content: ModeratedCommunitiesContent,
+  },
+  [AUDIO_NOTE]: {
+    preview: AudioNote,
+    detail: AudioNote,
   },
 };
 
