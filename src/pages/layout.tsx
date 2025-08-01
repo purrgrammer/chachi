@@ -1,4 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
+import { Navigate } from "react-router-dom";
 import { NostrEvent } from "nostr-tools";
 import { useState, ReactNode, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
@@ -424,9 +425,7 @@ function useUserEvents({
 const authRoutes = ["/dm", "/wallet", "/settings", "/zaps"];
 
 function isAuthRoute(pathname: string) {
-  return (
-    pathname === "/" || authRoutes.some((route) => pathname.startsWith(route))
-  );
+  return authRoutes.some((route) => pathname.startsWith(route));
 }
 
 function NostrSync({ children }: { children: ReactNode }) {
@@ -445,10 +444,16 @@ function NostrSync({ children }: { children: ReactNode }) {
       setIsLoggingIn(false);
     },
   });
+
+  useEffect(() => {
+    if (pubkey && isLoggingIn) {
+      setIsLoggingIn(false);
+    }
+  }, [pubkey, isLoggingIn]);
   if (isLoggingIn) {
     return <LoadingScreen />;
   }
-  if (!pubkey && isAuthRoute(location.pathname)) {
+  if (isAuthRoute(location.pathname) && !pubkey) {
     return <Landing />;
   }
   return children;
