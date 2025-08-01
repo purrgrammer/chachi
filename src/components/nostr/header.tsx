@@ -67,13 +67,10 @@ export function Header({ event }: { event: NostrEvent }) {
   // todo: try harder to figure out the right relay if not present
   const host = event.tags.find((t) => t[0] === "p" && t[3] === "host")?.[1];
   const clientTag = event.tags.find((t) => t[0] === "client");
-  const hasClientAddress =
-    clientTag?.[1] && clientTag[1].startsWith(`${NDKKind.AppHandler}:`);
-  const clientName = hasClientAddress ? null : clientTag?.[1];
-  const clientAddress = hasClientAddress
-    ? clientTag?.[1]
-    : clientTag?.[2]?.startsWith(`${NDKKind.AppHandler}:`)
-      ? clientTag?.[2]
+  const clientName = clientTag?.[1];
+  const clientAddress =
+    clientTag?.[2] && clientTag[2].startsWith(`${NDKKind.AppHandler}:`)
+      ? clientTag[2]
       : null;
   const clientRelay =
     clientTag?.[3] && isRelayURL(clientTag[3]) ? clientTag[3] : null;
