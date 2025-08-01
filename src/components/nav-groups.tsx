@@ -256,10 +256,10 @@ function RelayItem({ group }: { group: Group }) {
 function CommunityItem({ group }: { group: Group }) {
   const lastMessage = useLastMessage(group);
   const navigate = useNavigate();
-  const { pubkey } = useParams();
+  const { identifier } = useParams();
   const unreadMessages = useUnreadMessages(group);
   //const unreadMentions = useUnreadMentions(group);
-  const isActive = pubkey === group.id;
+  const isActive = identifier === group.id;
 
   function openGroup() {
     navigate(`/c/${group.id}`);
