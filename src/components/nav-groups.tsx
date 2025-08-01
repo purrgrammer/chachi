@@ -42,49 +42,48 @@ interface MessageEvent {
 }
 
 function PaymentPreview({ group, zap }: { group: Group; zap: Zap | Nutzap }) {
-  return (
-    <div className="flex flex-row items-start gap-1 text-xs line-clamp-1 text-muted-foreground">
+  return zap.content ? (
+    <div className="flex flex-row items-baseline gap-1 text-xs line-clamp-1 text-muted-foreground">
       <span className="font-semibold">
         <Name pubkey={zap.pubkey} short />
       </span>
-      {zap.content ? (
-        <>
-          <LazyRichText
-            group={group}
-            className="leading-none line-clamp-1"
-            options={{
-              inline: true,
-              emojis: true,
-              mentions: true,
-              hashtags: true,
-              events: false,
-              ecash: false,
-              codeBlock: false,
-              syntax: false,
-              images: false,
-              video: false,
-              audio: false,
-              youtube: false,
-            }}
-            classNames={{
-              emojis: "size-4 opacity-70",
-              spans: "break-all",
-              urls: "pointer-events-none",
-              mentions: "pointer-events-none",
-            }}
-            tags={zap.tags}
-          >
-            {zap.content}
-          </LazyRichText>
-        </>
-      ) : (
-        <div className="flex flex-row items-center gap-1">
-          <Amount amount={zap.amount} size="sm" />
-          <span className="font-semibold">
-            <Name pubkey={zap.p!} short />
-          </span>
-        </div>
-      )}
+      <LazyRichText
+        group={group}
+        className="leading-none line-clamp-1"
+        options={{
+          inline: true,
+          emojis: true,
+          mentions: true,
+          hashtags: true,
+          events: false,
+          ecash: false,
+          codeBlock: false,
+          syntax: false,
+          images: false,
+          video: false,
+          audio: false,
+          youtube: false,
+        }}
+        classNames={{
+          emojis: "size-4 opacity-70",
+          spans: "break-all",
+          urls: "pointer-events-none",
+          mentions: "pointer-events-none",
+        }}
+        tags={zap.tags}
+      >
+        {zap.content}
+      </LazyRichText>
+    </div>
+  ) : (
+    <div className="flex flex-row items-center gap-1 text-xs line-clamp-1 text-muted-foreground">
+      <span className="font-semibold">
+        <Name pubkey={zap.pubkey} short />
+      </span>
+      <Amount amount={zap.amount} size="xs" />
+      <span className="font-semibold">
+        <Name pubkey={zap.p!} short />
+      </span>
     </div>
   );
 }

@@ -1,5 +1,4 @@
 import { useAtom, useAtomValue } from "jotai";
-import { Navigate } from "react-router-dom";
 import { NostrEvent } from "nostr-tools";
 import { useState, ReactNode, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
