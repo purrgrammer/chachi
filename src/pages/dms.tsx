@@ -14,7 +14,6 @@ import { useNavigate } from "react-router-dom";
 import { Avatar } from "@/components/nostr/avatar";
 import { Name } from "@/components/nostr/name";
 import { NameList } from "@/components/nostr/name-list";
-import { WebRTC } from "@/components/webrtc";
 
 function Heading({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
@@ -145,7 +144,6 @@ export default function DirectMessages() {
         <h2 className="text-lg">{t("private-group.private-groups")}</h2>
       </Header>
       <div className="flex flex-col p-2 px-4 space-y-4">
-        <WebRTC />
         <GroupsActivity />
         {hasNoDMRelays ? (
           <p className="text-lg font-bold">{t("private-group.no-dm-relays")}</p>
