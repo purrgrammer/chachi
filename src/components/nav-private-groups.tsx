@@ -166,7 +166,7 @@ function GroupItem({ group }: { group: PrivateGroup }) {
                 youtube: false,
               }}
               classNames={{
-                emojis: "size-4 opacity-70",
+                emojis: "pointer-events-none size-4 opacity-70",
                 spans: "break-all",
               }}
               tags={lastMessage.tags}

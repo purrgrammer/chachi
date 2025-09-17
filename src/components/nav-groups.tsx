@@ -65,7 +65,7 @@ function PaymentPreview({ group, zap }: { group: Group; zap: Zap | Nutzap }) {
           youtube: false,
         }}
         classNames={{
-          emojis: "size-4 opacity-70",
+          emojis: "pointer-events-none size-4 opacity-70",
           spans: "break-all",
           urls: "pointer-events-none",
           mentions: "pointer-events-none",
@@ -187,7 +187,7 @@ const LastMessagePreview = ({
           youtube: false,
         }}
         classNames={{
-          emojis: "size-4 opacity-70",
+          emojis: "pointer-events-none size-4 opacity-70",
           spans: "break-all",
           urls: "pointer-events-none",
           mentions: "pointer-events-none",
