@@ -102,7 +102,7 @@ function GroupItem({ group }: { group: PrivateGroup }) {
 
   return (
     <div
-      className={`flex flex-row gap-2 items-center p-1 py-2 cursor-pointer transition-colors ${isActive ? "bg-accent/50" : "bg-background"} hover:bg-accent/80 overflow-hidden group-has-[[data-collapsible=icon]]/sidebar-wrapper:bg-transparent group-has-[[data-collapsible=icon]]/sidebar-wrapper:py-1 transition-all`}
+      className={`flex flex-row gap-2 items-center p-1 py-2 cursor-pointer ${isActive ? "bg-accent/50" : "bg-background"} hover:bg-accent/80 overflow-hidden group-has-[[data-collapsible=icon]]/sidebar-wrapper:bg-transparent group-has-[[data-collapsible=icon]]/sidebar-wrapper:py-1`}
       onClick={openGroup}
     >
       <div
@@ -189,7 +189,7 @@ function PublicGroups() {
   const unreadMessages = unreads.reduce((acc, curr) => acc + curr.count, 0);
   return (
     <div
-      className={`flex flex-row gap-2 items-center p-1 py-2 cursor-pointer transition-colors hover:bg-accent/80 overflow-hidden group-has-[[data-collapsible=icon]]/sidebar-wrapper:bg-transparent group-has-[[data-collapsible=icon]]/sidebar-wrapper:py-1 transition-all relative`}
+      className={`flex flex-row gap-2 items-center p-1 py-2 cursor-pointer hover:bg-accent/80 overflow-hidden group-has-[[data-collapsible=icon]]/sidebar-wrapper:bg-transparent group-has-[[data-collapsible=icon]]/sidebar-wrapper:py-1 relative`}
       onClick={() => navigate("/")}
     >
       <div className={`size-10 rounded-full relative`}>
