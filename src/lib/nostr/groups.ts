@@ -122,6 +122,7 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
         { kinds: [NDKKind.GroupMetadata], "#d": [group.id] },
         {
           closeOnEose: true,
+          groupable: false,
           cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
         },
         NDKRelaySet.fromRelayUrls([group.relay], ndk),
@@ -135,6 +136,7 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
                 { kinds: [COMMUNIKEY], authors: [group.id] },
                 {
                   closeOnEose: true,
+                  groupable: false,
                   cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
                 },
                 relays ? NDKRelaySet.fromRelayUrls(relays, ndk) : undefined,
@@ -204,7 +206,11 @@ async function fetchGroups(ndk: NDK, relay: string) {
   return ndk
     .fetchEvents(
       { kinds: [NDKKind.GroupMetadata] },
-      { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY },
+      {
+        closeOnEose: true,
+        groupable: false,
+        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+      },
       NDKRelaySet.fromRelayUrls([relay], ndk),
     )
     .then((events) => {
@@ -249,6 +255,7 @@ async function fetchGroupMembers(ndk: NDK, group: Group): Promise<string[]> {
     },
     {
       closeOnEose: true,
+      groupable: false,
       cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
     },
     relaySet,
@@ -273,6 +280,7 @@ async function fetchGroupAdmins(ndk: NDK, group: Group): Promise<string[]> {
     },
     {
       closeOnEose: true,
+      groupable: false,
       cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
     },
     relaySet,
@@ -396,7 +404,11 @@ export function useCloseGroups() {
     queryFn: async () => {
       const events = await ndk.fetchEvents(
         { kinds: [NDKKind.GroupMembers], "#p": follows },
-        { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY },
+        {
+          closeOnEose: true,
+          groupable: false,
+          cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+        },
         relaySet,
       );
       // todo: get metadatas
@@ -651,6 +663,7 @@ export function useValidateInviteCode(group: Group) {
         },
         {
           closeOnEose: true,
+          groupable: false,
           cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
         },
         relaySet,
