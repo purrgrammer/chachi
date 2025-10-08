@@ -24,7 +24,7 @@ import {
   NDKCashuWallet,
   NDKWebLNWallet,
   NDKNWCWallet,
-} from "@nostr-dev-kit/ndk-wallet";
+} from "@nostr-dev-kit/wallet";
 import { Button } from "@/components/ui/button";
 import { MintLink } from "@/components/mint";
 import { RelayLink } from "@/components/nostr/relay";

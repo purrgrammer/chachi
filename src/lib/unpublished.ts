@@ -30,7 +30,8 @@ export function useRetryUnpublishedEvent() {
     try {
       const unpublishedEvents = await cache.getUnpublishedEvents();
       const eventToRetry = unpublishedEvents.find(
-        (e) => e.event.id === eventId && e.relays.filter(isRelayURL).length > 0,
+        (e: { event: { id: string }; relays: string[] }) =>
+          e.event.id === eventId && e.relays.filter(isRelayURL).length > 0,
       );
 
       if (!eventToRetry) {

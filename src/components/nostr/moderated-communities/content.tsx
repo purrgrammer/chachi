@@ -19,7 +19,7 @@ function useApprovedPosts(community: ModeratedCommunity) {
   const postKinds = [
     String(NDKKind.Text),
     String(NDKKind.Article),
-    String(NDKKind.GroupNote),
+    String(NDKKind.Thread),
   ];
   const relaySet = useRelaySet(community.relays);
   const fetchOptions = {
@@ -45,7 +45,7 @@ function useApprovedPosts(community: ModeratedCommunity) {
           [
             // moderator's posts
             {
-              kinds: [NDKKind.Text, NDKKind.Article, NDKKind.GroupNote],
+              kinds: [NDKKind.Text, NDKKind.Article, NDKKind.Thread],
               "#a": [
                 `${MODERATED_COMMUNITY}:${community.pubkey}:${community.id}`,
               ],

@@ -7,8 +7,8 @@ import db from "@/lib/db";
 import { NostrEvent } from "nostr-tools";
 import { useNDK } from "@/lib/ndk";
 import { useCashuWallet } from "@/lib/wallet";
-import { NDKUser } from "@nostr-dev-kit/ndk";
-import { NDKNutzapMonitor } from "@nostr-dev-kit/ndk-wallet";
+import { NDKCashuMintList, NDKUser, NDKNutzap } from "@nostr-dev-kit/ndk";
+import { NDKNutzapMonitor } from "@nostr-dev-kit/wallet";
 import { formatShortNumber } from "@/lib/number";
 import { usePubkey } from "@/lib/account";
 
@@ -53,8 +53,6 @@ export function saveNutzap(
 
 const nutzapMonitorAtom = atom<NDKNutzapMonitor | null>(null);
 
-const MONITOR_PAGE_SIZE = 20;
-
 export function useNutzapMonitor() {
   const { t } = useTranslation();
   const ndk = useNDK();
@@ -74,11 +72,10 @@ export function useNutzapMonitor() {
     if (nutzapMonitor) return;
 
     // todo: fetch and pass mint list
-    const monitor = new NDKNutzapMonitor(
-      ndk,
-      new NDKUser({ pubkey }),
-      //cashuWallet.relaySet,
-    );
+    const mintList = new NDKCashuMintList(ndk);
+    const monitor = new NDKNutzapMonitor(ndk, new NDKUser({ pubkey }), {
+      mintList,
+    });
     monitor.wallet = cashuWallet;
 
     setNutzapMonitor(monitor);
@@ -87,7 +84,7 @@ export function useNutzapMonitor() {
       saveNutzap(event.rawEvent() as NostrEvent);
     });
 
-    monitor.on("redeem", (events) => {
+    monitor.on("redeemed", (events: NDKNutzap[], amount: number) => {
       for (const event of events) {
         saveNutzap(
           event.rawEvent() as NostrEvent,
@@ -95,16 +92,12 @@ export function useNutzapMonitor() {
           event.id,
           Math.floor(Date.now() / 1000),
         );
-        toast.success(
-          t("nutzaps.redeem-success", {
-            amount: formatShortNumber(event.amount),
-          }),
-        );
       }
-    });
-
-    monitor.on("spent", (event) => {
-      saveNutzap(event.rawEvent() as NostrEvent, "spent");
+      toast.success(
+        t("nutzaps.redeem-success", {
+          amount: formatShortNumber(amount),
+        }),
+      );
     });
 
     monitor.on("failed", (event) => {
@@ -112,8 +105,9 @@ export function useNutzapMonitor() {
     });
 
     monitor.start({
-      knownNutzaps,
-      pageSize: MONITOR_PAGE_SIZE,
+      opts: {
+        groupable: false,
+      },
     });
   }, [cashuWallet, pubkey, nutzapMonitor, knownNutzaps]);
 }

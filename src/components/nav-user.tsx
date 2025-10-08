@@ -29,7 +29,7 @@ import {
   NDKCashuWallet,
   NDKNWCWallet,
   NDKWebLNWallet,
-} from "@nostr-dev-kit/ndk-wallet";
+} from "@nostr-dev-kit/wallet";
 import { useNDKWallets } from "@/lib/wallet";
 import { CHACHI_PUBKEY, CHACHI_GROUP } from "@/constants";
 import { useAtomValue } from "jotai";

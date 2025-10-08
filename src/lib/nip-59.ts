@@ -7,7 +7,6 @@ import {
   NDKKind,
   NDKEncryptionScheme,
 } from "@nostr-dev-kit/ndk";
-import { NostrEvent as NostrEventType } from "nostr-tools";
 import { getEventHash } from "nostr-tools";
 
 export type GiftWrapParams = {
@@ -91,8 +90,7 @@ export async function giftUnwrap(
 function getRumorEvent(event: NDKEvent, kind?: number): NDKEvent {
   const rumor = event.rawEvent();
   rumor.kind = kind || rumor.kind || NDKKind.PrivateDirectMessage;
-  rumor.sig = undefined;
-  rumor.id = getEventHash(rumor as NostrEventType);
+  rumor.id = getEventHash(rumor);
   return new NDKEvent(event.ndk, rumor);
 }
 

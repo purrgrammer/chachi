@@ -25,7 +25,7 @@ import { useTranslation } from "react-i18next";
 export function NewPost({
   group,
   children,
-  kind = NDKKind.GroupNote,
+  kind = NDKKind.Thread,
   action = "Post",
   //TODO add translation
   title = "New post",

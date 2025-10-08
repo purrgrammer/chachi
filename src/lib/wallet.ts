@@ -29,7 +29,8 @@ import {
   NDKCashuWallet,
   NDKWebLNWallet,
   NDKNWCWallet,
-} from "@nostr-dev-kit/ndk-wallet";
+} from "@nostr-dev-kit/wallet";
+import type { Proof } from "@cashu/cashu-ts";
 import { useNDK, useNWCNDK } from "@/lib/ndk";
 import { Zap, validateZapRequest } from "@/lib/nip-57";
 import { usePubkey, useMintList } from "@/lib/account";
@@ -122,7 +123,7 @@ export function useChachiWallet() {
         if (w.type === "nwc") {
           return createNWCWallet(w.connection, nwcNDK);
         } else if (w.type === "webln") {
-          return createWebLNWallet();
+          return createWebLNWallet(ndk);
         }
         throw new Error("Unsupported wallet type");
       }),
@@ -435,11 +436,8 @@ export function useCreateWallet() {
     const allRelays = Array.from(new Set([...relays, ...myRelays]));
     await ev.publish(NDKRelaySet.fromRelayUrls(allRelays, ndk));
     await wallet.publish();
-    if (wallet.event) {
-      setWallets((wallets) => [...wallets, { type: "nip60" }]);
-    } else {
-      throw new Error("Failed to create wallet");
-    }
+    // Wallet created successfully
+    setWallets((wallets) => [...wallets, { type: "nip60" }]);
   };
 }
 
@@ -625,8 +623,8 @@ export async function createCashuWallet(
   });
 }
 
-export async function createWebLNWallet() {
-  return new NDKWebLNWallet();
+export async function createWebLNWallet(ndk: NDK) {
+  return new NDKWebLNWallet(ndk);
 }
 
 export async function createNWCWallet(connection: string, ndk: NDK) {
@@ -690,7 +688,7 @@ export async function mintEcash(
   amount: number,
   description = "",
 ): Promise<Token | undefined> {
-  const cashuWallet = await wallet.cashuWallet(mint);
+  const cashuWallet = await wallet.getCashuWallet(mint);
   const mintProofs = await wallet.state.getProofs({ mint });
   const result = await cashuWallet.send(amount, mintProofs, {
     proofsWeHave: mintProofs,
@@ -701,7 +699,9 @@ export async function mintEcash(
   });
 
   if (result?.send.length > 0) {
-    const destroy = result.send.filter((p) => wallet.state.proofs.get(p.C));
+    const destroy = result.send.filter((p: Proof) =>
+      wallet.state.proofs.get(p.C),
+    );
     const change = { store: result?.keep ?? [], destroy, mint };
     const updateRes = await wallet.state.update(change);
 

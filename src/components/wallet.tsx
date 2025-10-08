@@ -45,7 +45,7 @@ import {
   NDKCashuWallet,
   NDKWebLNWallet,
   NDKNWCWallet,
-} from "@nostr-dev-kit/ndk-wallet";
+} from "@nostr-dev-kit/wallet";
 import { RichText } from "@/components/rich-text";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -542,7 +542,7 @@ export function ConnectWallet() {
     }
     try {
       setIsLoadingWebln(true);
-      const wallet = new NDKWebLNWallet();
+      const wallet = new NDKWebLNWallet(ndk);
       setWallets((ws) => [{ type: "webln" }, ...ws]);
       setNDKWallets((ws) => [...ws, wallet]);
       setIsOpen(false);
@@ -2592,11 +2592,12 @@ export function WebLNWalletBalanceAmount({
   );
 }
 
-function CashuWalletName({ wallet }: { wallet: NDKCashuWallet }) {
-  return wallet.event ? (
+function CashuWalletName() {
+  const pubkey = usePubkey();
+  return pubkey ? (
     <User
       notClickable
-      pubkey={wallet.event.pubkey}
+      pubkey={pubkey}
       classNames={{
         wrapper: "gap-1.5",
         avatar: "size-4",
@@ -2620,7 +2621,7 @@ function CashuWalletBalance({
     <div className="flex flex-row gap-10 w-full items-center justify-between">
       <div className="flex flex-row gap-2 items-center">
         <WalletIcon className="size-4 text-muted-foreground" />
-        <CashuWalletName wallet={wallet} />
+        <CashuWalletName />
       </div>
       <Balance short={short} amount={balance} unit="sat" size={size} />
     </div>
@@ -2658,7 +2659,7 @@ function WebLNWalletName({ wallet }: { wallet: NDKWebLNWallet }) {
 
 export function WalletName({ wallet }: { wallet: NDKWallet }) {
   if (wallet instanceof NDKCashuWallet) {
-    return <CashuWalletName wallet={wallet} />;
+    return <CashuWalletName />;
   } else if (wallet instanceof NDKWebLNWallet) {
     return <WebLNWalletName wallet={wallet} />;
   } else if (wallet instanceof NDKNWCWallet) {

@@ -16,7 +16,7 @@ import {
 import { NostrEvent } from "nostr-tools";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { NDKEvent, NDKKind, NDKNutzap } from "@nostr-dev-kit/ndk";
-import { NDKCashuWallet } from "@nostr-dev-kit/ndk-wallet";
+import { NDKCashuWallet } from "@nostr-dev-kit/wallet";
 import { User } from "@/components/nostr/user";
 import { ProfileDrawer } from "@/components/nostr/profile";
 import { useCopy } from "@/lib/hooks";
@@ -146,21 +146,30 @@ export function ChatNutzap({
     try {
       if (wallet instanceof NDKCashuWallet) {
         const nutzap = NDKNutzap.from(new NDKEvent(ndk, event));
-        if (nutzap) {
-          await wallet.redeemNutzap(nutzap, {
-            onRedeemed: (proofs) => {
-              // todo: msat unit
-              const amount = proofs.reduce(
-                (acc, proof) => acc + proof.amount,
-                0,
-              );
-              toast.success(
-                t("nutzaps.redeem-success", {
-                  amount: formatShortNumber(amount),
-                }),
-              );
-            },
+        if (nutzap && nutzap.p2pk) {
+          const privkey = wallet.privkeys.get(nutzap.p2pk)?.privateKey;
+          if (!privkey) {
+            toast.error(t("nutzaps.redeem-error"));
+            return;
+          }
+
+          const cashuWallet = await wallet.getCashuWallet(nutzap.mint);
+          if (!cashuWallet) {
+            toast.error(t("nutzaps.redeem-error"));
+            return;
+          }
+
+          const amount = await wallet.redeemNutzaps([nutzap], privkey, {
+            mint: nutzap.mint,
+            proofs: nutzap.proofs,
+            cashuWallet,
           });
+
+          toast.success(
+            t("nutzaps.redeem-success", {
+              amount: formatShortNumber(amount),
+            }),
+          );
         }
       }
     } catch (err) {

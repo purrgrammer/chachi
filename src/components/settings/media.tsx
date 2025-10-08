@@ -76,7 +76,7 @@ function MediaServerList({
         tags: servers.map((server) => ["server", server]),
       } as NostrEvent);
       await event.sign();
-      await ndk.publish(event);
+      await event.publish();
       console.log("SAVE MEDIA SERVER LIST", servers, event.rawEvent());
     } catch (err) {
       console.error(err);

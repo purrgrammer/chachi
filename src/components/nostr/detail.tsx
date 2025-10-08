@@ -189,7 +189,7 @@ const eventDetails: Record<
     preview: ZapGoal,
     detail: ZapGoal,
   },
-  [NDKKind.GroupNote]: {
+  [NDKKind.Thread]: {
     preview: Post,
     detail: PostDetail,
   },

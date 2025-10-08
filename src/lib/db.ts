@@ -1,5 +1,5 @@
 import Dexie, { Table } from "dexie";
-import NDKCacheAdapterDexie from "@nostr-dev-kit/ndk-cache-dexie";
+import NDKCacheAdapterDexie from "@nostr-dev-kit/cache-dexie";
 import { NDKCashuToken, NDKEvent } from "@nostr-dev-kit/ndk";
 import { Event, Group, GroupMetadata, Community, EmojiSet } from "./types";
 import { groupId } from "./groups";
@@ -113,7 +113,7 @@ export default db;
 export function getUnpublishedEvents() {
   return cache
     .getUnpublishedEvents()
-    .then((events) => events.map((e) => e.event));
+    .then((events: { event: NDKEvent }[]) => events.map((e) => e.event));
 }
 
 export function getTokenEvents(pubkey: string) {
@@ -167,7 +167,10 @@ export async function getUnpublishedEvent(
   eventId: string,
 ): Promise<NDKEvent | null> {
   const unpublishedEvents = await cache.getUnpublishedEvents();
-  return unpublishedEvents.find((e) => e.event.id === eventId)?.event ?? null;
+  return (
+    unpublishedEvents.find((e: { event: NDKEvent }) => e.event.id === eventId)
+      ?.event ?? null
+  );
 }
 
 export function getCommunity(pubkey: string) {

@@ -73,7 +73,7 @@ export const ContentKinds = [
     icon: <Heart size={16} />,
   },
   {
-    kind: NDKKind.GroupNote,
+    kind: NDKKind.Thread,
     translationKey: "kinds.11",
     icon: <Hash size={16} />,
   },
@@ -218,7 +218,7 @@ export const ContentCategoryGroups = [
     kinds: [
       NDKKind.Text,
       NDKKind.GroupChat,
-      NDKKind.GroupNote,
+      NDKKind.Thread,
       COMMENT,
       NDKKind.Article,
       BOOK,

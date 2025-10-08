@@ -18,14 +18,14 @@ export const GroupPosts = forwardRef(
     const includeOpPublications = metadata?.isCommunity;
     const filter = [
       {
-        kinds: [NDKKind.GroupNote],
+        kinds: [NDKKind.Thread],
         "#h": [group.id],
         limit: 50,
       },
       ...(includeOpPublications
         ? [
             {
-              kinds: [NDKKind.Text, NDKKind.GroupNote],
+              kinds: [NDKKind.Text, NDKKind.Thread],
               authors: [group.id],
               limit: 50,
             },
