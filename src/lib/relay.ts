@@ -59,7 +59,7 @@ export const discoveryRelays = [
   "wss://purplepag.es",
   "wss://relay.nostr.band",
   "wss://profiles.nostrver.se",
-  "wss://profiles.nostr1.com",
+  //"wss://profiles.nostr1.com",
 ];
 
 export const fallbackRelays = ["wss://relay.nostr.band"];
