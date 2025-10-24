@@ -57,12 +57,12 @@ export interface RelayInfo {
 
 export const discoveryRelays = [
   "wss://purplepag.es",
-  "wss://relay.nostr.band",
+  //"wss://relay.nostr.band",
   "wss://profiles.nostrver.se",
   //"wss://profiles.nostr1.com",
 ];
 
-export const fallbackRelays = ["wss://relay.nostr.band"];
+export const fallbackRelays = ["wss://relay.primal.net"];
 
 export const nip29Relays = [
   "wss://groups.0xchat.com",
