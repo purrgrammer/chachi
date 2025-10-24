@@ -57,7 +57,7 @@ export function AppRecommendation({
         pubkey={pubkey}
         kind={Number(kind)}
         identifier={id}
-        relays={relays || ["wss://relay.nostr.band"]}
+        relays={relays}
       />
     </div>
   );
