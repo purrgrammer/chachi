@@ -28,6 +28,7 @@ import { PrivateGroup as Group, PrivateGroup } from "@/lib/types";
 import { useOnWebRTCSignal } from "@/components/webrtc";
 import { WEBRTC_SIGNAL } from "@/lib/kinds";
 import { privateMessagesEnabledAtom } from "@/app/store";
+import { triggerLastSeenSync } from "@/lib/lastSeenSyncTrigger";
 import Dexie from "dexie";
 
 export function groupId(event: NostrEvent) {
@@ -379,6 +380,9 @@ export function saveLastSeen(ev: NostrEvent, group: PrivateGroup) {
     tag,
     ref,
   });
+
+  // Trigger sync if enabled
+  triggerLastSeenSync();
 }
 
 export function useSaveLastSeen(group: Group) {

@@ -880,6 +880,10 @@
         "add": "Add Relay",
         "placeholder": "wss://relay.example.com",
         "invalid-url": "Please enter a valid relay URL"
+      },
+      "unreadSync": {
+        "title": "Unread sync",
+        "description": "Sync read status across devices using encrypted Nostr events"
       }
     },
     "title": "Settings",

@@ -78,6 +78,12 @@ export interface PrivateEvent {
   tags: string[][];
 }
 
+export interface LastSeenSyncMeta {
+  key: string; // singleton key, always "sync"
+  lastProcessedTimestamp: number; // last remote event timestamp we processed
+  lastPublishedTimestamp: number; // last event timestamp we published
+}
+
 class ChachiDatabase extends Dexie {
   events!: Table<Event>;
   lastSeen!: Table<LastSeen>;
@@ -89,10 +95,11 @@ class ChachiDatabase extends Dexie {
   community!: Table<Community>;
   dms!: Table<PrivateEvent>;
   emojiSets!: Table<EmojiSet>;
+  lastSeenSyncMeta!: Table<LastSeenSyncMeta>;
 
   constructor(name: string) {
     super(name);
-    this.version(14).stores({
+    this.version(15).stores({
       events:
         "&id,created_at,group,[group+kind],[group+kind+created_at],[group+created_at]",
       lastSeen: "[group+kind],created_at,[group+created_at]",
@@ -103,6 +110,7 @@ class ChachiDatabase extends Dexie {
       community: "&pubkey",
       dms: "&id,gift,created_at,group,pubkey,[group+kind],[group+kind+created_at],[group+created_at],[group+pubkey]",
       emojiSets: "&address",
+      lastSeenSyncMeta: "&key",
     });
   }
 }
@@ -219,4 +227,83 @@ export function getEmojiSet(address: string) {
 
 export function saveEmojiSet(emojiSet: EmojiSet) {
   return db.emojiSets.put(emojiSet);
+}
+
+export async function getLastSeenSyncMeta(): Promise<LastSeenSyncMeta> {
+  const meta = await db.lastSeenSyncMeta.get("sync");
+  return (
+    meta || {
+      key: "sync",
+      lastProcessedTimestamp: 0,
+      lastPublishedTimestamp: 0,
+    }
+  );
+}
+
+export async function updateLastSeenSyncMeta(
+  updates: Partial<Omit<LastSeenSyncMeta, "key">>,
+) {
+  const current = await getLastSeenSyncMeta();
+  await db.lastSeenSyncMeta.put({
+    ...current,
+    ...updates,
+  });
+}
+
+/**
+ * Prunes old lastSeen entries to prevent unbounded database growth
+ * Keeps entries from the last N days (default 365 days)
+ * @param retentionDays - Number of days to retain (default: 365)
+ * @returns Number of entries deleted
+ */
+export async function pruneOldLastSeenEntries(
+  retentionDays: number = 365,
+): Promise<number> {
+  const cutoffTimestamp = Math.floor(Date.now() / 1000) - retentionDays * 86400;
+
+  const deleteCount = await db.lastSeen
+    .where("created_at")
+    .below(cutoffTimestamp)
+    .delete();
+
+  if (deleteCount > 0) {
+    console.log(
+      `[DB] Pruned ${deleteCount} lastSeen entries older than ${retentionDays} days`,
+    );
+  }
+
+  return deleteCount;
+}
+
+export async function logLastSeenData() {
+  const records = await db.lastSeen.toArray();
+
+  console.group("📊 LastSeen Tracking Data");
+  console.log(`Total records: ${records.length}`);
+  console.log("");
+
+  records.forEach((record, index) => {
+    const date = new Date(record.created_at * 1000).toISOString();
+    console.log(`[${index + 1}] group: ${record.group}`);
+    console.log(`    kind: ${record.kind}`);
+    console.log(`    created_at: ${record.created_at} (${date})`);
+    console.log(`    tag: ${record.tag || "(empty)"}`);
+    console.log(`    ref: ${record.ref || "(empty)"}`);
+    console.log("");
+  });
+
+  // Group by kind to see patterns
+  const byKind = records.reduce((acc, record) => {
+    acc[record.kind] = (acc[record.kind] || 0) + 1;
+    return acc;
+  }, {} as Record<number, number>);
+
+  console.log("📈 Summary by Kind:");
+  Object.entries(byKind).forEach(([kind, count]) => {
+    console.log(`  Kind ${kind}: ${count} records`);
+  });
+
+  console.groupEnd();
+
+  return records;
 }

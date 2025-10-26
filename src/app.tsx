@@ -13,6 +13,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import { LoadingScreen } from "@/components/loading-screen";
 import { ErrorPage } from "@/components/error-page";
+import { LastSeenSyncProvider } from "@/components/last-seen-sync-provider";
 import ndk, { nwcNdk, NDKContext } from "@/lib/ndk";
 import { queryClient } from "@/lib/query";
 
@@ -212,6 +213,7 @@ export default function App() {
         <QueryClientProvider client={queryClient}>
           <SidebarProvider>
             <ThemeProvider defaultTheme="dark" storageKey="chachi-theme">
+              <LastSeenSyncProvider />
               <RouterProvider router={router} />
               <Toaster
                 toastOptions={{

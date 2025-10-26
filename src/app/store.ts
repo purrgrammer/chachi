@@ -223,3 +223,10 @@ export const privateMessagesEnabledAtom = atomWithStorage<boolean>(
   undefined,
   { getOnInit: true },
 );
+
+export const unreadSyncEnabledAtom = atomWithStorage<boolean>(
+  "unread-sync",
+  false, // Disabled by default
+  undefined,
+  { getOnInit: true },
+);

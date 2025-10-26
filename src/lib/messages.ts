@@ -28,6 +28,7 @@ import { Group } from "@/lib/types";
 import { DELETE_GROUP, RELATIONSHIP } from "@/lib/kinds";
 import { LastSeen } from "@/lib/db";
 import { useCommunity } from "./nostr/groups";
+import { triggerLastSeenSync } from "@/lib/lastSeenSyncTrigger";
 
 export function saveGroupEvent(event: NostrEvent, group: Group) {
   const record = {
@@ -61,6 +62,9 @@ export function saveLastSeen(ev: NostrEvent, group: Group) {
     tag,
     ref,
   });
+
+  // Trigger sync if enabled
+  triggerLastSeenSync();
 }
 
 export function useGroupchat(group: Group) {

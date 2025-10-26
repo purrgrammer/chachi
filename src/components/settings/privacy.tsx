@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import {
   VenetianMask,
   MessageSquare,
+  MessageSquareDot,
   Server,
   Plus,
   Trash2,
@@ -21,7 +22,7 @@ import {
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { useAtom } from "jotai";
-import { privateMessagesEnabledAtom, dmRelayListAtom } from "@/app/store";
+import { privateMessagesEnabledAtom, dmRelayListAtom, unreadSyncEnabledAtom } from "@/app/store";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -202,6 +203,7 @@ function DmRelayList({
 
 const privacySchema = z.object({
   privateMessagesEnabled: z.boolean().default(false),
+  unreadSyncEnabled: z.boolean().default(false),
 });
 
 export function Privacy() {
@@ -209,12 +211,16 @@ export function Privacy() {
   const [privateMessagesEnabled, setPrivateMessagesEnabled] = useAtom(
     privateMessagesEnabledAtom,
   );
+  const [unreadSyncEnabled, setUnreadSyncEnabled] = useAtom(
+    unreadSyncEnabledAtom,
+  );
   const [dmRelayList] = useAtom(dmRelayListAtom);
 
   const form = useForm<z.infer<typeof privacySchema>>({
     resolver: zodResolver(privacySchema),
     defaultValues: {
       privateMessagesEnabled,
+      unreadSyncEnabled,
     },
   });
 
@@ -224,6 +230,10 @@ export function Privacy() {
 
   function togglePrivateMessages(enabled: boolean) {
     setPrivateMessagesEnabled(enabled);
+  }
+
+  function toggleUnreadSync(enabled: boolean) {
+    setUnreadSyncEnabled(enabled);
   }
 
   return (
@@ -285,6 +295,36 @@ export function Privacy() {
             <DmRelayList relays={dmRelayList.relays} />
           </div>
         )}
+
+        <div className="flex flex-col gap-1.5 mt-3">
+          <FormField
+            control={form.control}
+            name="unreadSyncEnabled"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between p-1">
+                <div className="space-y-0.5">
+                  <FormLabel className="flex items-center gap-2">
+                    <MessageSquareDot className="size-4 text-muted-foreground" />
+                    {t("settings.privacy.unreadSync.title")}
+                  </FormLabel>
+                  <FormDescription>
+                    {t("settings.privacy.unreadSync.description")}
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={(checked) => {
+                      field.onChange(checked);
+                      toggleUnreadSync(checked);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </form>
     </Form>
   );
