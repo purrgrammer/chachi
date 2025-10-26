@@ -114,6 +114,7 @@ export function useNip46Login() {
           remoteSignerURL,
           localSigner,
         );
+        signer.rpc.encryptionType = "nip44";
         signer.on("authUrl", (url) => {
           window.open(url, "auth", "width=600,height=600");
         });

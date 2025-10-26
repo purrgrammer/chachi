@@ -93,6 +93,7 @@ function useUserEvents({
           nip46account.bunker,
           new NDKPrivateKeySigner(nip46account.secret),
         );
+        signer.rpc.encryptionType = "nip44";
         signer
           .blockUntilReady()
           .then(() => {
