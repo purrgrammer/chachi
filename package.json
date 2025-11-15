@@ -8,7 +8,10 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -b --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
     "@cashu/cashu-ts": "^2.1.0",
@@ -100,6 +103,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.13",
     "globals": "^15.11.0",
+    "jsdom": "^27.2.0",
     "postcss": "^8.4.47",
     "prettier": "^3.3.3",
     "rollup-plugin-visualizer": "^6.0.3",
@@ -109,6 +113,7 @@
     "vite": "^5.4.9",
     "vite-bundle-analyzer": "^0.23.0",
     "vite-plugin-node-polyfills": "^0.23.0",
-    "vite-plugin-pwa": "^0.21.1"
+    "vite-plugin-pwa": "^0.21.1",
+    "vitest": "^4.0.9"
   }
 }

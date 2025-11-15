@@ -293,10 +293,13 @@ export async function logLastSeenData() {
   });
 
   // Group by kind to see patterns
-  const byKind = records.reduce((acc, record) => {
-    acc[record.kind] = (acc[record.kind] || 0) + 1;
-    return acc;
-  }, {} as Record<number, number>);
+  const byKind = records.reduce(
+    (acc, record) => {
+      acc[record.kind] = (acc[record.kind] || 0) + 1;
+      return acc;
+    },
+    {} as Record<number, number>,
+  );
 
   console.log("📈 Summary by Kind:");
   Object.entries(byKind).forEach(([kind, count]) => {

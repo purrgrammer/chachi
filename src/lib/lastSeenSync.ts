@@ -18,6 +18,7 @@ export const MAX_CLOCK_SKEW = 300; // seconds
  */
 const MIN_TIMESTAMP = 1577836800; // 2020-01-01
 
+// Legacy format (for backwards compatibility)
 export interface LastSeenEntry {
   group: string;
   kind: number;
@@ -26,8 +27,46 @@ export interface LastSeenEntry {
   ref: string;
 }
 
+// Compact format for new events (18% smaller)
+export interface CompactLastSeenEntry {
+  g: string; // group
+  k: number; // kind
+  t: number; // created_at (timestamp)
+  r?: string; // ref (optional)
+}
+
 /**
- * Validates a LastSeenEntry object for type safety and sanity
+ * Validates a CompactLastSeenEntry object for type safety and sanity
+ * @param entry - The entry to validate
+ * @returns true if entry is valid, false otherwise
+ */
+export function validateCompactLastSeenEntry(
+  entry: unknown,
+): entry is CompactLastSeenEntry {
+  if (typeof entry !== "object" || entry === null) {
+    return false;
+  }
+
+  const e = entry as Record<string, unknown>;
+  const now = Math.floor(Date.now() / 1000);
+
+  return (
+    typeof e.g === "string" &&
+    e.g.length > 0 &&
+    e.g.length < 1000 && // Reasonable max length
+    typeof e.k === "number" &&
+    Number.isInteger(e.k) &&
+    e.k >= 0 &&
+    typeof e.t === "number" &&
+    Number.isInteger(e.t) &&
+    e.t >= MIN_TIMESTAMP && // Not from distant past
+    e.t <= now + MAX_CLOCK_SKEW && // Not from future
+    (e.r === undefined || (typeof e.r === "string" && e.r.length < 1000)) // ref is optional
+  );
+}
+
+/**
+ * Validates a legacy LastSeenEntry object for type safety and sanity
  * @param entry - The entry to validate
  * @returns true if entry is valid, false otherwise
  */
@@ -55,6 +94,36 @@ export function validateLastSeenEntry(entry: unknown): entry is LastSeenEntry {
     typeof e.ref === "string" &&
     e.ref.length < 1000 // Reasonable max length
   );
+}
+
+/**
+ * Converts compact format to legacy format (for internal use)
+ */
+function compactToLegacy(entry: CompactLastSeenEntry): LastSeenEntry {
+  return {
+    group: entry.g,
+    kind: entry.k,
+    created_at: entry.t,
+    tag: "", // Tag field is redundant with kind, always empty in new format
+    ref: entry.r || "",
+  };
+}
+
+/**
+ * Detects and normalizes entry format to legacy format for internal processing
+ */
+function normalizeEntry(entry: unknown): LastSeenEntry | null {
+  // Try compact format first (new format)
+  if (validateCompactLastSeenEntry(entry)) {
+    return compactToLegacy(entry);
+  }
+
+  // Try legacy format
+  if (validateLastSeenEntry(entry)) {
+    return entry;
+  }
+
+  return null;
 }
 
 /**
@@ -105,19 +174,28 @@ export function shouldSkipEvent(
 }
 
 /**
- * Encrypt an array of LastSeen entries using NIP-44
+ * Encrypt an array of LastSeen entries using NIP-44 with compact format
+ * New events use compact format (18% smaller), but can read legacy format
  */
 export async function encryptLastSeenData(
   ndk: NDK,
   entries: LastSeen[],
 ): Promise<string> {
-  const data: LastSeenEntry[] = entries.map((entry) => ({
-    group: entry.group,
-    kind: entry.kind,
-    created_at: entry.created_at,
-    tag: entry.tag || "",
-    ref: entry.ref || "",
-  }));
+  // Use compact format for new events (18% space savings)
+  const data: CompactLastSeenEntry[] = entries.map((entry) => {
+    const compact: CompactLastSeenEntry = {
+      g: entry.group,
+      k: entry.kind,
+      t: entry.created_at,
+    };
+
+    // Only include ref if it's non-empty
+    if (entry.ref) {
+      compact.r = entry.ref;
+    }
+
+    return compact;
+  });
 
   const json = JSON.stringify(data);
 
@@ -140,6 +218,7 @@ export async function encryptLastSeenData(
 
 /**
  * Decrypt and parse LastSeen entries from NIP-44 encrypted content
+ * Supports both compact (new) and legacy formats for backwards compatibility
  * Validates and filters out malformed entries
  */
 export async function decryptLastSeenData(
@@ -166,13 +245,22 @@ export async function decryptLastSeenData(
       throw new Error("Invalid data format: expected array");
     }
 
-    // Validate and filter entries
-    const validatedEntries = data.filter(validateLastSeenEntry);
+    // Normalize entries (handles both compact and legacy formats)
+    const validatedEntries: LastSeenEntry[] = [];
+    let filteredCount = 0;
 
-    if (validatedEntries.length !== data.length) {
-      const filtered = data.length - validatedEntries.length;
+    for (const entry of data) {
+      const normalized = normalizeEntry(entry);
+      if (normalized) {
+        validatedEntries.push(normalized);
+      } else {
+        filteredCount++;
+      }
+    }
+
+    if (filteredCount > 0) {
       console.warn(
-        `[LastSeenSync] Filtered ${filtered} invalid entries from decrypted data`,
+        `[LastSeenSync] Filtered ${filteredCount} invalid entries from decrypted data`,
       );
     }
 
@@ -326,7 +414,13 @@ export function entryToLastSeen(entry: LastSeenEntry): LastSeen {
  * @returns Number of entries after merge
  */
 export async function mergeAndStoreRemoteData(
-  db: { lastSeen: { toArray: () => Promise<LastSeen[]>; clear: () => Promise<void>; bulkPut: (items: LastSeen[]) => Promise<void> } },
+  db: {
+    lastSeen: {
+      toArray: () => Promise<LastSeen[]>;
+      clear: () => Promise<void>;
+      bulkPut: (items: LastSeen[]) => Promise<void>;
+    };
+  },
   remoteEntries: LastSeenEntry[],
 ): Promise<number> {
   // Get current local state

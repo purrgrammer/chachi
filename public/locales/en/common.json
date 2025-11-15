@@ -513,6 +513,7 @@
       "request": {
         "sent": "Request sent",
         "success": "Join request sent",
+        "resend": "Try again",
         "error": "Failed to send join request"
       }
     },

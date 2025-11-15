@@ -51,11 +51,21 @@ function JoinRequest({ group, pubkey }: { group: Group; pubkey: string }) {
         {t("chat.user.not-member")}
       </span>
       {requested ? (
-        <div className="flex flex-row gap-2">
+        <div className="flex flex-row gap-2 items-center">
           <Check className="size-5" />
           <span className="text-sm text-muted-foreground">
             {t("chat.join.request.sent")}
           </span>
+          {canSign ? (
+            <Button
+              variant="text"
+              disabled={!canSign}
+              size="sm"
+              onClick={sendJoinRequest}
+            >
+              {t("chat.join.request.resend")}
+            </Button>
+          ) : null}
         </div>
       ) : (
         <Button disabled={!canSign} size="sm" onClick={sendJoinRequest}>

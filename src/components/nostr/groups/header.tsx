@@ -6,7 +6,7 @@ import {
   ShieldOff,
   Settings,
 } from "lucide-react";
-import { useGroup, useGroupParticipants } from "@/lib/nostr/groups";
+import { useGroup, useFetchGroupParticipants } from "@/lib/nostr/groups";
 import { GroupInfo } from "@/components/nostr/groups/info";
 import { BookmarkGroup } from "@/components/nostr/groups/bookmark";
 import { Separator } from "@/components/ui/separator";
@@ -26,7 +26,8 @@ import { useTranslation } from "react-i18next";
 
 export function GroupHeader({ group }: { group: Group }) {
   const { data: metadata } = useGroup(group);
-  const { admins } = useGroupParticipants(group);
+  const { data: participants } = useFetchGroupParticipants(group);
+  const admins = participants?.admins || [];
   const pubkey = usePubkey();
   const canSign = useCanSign();
   const name = metadata?.name;

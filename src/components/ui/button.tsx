@@ -20,6 +20,7 @@ const buttonVariants = cva(
         amount:
           "rounded-full border border-accent bg-secondary text-secondary-foreground hover:bg-secondary/80",
         link: "text-primary underline-offset-4 hover:underline",
+        text: "text-primary-foreground underline-offset-4 hover:underline",
         reaction:
           "bg-background/90 dark:bg-background/30 text-muted-foreground hover:bg-background/90 disabled:opacity-100 rounded-xl",
         action:

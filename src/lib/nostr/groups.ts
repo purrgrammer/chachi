@@ -377,6 +377,48 @@ export function useGroupAdminsList(group?: Group) {
   });
 }
 
+/**
+ * Hook to fetch and cache group participants (members and admins)
+ * Fetches fresh data from relay on first call, then caches it
+ */
+export function useFetchGroupParticipants(group: Group) {
+  const ndk = useNDK();
+
+  return useQuery({
+    queryKey: [GROUP_PARTICIPANTS, groupId(group)],
+    queryFn: async () => {
+      // Skip for communities and relay groups
+      if (group.isCommunity || group.id === "_") {
+        return getGroupParticipants(group);
+      }
+
+      try {
+        // Fetch fresh data from relay
+        const [members, admins] = await Promise.all([
+          fetchGroupMembers(ndk, group),
+          fetchGroupAdmins(ndk, group),
+        ]);
+
+        // Save to database
+        saveGroupParticipants(group, members, admins);
+
+        // Return from database to ensure consistency
+        return getGroupParticipants(group);
+      } catch (error) {
+        console.error("Error fetching group participants:", error);
+        // Fallback to cached data if fetch fails
+        return getGroupParticipants(group);
+      }
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
+  });
+}
+
+/**
+ * Hook to get group participants from cache only
+ * Use useFetchGroupParticipants if you want to fetch fresh data
+ */
 export function useGroupParticipants(group: Group) {
   const { data, isSuccess } = useQuery({
     queryKey: [GROUP_PARTICIPANTS, groupId(group)],
@@ -547,6 +589,15 @@ export function useJoinRequest(group: Group) {
       tags,
     } as NostrEvent);
     await event.publish(relaySet);
+
+    // Refresh group participants after join request
+    // Wait a bit for the relay to process the request
+    setTimeout(() => {
+      queryClient.invalidateQueries({
+        queryKey: [GROUP_PARTICIPANTS, groupId(group)],
+      });
+    }, 2000);
+
     return event.rawEvent() as NostrEvent;
   };
 }
@@ -562,6 +613,14 @@ export function useLeaveRequest(group: Group) {
         tags: [["h", group.id]],
       } as NostrEvent);
       await event.publish(relaySet);
+
+      // Refresh group participants after leave request
+      setTimeout(() => {
+        queryClient.invalidateQueries({
+          queryKey: [GROUP_PARTICIPANTS, groupId(group)],
+        });
+      }, 2000);
+
       return event.rawEvent() as NostrEvent;
     }
   };

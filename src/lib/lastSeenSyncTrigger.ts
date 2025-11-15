@@ -13,9 +13,7 @@ let registrationCount = 0;
  * Uses reference counting to handle multiple mounts/unmounts safely
  * @returns Cleanup function to unregister this specific registration
  */
-export function registerSyncTrigger(
-  callback: SyncTriggerCallback,
-): () => void {
+export function registerSyncTrigger(callback: SyncTriggerCallback): () => void {
   // Warn if overwriting a different callback
   if (syncCallback && syncCallback !== callback) {
     console.warn(

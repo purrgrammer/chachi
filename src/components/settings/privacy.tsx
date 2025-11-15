@@ -22,7 +22,11 @@ import {
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { useAtom } from "jotai";
-import { privateMessagesEnabledAtom, dmRelayListAtom, unreadSyncEnabledAtom } from "@/app/store";
+import {
+  privateMessagesEnabledAtom,
+  dmRelayListAtom,
+  unreadSyncEnabledAtom,
+} from "@/app/store";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
