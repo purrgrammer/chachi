@@ -96,6 +96,7 @@ export function CreateGroup({
   const [showDialog, setShowDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [groupType, setGroupType] = useState<GroupType>(null);
+  const [useCustomRelay, setUseCustomRelay] = useState(false);
   const groups = useMyGroups();
   const groupsContent = useAtomValue(groupsContentAtom);
   const userRelaysData = useAtomValue(relaysAtom);
@@ -221,6 +222,7 @@ export function CreateGroup({
     });
 
     setGroupType(null);
+    setUseCustomRelay(false);
   }
 
   function onOpenChange(open: boolean) {
@@ -345,22 +347,63 @@ export function CreateGroup({
                     {t("group.create.form.relay.label")}
                   </FormLabel>
                   <FormControl>
-                    <Select disabled={isLoading} onValueChange={field.onChange}>
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t("group.create.form.relay.placeholder")}
+                    {useCustomRelay ? (
+                      <div className="space-y-2">
+                        <Input
+                          disabled={isLoading}
+                          placeholder="wss://relay.example.com"
+                          className="font-mono"
+                          value={field.value}
+                          onChange={(e) => {
+                            const normalized = normalizeRelayUrl(e.target.value);
+                            field.onChange(normalized);
+                          }}
                         />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {nip29Relays.map((relay) => (
-                          <SelectItem key={relay} value={relay}>
-                            <span className="font-mono">
-                              {getRelayHost(relay)}
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setUseCustomRelay(false);
+                            field.onChange(nip29Relays[0]);
+                          }}
+                          className="h-8"
+                        >
+                          {t("group.create.form.relay.use-predefined")}
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <Select disabled={isLoading} onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger>
+                            <SelectValue
+                              placeholder={t("group.create.form.relay.placeholder")}
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {nip29Relays.map((relay) => (
+                              <SelectItem key={relay} value={relay}>
+                                <span className="font-mono">
+                                  {getRelayHost(relay)}
+                                </span>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setUseCustomRelay(true);
+                            field.onChange("");
+                          }}
+                          className="h-8"
+                        >
+                          {t("group.create.form.relay.use-custom")}
+                        </Button>
+                      </div>
+                    )}
                   </FormControl>
                   <FormMessage />
                   <FormDescription>

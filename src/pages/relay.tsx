@@ -17,6 +17,7 @@ import {
   NDKSubscriptionCacheUsage,
 } from "@nostr-dev-kit/ndk";
 import { GroupChat } from "@/components/nostr/groups/chat";
+import { CreateGroupOnRelay } from "@/components/nostr/groups/create-on-relay";
 import { t } from "i18next";
 import {
   Tooltip,
@@ -44,15 +45,20 @@ function RelayGroups({ relay }: { relay: string }) {
     kinds: [NDKKind.GroupMetadata],
   };
   return (
-    <Feed
-      filter={filter}
-      outboxRelays={[relay]}
-      onlyRelays
-      live={false}
-      showReactions={false}
-      loadingClassname="py-32"
-      emptyClassname="py-32"
-    />
+    <div className="flex flex-col">
+      <div className="flex justify-center w-full max-w-lg mx-auto pt-4 mb-4">
+        <CreateGroupOnRelay relay={relay} />
+      </div>
+      <Feed
+        filter={filter}
+        outboxRelays={[relay]}
+        onlyRelays
+        live={false}
+        showReactions={false}
+        loadingClassname="py-32"
+        emptyClassname="py-32"
+      />
+    </div>
   );
 }
 

@@ -174,7 +174,9 @@
           "label": "Relay",
           "placeholder": "Choose a relay.",
           "description": "This is the server where the posts will be stored.",
-          "required": "Please select a relay"
+          "required": "Please select a relay",
+          "use-custom": "Use custom relay",
+          "use-predefined": "Use predefined relay"
         },
         "visibility": {
           "label": "Visibility",

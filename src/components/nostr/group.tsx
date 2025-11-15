@@ -60,12 +60,14 @@ export function Group({
       ) : null}
       <div className="flex flex-col gap-3 p-3 border-b">
         <div className="flex flex-row gap-3 items-center">
-          <Avatar className="size-12">
-            <AvatarImage src={picture} className="object-cover" />
-            <AvatarFallback>
-              {name?.slice(0, 1) || group.id.slice(0, 1)}
-            </AvatarFallback>
-          </Avatar>
+          {picture ? (
+            <Avatar className="size-12">
+              <AvatarImage src={picture} className="object-cover" />
+              <AvatarFallback>
+                {name?.slice(0, 1) || group.id.slice(0, 1)}
+              </AvatarFallback>
+            </Avatar>
+          ) : null}
           <h3 className="text-lg line-clamp-1">
             {name || group.id.slice(0, 8)}
           </h3>
