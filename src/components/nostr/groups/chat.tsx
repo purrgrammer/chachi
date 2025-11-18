@@ -33,7 +33,7 @@ import { formatShortNumber } from "@/lib/number";
 import { Badge } from "@/components/ui/badge";
 import { Name } from "@/components/nostr/name";
 import Amount from "@/components/amount";
-import { useCommunity, useGroupParticipants } from "@/lib/nostr/groups";
+import { useCommunity, useFetchGroupParticipants } from "@/lib/nostr/groups";
 import { Zap } from "@/components/nostr/zap";
 import { validateZap } from "@/lib/nip-57";
 import { ChatInput } from "@/components/nostr/chat/input";
@@ -811,7 +811,9 @@ function UserActivity({
 export const GroupChat = forwardRef(
   ({ group }: { group: Group }, ref: ForwardedRef<HTMLDivElement | null>) => {
     // todo: load older messages when scrolling up
-    const { members, admins } = useGroupParticipants(group);
+    const { data: participants } = useFetchGroupParticipants(group);
+    const members = participants?.members || [];
+    const admins = participants?.admins || [];
     const { data: relayInfo } = useRelayInfo(group.relay);
     const events = useGroupchat(group);
     const hasBeenDeleted = events.some((e) => e.kind === DELETE_GROUP);
