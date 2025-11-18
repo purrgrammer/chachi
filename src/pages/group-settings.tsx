@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingScreen } from "@/components/loading-screen";
 import { RelayLink, RelayName } from "@/components/nostr/relay";
 import type { Group } from "@/lib/types";
+import { normalizeRelayFromParam } from "@/lib/relay";
 
 function GroupHeader({ group }: { group: Group }) {
   const { t } = useTranslation();
@@ -79,7 +80,7 @@ export default function GroupSettings() {
   // Create group object directly like in group.tsx
   const group: Group = {
     id: id || "_",
-    relay: `wss://${host}`,
+    relay: normalizeRelayFromParam(host),
   };
 
   const { data: metadata, isLoading, error } = useGroup(group);

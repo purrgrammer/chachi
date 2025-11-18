@@ -4,6 +4,7 @@ import { EventDetail } from "@/components/nostr/detail";
 import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import { Loading } from "@/components/loading";
+import { normalizeRelayFromParam } from "@/lib/relay";
 
 export function WrongLink() {
   const { t } = useTranslation();
@@ -26,7 +27,7 @@ export default function EventPage() {
   const group = host
     ? {
         id: id || "_",
-        relay: `wss://${host}`,
+        relay: normalizeRelayFromParam(host),
       }
     : undefined;
   // todo: error handling

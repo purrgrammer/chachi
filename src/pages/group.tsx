@@ -14,6 +14,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/nav-tabs";
 import { groupId } from "@/lib/groups";
+import { normalizeRelayFromParam } from "@/lib/relay";
 
 type GroupTab = "chat" | "posts" | "videos" | "images" | "polls";
 
@@ -22,7 +23,7 @@ export default function GroupPage({ tab = "chat" }: { tab?: GroupTab }) {
   const { host, id } = useParams();
   const group = {
     id: id || "_",
-    relay: `wss://${host}`,
+    relay: normalizeRelayFromParam(host || ""),
   };
 
   function onValueChange(value: string) {

@@ -81,6 +81,28 @@ export function isRelayURL(content: string) {
   return relayUrlRegex.test(content);
 }
 
+/**
+ * Normalizes a relay URL from route params or user input.
+ * Handles URLs with or without protocol prefix.
+ *
+ * @param relayParam - The relay URL from route params (already decoded by React Router)
+ * @returns Normalized relay URL with wss:// protocol
+ *
+ * @example
+ * normalizeRelayFromParam("relay.example.com") // "wss://relay.example.com"
+ * normalizeRelayFromParam("wss://relay.example.com") // "wss://relay.example.com"
+ * normalizeRelayFromParam("ws://relay.example.com") // "ws://relay.example.com"
+ */
+export function normalizeRelayFromParam(relayParam: string): string {
+  // React Router already decodes the param, so no need to decode
+  // Check if it already has a protocol
+  if (relayParam.startsWith("ws://") || relayParam.startsWith("wss://")) {
+    return relayParam;
+  }
+  // Add wss:// prefix if no protocol present
+  return `wss://${relayParam}`;
+}
+
 export function fetchRelayInfo(url: string): Promise<RelayInfo> {
   const httpUrl = url.replace("wss://", "https://");
   return fetch(httpUrl, {
@@ -103,6 +125,17 @@ export function normalizeRelayURL(url: string) {
   return url.replace("wss://", "").replace(/\/?$/, "");
 }
 
+/**
+ * Extracts the host part from a relay URL by removing the protocol.
+ * Used when constructing navigation URLs.
+ *
+ * @param url - Full relay URL with protocol (wss:// or ws://)
+ * @returns Host part without protocol or trailing slash
+ *
+ * @example
+ * getRelayHost("wss://relay.example.com") // "relay.example.com"
+ * getRelayHost("ws://relay.example.com/") // "relay.example.com"
+ */
 export function getRelayHost(url: string) {
-  return url.replace("wss://", "").replace(/\/?$/, "");
+  return url.replace(/^wss?:\/\//, "").replace(/\/?$/, "");
 }

@@ -2,7 +2,7 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Server, Cog, Users, Contact, Code } from "lucide-react";
 import { Header } from "@/components/header";
-import { isRelayURL, useRelayInfo } from "@/lib/relay";
+import { isRelayURL, useRelayInfo, normalizeRelayFromParam } from "@/lib/relay";
 import { RelayIcon, RelayName } from "@/components/nostr/relay";
 import Feed from "@/components/nostr/feed";
 import {
@@ -361,10 +361,7 @@ export default function Relay({ tab = "info" }: { tab?: RelayTab }) {
     return <Navigate to="/" />;
   }
 
-  const relay =
-    relayUrl.startsWith("ws://") || relayUrl.startsWith("wss://")
-      ? relayUrl
-      : `wss://${relayUrl}`;
+  const relay = normalizeRelayFromParam(relayUrl);
 
   if (!isRelayURL(relay)) {
     return <Navigate to="/" />;
