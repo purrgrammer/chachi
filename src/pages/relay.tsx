@@ -46,8 +46,10 @@ function RelayGroups({ relay }: { relay: string }) {
   };
   return (
     <div className="flex flex-col">
-      <div className="flex justify-center w-full max-w-lg mx-auto pt-4 mb-4">
-        <CreateGroupOnRelay relay={relay} />
+      <div className="flex justify-center w-full pt-4 mb-4">
+        <div className="w-[calc(100dvw-2rem)] sm:w-[420px] md:w-[510px]">
+          <CreateGroupOnRelay relay={relay} />
+        </div>
       </div>
       <Feed
         filter={filter}
