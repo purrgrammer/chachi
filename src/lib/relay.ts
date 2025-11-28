@@ -66,12 +66,12 @@ export const fallbackRelays = ["wss://relay.primal.net"];
 
 export const nip29Relays = [
   "wss://groups.0xchat.com",
-  "wss://groups.fiatjaf.com",
-  "wss://relay.groups.nip29.com",
-  "wss://relay29.notoshi.win",
-  "wss://communities.nos.social",
-  "wss://community.bitcointxoko.com",
-  "wss://groups.hzrd149.com",
+  //"wss://groups.fiatjaf.com",
+  //"wss://relay.groups.nip29.com",
+  //"wss://relay29.notoshi.win",
+  //"wss://communities.nos.social",
+  //"wss://community.bitcointxoko.com",
+  //"wss://groups.hzrd149.com",
 ];
 
 const relayUrlRegex =
