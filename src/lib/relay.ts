@@ -56,22 +56,16 @@ export interface RelayInfo {
 }
 
 export const discoveryRelays = [
-  //"wss://purplepag.es",
-  //"wss://relay.nostr.band",
-  "wss://profiles.nostrver.se",
-  //"wss://profiles.nostr1.com",
+  "wss://purplepag.es",
+  "wss://profiles.nostr1.com",
 ];
 
 export const fallbackRelays = ["wss://relay.primal.net"];
 
 export const nip29Relays = [
   "wss://groups.0xchat.com",
-  //"wss://groups.fiatjaf.com",
-  //"wss://relay.groups.nip29.com",
-  //"wss://relay29.notoshi.win",
-  //"wss://communities.nos.social",
-  //"wss://community.bitcointxoko.com",
-  //"wss://groups.hzrd149.com",
+  "wss://groups.hzrd149.com",
+  "wss://pyramid.fiatjaf.com",
 ];
 
 const relayUrlRegex =
