@@ -1,8 +1,8 @@
 import {
   BookLock,
-  BookOpen,
   Castle,
-  Shield,
+  PenOff,
+  EyeOff,
   ShieldOff,
   Settings,
 } from "lucide-react";
@@ -65,78 +65,80 @@ export function GroupHeader({ group }: { group: Group }) {
           </div>
           {isRelayGroup ? null : (
             <div className="flex flex-row gap-2 items-center">
-              <div className="flex flex-row gap-1 items-center">
-                {metadata?.isCommunity ? (
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Castle className="size-3 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {t("group.metadata.community")}
-                    </TooltipContent>
-                  </Tooltip>
-                ) : null}
-                {metadata?.visibility === "private" ? (
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="flex gap-1.5 items-center">
-                        <BookLock className="size-3 text-muted-foreground" />
-                        <span className="hidden text-xs sm:block">
-                          {t("group.metadata.visibility.private.trigger")}
-                        </span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {t("group.metadata.visibility.private.content")}
-                    </TooltipContent>
-                  </Tooltip>
-                ) : metadata?.visibility === "public" ? (
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="flex gap-1.5 items-center">
-                        <BookOpen className="size-3 text-muted-foreground" />
-                        <span className="hidden text-xs sm:block">
-                          {t("group.metadata.visibility.public.trigger")}
-                        </span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {t("group.metadata.visibility.public.content")}
-                    </TooltipContent>
-                  </Tooltip>
-                ) : null}
-              </div>
-              <div className="flex flex-row gap-1 items-center">
-                {metadata?.access === "closed" ? (
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="flex gap-1.5 items-center">
-                        <Shield className="size-3 text-muted-foreground" />
-                        <span className="hidden text-xs sm:block">
-                          {t("group.metadata.access.closed.trigger")}
-                        </span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {t("group.metadata.access.closed.content")}
-                    </TooltipContent>
-                  </Tooltip>
-                ) : metadata?.access === "open" ? (
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="flex gap-1.5 items-center">
-                        <ShieldOff className="size-3 text-muted-foreground" />
-                        <span className="hidden text-xs sm:block">
-                          {t("group.metadata.access.open.trigger")}
-                        </span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {t("group.metadata.access.open.content")}
-                    </TooltipContent>
-                  </Tooltip>
-                ) : null}
-              </div>
+              {metadata?.isCommunity ? (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Castle className="size-3 text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {t("group.metadata.community")}
+                  </TooltipContent>
+                </Tooltip>
+              ) : null}
+              {/* Private marker - read access */}
+              {metadata?.isPrivate ? (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className="flex gap-1.5 items-center">
+                      <BookLock className="size-3 text-muted-foreground" />
+                      <span className="hidden text-xs sm:block">
+                        {t("group.metadata.private.trigger")}
+                      </span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {t("group.metadata.private.content")}
+                  </TooltipContent>
+                </Tooltip>
+              ) : null}
+              {/* Restricted marker - write access */}
+              {metadata?.isRestricted ? (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className="flex gap-1.5 items-center">
+                      <PenOff className="size-3 text-muted-foreground" />
+                      <span className="hidden text-xs sm:block">
+                        {t("group.metadata.restricted.trigger")}
+                      </span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {t("group.metadata.restricted.content")}
+                  </TooltipContent>
+                </Tooltip>
+              ) : null}
+              {/* Hidden marker - metadata visibility */}
+              {metadata?.isHidden ? (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className="flex gap-1.5 items-center">
+                      <EyeOff className="size-3 text-muted-foreground" />
+                      <span className="hidden text-xs sm:block">
+                        {t("group.metadata.hidden.trigger")}
+                      </span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {t("group.metadata.hidden.content")}
+                  </TooltipContent>
+                </Tooltip>
+              ) : null}
+              {/* Closed marker - join requests */}
+              {metadata?.isClosed ? (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className="flex gap-1.5 items-center">
+                      <ShieldOff className="size-3 text-muted-foreground" />
+                      <span className="hidden text-xs sm:block">
+                        {t("group.metadata.closed.trigger")}
+                      </span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {t("group.metadata.closed.content")}
+                  </TooltipContent>
+                </Tooltip>
+              ) : null}
             </div>
           )}
         </div>
