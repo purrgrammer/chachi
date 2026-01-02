@@ -185,11 +185,22 @@
           "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay.",
           "placeholder": "Choose visibility"
         },
-        "access": {
-          "label": "Access",
-          "anyone": "Anyone",
-          "invite-only": "Invite only",
-          "placeholder": "Choose policy"
+        "access-settings": "Access Settings",
+        "private": {
+          "label": "Private",
+          "description": "Only members can read group messages"
+        },
+        "restricted": {
+          "label": "Restricted",
+          "description": "Only members can send messages"
+        },
+        "hidden": {
+          "label": "Hidden",
+          "description": "Group info is hidden from non-members"
+        },
+        "closed": {
+          "label": "Closed",
+          "description": "Join requests are ignored (invite-only)"
         },
         "submit": {
           "trigger": "Create",
@@ -281,27 +292,21 @@
     "metadata": {
       "community": "This is a profile based community",
       "group": "Group",
-      "private": "Private",
-      "closed": "Closed",
-      "visibility": {
-        "private": {
-          "trigger": "Members only",
-          "content": "Only members can read content"
-        },
-        "public": {
-          "trigger": "Public",
-          "content": "Can be read by anyone"
-        }
+      "private": {
+        "trigger": "Private",
+        "content": "Only members can read messages"
       },
-      "access": {
-        "closed": {
-          "trigger": "Closed",
-          "content": "Requires approval or an invitation to join"
-        },
-        "open": {
-          "trigger": "Open",
-          "content": "Anyone can join"
-        }
+      "restricted": {
+        "trigger": "Restricted",
+        "content": "Only members can send messages"
+      },
+      "hidden": {
+        "trigger": "Hidden",
+        "content": "Group info is hidden from non-members"
+      },
+      "closed": {
+        "trigger": "Closed",
+        "content": "Join requests are ignored (invite-only)"
       },
       "join-the-conversation": "Join the conversation",
       "map_picker": {
@@ -347,16 +352,14 @@
       },
       "privacy": {
         "tab": "Privacy",
-        "visibility": "Visibility",
-        "access": "Access Control",
-        "public": "Public",
-        "public_description": "Anyone can see the group and its content",
         "private": "Private",
-        "private_description": "Only members can see the group content",
-        "open": "Open",
-        "open_description": "Anyone can join the group",
+        "private_description": "Only members can read group messages",
+        "restricted": "Restricted",
+        "restricted_description": "Only members can send messages to the group",
+        "hidden": "Hidden",
+        "hidden_description": "Relay hides group metadata from non-members",
         "closed": "Closed",
-        "closed_description": "Members must be approved to join",
+        "closed_description": "Join requests are ignored (invite-only)",
         "save": "Save Privacy Settings",
         "saving": "Saving...",
         "success": "Group privacy settings updated successfully",

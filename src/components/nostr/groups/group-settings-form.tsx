@@ -14,6 +14,10 @@ import {
   Copy,
   Trash2,
   Link,
+  BookLock,
+  PenOff,
+  EyeOff,
+  ShieldOff,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -76,12 +80,12 @@ export function GroupEditor({
   const [isInfoLoading, setIsInfoLoading] = useState(false);
 
   // Privacy tab states
-  const [visibility, setVisibility] = useState<"public" | "private">(
-    metadata?.visibility || "public",
+  const [isPrivate, setIsPrivate] = useState(metadata?.isPrivate || false);
+  const [isRestricted, setIsRestricted] = useState(
+    metadata?.isRestricted || false,
   );
-  const [access, setAccess] = useState<"open" | "closed">(
-    metadata?.access || "open",
-  );
+  const [isHidden, setIsHidden] = useState(metadata?.isHidden || false);
+  const [isClosed, setIsClosed] = useState(metadata?.isClosed || false);
   const [isPrivacyLoading, setIsPrivacyLoading] = useState(false);
 
   // Members tab states
@@ -146,8 +150,10 @@ export function GroupEditor({
       setName(metadata.name || "");
       setAbout(metadata.about || "");
       setPicture(metadata.picture || "");
-      setVisibility(metadata.visibility || "public");
-      setAccess(metadata.access || "open");
+      setIsPrivate(metadata.isPrivate || false);
+      setIsRestricted(metadata.isRestricted || false);
+      setIsHidden(metadata.isHidden || false);
+      setIsClosed(metadata.isClosed || false);
     }
   }, [metadata]);
 
@@ -168,8 +174,10 @@ export function GroupEditor({
         name,
         about,
         picture,
-        visibility,
-        access,
+        isPrivate,
+        isRestricted,
+        isHidden,
+        isClosed,
       };
 
       await editGroup(updatedMetadata);
@@ -203,8 +211,10 @@ export function GroupEditor({
         name,
         about,
         picture,
-        visibility,
-        access,
+        isPrivate,
+        isRestricted,
+        isHidden,
+        isClosed,
       };
 
       await editGroup(updatedMetadata);
@@ -582,109 +592,97 @@ export function GroupEditor({
       children: (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-6">
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-sm font-medium mb-3">
-                  {t("group.settings.privacy.visibility", "Visibility")}
-                </h4>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex-1">
-                      <Label
-                        htmlFor="visibility-public"
-                        className="font-medium"
-                      >
-                        {t("group.settings.privacy.public", "Public")}
-                      </Label>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {t(
-                          "group.settings.privacy.public_description",
-                          "Anyone can see the group and its content",
-                        )}
-                      </p>
-                    </div>
-                    <Switch
-                      id="visibility-public"
-                      checked={visibility === "public"}
-                      onCheckedChange={(checked) =>
-                        setVisibility(checked ? "public" : "private")
-                      }
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex-1">
-                      <Label
-                        htmlFor="visibility-private"
-                        className="font-medium"
-                      >
-                        {t("group.settings.privacy.private", "Private")}
-                      </Label>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {t(
-                          "group.settings.privacy.private_description",
-                          "Only members can see the group content",
-                        )}
-                      </p>
-                    </div>
-                    <Switch
-                      id="visibility-private"
-                      checked={visibility === "private"}
-                      onCheckedChange={(checked) =>
-                        setVisibility(checked ? "private" : "public")
-                      }
-                    />
+            <div className="space-y-3">
+              {/* Private - Read permission */}
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center gap-2">
+                  <BookLock className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex-1">
+                    <Label htmlFor="is-private" className="font-medium">
+                      {t("group.settings.privacy.private", "Private")}
+                    </Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {t(
+                        "group.settings.privacy.private_description",
+                        "Only members can read group messages",
+                      )}
+                    </p>
                   </div>
                 </div>
+                <Switch
+                  id="is-private"
+                  checked={isPrivate}
+                  onCheckedChange={setIsPrivate}
+                />
               </div>
 
-              <div>
-                <h4 className="text-sm font-medium mb-3">
-                  {t("group.settings.privacy.access", "Access Control")}
-                </h4>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex-1">
-                      <Label htmlFor="access-open" className="font-medium">
-                        {t("group.settings.privacy.open", "Open")}
-                      </Label>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {t(
-                          "group.settings.privacy.open_description",
-                          "Anyone can join the group",
-                        )}
-                      </p>
-                    </div>
-                    <Switch
-                      id="access-open"
-                      checked={access === "open"}
-                      onCheckedChange={(checked) =>
-                        setAccess(checked ? "open" : "closed")
-                      }
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex-1">
-                      <Label htmlFor="access-closed" className="font-medium">
-                        {t("group.settings.privacy.closed", "Closed")}
-                      </Label>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {t(
-                          "group.settings.privacy.closed_description",
-                          "Members must be approved to join",
-                        )}
-                      </p>
-                    </div>
-                    <Switch
-                      id="access-closed"
-                      checked={access === "closed"}
-                      onCheckedChange={(checked) =>
-                        setAccess(checked ? "closed" : "open")
-                      }
-                    />
+              {/* Restricted - Write permission */}
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center gap-2">
+                  <PenOff className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex-1">
+                    <Label htmlFor="is-restricted" className="font-medium">
+                      {t("group.settings.privacy.restricted", "Restricted")}
+                    </Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {t(
+                        "group.settings.privacy.restricted_description",
+                        "Only members can send messages to the group",
+                      )}
+                    </p>
                   </div>
                 </div>
+                <Switch
+                  id="is-restricted"
+                  checked={isRestricted}
+                  onCheckedChange={setIsRestricted}
+                />
+              </div>
+
+              {/* Hidden - Metadata visibility */}
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center gap-2">
+                  <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex-1">
+                    <Label htmlFor="is-hidden" className="font-medium">
+                      {t("group.settings.privacy.hidden", "Hidden")}
+                    </Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {t(
+                        "group.settings.privacy.hidden_description",
+                        "Relay hides group metadata from non-members",
+                      )}
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  id="is-hidden"
+                  checked={isHidden}
+                  onCheckedChange={setIsHidden}
+                />
+              </div>
+
+              {/* Closed - Join requests */}
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center gap-2">
+                  <ShieldOff className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex-1">
+                    <Label htmlFor="is-closed" className="font-medium">
+                      {t("group.settings.privacy.closed", "Closed")}
+                    </Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {t(
+                        "group.settings.privacy.closed_description",
+                        "Join requests are ignored (invite-only)",
+                      )}
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  id="is-closed"
+                  checked={isClosed}
+                  onCheckedChange={setIsClosed}
+                />
               </div>
             </div>
           </div>
@@ -708,7 +706,7 @@ export function GroupEditor({
       children: (
         <div className="flex flex-col gap-4">
           {/* Join Requests Section - Only show for closed groups */}
-          {access === "closed" && isAdmin && canSign && (
+          {isClosed && isAdmin && canSign && (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <UserRoundPlus className="h-5 w-5" />

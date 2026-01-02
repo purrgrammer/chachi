@@ -33,7 +33,11 @@ import { formatShortNumber } from "@/lib/number";
 import { Badge } from "@/components/ui/badge";
 import { Name } from "@/components/nostr/name";
 import Amount from "@/components/amount";
-import { useCommunity, useFetchGroupParticipants } from "@/lib/nostr/groups";
+import {
+  useCommunity,
+  useFetchGroupParticipants,
+  useGroup,
+} from "@/lib/nostr/groups";
 import { Zap } from "@/components/nostr/zap";
 import { validateZap } from "@/lib/nip-57";
 import { ChatInput } from "@/components/nostr/chat/input";
@@ -812,6 +816,7 @@ export const GroupChat = forwardRef(
   ({ group }: { group: Group }, ref: ForwardedRef<HTMLDivElement | null>) => {
     // todo: load older messages when scrolling up
     const { data: participants } = useFetchGroupParticipants(group);
+    const { data: metadata } = useGroup(group);
     const members = participants?.members || [];
     const admins = participants?.admins || [];
     const { data: relayInfo } = useRelayInfo(group.relay);
@@ -964,7 +969,9 @@ export const GroupChat = forwardRef(
               ...(isRelayGroup ? [["-"]] : []),
             ]}
             showJoinRequest={
-              !canIPoast && relayInfo?.supported_nips?.includes(29)
+              !canIPoast &&
+              relayInfo?.supported_nips?.includes(29) &&
+              !metadata?.isClosed
             }
           >
             {replyingTo ? (
