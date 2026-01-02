@@ -1,4 +1,14 @@
-import { Info, Crown, Server, CloudUpload, Landmark } from "lucide-react";
+import {
+  Info,
+  Crown,
+  Server,
+  CloudUpload,
+  Landmark,
+  BookLock,
+  PenOff,
+  EyeOff,
+  ShieldOff,
+} from "lucide-react";
 import { Avatar as NostrAvatar } from "@/components/nostr/avatar";
 import {
   Drawer,
@@ -202,12 +212,7 @@ function CommunityInfo({ group }: { group: Group }) {
 }
 
 function GroupInfoContent({ group }: { group: Group }) {
-  //const isAdmin = me ? admins?.includes(me) : false;
-  //const isMember = me ? members?.includes(me) : false;
-  // todo: join/joined status
-  // todo: public/private
-  // todo: open/closed
-  // todo: invite someone
+  const { t } = useTranslation();
   const { data: metadata } = useGroup(group);
   const { id } = group;
   const name = metadata?.name;
@@ -215,6 +220,14 @@ function GroupInfoContent({ group }: { group: Group }) {
   const picture = metadata?.picture;
   const shortname = name ? name[0] : id.slice(0, 2);
   const nlink = metadata?.nlink;
+
+  // Check if any access markers are set
+  const hasAccessMarkers =
+    metadata?.isPrivate ||
+    metadata?.isRestricted ||
+    metadata?.isHidden ||
+    metadata?.isClosed;
+
   return (
     <div className="flex flex-col gap-4 p-4 mx-auto w-full max-w-sm lg:max-w-lg">
       <DrawerHeader className="flex flex-col gap-3 items-center">
@@ -244,6 +257,35 @@ function GroupInfoContent({ group }: { group: Group }) {
           <DrawerDescription className="text-center">
             <RichText group={group}>{about}</RichText>
           </DrawerDescription>
+        ) : null}
+        {/* Access markers display */}
+        {hasAccessMarkers && !group.isCommunity ? (
+          <div className="flex flex-wrap gap-2 justify-center mt-2">
+            {metadata?.isPrivate ? (
+              <Badge variant="secondary" className="flex gap-1 items-center">
+                <BookLock className="size-3" />
+                {t("group.metadata.private.trigger")}
+              </Badge>
+            ) : null}
+            {metadata?.isRestricted ? (
+              <Badge variant="secondary" className="flex gap-1 items-center">
+                <PenOff className="size-3" />
+                {t("group.metadata.restricted.trigger")}
+              </Badge>
+            ) : null}
+            {metadata?.isHidden ? (
+              <Badge variant="secondary" className="flex gap-1 items-center">
+                <EyeOff className="size-3" />
+                {t("group.metadata.hidden.trigger")}
+              </Badge>
+            ) : null}
+            {metadata?.isClosed ? (
+              <Badge variant="secondary" className="flex gap-1 items-center">
+                <ShieldOff className="size-3" />
+                {t("group.metadata.closed.trigger")}
+              </Badge>
+            ) : null}
+          </div>
         ) : null}
       </DrawerHeader>
       {/*
