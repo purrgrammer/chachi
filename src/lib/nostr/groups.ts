@@ -134,8 +134,10 @@ function groupMetadata(ev: NDKEvent, id: string, relay: string) {
     name: ev.tagValue("name") || "",
     about: ev.tagValue("about"),
     picture: ev.tagValue("picture"),
-    visibility: ev.tags.find((t) => t[0] === "private") ? "private" : "public",
-    access: ev.tags.find((t) => t[0] === "closed") ? "closed" : "open",
+    isPrivate: ev.tags.some((t) => t[0] === "private"),
+    isRestricted: ev.tags.some((t) => t[0] === "restricted"),
+    isHidden: ev.tags.some((t) => t[0] === "hidden"),
+    isClosed: ev.tags.some((t) => t[0] === "closed"),
     pubkey: ev.pubkey,
   } as GroupMetadata;
 }
@@ -225,10 +227,10 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
           name: ev.tagValue("name") || "",
           about: ev.tagValue("about"),
           picture: ev.tagValue("picture"),
-          visibility: ev.tags.find((t) => t[0] === "private")
-            ? "private"
-            : "public",
-          access: ev.tags.find((t) => t[0] === "closed") ? "closed" : "open",
+          isPrivate: ev.tags.some((t) => t[0] === "private"),
+          isRestricted: ev.tags.some((t) => t[0] === "restricted"),
+          isHidden: ev.tags.some((t) => t[0] === "hidden"),
+          isClosed: ev.tags.some((t) => t[0] === "closed"),
           nlink: nip19.naddrEncode({
             kind: NDKKind.GroupMetadata,
             pubkey: ev.pubkey,
@@ -533,18 +535,12 @@ export function useEditGroup() {
     if (metadata.about) edit.tags.push(["about", metadata.about]);
     if (metadata.picture) edit.tags.push(["picture", metadata.picture]);
 
-    // Add visibility and access as single-element tags per NIP-29 spec
-    if (metadata.visibility === "private") {
-      edit.tags.push(["private"]);
-    } else {
-      edit.tags.push(["public"]);
-    }
-
-    if (metadata.access === "closed") {
-      edit.tags.push(["closed"]);
-    } else {
-      edit.tags.push(["open"]);
-    }
+    // Add access markers as single-element tags per NIP-29 spec (presence-based)
+    // Only add tags when the marker is true; omitting means the opposite
+    if (metadata.isPrivate) edit.tags.push(["private"]);
+    if (metadata.isRestricted) edit.tags.push(["restricted"]);
+    if (metadata.isHidden) edit.tags.push(["hidden"]);
+    if (metadata.isClosed) edit.tags.push(["closed"]);
 
     await edit.publish(relaySet);
     console.log("[useEditGroup] Published successfully");
