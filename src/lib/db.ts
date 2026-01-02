@@ -25,8 +25,14 @@ export interface GroupInfo {
   pubkey?: string;
   picture?: string;
   nlink?: string;
-  visibility?: "public" | "private";
-  access?: "open" | "closed";
+  /** private: only members can read group messages */
+  isPrivate?: boolean;
+  /** restricted: only members can write messages to the group */
+  isRestricted?: boolean;
+  /** hidden: relay hides group metadata from non-members */
+  isHidden?: boolean;
+  /** closed: join requests are ignored (invite-only) */
+  isClosed?: boolean;
   isCommunity?: boolean;
 }
 
@@ -110,8 +116,10 @@ export async function saveGroupInfo(
       pubkey: metadata.pubkey,
       picture: metadata.picture,
       nlink: metadata.nlink,
-      visibility: metadata.visibility,
-      access: metadata.access,
+      isPrivate: metadata.isPrivate,
+      isRestricted: metadata.isRestricted,
+      isHidden: metadata.isHidden,
+      isClosed: metadata.isClosed,
       isCommunity: metadata.isCommunity,
     });
   } catch (error) {
