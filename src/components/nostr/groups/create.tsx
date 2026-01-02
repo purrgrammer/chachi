@@ -5,7 +5,7 @@ import { z } from "zod";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Plus, Castle, Server } from "lucide-react";
+import { Plus, Castle, Server, BookLock, PenOff, EyeOff, ShieldOff } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import {
   groupsContentAtom,
@@ -34,6 +34,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadImage } from "@/components/upload-image";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -69,8 +70,10 @@ const formSchema = z.object({
   name: z.string().min(1).max(140),
   picture: z.string().url().optional(),
   about: z.string().min(0).max(500).optional(),
-  visibility: z.enum(["public", "private"]).default("public"),
-  access: z.enum(["open", "closed"]).default("open"),
+  isPrivate: z.boolean().default(false),
+  isRestricted: z.boolean().default(false),
+  isHidden: z.boolean().default(false),
+  isClosed: z.boolean().default(false),
   relay: z.string().url(),
 });
 
@@ -208,8 +211,10 @@ export function CreateGroup({
       name: "",
       picture: "",
       about: "",
-      visibility: "public",
-      access: "open",
+      isPrivate: false,
+      isRestricted: false,
+      isHidden: false,
+      isClosed: false,
       relay: nip29Relays[0],
     });
 
@@ -412,81 +417,116 @@ export function CreateGroup({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="visibility"
-              render={({ field }) => (
-                <FormItem>
-                  <div className="flex flex-row justify-between items-center">
-                    <FormLabel>
-                      {t("group.create.form.visibility.label")}
-                    </FormLabel>
+            {/* Group Access Settings */}
+            <div className="space-y-3 pt-2">
+              <h4 className="text-sm font-medium text-muted-foreground">
+                {t("group.create.form.access-settings")}
+              </h4>
+              <FormField
+                control={form.control}
+                name="isPrivate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                    <div className="flex items-center gap-2">
+                      <BookLock className="h-4 w-4 text-muted-foreground" />
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-sm font-medium">
+                          {t("group.create.form.private.label")}
+                        </FormLabel>
+                        <FormDescription className="text-xs">
+                          {t("group.create.form.private.description")}
+                        </FormDescription>
+                      </div>
+                    </div>
                     <FormControl>
-                      <Select
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
                         disabled={isLoading}
-                        onValueChange={field.onChange}
-                        defaultValue={"public"}
-                      >
-                        <SelectTrigger className="w-32">
-                          <SelectValue
-                            placeholder={t(
-                              "group.create.form.visibility.placeholder",
-                            )}
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="public">
-                            {t("group.create.form.visibility.anyone")}
-                          </SelectItem>
-                          <SelectItem value="private">
-                            {t("group.create.form.visibility.members-only")}
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      />
                     </FormControl>
-                  </div>
-                  <FormDescription>
-                    {t("group.create.form.visibility.description")}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="access"
-              render={({ field }) => (
-                <FormItem>
-                  <div className="flex flex-row justify-between items-center">
-                    <FormLabel>{t("group.create.form.access.label")}</FormLabel>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="isRestricted"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                    <div className="flex items-center gap-2">
+                      <PenOff className="h-4 w-4 text-muted-foreground" />
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-sm font-medium">
+                          {t("group.create.form.restricted.label")}
+                        </FormLabel>
+                        <FormDescription className="text-xs">
+                          {t("group.create.form.restricted.description")}
+                        </FormDescription>
+                      </div>
+                    </div>
                     <FormControl>
-                      <Select
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
                         disabled={isLoading}
-                        onValueChange={field.onChange}
-                        defaultValue={"open"}
-                      >
-                        <SelectTrigger className="w-32">
-                          <SelectValue
-                            placeholder={t(
-                              "group.create.form.access.placeholder",
-                            )}
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="open">
-                            {t("group.create.form.access.anyone")}
-                          </SelectItem>
-                          <SelectItem value="closed">
-                            {t("group.create.form.access.invite-only")}
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      />
                     </FormControl>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="isHidden"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                    <div className="flex items-center gap-2">
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-sm font-medium">
+                          {t("group.create.form.hidden.label")}
+                        </FormLabel>
+                        <FormDescription className="text-xs">
+                          {t("group.create.form.hidden.description")}
+                        </FormDescription>
+                      </div>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="isClosed"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                    <div className="flex items-center gap-2">
+                      <ShieldOff className="h-4 w-4 text-muted-foreground" />
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-sm font-medium">
+                          {t("group.create.form.closed.label")}
+                        </FormLabel>
+                        <FormDescription className="text-xs">
+                          {t("group.create.form.closed.description")}
+                        </FormDescription>
+                      </div>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
             <div className="flex flex-row justify-between items-center gap-4 mt-6">
               <Button
                 type="button"
