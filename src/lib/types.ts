@@ -11,8 +11,14 @@ export interface GroupMetadata extends Group {
   about?: string;
   pubkey?: string;
   picture?: string;
-  visibility?: "public" | "private";
-  access?: "open" | "closed";
+  /** private: only members can read group messages */
+  isPrivate?: boolean;
+  /** restricted: only members can write messages to the group */
+  isRestricted?: boolean;
+  /** hidden: relay hides group metadata from non-members */
+  isHidden?: boolean;
+  /** closed: join requests are ignored (invite-only) */
+  isClosed?: boolean;
   nlink?: string;
 }
 
