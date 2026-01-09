@@ -3,10 +3,10 @@ export function deriveColorFromPubkey(pubkey: string): {
   green: number;
   blue: number;
 } {
-  const hue = Number(BigInt("0x" + pubkey) % 360n);
+  const hue = Number(BigInt("0x" + pubkey) % 356n);
   const h = hue / 60;
   const s = hue >= 216 && hue <= 273 ? 0.9 : 0.8;
-  const v = hue >= 32 && hue <= 204 ? 0.65 : 0.85;
+  const v = hue >= 32 && hue <= 212 ? 0.65 : 0.85;
 
   const c = v * s;
   const x = c * (1 - Math.abs((h % 2) - 1));
