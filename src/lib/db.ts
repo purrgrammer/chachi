@@ -135,26 +135,45 @@ export function saveTokenEvent(token: NDKCashuToken) {
   db.tokenEvents.put(token.rawEvent() as TokenEvent);
 }
 
-export function saveGroupInfo(group: Group, metadata: GroupMetadata) {
-  db.groupInfo.put({
-    id: group.id,
-    relay: group.relay,
-    name: metadata.name,
-    about: metadata.about,
-    pubkey: metadata.pubkey,
-    picture: metadata.picture,
-    nlink: metadata.nlink,
-    visibility: metadata.visibility,
-    access: metadata.access,
-    isCommunity: metadata.isCommunity,
-  });
+export async function saveGroupInfo(
+  group: Group,
+  metadata: GroupMetadata,
+): Promise<void> {
+  try {
+    await db.groupInfo.put({
+      id: group.id,
+      relay: group.relay,
+      name: metadata.name,
+      about: metadata.about,
+      pubkey: metadata.pubkey,
+      picture: metadata.picture,
+      nlink: metadata.nlink,
+      visibility: metadata.visibility,
+      access: metadata.access,
+      isCommunity: metadata.isCommunity,
+    });
+  } catch (error) {
+    console.error("Error saving group info to database:", error, {
+      group,
+      metadata,
+    });
+    // Re-throw to let callers handle the error if needed
+    throw error;
+  }
 }
 
-export function getGroupInfo(group: Group) {
-  return db.groupInfo
-    .where("[id+relay]")
-    .equals([group.id, group.relay])
-    .first();
+export async function getGroupInfo(
+  group: Group,
+): Promise<GroupInfo | undefined> {
+  try {
+    return await db.groupInfo
+      .where("[id+relay]")
+      .equals([group.id, group.relay])
+      .first();
+  } catch (error) {
+    console.error("Error reading group info from database:", error, { group });
+    return undefined;
+  }
 }
 
 // Function to check if an event is unpublished
@@ -185,40 +204,63 @@ export function getCommunity(pubkey: string) {
   return db.community.get(pubkey);
 }
 
-export function saveCommunity(community: Community) {
-  db.community.put(community);
+export async function saveCommunity(community: Community): Promise<void> {
+  try {
+    await db.community.put(community);
+  } catch (error) {
+    console.error("Error saving community to database:", error, { community });
+    throw error;
+  }
 }
 
-export function saveGroupParticipants(
+export async function saveGroupParticipants(
   group: Group,
   members: string[],
   admins: string[],
-) {
-  const id = groupId(group);
-  db.groupParticipants.put({
-    group: id,
-    members,
-    admins,
-  });
+): Promise<void> {
+  try {
+    const id = groupId(group);
+    await db.groupParticipants.put({
+      group: id,
+      members,
+      admins,
+    });
+  } catch (error) {
+    console.error("Error saving group participants to database:", error, {
+      group,
+      memberCount: members.length,
+      adminCount: admins.length,
+    });
+    throw error;
+  }
 }
 
-export function getGroupParticipants(group: Group) {
-  const id = groupId(group);
-  if (group.isCommunity) {
-    return {
-      group: id,
-      admins: [group.id],
-      members: [],
-    };
+export async function getGroupParticipants(
+  group: Group,
+): Promise<GroupParticipants | undefined> {
+  try {
+    const id = groupId(group);
+    if (group.isCommunity) {
+      return {
+        group: id,
+        admins: [group.id],
+        members: [],
+      };
+    }
+    if (group.id === "_") {
+      return {
+        group: id,
+        admins: [],
+        members: [],
+      };
+    }
+    return await db.groupParticipants.get(id);
+  } catch (error) {
+    console.error("Error reading group participants from database:", error, {
+      group,
+    });
+    return undefined;
   }
-  if (group.id === "_") {
-    return {
-      group: id,
-      admins: [],
-      members: [],
-    };
-  }
-  return db.groupParticipants.get(id);
 }
 
 export function getEmojiSet(address: string) {

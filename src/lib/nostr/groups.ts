@@ -52,6 +52,44 @@ import {
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect, useMemo } from "react";
 
+// Group type utilities
+export const isRelayGroup = (group: Group): boolean => group.id === "_";
+export const isCommunityGroup = (group: Group): boolean =>
+  group.isCommunity === true;
+export const isNIP29Group = (group: Group): boolean =>
+  !isRelayGroup(group) && !isCommunityGroup(group);
+
+// Deduplicates an array of pubkeys
+const dedupePubkeys = (pubkeys: string[]): string[] => [...new Set(pubkeys)];
+
+// Fetches participants (members or admins) for a NIP-29 group
+async function fetchGroupParticipantsByKind(
+  ndk: NDK,
+  group: Group,
+  kind: NDKKind,
+): Promise<string[]> {
+  if (!isNIP29Group(group)) return [];
+
+  const relaySet = NDKRelaySet.fromRelayUrls([group.relay], ndk);
+  const event = await ndk.fetchEvent(
+    {
+      kinds: [kind],
+      "#d": [group.id],
+    },
+    {
+      closeOnEose: true,
+      groupable: false,
+      cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+    },
+    relaySet,
+  );
+
+  if (!event) return [];
+
+  const pTags = event.tags.filter((t) => t[0] === "p");
+  return dedupePubkeys(pTags.map((t) => t[1]));
+}
+
 export function useUserGroups(pubkey: string) {
   const ndk = useNDK();
   const { data: userRelays } = useRelayList(pubkey);
@@ -103,8 +141,8 @@ function groupMetadata(ev: NDKEvent, id: string, relay: string) {
 }
 
 export async function fetchGroupMetadata(ndk: NDK, group: Group) {
-  // todo: useRelayInfo
-  if (group.id === "_") {
+  // Handle relay groups (special "_" id)
+  if (isRelayGroup(group)) {
     return fetchRelayInfo(group.relay).then((info) => {
       const metadata = {
         id: group.id,
@@ -245,52 +283,14 @@ export function useGroup(group: Group) {
 }
 
 async function fetchGroupMembers(ndk: NDK, group: Group): Promise<string[]> {
-  if (group.id === "_" || group.isCommunity) return [];
-  const relaySet = NDKRelaySet.fromRelayUrls([group.relay], ndk);
-
-  const event = await ndk.fetchEvent(
-    {
-      kinds: [NDKKind.GroupMembers],
-      "#d": [group.id],
-    },
-    {
-      closeOnEose: true,
-      groupable: false,
-      cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
-    },
-    relaySet,
-  );
-
-  if (event) {
-    const pTags = event.tags.filter((t) => t[0] === "p");
-    return pTags.map((t) => t[1]);
-  }
-  return [];
+  if (isRelayGroup(group) || isCommunityGroup(group)) return [];
+  return fetchGroupParticipantsByKind(ndk, group, NDKKind.GroupMembers);
 }
 
 async function fetchGroupAdmins(ndk: NDK, group: Group): Promise<string[]> {
-  if (group.id === "_") return [];
-  if (group.isCommunity) return [group.id];
-  const relaySet = NDKRelaySet.fromRelayUrls([group.relay], ndk);
-
-  const event = await ndk.fetchEvent(
-    {
-      kinds: [NDKKind.GroupAdmins],
-      "#d": [group.id],
-    },
-    {
-      closeOnEose: true,
-      groupable: false,
-      cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
-    },
-    relaySet,
-  );
-
-  if (event) {
-    const pTags = event.tags.filter((t) => t[0] === "p");
-    return pTags.map((t) => t[1]);
-  }
-  return [];
+  if (isRelayGroup(group)) return [];
+  if (isCommunityGroup(group)) return [group.id];
+  return fetchGroupParticipantsByKind(ndk, group, NDKKind.GroupAdmins);
 }
 
 export function useGroups(groups: Group[]) {
@@ -301,32 +301,19 @@ export function useGroups(groups: Group[]) {
       queryFn: async () => {
         if (!group) throw new Error("Group not found");
 
-        // Fetch and store metadata
-        fetchGroupMetadata(ndk, group).then((m) => {
-          if (m) {
-            saveGroupInfo(group, m);
-          }
-        });
-
-        // Fetch and store participants for groups that are not communities and not relay groups
-        if (!group.isCommunity && group.id !== "_") {
-          try {
-            const [members, admins] = await Promise.all([
-              fetchGroupMembers(ndk, group),
-              fetchGroupAdmins(ndk, group),
-            ]);
-            saveGroupParticipants(group, members, admins);
-
-            // Invalidate the participants query to ensure fresh data
-            queryClient.invalidateQueries({
-              queryKey: [GROUP_PARTICIPANTS, groupId(group)],
-            });
-          } catch (error) {
-            console.error("Error fetching group participants:", error);
-          }
+        // Check cache first
+        const cached = await getGroupInfo(group);
+        if (cached) {
+          return cached;
         }
 
-        return getGroupInfo(group);
+        // Fetch and store metadata
+        const metadata = await fetchGroupMetadata(ndk, group);
+        if (metadata) {
+          await saveGroupInfo(group, metadata);
+        }
+
+        return metadata;
       },
       staleTime: Infinity,
       gcTime: 0,
@@ -350,11 +337,10 @@ export function useGroupAdminsList(group?: Group) {
   const ndk = useNDK();
   const relaySet = useRelaySet(group ? [group.relay] : []);
   return useQuery({
-    enabled: Boolean(group),
+    enabled: Boolean(group) && isNIP29Group(group!),
     queryKey: ["admin-list", group?.id, group?.relay],
     queryFn: async () => {
-      if (!group) return [];
-      if (group.id === "_") return [];
+      if (!group || !isNIP29Group(group)) return [];
       return ndk
         .fetchEvent(
           {
@@ -367,12 +353,14 @@ export function useGroupAdminsList(group?: Group) {
         .then((event) => {
           if (event) {
             const pTags = event.tags.filter((t) => t[0] === "p");
-            const pubkeys = pTags.map((t) => t[1]);
-            return pubkeys;
+            return dedupePubkeys(pTags.map((t) => t[1]));
           }
           return [];
         })
-        .catch((err) => console.error(err));
+        .catch((err) => {
+          console.error("Error fetching admin list:", err);
+          return [];
+        });
     },
   });
 }
@@ -387,9 +375,16 @@ export function useFetchGroupParticipants(group: Group) {
   return useQuery({
     queryKey: [GROUP_PARTICIPANTS, groupId(group)],
     queryFn: async () => {
+      const fallback = {
+        group: groupId(group),
+        members: [],
+        admins: [],
+      };
+
       // Skip for communities and relay groups
-      if (group.isCommunity || group.id === "_") {
-        return getGroupParticipants(group);
+      if (!isNIP29Group(group)) {
+        const cached = await getGroupParticipants(group);
+        return cached ?? fallback;
       }
 
       try {
@@ -400,14 +395,16 @@ export function useFetchGroupParticipants(group: Group) {
         ]);
 
         // Save to database
-        saveGroupParticipants(group, members, admins);
+        await saveGroupParticipants(group, members, admins);
 
         // Return from database to ensure consistency
-        return getGroupParticipants(group);
+        const saved = await getGroupParticipants(group);
+        return saved ?? fallback;
       } catch (error) {
         console.error("Error fetching group participants:", error);
-        // Fallback to cached data if fetch fails
-        return getGroupParticipants(group);
+        // Fallback to cached data if fetch fails, or empty if no cache
+        const cached = await getGroupParticipants(group);
+        return cached ?? fallback;
       }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -422,15 +419,22 @@ export function useFetchGroupParticipants(group: Group) {
 export function useGroupParticipants(group: Group) {
   const { data, isSuccess } = useQuery({
     queryKey: [GROUP_PARTICIPANTS, groupId(group)],
-    queryFn: () => getGroupParticipants(group),
+    queryFn: async () => {
+      const cached = await getGroupParticipants(group);
+      return cached ?? {
+        group: groupId(group),
+        members: [],
+        admins: [],
+      };
+    },
     staleTime: Infinity,
     gcTime: 0,
   });
 
   return {
     isSuccess,
-    members: data?.members || [],
-    admins: data?.admins || [],
+    members: data?.members ?? [],
+    admins: data?.admins ?? [],
     roles: {}, // Ignoring roles for now as requested
   };
 }
@@ -551,16 +555,6 @@ export function useJoinRequests(group: Group) {
   );
 }
 
-export function useJoined(group: Group) {
-  return useStream(
-    {
-      kinds: [NDKKind.GroupAdminRequestJoin],
-      "#h": [group.id],
-    },
-    [group.relay],
-  );
-}
-
 export function useRequestedToJoin(group: Group, pubkey: string) {
   return useStream(
     {
@@ -606,23 +600,25 @@ export function useLeaveRequest(group: Group) {
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
   return async () => {
-    if (group.id !== "_") {
-      const event = new NDKEvent(ndk, {
-        kind: LEAVE_REQUEST,
-        content: "",
-        tags: [["h", group.id]],
-      } as NostrEvent);
-      await event.publish(relaySet);
-
-      // Refresh group participants after leave request
-      setTimeout(() => {
-        queryClient.invalidateQueries({
-          queryKey: [GROUP_PARTICIPANTS, groupId(group)],
-        });
-      }, 2000);
-
-      return event.rawEvent() as NostrEvent;
+    if (isRelayGroup(group)) {
+      return; // Can't leave relay groups
     }
+
+    const event = new NDKEvent(ndk, {
+      kind: LEAVE_REQUEST,
+      content: "",
+      tags: [["h", group.id]],
+    } as NostrEvent);
+    await event.publish(relaySet);
+
+    // Refresh group participants after leave request
+    setTimeout(() => {
+      queryClient.invalidateQueries({
+        queryKey: [GROUP_PARTICIPANTS, groupId(group)],
+      });
+    }, 2000);
+
+    return event.rawEvent() as NostrEvent;
   };
 }
 
