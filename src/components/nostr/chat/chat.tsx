@@ -10,6 +10,8 @@ import {
   Ban,
   ShieldBan,
   Bitcoin,
+  Loader2,
+  History,
 } from "lucide-react";
 import type { NostrEvent } from "nostr-tools";
 import { Button } from "@/components/ui/button";
@@ -775,8 +777,11 @@ interface ChatProps extends MotionProps {
   showRootReply?: boolean;
   showTimestamps?: boolean;
   lastSeen?: { ref: string };
-  deleteEvents: NostrEvent[];
+  deleteEvents?: NostrEvent[];
   showReactions?: boolean;
+  hasMore?: boolean;
+  loadMore?: () => void;
+  isLoadingMore?: boolean;
 }
 
 export function Chat({
@@ -797,8 +802,12 @@ export function Chat({
   scrollTo,
   setScrollTo,
   showReactions = true,
+  hasMore = false,
+  loadMore,
+  isLoadingMore = false,
 }: ChatProps) {
   // todo: check admin events against relay pubkey
+  const { t } = useTranslation();
   const groupedMessages = groupByDay(events);
   const lastMessage = events.filter((e) => e.kind === NDKKind.GroupChat).at(0);
   const me = usePubkey();
@@ -866,6 +875,23 @@ export function Chat({
           })}
         </div>
       ))}
+      {hasMore && loadMore ? (
+        <div className="flex justify-center my-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={loadMore}
+            disabled={isLoadingMore}
+          >
+            {isLoadingMore ? (
+              <Loader2 className="size-4 animate-spin mr-2" />
+            ) : (
+              <History className="size-4 mr-2" />
+            )}
+            {t("chat.load-older")}
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }

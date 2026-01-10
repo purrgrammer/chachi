@@ -51,7 +51,7 @@ import type { Group } from "@/lib/types";
 import { useCopy } from "@/lib/hooks";
 import { useRelayInfo } from "@/lib/relay";
 import {
-  useGroupchat,
+  usePaginatedGroupchat,
   useCommunitychat,
   useLastSeen,
   useNewMessage,
@@ -815,7 +815,8 @@ export const GroupChat = forwardRef(
     const members = participants?.members || [];
     const admins = participants?.admins || [];
     const { data: relayInfo } = useRelayInfo(group.relay);
-    const events = useGroupchat(group);
+    const { events, hasMore, loadMore, isLoadingMore } =
+      usePaginatedGroupchat(group);
     const hasBeenDeleted = events.some((e) => e.kind === DELETE_GROUP);
     const [replyingTo, setReplyingTo] = useState<NostrEvent | undefined>();
     const [scrollTo, setScrollTo] = useState<NostrEvent | undefined>();
@@ -937,6 +938,9 @@ export const GroupChat = forwardRef(
             ),
           }}
           setReplyingTo={setReplyingTo}
+          hasMore={hasMore}
+          loadMore={loadMore}
+          isLoadingMore={isLoadingMore}
         />
         {hasBeenDeleted ? (
           <div

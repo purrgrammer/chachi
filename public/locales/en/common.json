@@ -502,6 +502,7 @@
       }
     },
     "new-messages": "New messages",
+    "load-older": "Load older messages",
     "user": {
       "not-member": "You are not a member of this group yet",
       "kick": {
