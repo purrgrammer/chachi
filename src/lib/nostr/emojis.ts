@@ -192,7 +192,7 @@ export function useSyncEmojiSets() {
         since: emojiList.created_at,
       },
       {
-        cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
+        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
         closeOnEose: true,
       },
       relaySet,
@@ -256,7 +256,7 @@ export function useSyncEmojiSets() {
           const sub = ndk.subscribe(
             filter,
             {
-              cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
+              cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
               closeOnEose: true,
             },
             relaySet,
