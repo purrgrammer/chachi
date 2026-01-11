@@ -447,7 +447,7 @@ export async function fetchProfile(ndk: NDK, pubkey: string, relays: string[]) {
       },
       { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY },
       NDKRelaySet.fromRelayUrls(
-        relays.length > 0 ? relays : discoveryRelays,
+        relays.length > 0 ? relays : startupDiscoveryRelays,
         ndk,
       ),
     )
@@ -469,7 +469,7 @@ export function useProfiles(pubkeys: string[]) {
     queries: pubkeys.map((pubkey) => {
       return {
         queryKey: [PROFILE, pubkey],
-        queryFn: () => fetchProfile(ndk, pubkey, discoveryRelays),
+        queryFn: () => fetchProfile(ndk, pubkey, startupDiscoveryRelays),
         ...IMMUTABLE_CACHE_CONFIG,
       };
     }),
