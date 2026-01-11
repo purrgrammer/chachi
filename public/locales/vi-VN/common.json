@@ -342,6 +342,7 @@
       "sending": "sending..."
     },
     "new-messages": "New messages",
+    "load-older": "Tải tin nhắn cũ hơn",
     "user": {
       "not-member": "You are not a member of this group yet",
       "kick": {

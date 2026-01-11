@@ -342,6 +342,7 @@
       "sending": "sending..."
     },
     "new-messages": "New messages",
+    "load-older": "Завантажити старі повідомлення",
     "user": {
       "not-member": "You are not a member of this group yet",
       "kick": {
