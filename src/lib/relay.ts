@@ -60,6 +60,7 @@ export const discoveryRelays = [
   "wss://profiles.nostrver.se",
   "wss://relay.vertexlab.io",
   "wss://profiles.nostr1.com",
+  "wss://discovery.eu.nostria.app",
 ];
 
 export const fallbackRelays = ["wss://relay.primal.net"];
