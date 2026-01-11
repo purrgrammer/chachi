@@ -140,8 +140,8 @@ function useUserEvents({
         },
       ],
       {
-        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
-        closeOnEose: false,
+        cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
+        closeOnEose: true,
       },
       NDKRelaySet.fromRelayUrls(discoveryRelays, ndk),
     );
@@ -183,8 +183,8 @@ function useUserEvents({
     const sub = ndk.subscribe(
       filter,
       {
-        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
-        closeOnEose: false,
+        cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
+        closeOnEose: true,
       },
       NDKRelaySet.fromRelayUrls(discoveryRelays, ndk),
     );
@@ -217,8 +217,8 @@ function useUserEvents({
     const sub = ndk.subscribe(
       filter,
       {
-        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
-        closeOnEose: false,
+        cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
+        closeOnEose: true,
       },
       NDKRelaySet.fromRelayUrls(
         relays.map((r) => r.url),
@@ -250,8 +250,8 @@ function useUserEvents({
     const sub = ndk.subscribe(
       filter,
       {
-        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
-        closeOnEose: false,
+        cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
+        closeOnEose: true,
       },
       NDKRelaySet.fromRelayUrls(
         relays.map((r) => r.url),
@@ -297,8 +297,8 @@ function useUserEvents({
       const sub = ndk.subscribe(
         filters,
         {
-          cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
-          closeOnEose: false,
+          cacheUsage: NDKSubscriptionCacheUsage.PARALLEL,
+          closeOnEose: true,
         },
         NDKRelaySet.fromRelayUrls(
           relays.map((r) => r.url),
