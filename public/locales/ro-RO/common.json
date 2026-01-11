@@ -4,7 +4,8 @@
   },
   "home": "Home",
   "nav": {
-    "no-groups": "No groups"
+    "no-groups": "No groups",
+    "no-private-groups": "Fără grupuri private"
   },
   "user": {
     "community": "Community",
@@ -47,7 +48,11 @@
       "dark": "Dark",
       "system": "System"
     },
-    "settings": "Settings"
+    "settings": "Settings",
+    "profile": "Profil",
+    "wallets": "Portofele",
+    "dms": "Mesaje private",
+    "groups": "Grupuri"
   },
   "dashboard": {
     "activity": {
@@ -81,7 +86,8 @@
         "no-groups-found-for-x-want-to": "No groups found for \"{{search}}\", want to ",
         "start-one": "start one",
         "?": "?"
-      }
+      },
+      "action": "Caută"
     }
   },
   "group": {
@@ -162,18 +168,22 @@
           "label": "Relay",
           "placeholder": "Choose a relay.",
           "description": "This is the server where the posts will be stored.",
-          "required": "Please select a relay"
+          "required": "Please select a relay",
+          "use-custom": "Use custom relay",
+          "use-predefined": "Use predefined relay"
         },
         "visibility": {
           "label": "Visibility",
           "anyone": "Anyone",
           "members-only": "Members only",
-          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay.",
+          "placeholder": "Choose visibility"
         },
         "access": {
           "label": "Access",
           "anyone": "Anyone",
-          "invite-only": "Invite only"
+          "invite-only": "Invite only",
+          "placeholder": "Choose policy"
         },
         "submit": {
           "trigger": "Create",
@@ -188,7 +198,8 @@
         "name": {
           "label": "Name",
           "placeholder": "My Group",
-          "description": "This is the group's name"
+          "description": "This is the group's name",
+          "required": "Please add a name"
         },
         "about": {
           "label": "About",
@@ -199,13 +210,15 @@
           "label": "Visibility",
           "anyone": "Anyone",
           "members-only": "Members only",
-          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay."
+          "description": "Messages are not encrypted and can be read by relays. For maximum privacy host your own relay.",
+          "placeholder": "Choose visibility"
         },
         "access": {
           "label": "Access",
           "anyone": "Anyone",
           "invite-only": "Invite only",
-          "description": "Anyone can join an open group. Closed groups require approval"
+          "description": "Anyone can join an open group. Closed groups require approval",
+          "placeholder": "Choose policy"
         },
         "submit": {
           "trigger": "Save",
@@ -249,7 +262,8 @@
     "chat": {
       "user": {
         "joined": "joined",
-        "left": "left"
+        "left": "left",
+        "admin": "is now {{ role }}"
       },
       "event": {
         "delete": {
@@ -287,14 +301,154 @@
         "description": "Click on the map to select a location or search by address",
         "search_placeholder": "Search for a location...",
         "location_not_found": "Location not found",
-        "search_error": "Error searching for location"
-      }
+        "search_error": "Error searching for location",
+        "search_description": "Search for a location or click on the map to select coordinates.",
+        "no_location_selected": "Search for a location or click the map"
+      },
+      "group": "Group",
+      "private": "Private",
+      "closed": "Closed"
     },
     "info": {
       "admin": "Admin",
       "admins": "Admins ({{adminsLength}})",
       "members": "Members ({{membersLength}})",
       "no-members": "No members"
+    },
+    "settings": {
+      "title": "Group Settings",
+      "access-denied": "Access Denied",
+      "admin-only": "Only group administrators can access settings.",
+      "optional": "Optional",
+      "information": {
+        "tab": "Information",
+        "picture": "Group Image",
+        "picture_placeholder": "https://example.com/image.jpg",
+        "name": "Group Name",
+        "name_placeholder": "Enter group name",
+        "about": "About",
+        "about_placeholder": "Describe what this group is about...",
+        "upload_image": "Upload Image",
+        "uploading": "Uploading...",
+        "remove_image": "Remove",
+        "or_enter_url": "Or enter image URL",
+        "image_uploaded": "Image uploaded successfully",
+        "image_upload_error": "Failed to upload image",
+        "save": "Save Information",
+        "saving": "Saving...",
+        "success": "Group information updated successfully",
+        "error": "Failed to update group information"
+      },
+      "privacy": {
+        "tab": "Privacy",
+        "visibility": "Visibility",
+        "access": "Access Control",
+        "public": "Public",
+        "public_description": "Anyone can see the group and its content",
+        "private": "Private",
+        "private_description": "Only members can see the group content",
+        "open": "Open",
+        "open_description": "Anyone can join the group",
+        "closed": "Closed",
+        "closed_description": "Members must be approved to join",
+        "save": "Save Privacy Settings",
+        "saving": "Saving...",
+        "success": "Group privacy settings updated successfully",
+        "error": "Failed to update group privacy settings"
+      },
+      "members": {
+        "tab": "Members",
+        "join_requests": "Join Requests",
+        "no_requests": "No pending join requests",
+        "list": "Group Members"
+      },
+      "roles": {
+        "tab": "Roles",
+        "title": "Group Roles",
+        "description": "Roles define what permissions members have within this group. These are configured by the relay and cannot be modified here.",
+        "no_roles": "No custom roles defined for this group.",
+        "default_note": "The group uses default member and admin permissions.",
+        "no_description": "No description provided for this role.",
+        "note_title": "Note:",
+        "note_content": "Role permissions are managed by the relay administrator. Contact the relay operator to request changes to role definitions or assignments."
+      },
+      "admins": {
+        "tab": "Admins",
+        "title": "Group Administrators",
+        "description": "Administrators have special permissions to manage the group, including adding/removing members and moderating content.",
+        "current": "Current Administrators",
+        "none": "No administrators found",
+        "you": "You",
+        "add_new": "Add New Administrators",
+        "search_placeholder": "Search members to add as admin...",
+        "selected": "Selected to add",
+        "clear": "Clear",
+        "add_selected": "Add Selected as Admins",
+        "more_results": "{{count}} more results...",
+        "no_results": "No members found matching your search",
+        "add": {
+          "success": "Admin added successfully",
+          "error": "Failed to add admin"
+        },
+        "remove": {
+          "success": "Admin removed successfully",
+          "error": "Failed to remove admin"
+        },
+        "batch_add": {
+          "success": "Admins added successfully",
+          "error": "Failed to add some admins"
+        }
+      },
+      "invite_codes": {
+        "title": "Invite Codes",
+        "description": "Create invite codes to allow specific users to join your group.",
+        "create_button": "Create Invite Code",
+        "creating": "Creating...",
+        "active": "Active Invite Codes",
+        "none": "No active invite codes",
+        "expires": "Expires:",
+        "copy_code": "Copy code",
+        "dialog": {
+          "title": "Create Invite Code",
+          "description": "Choose when this invite code should expire. The code will be automatically revoked after the expiration date.",
+          "created_title": "Invite Code Created",
+          "created_description": "Your invite code has been created successfully. Share this code with users you want to invite to the group.",
+          "your_code": "Invite Code",
+          "invite_url": "Invite URL",
+          "share_hint": "Share the code or URL with users you want to invite to your group",
+          "expiration": "Expiration",
+          "1week": "1 Week",
+          "1month": "1 Month",
+          "1year": "1 Year",
+          "never": "Never (No Expiry)",
+          "done": "Done",
+          "cancel": "Cancel"
+        },
+        "create": {
+          "success": "Invite code created successfully",
+          "error": "Failed to create invite code"
+        },
+        "revoke": {
+          "success": "Invite code revoked successfully",
+          "error": "Failed to revoke invite code"
+        },
+        "copy": {
+          "success": "Invite code copied to clipboard",
+          "error": "Failed to copy invite code"
+        },
+        "copy_url": {
+          "success": "Invite URL copied to clipboard",
+          "error": "Failed to copy invite URL"
+        }
+      }
+    },
+    "error": {
+      "no-host": "No host provided",
+      "no-metadata": "Could not load group information"
+    },
+    "not-found": "Group Not Found",
+    "action": {
+      "go-back": "Go Back"
     }
   },
   "chat": {
@@ -356,10 +510,12 @@
       "request": {
         "sent": "Request sent",
         "success": "Join request sent",
-        "error": "Failed to send join request"
+        "error": "Failed to send join request",
+        "resend": "Try again"
       }
     },
-    "debug": "Debug"
+    "debug": "Debug",
+    "load-older": "Load older messages"
   },
   "join": {
     "request": {
@@ -381,7 +537,16 @@
     "requests": {
       "n": "Join requests ({{requestsLength}})",
       "none": "No join requests... yet"
-    }
+    },
+    "title": "Join Group",
+    "description": "You've been invited to join a group",
+    "group_info": "Group Information",
+    "group_id": "Group ID",
+    "relay": "Relay",
+    "invite_code": "Invite Code",
+    "placeholder": "Join functionality will be implemented here",
+    "go_back": "Go Back",
+    "onboard": "Get Started"
   },
   "gif": {
     "search": "Search GIF",
@@ -407,6 +572,9 @@
     "description": {
       "label": "Description",
       "placeholder": "Add a description"
+    },
+    "upload": {
+      "error": "Couldn't upload image"
     }
   },
   "copy": {
@@ -428,7 +596,9 @@
       "videos": "Videos",
       "image": "Image",
       "images": "Images",
-      "community": "Community"
+      "community": "Community",
+      "feed": "Feed",
+      "publication": "Targeted Publication"
     }
   },
   "post": {
@@ -489,6 +659,10 @@
     "set": {
       "bookmark": {
         "error": "Failed to bookmark emoji set"
+      },
+      "dialog": {
+        "title": "Emoji Set",
+        "click-to-view": "Click to view set"
       }
     }
   },
@@ -508,7 +682,8 @@
     "not-found": "Event not found",
     "fetch-error": "Error fetching event",
     "replied": "replied",
-    "thread": "Thread"
+    "thread": "Thread",
+    "link-not-recognized": "Link not recognized"
   },
   "events": {
     "loading": "Loading events",
@@ -536,7 +711,10 @@
   },
   "header": {
     "public": "Public",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "private": "Private",
+    "client": "via {{ client }}",
+    "via": "via"
   },
   "book": {
     "by": "by {{ author }}",
@@ -670,12 +848,17 @@
       "wallet-error": "Couldn't open wallet",
       "success": "Zapped {{ amount }} to {{ name }}",
       "fail": "Failed to zap",
-      "error": "Failed to zap {{ amount }} to {{ name }}"
+      "error": "Failed to zap {{ amount }} to {{ name }}",
+      "invoice-generated": "Invoice generated successfully",
+      "invoice-error": "Failed to generate invoice"
     }
   },
   "ecash": {
     "redeem": "Redeem",
-    "fee": "fee:"
+    "fee": "fee:",
+    "request": "Payment Request",
+    "pay-request": "Pay",
+    "paid-request": "Paid"
   },
   "settings": {
     "title": "Settings",
@@ -744,6 +927,27 @@
     },
     "relays": {
       "title": "Relays"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "description": "Manage your privacy settings",
+      "private-messages": "Private messages",
+      "private-messages-description": "Enable private messages for your account",
+      "privateMessages": {
+        "title": "Private messages",
+        "description": "Enable private messages"
+      },
+      "dm-relays": {
+        "title": "Private message relays",
+        "description": "Configure relays used for private messages",
+        "add": "Add Relay",
+        "placeholder": "wss://relay.example.com",
+        "invalid-url": "Please enter a valid relay URL"
+      },
+      "unreadSync": {
+        "title": "Unread sync",
+        "description": "Sync read status across devices using encrypted Nostr events"
+      }
     }
   },
   "nutzaps": {
@@ -840,7 +1044,9 @@
           "description": "Click on the map to select a location or search by address",
           "search_placeholder": "Search for a location...",
           "location_not_found": "Location not found",
-          "search_error": "Error searching for location"
+          "search_error": "Error searching for location",
+          "search_description": "Search for a location or click on the map to select coordinates.",
+          "no_location_selected": "Search for a location or click the map"
         },
         "optional": "optional",
         "save": "Save changes",
@@ -848,13 +1054,28 @@
         "success": "Metadata saved successfully",
         "error": "Failed to save metadata"
       }
+    },
+    "targeted-publication": {
+      "new": "New publication",
+      "description": "Create a publication that is targeted to one or more communities",
+      "success": "Publication created successfully",
+      "error": "Failed to create publication",
+      "post": "Post",
+      "posting": "Posting...",
+      "event-not-found": "Event not found",
+      "loading": "Loading...",
+      "enter-nip19": "Enter a NIP-19 identifier",
+      "event-found": "Event found",
+      "post-success": "Publication posted successfully",
+      "post-error": "Failed to post publication",
+      "select-communities": "Select communities",
+      "select-communities-desc": "Select the communities you want to target",
+      "communities-selected": "{{count}} communities selected"
     }
   },
   "kinds": {
     "0": "User Metadata",
     "1": "Short Text Note",
-    "31990": "App",
-    "31989": "App Recommendation",
     "3": "Follows",
     "4": "Encrypted DM",
     "5": "Deletion",
@@ -867,22 +1088,22 @@
     "40": "Channel Creation",
     "41": "Channel Metadata",
     "42": "Channel Message",
-    "10002": "Relay List",
     "1063": "File Metadata",
-    "1621": "Issue",
-    "30617": "Repository",
-    "34235": "Horizontal Video",
-    "34236": "Vertical Video",
     "1068": "Poll",
     "1111": "Comment",
+    "1222": "Audio Note",
     "1337": "Code Snippet",
+    "1621": "Issue",
     "9041": "Goal",
     "9321": "Nutzap",
     "9734": "Zap Request",
     "9735": "Zap",
     "9802": "Highlight",
     "10001": "Pin List",
+    "10002": "Relay List",
     "10222": "Community Key",
+    "30000": "People List",
+    "30009": "Badge",
     "30015": "Interests",
     "30023": "Long-form",
     "30030": "Emoji Set",
@@ -890,8 +1111,18 @@
     "30169": "GIF Set",
     "30311": "Stream",
     "30315": "Status",
+    "30617": "Repository",
     "31923": "Calendar Event",
-    "38172": "Cashu Mint"
+    "31924": "Calendar",
+    "31989": "App Recommendation",
+    "31990": "App",
+    "34235": "Horizontal Video",
+    "34236": "Vertical Video",
+    "34550": "Moderated Community",
+    "38172": "Cashu Mint",
+    "39000": "Group Metadata",
+    "39089": "Follow Pack",
+    "unknown": "Kind {{kind}}"
   },
   "relay": {
     "new": {
@@ -905,7 +1136,17 @@
       "create": "Create Relay",
       "order-success": "Order created successfully",
       "error": "Failed to create relay"
-    }
+    },
+    "info": "Relay",
+    "feed": "Feed",
+    "supported-nips": "Supported NIPs",
+    "users": "Users",
+    "use-this-relay": "use this relay",
+    "software": "Software",
+    "contact": "Contact",
+    "groups": "Groups",
+    "communities": "Communities",
+    "chat": "Chat"
   },
   "landing": {
     "features": {
@@ -920,7 +1161,9 @@
       "files": "Files",
       "files-desc": "Upload and share files",
       "selfhost": "Own your data",
-      "selfhost-desc": "Self-host your messages and files"
+      "selfhost-desc": "Self-host your messages and files",
+      "content-types": "Content types",
+      "content-types-desc": "Text, images, videos, polls, code snippets and much more!"
     },
     "testimonials": "Testimonials",
     "testimonials-desc": "What people are saying about us",
@@ -942,10 +1185,281 @@
       "joined": "Joined",
       "relays": "Relays",
       "blossom": "Media Servers",
-      "mint": "Mint"
+      "mint": "Mint",
+      "supporters": "Supporters"
     }
   },
   "app": {
-    "supported_kinds": "Content Types"
+    "supported_kinds": "Content Types",
+    "categories": "Categories"
+  },
+  "calendar": {
+    "calendar": "Calendar",
+    "upcoming-events": "Evenimente viitoare",
+    "past-events": "Evenimente trecute",
+    "no-events": "Nu s-au găsit evenimente"
+  },
+  "open-in": "Open in",
+  "action-open-with": "Open in {{ client }}",
+  "action-apps": "Open in",
+  "nips": {
+    "10": "Text Notes and Threads",
+    "11": "Relay Information",
+    "13": "Proof of Work",
+    "14": "Subject Tag",
+    "15": "Marketplace",
+    "17": "Private Messages",
+    "18": "Reposts",
+    "19": "Bech32 Entities",
+    "21": "URI Scheme",
+    "22": "Comment",
+    "23": "Long-form Content",
+    "24": "Extra Metadata",
+    "25": "Reactions",
+    "26": "Delegated Signing",
+    "27": "Text References",
+    "28": "Public Chat",
+    "29": "Relay-based Groups",
+    "30": "Custom Emoji",
+    "31": "Unknown Events",
+    "32": "Labeling",
+    "34": "Git Integration",
+    "35": "Torrents",
+    "36": "Sensitive Content",
+    "37": "Draft Events",
+    "38": "User Statuses",
+    "39": "External Identities",
+    "40": "Expiration Timestamp",
+    "42": "Authentication",
+    "44": "Encrypted Payloads",
+    "45": "Counting Results",
+    "46": "Remote Signing",
+    "47": "Wallet Connect",
+    "48": "Proxy Tags",
+    "49": "Private Key Encryption",
+    "50": "Search Capability",
+    "51": "Lists",
+    "52": "Calendar Events",
+    "53": "Live Activities",
+    "54": "Wiki",
+    "55": "Android Signer",
+    "56": "Reporting",
+    "57": "Lightning Zaps",
+    "58": "Badges",
+    "59": "Gift Wrap",
+    "60": "Cashu Wallet",
+    "61": "Nutzaps",
+    "62": "Request to Vanish",
+    "64": "Chess PGN",
+    "65": "Relay List Metadata",
+    "66": "Relay Discovery",
+    "68": "Picture Feeds",
+    "69": "P2P Orders",
+    "70": "Protected Events",
+    "71": "Video Events",
+    "72": "Moderated Communities",
+    "73": "External Content IDs",
+    "75": "Zap Goals",
+    "78": "App-specific Data",
+    "84": "Highlights",
+    "86": "Relay Management API",
+    "88": "Polls",
+    "89": "App Handlers",
+    "90": "Data Vending Machines",
+    "92": "Media Attachments",
+    "94": "File Metadata",
+    "96": "HTTP File Storage",
+    "98": "HTTP Auth",
+    "99": "Classified Listings",
+    "01": "Basic Protocol Flow",
+    "02": "Follow List",
+    "03": "OpenTimestamps Attestations",
+    "04": "Encrypted Direct Message",
+    "05": "DNS Identity Mapping",
+    "06": "Key Derivation",
+    "07": "Browser Extension",
+    "08": "Mentions",
+    "09": "Event Deletion",
+    "7D": "Threads",
+    "B0": "Web Bookmarks",
+    "B7": "Blossom",
+    "C0": "Code Snippets",
+    "C7": "Chats"
+  },
+  "private-group": {
+    "create": {
+      "new": "New private group",
+      "title": "Create private group",
+      "description": "Create a new private group to chat with your friends",
+      "selected": "Selected",
+      "no-matches": "No matches found",
+      "trigger": "Create",
+      "success": "Private group created",
+      "error": "Failed to create private group",
+      "follows": "Follows",
+      "participants": "{{ n }} participant",
+      "participants_plural": "{{ n }} participants",
+      "private-message": "Private message",
+      "add-some-participants": "Add one or more participants to the group",
+      "group-members": "Group members",
+      "search-follows": "Start typing to search your follows",
+      "group-chat": "Group chat",
+      "form": {
+        "submit": {
+          "trigger": "Create",
+          "success": "Private group created",
+          "error": "Failed to create private group"
+        }
+      }
+    },
+    "private-groups": "Private groups",
+    "dm-relays": "Private message relays",
+    "auth": "Auth",
+    "type": {
+      "trigger": "Private messages",
+      "trigger-many": "Private group",
+      "content": "Encrypted messages, only you and the recipient can read the content",
+      "content-many": "Encrypted group messages, only members can read content"
+    },
+    "relays": "Relays",
+    "no-relays": "No relays found",
+    "searching-relays": "Searching relays",
+    "compliant": "User has set up private message relays",
+    "non-compliant": "User has not set up private message relays, falling back to outbox relays",
+    "requests": "Requests",
+    "no-dm-relays": "No private message relays found",
+    "groups": "Groups",
+    "saved-messages": "Saved messages",
+    "invalid-group": "Invalid group",
+    "webrtc": {
+      "incoming-call": "Incoming call",
+      "decline": "Decline",
+      "accept": "Accept",
+      "incoming-call-description": "is calling you",
+      "ongoing-call": "Ongoing call",
+      "end-call": "End call",
+      "outgoing-call-started": "Outgoing call started",
+      "incoming-call-received": "Incoming call received",
+      "call-answered": "Call answered",
+      "call-ended": "Call ended",
+      "call-connected": "Call connected",
+      "invalid-group": "Invalid group"
+    }
+  },
+  "rsvp": {
+    "going": "going",
+    "tentative": "tentative",
+    "declined": "declined",
+    "yes": "yes",
+    "no": "no",
+    "maybe": "maybe",
+    "rsvp": "RSVP"
+  },
+  "feed": {
+    "content-types": "Content Types",
+    "clear": "Clear",
+    "all": "All",
+    "save": "Save",
+    "select-all": "Select All",
+    "apply-filters": "Apply Filters",
+    "live-on": "Live updates enabled",
+    "live-off": "Live updates disabled",
+    "load-older": "Load older posts"
+  },
+  "stream": {
+    "live-updates": "Live",
+    "ended": "Ended",
+    "planned": "Planned"
+  },
+  "aria": {
+    "upload-file": "Upload file",
+    "upload-image": "Upload image",
+    "upload-video": "Upload video",
+    "add-emoji": "Add emoji reaction",
+    "retry-message": "Retry sending message",
+    "close": "Close",
+    "open-menu": "Open menu",
+    "search-gif": "Search GIF",
+    "select-emoji": "Select emoji",
+    "remove": "Remove",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Go back",
+    "more-options": "More options",
+    "toggle-theme": "Toggle theme",
+    "toggle-language": "Toggle language",
+    "accept-request": "Accept join request",
+    "reject-request": "Reject join request",
+    "kick-user": "Kick user",
+    "copy-link": "Copy link",
+    "share": "Share",
+    "bookmark": "Bookmark",
+    "unbookmark": "Remove bookmark",
+    "forward-message": "Forward message",
+    "reply-to-message": "Reply to message",
+    "vote-option": "Vote for this option",
+    "add-poll-option": "Add poll option",
+    "remove-poll-option": "Remove poll option",
+    "select-location": "Select location on map",
+    "clear-location": "Clear selected location",
+    "play-video": "Play video",
+    "pause-video": "Pause video",
+    "mute-video": "Mute video",
+    "unmute-video": "Unmute video",
+    "fullscreen-video": "Enter fullscreen",
+    "exit-fullscreen": "Exit fullscreen",
+    "previous": "Previous",
+    "next": "Next",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "refresh": "Refresh",
+    "sync-wallet": "Sync wallet",
+    "connect-wallet": "Connect wallet",
+    "disconnect-wallet": "Disconnect wallet",
+    "add-mint": "Add mint",
+    "remove-mint": "Remove mint",
+    "add-relay": "Add relay",
+    "remove-relay": "Remove relay",
+    "add-server": "Add Blossom server",
+    "remove-server": "Remove Blossom server",
+    "show-qr": "Show QR code",
+    "hide-qr": "Hide QR code",
+    "scan-qr": "Scan QR code",
+    "copy-invoice": "Copy invoice",
+    "open-wallet": "Open in wallet",
+    "send-payment": "Send payment",
+    "receive-payment": "Receive payment",
+    "redeem-ecash": "Redeem ecash",
+    "create-ecash": "Create ecash token",
+    "toggle-visibility": "Toggle visibility"
+  },
+  "profile": {
+    "message": "Mesaj",
+    "groups": "Grupuri",
+    "relays": "Relee",
+    "not-found": "Profil negăsit",
+    "error": {
+      "no-identifier": "Nu a fost furnizat niciun identificator",
+      "invalid-format": "Format identificator invalid",
+      "nip05-resolve": "Nu s-a putut rezolva adresa NIP-05",
+      "load-failed": "Acest profil de utilizator nu a putut fi încărcat"
+    },
+    "banner": {
+      "alt": "Banner profil"
+    },
+    "action": {
+      "go-back": "Înapoi"
+    },
+    "groups.none": "Nu s-au găsit grupuri"
+  },
+  "error": {
+    "something-went-wrong": "Ceva nu a mers bine",
+    "report-problem": "Raportează problemă",
+    "reload-page": "Reîncarcă pagina"
+  },
+  "search": {
+    "placeholder": "Caută..."
   }
 }
