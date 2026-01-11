@@ -342,6 +342,7 @@
       "sending": "sending..."
     },
     "new-messages": "新消息",
+    "load-older": "加载更早的消息",
     "user": {
       "not-member": "你还不是该群聊的成员",
       "kick": {

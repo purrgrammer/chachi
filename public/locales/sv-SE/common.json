@@ -342,6 +342,7 @@
       "sending": "sending..."
     },
     "new-messages": "Nya meddelanden",
+    "load-older": "Ladda äldre meddelanden",
     "user": {
       "not-member": "Du är ännu inte medlem i denna grupp",
       "kick": {

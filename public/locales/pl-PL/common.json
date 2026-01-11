@@ -342,6 +342,7 @@
       "sending": "sending..."
     },
     "new-messages": "Nowe wiadomości",
+    "load-older": "Załaduj starsze wiadomości",
     "user": {
       "not-member": "Nie jesteś jeszcze członkiem tej grupy",
       "kick": {

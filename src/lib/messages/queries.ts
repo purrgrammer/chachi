@@ -32,20 +32,6 @@ export async function getGroupEvents(group: Group, limit = MESSAGE_PAGE_SIZE) {
     .toArray();
 }
 
-export async function getGroupEventsBeforeTimestamp(
-  group: Group,
-  beforeTimestamp: number,
-  limit = MESSAGE_PAGE_SIZE,
-) {
-  const id = groupId(group);
-  return db.events
-    .where("[group+created_at]")
-    .between([id, Dexie.minKey], [id, beforeTimestamp - 1])
-    .reverse()
-    .limit(limit)
-    .toArray();
-}
-
 export async function getGroupEventCount(group: Group) {
   const id = groupId(group);
   return db.events

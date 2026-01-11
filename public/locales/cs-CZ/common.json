@@ -342,6 +342,7 @@
       "sending": "sending..."
     },
     "new-messages": "Nové zprávy",
+    "load-older": "Načíst starší zprávy",
     "user": {
       "not-member": "Zatím nejste členem této skupiny",
       "kick": {
