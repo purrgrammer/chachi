@@ -62,6 +62,10 @@ function useUserEvents({
   const [contactList, setContactList] = useAtom(contactListAtom);
   const [mediaServerList, setMediaServerList] = useAtom(mediaServerListAtom);
 
+  // Bootstrap phases for optimized loading
+  const [relayListsLoaded, setRelayListsLoaded] = useState(false);
+  const [groupsLoaded, setGroupsLoaded] = useState(false);
+
   // Log in account
   useEffect(() => {
     if (loginMethod === '"nip07"') {
@@ -168,12 +172,17 @@ function useUserEvents({
       }
     });
 
+    // Mark relay lists as loaded when initial sync completes
+    sub.on("eose", () => {
+      setRelayListsLoaded(true);
+    });
+
     return () => sub.stop();
   }, [pubkey]);
 
-  // Mint list
+  // Phase 3: Mint list (load after groups)
   useEffect(() => {
-    if (!pubkey) return;
+    if (!pubkey || !groupsLoaded) return;
 
     const filter = {
       kinds: [NDKKind.CashuMintList],
@@ -203,11 +212,11 @@ function useUserEvents({
     });
 
     return () => sub.stop();
-  }, [pubkey]);
+  }, [pubkey, groupsLoaded]);
 
-  // Cashu wallet
+  // Phase 3: Cashu wallet (load after groups)
   useEffect(() => {
-    if (!pubkey) return;
+    if (!pubkey || !groupsLoaded) return;
 
     const filter = {
       kinds: [NDKKind.CashuWallet],
@@ -234,11 +243,11 @@ function useUserEvents({
     });
 
     return () => sub.stop();
-  }, [pubkey]);
+  }, [pubkey, groupsLoaded]);
 
-  // Communikey
+  // Phase 3: Communikey (load after groups)
   useEffect(() => {
-    if (!pubkey) return;
+    if (!pubkey || !groupsLoaded) return;
 
     const filter = {
       kinds: [COMMUNIKEY],
@@ -267,44 +276,35 @@ function useUserEvents({
     });
 
     return () => sub.stop();
-  }, [pubkey]);
+  }, [pubkey, groupsLoaded]);
 
-  // Groups, contacts, media server, etc
+  // Phase 2: Groups and relationships (load after relay lists)
   useEffect(() => {
-    if (pubkey && relays.length > 0) {
-      const filters = [
-        {
-          kinds: [NDKKind.SimpleGroupList],
-          authors: [pubkey],
-          since: groupList.created_at,
-        },
-        {
-          kinds: [RELATIONSHIP],
-          authors: [pubkey],
-          //since: relationshipList.created_at,
-        },
-        {
-          kinds: [NDKKind.Contacts],
-          authors: [pubkey],
-          since: contactList.created_at,
-        },
-        {
-          kinds: [NDKKind.BlossomList],
-          authors: [pubkey],
-          since: mediaServerList.created_at,
-        },
-      ];
-      const sub = ndk.subscribe(
-        filters,
-        {
-          cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
-          closeOnEose: true,
-        },
-        NDKRelaySet.fromRelayUrls(
-          relays.map((r) => r.url),
-          ndk,
-        ),
-      );
+    if (!pubkey || !relayListsLoaded || relays.length === 0) return;
+
+    const filters = [
+      {
+        kinds: [NDKKind.SimpleGroupList],
+        authors: [pubkey],
+        since: groupList.created_at,
+      },
+      {
+        kinds: [RELATIONSHIP],
+        authors: [pubkey],
+        //since: relationshipList.created_at,
+      },
+    ];
+    const sub = ndk.subscribe(
+      filters,
+      {
+        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+        closeOnEose: true,
+      },
+      NDKRelaySet.fromRelayUrls(
+        relays.map((r) => r.url),
+        ndk,
+      ),
+    );
 
       sub.on("event", async (event) => {
         if (event.kind === NDKKind.SimpleGroupList) {
@@ -378,38 +378,77 @@ function useUserEvents({
               return { ...groupList, groups: newGroups };
             });
           }
-        } else if (event.kind === NDKKind.Contacts) {
-          // todo: petnames
-          if (
-            event.created_at &&
-            event.created_at > (contactList.created_at || 0)
-          ) {
-            const pubkeys = event.tags
-              .filter((t) => t[0] === "p" && t[1] && t[1].length === 64)
-              .map((t) => t[1]);
-            setContactList({
-              created_at: event.created_at,
-              pubkeys,
-            });
-          }
-        } else if (event.kind === NDKKind.BlossomList) {
-          if (
-            event.created_at &&
-            event.created_at > (mediaServerList.created_at || 0)
-          ) {
-            const servers = event.tags
-              .filter((t) => t[0] === "server" && t[1])
-              .map((t) => t[1]);
-            if (servers.length > 0) {
-              setMediaServerList({ created_at: event.created_at, servers });
-            }
+        }
+    });
+
+    // Mark groups as loaded when initial sync completes
+    sub.on("eose", () => {
+      setGroupsLoaded(true);
+    });
+
+    return () => sub.stop();
+  }, [pubkey, relayListsLoaded, relays]);
+
+  // Phase 3: Contacts and media servers (load after groups)
+  useEffect(() => {
+    if (!pubkey || !groupsLoaded || relays.length === 0) return;
+
+    const filters = [
+      {
+        kinds: [NDKKind.Contacts],
+        authors: [pubkey],
+        since: contactList.created_at,
+      },
+      {
+        kinds: [NDKKind.BlossomList],
+        authors: [pubkey],
+        since: mediaServerList.created_at,
+      },
+    ];
+    const sub = ndk.subscribe(
+      filters,
+      {
+        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+        closeOnEose: true,
+      },
+      NDKRelaySet.fromRelayUrls(
+        relays.map((r) => r.url),
+        ndk,
+      ),
+    );
+
+    sub.on("event", (event) => {
+      if (event.kind === NDKKind.Contacts) {
+        // todo: petnames
+        if (
+          event.created_at &&
+          event.created_at > (contactList.created_at || 0)
+        ) {
+          const pubkeys = event.tags
+            .filter((t) => t[0] === "p" && t[1] && t[1].length === 64)
+            .map((t) => t[1]);
+          setContactList({
+            created_at: event.created_at,
+            pubkeys,
+          });
+        }
+      } else if (event.kind === NDKKind.BlossomList) {
+        if (
+          event.created_at &&
+          event.created_at > (mediaServerList.created_at || 0)
+        ) {
+          const servers = event.tags
+            .filter((t) => t[0] === "server" && t[1])
+            .map((t) => t[1]);
+          if (servers.length > 0) {
+            setMediaServerList({ created_at: event.created_at, servers });
           }
         }
-      });
+      }
+    });
 
-      return () => sub.stop();
-    }
-  }, [pubkey, relays]);
+    return () => sub.stop();
+  }, [pubkey, groupsLoaded, relays]);
 
   // Groups and messages
   useGroups(groupList.groups);
