@@ -4,7 +4,8 @@
   },
   "home": "Inicio",
   "nav": {
-    "no-groups": "No hay grupos"
+    "no-groups": "No hay grupos",
+    "no-private-groups": "Sin grupos privados"
   },
   "user": {
     "community": "Community",
@@ -47,7 +48,11 @@
       "dark": "Obscuro",
       "system": "Sistema"
     },
-    "settings": "Ajustes"
+    "settings": "Ajustes",
+    "profile": "Perfil",
+    "wallets": "Billeteras",
+    "dms": "Mensajes privados",
+    "groups": "Grupos"
   },
   "dashboard": {
     "activity": {
@@ -81,7 +86,8 @@
         "no-groups-found-for-x-want-to": "No se encontraron grupos para «{{search}}», ¿quieres ",
         "start-one": "empezar uno",
         "?": "?"
-      }
+      },
+      "action": "Buscar"
     }
   },
   "group": {
@@ -162,18 +168,22 @@
           "label": "Relé",
           "placeholder": "Elige un relay.",
           "description": "Este es el servidor donde se almacenarán las publicaciones.",
-          "required": "Por favor, selecciona un relay"
+          "required": "Por favor, selecciona un relay",
+          "use-custom": "Usar relay personalizado",
+          "use-predefined": "Usar relay predefinido"
         },
         "visibility": {
           "label": "Visibilidad",
           "anyone": "Cualquiera",
           "members-only": "Solo miembros",
-          "description": "Los mensajes no están cifrados y pueden ser leídos por los relays. Para máxima privacidad, aloja tu propio relay."
+          "description": "Los mensajes no están cifrados y pueden ser leídos por los relays. Para máxima privacidad, aloja tu propio relay.",
+          "placeholder": "Elegir visibilidad"
         },
         "access": {
           "label": "Acceso",
           "anyone": "Cualquiera",
-          "invite-only": "Solo por invitación"
+          "invite-only": "Solo por invitación",
+          "placeholder": "Elegir política"
         },
         "submit": {
           "trigger": "Crear",
@@ -188,7 +198,8 @@
         "name": {
           "label": "Nombre",
           "placeholder": "Mi Grupo",
-          "description": "Este es el nombre de tu grupo."
+          "description": "Este es el nombre de tu grupo.",
+          "required": "Por favor añade un nombre"
         },
         "about": {
           "label": "Descripción",
@@ -199,13 +210,15 @@
           "label": "Visibilidad",
           "anyone": "Cualquiera",
           "members-only": "Solo miembros",
-          "description": "Los mensajes no están cifrados y pueden ser leídos por los relays. Para máxima privacidad, aloja tu propio relay."
+          "description": "Los mensajes no están cifrados y pueden ser leídos por los relays. Para máxima privacidad, aloja tu propio relay.",
+          "placeholder": "Elegir visibilidad"
         },
         "access": {
           "label": "Acceso",
           "anyone": "Cualquiera",
           "invite-only": "Solo por invitación",
-          "description": "Cualquiera puede unirse a un grupo abierto. Los grupos cerrados requieren aprobación."
+          "description": "Cualquiera puede unirse a un grupo abierto. Los grupos cerrados requieren aprobación.",
+          "placeholder": "Elegir política"
         },
         "submit": {
           "trigger": "Guardar",
@@ -249,7 +262,8 @@
     "chat": {
       "user": {
         "joined": "se ha unido",
-        "left": "ha salido"
+        "left": "ha salido",
+        "admin": "ahora es {{ role }}"
       },
       "event": {
         "delete": {
@@ -287,14 +301,154 @@
         "description": "Click on the map to select a location or search by address",
         "search_placeholder": "Search for a location...",
         "location_not_found": "Location not found",
-        "search_error": "Error searching for location"
-      }
+        "search_error": "Error searching for location",
+        "search_description": "Busca una ubicación o haz clic en el mapa para seleccionar coordenadas.",
+        "no_location_selected": "Busca una ubicación o haz clic en el mapa"
+      },
+      "group": "Grupo",
+      "private": "Privado",
+      "closed": "Cerrado"
     },
     "info": {
       "admin": "Admin",
       "admins": "Administradores ({{adminsLength}})",
       "members": "Miembros ({{membersLength}})",
       "no-members": "No hay miembros"
+    },
+    "settings": {
+      "title": "Configuración del grupo",
+      "access-denied": "Acceso denegado",
+      "admin-only": "Solo los administradores del grupo pueden acceder a la configuración.",
+      "optional": "Opcional",
+      "information": {
+        "tab": "Información",
+        "picture": "Imagen del grupo",
+        "picture_placeholder": "https://example.com/image.jpg",
+        "name": "Nombre del grupo",
+        "name_placeholder": "Introduce el nombre del grupo",
+        "about": "Acerca de",
+        "about_placeholder": "Describe de qué trata este grupo...",
+        "upload_image": "Subir imagen",
+        "uploading": "Subiendo...",
+        "remove_image": "Eliminar",
+        "or_enter_url": "O introduce la URL de la imagen",
+        "image_uploaded": "Imagen subida con éxito",
+        "image_upload_error": "Error al subir la imagen",
+        "save": "Guardar información",
+        "saving": "Guardando...",
+        "success": "Información del grupo actualizada con éxito",
+        "error": "Error al actualizar la información del grupo"
+      },
+      "privacy": {
+        "tab": "Privacidad",
+        "visibility": "Visibilidad",
+        "access": "Control de acceso",
+        "public": "Público",
+        "public_description": "Cualquiera puede ver el grupo y su contenido",
+        "private": "Privado",
+        "private_description": "Solo los miembros pueden ver el contenido del grupo",
+        "open": "Abierto",
+        "open_description": "Cualquiera puede unirse al grupo",
+        "closed": "Cerrado",
+        "closed_description": "Los miembros deben ser aprobados para unirse",
+        "save": "Guardar configuración de privacidad",
+        "saving": "Guardando...",
+        "success": "Configuración de privacidad del grupo actualizada con éxito",
+        "error": "Error al actualizar la configuración de privacidad del grupo"
+      },
+      "members": {
+        "tab": "Miembros",
+        "join_requests": "Solicitudes de unión",
+        "no_requests": "No hay solicitudes de unión pendientes",
+        "list": "Miembros del grupo"
+      },
+      "roles": {
+        "tab": "Roles",
+        "title": "Roles del grupo",
+        "description": "Los roles definen qué permisos tienen los miembros dentro de este grupo. Estos son configurados por el relay y no pueden ser modificados aquí.",
+        "no_roles": "No hay roles personalizados definidos para este grupo.",
+        "default_note": "El grupo usa permisos predeterminados de miembro y administrador.",
+        "no_description": "No se proporcionó descripción para este rol.",
+        "note_title": "Nota:",
+        "note_content": "Los permisos de roles son gestionados por el administrador del relay. Contacta al operador del relay para solicitar cambios en las definiciones o asignaciones de roles."
+      },
+      "admins": {
+        "tab": "Administradores",
+        "title": "Administradores del grupo",
+        "description": "Los administradores tienen permisos especiales para gestionar el grupo, incluyendo añadir/eliminar miembros y moderar contenido.",
+        "current": "Administradores actuales",
+        "none": "No se encontraron administradores",
+        "you": "Tú",
+        "add_new": "Añadir nuevos administradores",
+        "search_placeholder": "Buscar miembros para añadir como admin...",
+        "selected": "Seleccionados para añadir",
+        "clear": "Limpiar",
+        "add_selected": "Añadir seleccionados como admins",
+        "more_results": "{{count}} más resultados...",
+        "no_results": "No se encontraron miembros que coincidan con tu búsqueda",
+        "add": {
+          "success": "Administrador añadido con éxito",
+          "error": "Error al añadir administrador"
+        },
+        "remove": {
+          "success": "Administrador eliminado con éxito",
+          "error": "Error al eliminar administrador"
+        },
+        "batch_add": {
+          "success": "Administradores añadidos con éxito",
+          "error": "Error al añadir algunos administradores"
+        }
+      },
+      "invite_codes": {
+        "title": "Códigos de invitación",
+        "description": "Crea códigos de invitación para permitir que usuarios específicos se unan a tu grupo.",
+        "create_button": "Crear código de invitación",
+        "creating": "Creando...",
+        "active": "Códigos de invitación activos",
+        "none": "No hay códigos de invitación activos",
+        "expires": "Expira:",
+        "copy_code": "Copiar código",
+        "dialog": {
+          "title": "Crear código de invitación",
+          "description": "Elige cuándo debe expirar este código de invitación. El código será revocado automáticamente después de la fecha de expiración.",
+          "created_title": "Código de invitación creado",
+          "created_description": "Tu código de invitación ha sido creado con éxito. Comparte este código con los usuarios que quieras invitar al grupo.",
+          "your_code": "Código de invitación",
+          "invite_url": "URL de invitación",
+          "share_hint": "Comparte el código o la URL con los usuarios que quieras invitar a tu grupo",
+          "expiration": "Expiración",
+          "1week": "1 semana",
+          "1month": "1 mes",
+          "1year": "1 año",
+          "never": "Nunca (sin expiración)",
+          "done": "Hecho",
+          "cancel": "Cancelar"
+        },
+        "create": {
+          "success": "Código de invitación creado con éxito",
+          "error": "Error al crear código de invitación"
+        },
+        "revoke": {
+          "success": "Código de invitación revocado con éxito",
+          "error": "Error al revocar código de invitación"
+        },
+        "copy": {
+          "success": "Código de invitación copiado al portapapeles",
+          "error": "Error al copiar código de invitación"
+        },
+        "copy_url": {
+          "success": "URL de invitación copiada al portapapeles",
+          "error": "Error al copiar URL de invitación"
+        }
+      }
+    },
+    "error": {
+      "no-host": "No se proporcionó host",
+      "no-metadata": "No se pudo cargar la información del grupo"
+    },
+    "not-found": "Grupo no encontrado",
+    "action": {
+      "go-back": "Volver"
     }
   },
   "chat": {
@@ -355,10 +509,12 @@
       "request": {
         "sent": "Solicitud enviada",
         "success": "Solicitud de unión enviada",
-        "error": "Error al enviar la solicitud de unión"
+        "error": "Error al enviar la solicitud de unión",
+        "resend": "Intentar de nuevo"
       }
     },
-    "debug": "Debug"
+    "debug": "Debug",
+    "load-older": "Cargar mensajes anteriores"
   },
   "join": {
     "request": {
@@ -380,7 +536,16 @@
     "requests": {
       "n": "Solicitudes de unión ({{requestsLength}})",
       "none": "No hay solicitudes de unión... aún"
-    }
+    },
+    "title": "Unirse al grupo",
+    "description": "Has sido invitado a unirte a un grupo",
+    "group_info": "Información del grupo",
+    "group_id": "ID del grupo",
+    "relay": "Relay",
+    "invite_code": "Código de invitación",
+    "placeholder": "La funcionalidad de unirse se implementará aquí",
+    "go_back": "Volver",
+    "onboard": "Empezar"
   },
   "gif": {
     "search": "Buscar GIF",
@@ -406,6 +571,9 @@
     "description": {
       "label": "Descripción",
       "placeholder": "Añadir una descripción"
+    },
+    "upload": {
+      "error": "No se pudo subir la imagen"
     }
   },
   "copy": {
@@ -427,7 +595,9 @@
       "videos": "Videos",
       "image": "Imagen",
       "images": "Imagenes",
-      "community": "Comunidad"
+      "community": "Comunidad",
+      "feed": "Feed",
+      "publication": "Publicación dirigida"
     }
   },
   "post": {
@@ -488,6 +658,10 @@
     "set": {
       "bookmark": {
         "error": "No se pudo marcar el conjunto de emojis"
+      },
+      "dialog": {
+        "title": "Conjunto de emojis",
+        "click-to-view": "Haz clic para ver el conjunto"
       }
     }
   },
@@ -507,7 +681,8 @@
     "not-found": "Evento no encontrado",
     "fetch-error": "Error al obtener el evento",
     "replied": "respondió",
-    "thread": "Thread"
+    "thread": "Thread",
+    "link-not-recognized": "Enlace no reconocido"
   },
   "events": {
     "loading": "Cargando eventos",
@@ -535,7 +710,10 @@
   },
   "header": {
     "public": "Público",
-    "unknown": "Desconocido"
+    "unknown": "Desconocido",
+    "private": "Privado",
+    "client": "vía {{ client }}",
+    "via": "vía"
   },
   "book": {
     "by": "por {{ author }}",
@@ -669,12 +847,17 @@
       "wallet-error": "No se pudo abrir la billetera",
       "success": "Zapeado {{ amount }} a {{ name }}",
       "fail": "Error al zapear",
-      "error": "Error al zapear {{ amount }} a {{ name }}"
+      "error": "Error al zapear {{ amount }} a {{ name }}",
+      "invoice-generated": "Factura generada con éxito",
+      "invoice-error": "Error al generar factura"
     }
   },
   "ecash": {
     "redeem": "Redimir",
-    "fee": "comisión:"
+    "fee": "comisión:",
+    "request": "Solicitud de pago",
+    "pay-request": "Pagar",
+    "paid-request": "Pagado"
   },
   "settings": {
     "title": "Ajustes",
@@ -743,6 +926,27 @@
     },
     "relays": {
       "title": "Relés"
+    },
+    "privacy": {
+      "title": "Privacidad",
+      "description": "Gestiona tu configuración de privacidad",
+      "private-messages": "Mensajes privados",
+      "private-messages-description": "Habilitar mensajes privados para tu cuenta",
+      "privateMessages": {
+        "title": "Mensajes privados",
+        "description": "Habilitar mensajes privados"
+      },
+      "dm-relays": {
+        "title": "Relays de mensajes privados",
+        "description": "Configurar relays usados para mensajes privados",
+        "add": "Añadir Relay",
+        "placeholder": "wss://relay.example.com",
+        "invalid-url": "Por favor introduce una URL de relay válida"
+      },
+      "unreadSync": {
+        "title": "Sincronización de no leídos",
+        "description": "Sincronizar el estado de lectura entre dispositivos usando eventos Nostr encriptados"
+      }
     }
   },
   "nutzaps": {
@@ -799,61 +1003,78 @@
       "title": "Servidores de medios"
     },
     "edit": {
-      "title": "Edit community",
-      "cancel": "Cancel",
-      "description": "Edit the community details",
-      "save": "Save changes",
-      "success": "Community updated",
-      "add_button": "Save",
-      "error": "Failed to update community",
-      "submit": "Save",
-      "settings": "Settings",
-      "content": "Content",
+      "title": "Editar comunidad",
+      "cancel": "Cancelar",
+      "description": "Editar los detalles de la comunidad",
+      "save": "Guardar cambios",
+      "success": "Comunidad actualizada",
+      "add_button": "Guardar",
+      "error": "Error al actualizar la comunidad",
+      "submit": "Guardar",
+      "settings": "Configuración",
+      "content": "Contenido",
       "content_section": {
-        "add": "Add content section",
-        "add_button": "Add section",
-        "sections": "Content sections",
-        "empty": "No content sections added yet",
-        "name": "Section name",
-        "name_placeholder": "Enter section name",
-        "fee": "Fee amount (sats)",
-        "fee_placeholder": "Enter fee amount",
-        "optional": "optional",
-        "kinds": "Content types",
-        "save": "Save changes",
-        "saving": "Saving...",
-        "success": "Content sections saved successfully",
-        "error": "Failed to save content sections"
+        "add": "Añadir sección de contenido",
+        "add_button": "Añadir sección",
+        "sections": "Secciones de contenido",
+        "empty": "Aún no se han añadido secciones de contenido",
+        "name": "Nombre de la sección",
+        "name_placeholder": "Introduce el nombre de la sección",
+        "fee": "Cantidad de tarifa (sats)",
+        "fee_placeholder": "Introduce la cantidad de tarifa",
+        "optional": "opcional",
+        "kinds": "Tipos de contenido",
+        "save": "Guardar cambios",
+        "saving": "Guardando...",
+        "success": "Secciones de contenido guardadas con éxito",
+        "error": "Error al guardar secciones de contenido"
       },
       "metadata": {
-        "tab": "Information",
-        "description": "Description",
-        "description_placeholder": "Enter a description for your community",
-        "location": "Location",
-        "location_placeholder": "Enter a human-readable location",
-        "coordinates": "Coordinates",
-        "coordinates_placeholder": "Enter geohash coordinates",
+        "tab": "Información",
+        "description": "Descripción",
+        "description_placeholder": "Introduce una descripción para tu comunidad",
+        "location": "Ubicación",
+        "location_placeholder": "Introduce una ubicación legible",
+        "coordinates": "Coordenadas",
+        "coordinates_placeholder": "Introduce coordenadas geohash",
         "map_picker": {
-          "title": "Select Location",
-          "select": "Select Location",
-          "description": "Click on the map to select a location or search by address",
-          "search_placeholder": "Search for a location...",
-          "location_not_found": "Location not found",
-          "search_error": "Error searching for location"
+          "title": "Seleccionar ubicación",
+          "select": "Seleccionar ubicación",
+          "description": "Haz clic en el mapa para seleccionar una ubicación o busca por dirección",
+          "search_placeholder": "Buscar una ubicación...",
+          "location_not_found": "Ubicación no encontrada",
+          "search_error": "Error al buscar ubicación",
+          "search_description": "Busca una ubicación o haz clic en el mapa para seleccionar coordenadas.",
+          "no_location_selected": "Busca una ubicación o haz clic en el mapa"
         },
-        "optional": "optional",
-        "save": "Save changes",
-        "saving": "Saving...",
-        "success": "Metadata saved successfully",
-        "error": "Failed to save metadata"
+        "optional": "opcional",
+        "save": "Guardar cambios",
+        "saving": "Guardando...",
+        "success": "Metadatos guardados con éxito",
+        "error": "Error al guardar metadatos"
       }
+    },
+    "targeted-publication": {
+      "new": "Nueva publicación",
+      "description": "Crea una publicación dirigida a una o más comunidades",
+      "success": "Publicación creada con éxito",
+      "error": "Error al crear publicación",
+      "post": "Publicar",
+      "posting": "Publicando...",
+      "event-not-found": "Evento no encontrado",
+      "loading": "Cargando...",
+      "enter-nip19": "Introduce un identificador NIP-19",
+      "event-found": "Evento encontrado",
+      "post-success": "Publicación publicada con éxito",
+      "post-error": "Error al publicar",
+      "select-communities": "Seleccionar comunidades",
+      "select-communities-desc": "Selecciona las comunidades a las que quieres dirigirte",
+      "communities-selected": "{{count}} comunidades seleccionadas"
     }
   },
   "kinds": {
     "0": "User Metadata",
     "1": "Short Text Note",
-    "31990": "App",
-    "31989": "App Recommendation",
     "3": "Follows",
     "4": "Encrypted DM",
     "5": "Deletion",
@@ -866,22 +1087,22 @@
     "40": "Channel Creation",
     "41": "Channel Metadata",
     "42": "Channel Message",
-    "10002": "Relay List",
     "1063": "File Metadata",
-    "1621": "Issue",
-    "30617": "Repository",
-    "34235": "Horizontal Video",
-    "34236": "Vertical Video",
     "1068": "Poll",
     "1111": "Comment",
+    "1222": "Nota de audio",
     "1337": "Code Snippet",
+    "1621": "Issue",
     "9041": "Goal",
     "9321": "Nutzap",
     "9734": "Zap Request",
     "9735": "Zap",
     "9802": "Highlight",
     "10001": "Pin List",
+    "10002": "Relay List",
     "10222": "Community Key",
+    "30000": "Lista de personas",
+    "30009": "Insignia",
     "30015": "Interests",
     "30023": "Long-form",
     "30030": "Emoji Set",
@@ -889,8 +1110,18 @@
     "30169": "GIF Set",
     "30311": "Stream",
     "30315": "Status",
+    "30617": "Repository",
     "31923": "Calendar Event",
-    "38172": "Cashu Mint"
+    "31924": "Calendario",
+    "31989": "App Recommendation",
+    "31990": "App",
+    "34235": "Horizontal Video",
+    "34236": "Vertical Video",
+    "34550": "Comunidad moderada",
+    "38172": "Cashu Mint",
+    "39000": "Metadatos de grupo",
+    "39089": "Pack de seguidos",
+    "unknown": "Tipo {{kind}}"
   },
   "relay": {
     "new": {
@@ -904,7 +1135,17 @@
       "create": "Crear relé",
       "order-success": "Orden creada con éxito",
       "error": "Error al crear relé"
-    }
+    },
+    "info": "Relay",
+    "feed": "Feed",
+    "supported-nips": "NIPs soportados",
+    "users": "Usuarios",
+    "use-this-relay": "usar este relay",
+    "software": "Software",
+    "contact": "Contacto",
+    "groups": "Grupos",
+    "communities": "Comunidades",
+    "chat": "Chat"
   },
   "landing": {
     "features": {
@@ -919,7 +1160,9 @@
       "files": "Archivos",
       "files-desc": "Subir y compartir archivos",
       "selfhost": "Toma el control de tus datos",
-      "selfhost-desc": "Autoalojar tus mensajes y archivos"
+      "selfhost-desc": "Autoalojar tus mensajes y archivos",
+      "content-types": "Tipos de contenido",
+      "content-types-desc": "Texto, imágenes, videos, encuestas, fragmentos de código y mucho más!"
     },
     "testimonials": "Testimonios",
     "testimonials-desc": "Lo que la gente dice sobre nosotros",
@@ -941,11 +1184,13 @@
       "joined": "Joined",
       "relays": "Relays",
       "blossom": "Media Servers",
-      "mint": "Mint"
+      "mint": "Mint",
+      "supporters": "Colaboradores"
     }
   },
   "app": {
-    "supported_kinds": "Content Types"
+    "supported_kinds": "Content Types",
+    "categories": "Categorías"
   },
   "aria": {
     "upload-file": "Subir archivo",
@@ -1010,5 +1255,210 @@
     "redeem-ecash": "Canjear ecash",
     "create-ecash": "Crear token ecash",
     "toggle-visibility": "Cambiar visibilidad"
+  },
+  "calendar": {
+    "calendar": "Calendario",
+    "upcoming-events": "Próximos eventos",
+    "past-events": "Eventos pasados",
+    "no-events": "No se encontraron eventos"
+  },
+  "open-in": "Abrir en",
+  "action-open-with": "Abrir en {{ client }}",
+  "action-apps": "Abrir en",
+  "nips": {
+    "10": "Notas de texto e hilos",
+    "11": "Información de relay",
+    "13": "Prueba de trabajo",
+    "14": "Etiqueta de asunto",
+    "15": "Mercado",
+    "17": "Mensajes privados",
+    "18": "Reposts",
+    "19": "Entidades Bech32",
+    "21": "Esquema URI",
+    "22": "Comentario",
+    "23": "Contenido de formato largo",
+    "24": "Metadatos adicionales",
+    "25": "Reacciones",
+    "26": "Firma delegada",
+    "27": "Referencias de texto",
+    "28": "Chat público",
+    "29": "Grupos basados en relay",
+    "30": "Emoji personalizado",
+    "31": "Eventos desconocidos",
+    "32": "Etiquetado",
+    "34": "Integración Git",
+    "35": "Torrents",
+    "36": "Contenido sensible",
+    "37": "Eventos borrador",
+    "38": "Estados de usuario",
+    "39": "Identidades externas",
+    "40": "Marca de tiempo de expiración",
+    "42": "Autenticación",
+    "44": "Cargas útiles encriptadas",
+    "45": "Conteo de resultados",
+    "46": "Firma remota",
+    "47": "Wallet Connect",
+    "48": "Etiquetas proxy",
+    "49": "Encriptación de clave privada",
+    "50": "Capacidad de búsqueda",
+    "51": "Listas",
+    "52": "Eventos de calendario",
+    "53": "Actividades en vivo",
+    "54": "Wiki",
+    "55": "Firmante Android",
+    "56": "Reportes",
+    "57": "Lightning Zaps",
+    "58": "Insignias",
+    "59": "Gift Wrap",
+    "60": "Wallet Cashu",
+    "61": "Nutzaps",
+    "62": "Solicitud de desvanecimiento",
+    "64": "Ajedrez PGN",
+    "65": "Metadatos de lista de relays",
+    "66": "Descubrimiento de relays",
+    "68": "Feeds de imágenes",
+    "69": "Órdenes P2P",
+    "70": "Eventos protegidos",
+    "71": "Eventos de video",
+    "72": "Comunidades moderadas",
+    "73": "IDs de contenido externo",
+    "75": "Objetivos de zap",
+    "78": "Datos específicos de app",
+    "84": "Destacados",
+    "86": "API de gestión de relay",
+    "88": "Encuestas",
+    "89": "Manejadores de app",
+    "90": "Máquinas expendedoras de datos",
+    "92": "Adjuntos de medios",
+    "94": "Metadatos de archivo",
+    "96": "Almacenamiento de archivos HTTP",
+    "98": "Auth HTTP",
+    "99": "Listados clasificados",
+    "01": "Flujo de protocolo básico",
+    "02": "Lista de seguidos",
+    "03": "Atestaciones OpenTimestamps",
+    "04": "Mensaje directo encriptado",
+    "05": "Mapeo de identidad DNS",
+    "06": "Derivación de claves",
+    "07": "Extensión de navegador",
+    "08": "Menciones",
+    "09": "Eliminación de eventos",
+    "7D": "Hilos",
+    "B0": "Marcadores web",
+    "B7": "Blossom",
+    "C0": "Fragmentos de código",
+    "C7": "Chats"
+  },
+  "private-group": {
+    "create": {
+      "new": "New private group",
+      "title": "Create private group",
+      "description": "Create a new private group to chat with your friends",
+      "selected": "Selected",
+      "no-matches": "No matches found",
+      "trigger": "Create",
+      "success": "Private group created",
+      "error": "Failed to create private group",
+      "follows": "Follows",
+      "participants": "{{ n }} participante",
+      "participants_plural": "{{ n }} participantes",
+      "private-message": "Mensaje privado",
+      "add-some-participants": "Añade uno o más participantes al grupo",
+      "group-members": "Miembros del grupo",
+      "search-follows": "Empieza a escribir para buscar tus seguidos",
+      "group-chat": "Chat grupal",
+      "form": {
+        "submit": {
+          "trigger": "Create",
+          "success": "Private group created",
+          "error": "Failed to create private group"
+        }
+      }
+    },
+    "private-groups": "Private groups",
+    "dm-relays": "Private message relays",
+    "auth": "Auth",
+    "type": {
+      "trigger": "Private messages",
+      "trigger-many": "Private group",
+      "content": "Encrypted messages, only you and the recipient can read the content",
+      "content-many": "Encrypted group messages, only members can read content"
+    },
+    "relays": "Relays",
+    "no-relays": "No relays found",
+    "searching-relays": "Searching relays",
+    "compliant": "User has set up private message relays",
+    "non-compliant": "User has not set up private message relays, falling back to outbox relays",
+    "requests": "Requests",
+    "no-dm-relays": "No private message relays found",
+    "groups": "Groups",
+    "saved-messages": "Saved messages",
+    "invalid-group": "Invalid group",
+    "webrtc": {
+      "incoming-call": "Llamada entrante",
+      "decline": "Rechazar",
+      "accept": "Aceptar",
+      "incoming-call-description": "te está llamando",
+      "ongoing-call": "Llamada en curso",
+      "end-call": "Terminar llamada",
+      "outgoing-call-started": "Llamada saliente iniciada",
+      "incoming-call-received": "Llamada entrante recibida",
+      "call-answered": "Llamada contestada",
+      "call-ended": "Llamada terminada",
+      "call-connected": "Llamada conectada",
+      "invalid-group": "Grupo inválido"
+    }
+  },
+  "rsvp": {
+    "going": "asistiré",
+    "tentative": "tentativo",
+    "declined": "rechazado",
+    "yes": "sí",
+    "no": "no",
+    "maybe": "tal vez",
+    "rsvp": "RSVP"
+  },
+  "feed": {
+    "content-types": "Tipos de contenido",
+    "clear": "Limpiar",
+    "all": "Todos",
+    "save": "Guardar",
+    "select-all": "Seleccionar todo",
+    "apply-filters": "Aplicar filtros",
+    "live-on": "Actualizaciones en vivo habilitadas",
+    "live-off": "Actualizaciones en vivo deshabilitadas",
+    "load-older": "Cargar publicaciones anteriores"
+  },
+  "stream": {
+    "live-updates": "En vivo",
+    "ended": "Terminado",
+    "planned": "Planificado"
+  },
+  "profile": {
+    "message": "Mensaje",
+    "groups": "Grupos",
+    "relays": "Relays",
+    "not-found": "Perfil no encontrado",
+    "error": {
+      "no-identifier": "No se proporcionó identificador",
+      "invalid-format": "Formato de identificador inválido",
+      "nip05-resolve": "No se pudo resolver la dirección NIP-05",
+      "load-failed": "No se pudo cargar el perfil de este usuario"
+    },
+    "banner": {
+      "alt": "Banner del perfil"
+    },
+    "action": {
+      "go-back": "Volver"
+    },
+    "groups.none": "No se encontraron grupos"
+  },
+  "error": {
+    "something-went-wrong": "Algo salió mal",
+    "report-problem": "Reportar problema",
+    "reload-page": "Recargar página"
+  },
+  "search": {
+    "placeholder": "Buscar..."
   }
 }
