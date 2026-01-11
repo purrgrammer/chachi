@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -138,7 +138,7 @@ function Reply({
 }
 
 // Component for user's own messages that checks unpublished status
-function UserMessage({
+const UserMessage = React.memo(function UserMessage({
   group,
   event,
   admins,
@@ -211,10 +211,23 @@ function UserMessage({
       />
     </>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison to prevent unnecessary re-renders
+  return (
+    prevProps.event.id === nextProps.event.id &&
+    prevProps.isNew === nextProps.isNew &&
+    prevProps.isChain === nextProps.isChain &&
+    prevProps.isLastSeen === nextProps.isLastSeen &&
+    prevProps.isFirstInChain === nextProps.isFirstInChain &&
+    prevProps.isLast === nextProps.isLast &&
+    prevProps.isDeleted === nextProps.isDeleted &&
+    prevProps.scrollTo?.id === nextProps.scrollTo?.id &&
+    prevProps.showReactions === nextProps.showReactions
+  );
+});
 
 // Core message component without unpublished status check
-function MessageContent({
+const MessageContent = React.memo(function MessageContent({
   group,
   event,
   admins,
@@ -698,10 +711,24 @@ function MessageContent({
       ) : null}
     </>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison to prevent unnecessary re-renders
+  return (
+    prevProps.event.id === nextProps.event.id &&
+    prevProps.isNew === nextProps.isNew &&
+    prevProps.isChain === nextProps.isChain &&
+    prevProps.isLastSeen === nextProps.isLastSeen &&
+    prevProps.isFirstInChain === nextProps.isFirstInChain &&
+    prevProps.isLast === nextProps.isLast &&
+    prevProps.isDeleted === nextProps.isDeleted &&
+    prevProps.isMine === nextProps.isMine &&
+    prevProps.scrollTo?.id === nextProps.scrollTo?.id &&
+    prevProps.showReactions === nextProps.showReactions
+  );
+});
 
 // Main ChatMessage component that conditionally renders the appropriate message component
-export function ChatMessage(props: {
+export const ChatMessage = React.memo(function ChatMessage(props: {
   group?: Group;
   event: NostrEvent;
   admins: string[];
@@ -733,7 +760,21 @@ export function ChatMessage(props: {
   }
 
   return <MessageContent {...props} isMine={!!isMine} />;
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison to prevent unnecessary re-renders
+  return (
+    prevProps.event.id === nextProps.event.id &&
+    prevProps.isNew === nextProps.isNew &&
+    prevProps.isChain === nextProps.isChain &&
+    prevProps.isLastSeen === nextProps.isLastSeen &&
+    prevProps.isFirstInChain === nextProps.isFirstInChain &&
+    prevProps.isLast === nextProps.isLast &&
+    prevProps.isDeleted === nextProps.isDeleted &&
+    prevProps.isMine === nextProps.isMine &&
+    prevProps.scrollTo?.id === nextProps.scrollTo?.id &&
+    prevProps.showReactions === nextProps.showReactions
+  );
+});
 
 // todo
 // join/request access
@@ -808,7 +849,7 @@ export function Chat({
 }: ChatProps) {
   // todo: check admin events against relay pubkey
   const { t } = useTranslation();
-  const groupedMessages = groupByDay(events);
+  const groupedMessages = useMemo(() => groupByDay(events), [events]);
   const lastMessage = events.filter((e) => e.kind === NDKKind.GroupChat).at(0);
   const me = usePubkey();
 

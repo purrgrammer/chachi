@@ -79,7 +79,12 @@ export function useGroupchat(group: Group) {
     if (isSubbed) return;
 
     let sub: NDKSubscription | undefined;
+    let cancelled = false;
+
     getLastGroupMessage(group).then((last) => {
+      // Check if component was unmounted before subscription is created
+      if (cancelled) return;
+
       const filter = {
         kinds: [
           NDKKind.GroupChat,
@@ -120,6 +125,7 @@ export function useGroupchat(group: Group) {
     });
 
     return () => {
+      cancelled = true;
       sub?.stop();
     };
   }, [isSubbed, group.id, group.relay]);
@@ -148,7 +154,12 @@ export function usePaginatedGroupchat(group: Group) {
     if (isSubbed) return;
 
     let sub: NDKSubscription | undefined;
+    let cancelled = false;
+
     getLastGroupMessage(group).then((last) => {
+      // Check if component was unmounted before subscription is created
+      if (cancelled) return;
+
       const filter = {
         kinds: [
           NDKKind.GroupChat,
@@ -191,6 +202,7 @@ export function usePaginatedGroupchat(group: Group) {
     });
 
     return () => {
+      cancelled = true;
       sub?.stop();
     };
   }, [isSubbed, group.id, group.relay]);
