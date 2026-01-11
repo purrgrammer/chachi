@@ -824,7 +824,6 @@ interface ChatProps extends MotionProps {
   showRootReply?: boolean;
   showTimestamps?: boolean;
   lastSeen?: { ref: string };
-  deleteEvents?: NostrEvent[];
   showReactions?: boolean;
   hasMore?: boolean;
   loadMore?: () => void;

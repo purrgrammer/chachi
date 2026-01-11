@@ -342,6 +342,7 @@
       "sending": "sending..."
     },
     "new-messages": "New messages",
+    "load-older": "Φόρτωση παλαιότερων μηνυμάτων",
     "user": {
       "not-member": "Δεν είστε ακόμα μέλος αυτής της ομάδας",
       "kick": {

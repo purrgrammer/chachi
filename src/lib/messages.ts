@@ -68,7 +68,14 @@ export function saveLastSeen(ev: NostrEvent, group: Group) {
   triggerLastSeenSync();
 }
 
-export function useGroupchat(group: Group) {
+/**
+ * Shared hook for subscribing to group chat events.
+ * Handles the NDK subscription lifecycle and event processing.
+ */
+function useGroupSubscription(
+  group: Group,
+  onNewMessage?: () => void,
+) {
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
   const groups = useAtomValue(groupsAtom);
@@ -120,6 +127,7 @@ export function useGroupchat(group: Group) {
           }
         } else {
           saveGroupEvent(event.rawEvent() as NostrEvent, group);
+          onNewMessage?.();
         }
       });
     });
@@ -129,18 +137,16 @@ export function useGroupchat(group: Group) {
       sub?.stop();
     };
   }, [isSubbed, group.id, group.relay]);
+}
 
+export function useGroupchat(group: Group) {
+  useGroupSubscription(group);
   return useLiveQuery(() => getGroupEvents(group), [group.id, group.relay], []);
 }
 
 const MESSAGE_PAGE_SIZE = 50;
 
 export function usePaginatedGroupchat(group: Group) {
-  const ndk = useNDK();
-  const relaySet = useRelaySet([group.relay]);
-  const groups = useAtomValue(groupsAtom);
-  const groupIds = groups.map(groupId);
-  const isSubbed = groupIds.includes(groupId(group));
   const [messageLimit, setMessageLimit] = useState(MESSAGE_PAGE_SIZE);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -150,62 +156,10 @@ export function usePaginatedGroupchat(group: Group) {
     getGroupEventCount(group).then(setTotalCount);
   }, [group.id, group.relay]);
 
-  useEffect(() => {
-    if (isSubbed) return;
-
-    let sub: NDKSubscription | undefined;
-    let cancelled = false;
-
-    getLastGroupMessage(group).then((last) => {
-      // Check if component was unmounted before subscription is created
-      if (cancelled) return;
-
-      const filter = {
-        kinds: [
-          NDKKind.GroupChat,
-          NDKKind.GroupAdminAddUser,
-          NDKKind.GroupAdminRemoveUser,
-          DELETE_GROUP,
-          NDKKind.Nutzap,
-          RELATIONSHIP,
-          NDKKind.EventDeletion,
-          9005 as NDKKind,
-        ],
-        "#h": [group.id],
-        ...(last ? { since: last.created_at + 1 } : {}),
-      };
-      sub = ndk.subscribe(
-        filter,
-        {
-          cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
-          skipOptimisticPublishEvent: true,
-          groupable: false,
-          closeOnEose: false,
-        },
-        relaySet,
-      );
-
-      sub.on("event", (event) => {
-        if (event.kind === NDKKind.EventDeletion || event.kind === 9005) {
-          const ids = event.tags
-            .filter((t) => t[0] === "e" && t[1]?.length === 64)
-            .map((t) => t[1]);
-          if (ids.length > 0) {
-            ids.forEach((id) => deleteGroupEvent(id, group));
-          }
-        } else {
-          saveGroupEvent(event.rawEvent() as NostrEvent, group);
-          // Update total count when new message arrives
-          setTotalCount((prev) => prev + 1);
-        }
-      });
-    });
-
-    return () => {
-      cancelled = true;
-      sub?.stop();
-    };
-  }, [isSubbed, group.id, group.relay]);
+  // Use shared subscription, incrementing count on new messages
+  useGroupSubscription(group, () => {
+    setTotalCount((prev) => prev + 1);
+  });
 
   const events = useLiveQuery(
     () => getGroupEvents(group, messageLimit),
@@ -213,16 +167,20 @@ export function usePaginatedGroupchat(group: Group) {
     [],
   );
 
-  const hasMore = events.length >= messageLimit && events.length < totalCount;
+  const hasMore = events.length < totalCount;
 
   const loadMore = async () => {
     if (!hasMore || isLoadingMore) return;
     setIsLoadingMore(true);
-    setMessageLimit((prev) => prev + MESSAGE_PAGE_SIZE);
-    // Update total count
-    const count = await getGroupEventCount(group);
-    setTotalCount(count);
-    setIsLoadingMore(false);
+    try {
+      setMessageLimit((prev) => prev + MESSAGE_PAGE_SIZE);
+      const count = await getGroupEventCount(group);
+      setTotalCount(count);
+    } catch (error) {
+      console.error("Failed to load more messages:", error);
+    } finally {
+      setIsLoadingMore(false);
+    }
   };
 
   return {

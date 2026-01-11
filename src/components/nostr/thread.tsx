@@ -122,7 +122,6 @@ export function Thread({
               scrollTo={scrollTo}
               setScrollTo={setScrollTo}
               newMessage={newMessage}
-              deleteEvents={[]}
               showTimestamps={false}
               components={components}
               className="h-full pb-4 px-2"
