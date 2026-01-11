@@ -16,6 +16,7 @@ import { usePubkey } from "@/lib/account";
 import { groupId } from "@/lib/groups";
 import {
   getGroupEvents,
+  getGroupEventCount,
   getLastGroupMessage,
   getGroupsSortedByLastMessage,
   getLastSeen,
@@ -124,6 +125,101 @@ export function useGroupchat(group: Group) {
   }, [isSubbed, group.id, group.relay]);
 
   return useLiveQuery(() => getGroupEvents(group), [group.id, group.relay], []);
+}
+
+const MESSAGE_PAGE_SIZE = 50;
+
+export function usePaginatedGroupchat(group: Group) {
+  const ndk = useNDK();
+  const relaySet = useRelaySet([group.relay]);
+  const groups = useAtomValue(groupsAtom);
+  const groupIds = groups.map(groupId);
+  const isSubbed = groupIds.includes(groupId(group));
+  const [messageLimit, setMessageLimit] = useState(MESSAGE_PAGE_SIZE);
+  const [totalCount, setTotalCount] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  // Get total count of messages
+  useEffect(() => {
+    getGroupEventCount(group).then(setTotalCount);
+  }, [group.id, group.relay]);
+
+  useEffect(() => {
+    if (isSubbed) return;
+
+    let sub: NDKSubscription | undefined;
+    getLastGroupMessage(group).then((last) => {
+      const filter = {
+        kinds: [
+          NDKKind.GroupChat,
+          NDKKind.GroupAdminAddUser,
+          NDKKind.GroupAdminRemoveUser,
+          DELETE_GROUP,
+          NDKKind.Nutzap,
+          RELATIONSHIP,
+          NDKKind.EventDeletion,
+          9005 as NDKKind,
+        ],
+        "#h": [group.id],
+        ...(last ? { since: last.created_at + 1 } : {}),
+      };
+      sub = ndk.subscribe(
+        filter,
+        {
+          cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+          skipOptimisticPublishEvent: true,
+          groupable: false,
+          closeOnEose: false,
+        },
+        relaySet,
+      );
+
+      sub.on("event", (event) => {
+        if (event.kind === NDKKind.EventDeletion || event.kind === 9005) {
+          const ids = event.tags
+            .filter((t) => t[0] === "e" && t[1]?.length === 64)
+            .map((t) => t[1]);
+          if (ids.length > 0) {
+            ids.forEach((id) => deleteGroupEvent(id, group));
+          }
+        } else {
+          saveGroupEvent(event.rawEvent() as NostrEvent, group);
+          // Update total count when new message arrives
+          setTotalCount((prev) => prev + 1);
+        }
+      });
+    });
+
+    return () => {
+      sub?.stop();
+    };
+  }, [isSubbed, group.id, group.relay]);
+
+  const events = useLiveQuery(
+    () => getGroupEvents(group, messageLimit),
+    [group.id, group.relay, messageLimit],
+    [],
+  );
+
+  const hasMore = events.length >= messageLimit && events.length < totalCount;
+
+  const loadMore = async () => {
+    if (!hasMore || isLoadingMore) return;
+    setIsLoadingMore(true);
+    setMessageLimit((prev) => prev + MESSAGE_PAGE_SIZE);
+    // Update total count
+    const count = await getGroupEventCount(group);
+    setTotalCount(count);
+    setIsLoadingMore(false);
+  };
+
+  return {
+    events,
+    hasMore,
+    loadMore,
+    isLoadingMore,
+    totalCount,
+  };
 }
 
 export function useCommunitychat(pubkey: string) {

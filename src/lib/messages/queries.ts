@@ -20,14 +20,38 @@ export function saveGroupEvent(event: NostrEvent, group: Group) {
   db.events.put(record);
 }
 
-export async function getGroupEvents(group: Group) {
+const MESSAGE_PAGE_SIZE = 50;
+
+export async function getGroupEvents(group: Group, limit = MESSAGE_PAGE_SIZE) {
   const id = groupId(group);
   return db.events
     .where("[group+created_at]")
     .between([id, Dexie.minKey], [id, Dexie.maxKey])
     .reverse()
-    .limit(50)
+    .limit(limit)
     .toArray();
+}
+
+export async function getGroupEventsBeforeTimestamp(
+  group: Group,
+  beforeTimestamp: number,
+  limit = MESSAGE_PAGE_SIZE,
+) {
+  const id = groupId(group);
+  return db.events
+    .where("[group+created_at]")
+    .between([id, Dexie.minKey], [id, beforeTimestamp - 1])
+    .reverse()
+    .limit(limit)
+    .toArray();
+}
+
+export async function getGroupEventCount(group: Group) {
+  const id = groupId(group);
+  return db.events
+    .where("[group+created_at]")
+    .between([id, Dexie.minKey], [id, Dexie.maxKey])
+    .count();
 }
 
 export async function getGroupChatParticipants(
