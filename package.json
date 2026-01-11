@@ -83,6 +83,7 @@
     "react-player": "^2.16.0",
     "react-router-dom": "^6.30.0",
     "react-textarea-autosize": "^8.5.4",
+    "react-virtuoso": "^4.18.1",
     "remark-gfm": "^4.0.0",
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.5.4",
