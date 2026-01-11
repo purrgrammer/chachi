@@ -59,6 +59,7 @@ export const discoveryRelays = [
   "wss://purplepag.es",
   //"wss://relay.nostr.band",
   "wss://profiles.nostrver.se",
+  "wss://relay.vertexlab.io",
   //"wss://profiles.nostr1.com",
 ];
 
