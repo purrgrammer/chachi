@@ -12,8 +12,8 @@ import NDK, {
   NDKSubscriptionCacheUsage,
 } from "@nostr-dev-kit/ndk";
 import { relaysAtom } from "@/app/store";
-import { useNDK } from "@/lib/ndk";
-import { isRelayURL, discoveryRelays, fallbackRelays } from "@/lib/relay";
+import { useNDK, startupDiscoveryRelays } from "@/lib/ndk";
+import { isRelayURL, fallbackRelays } from "@/lib/relay";
 import {
   IMMUTABLE_CACHE_CONFIG,
   EVENT,
@@ -506,7 +506,7 @@ export async function fetchRelayList(ndk: NDK, pubkey: string) {
         authors: [pubkey],
       },
       { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY },
-      NDKRelaySet.fromRelayUrls(discoveryRelays, ndk),
+      NDKRelaySet.fromRelayUrls(startupDiscoveryRelays, ndk),
     )
     .then((ev) => {
       if (ev) {

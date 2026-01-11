@@ -21,8 +21,9 @@ import {
   fetchRelayList,
   fetchLatest,
 } from "@/lib/nostr";
-import { nip29Relays, discoveryRelays, isRelayURL } from "@/lib/relay";
+import { nip29Relays, isRelayURL } from "@/lib/relay";
 import { useAccount } from "@/lib/account";
+import { startupDiscoveryRelays } from "@/lib/ndk";
 import { useRelayInfo, fetchRelayInfo } from "@/lib/relay";
 import { LEAVE_REQUEST, COMMUNIKEY } from "@/lib/kinds";
 import type {
@@ -932,7 +933,7 @@ export async function fetchCommunity(ndk: NDK, pubkey: string) {
       kinds: [COMMUNIKEY],
       authors: [pubkey],
     },
-    NDKRelaySet.fromRelayUrls(relays.concat(discoveryRelays), ndk),
+    NDKRelaySet.fromRelayUrls(relays.concat(startupDiscoveryRelays), ndk),
   );
   if (!info) throw new Error("Can't find community metadata");
   const communityRelays = info.tags

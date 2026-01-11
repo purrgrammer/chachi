@@ -35,9 +35,9 @@ import { useGroupMessages } from "@/lib/nostr/chat";
 import { useSyncEmojiSets } from "@/lib/nostr/emojis";
 import { useChachiWallet } from "@/lib/wallet";
 import { RELATIONSHIP, COMMUNIKEY } from "@/lib/kinds";
-import { discoveryRelays } from "@/lib/relay";
 import { useDirectMessages } from "@/lib/nostr/dm";
 import { usePubkey } from "@/lib/account";
+import { startupDiscoveryRelays } from "@/lib/ndk";
 
 function useUserEvents({
   loginMethod,
@@ -143,7 +143,7 @@ function useUserEvents({
         cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
         closeOnEose: true,
       },
-      NDKRelaySet.fromRelayUrls(discoveryRelays, ndk),
+      NDKRelaySet.fromRelayUrls(startupDiscoveryRelays, ndk),
     );
 
     sub.on("event", (event) => {
@@ -186,7 +186,7 @@ function useUserEvents({
         cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
         closeOnEose: true,
       },
-      NDKRelaySet.fromRelayUrls(discoveryRelays, ndk),
+      NDKRelaySet.fromRelayUrls(startupDiscoveryRelays, ndk),
     );
 
     sub.on("event", (event) => {

@@ -61,7 +61,20 @@ export const discoveryRelays = [
   "wss://relay.vertexlab.io",
   "wss://profiles.nostr1.com",
   "wss://discovery.eu.nostria.app",
+  "wss://purplepag.es",
 ];
+
+/**
+ * Get a random subset of discovery relays for app startup.
+ * Reduces initial connection overhead by connecting to fewer relays.
+ *
+ * @param count - Number of random relays to select (default: 2)
+ * @returns Array of randomly selected relay URLs
+ */
+export function getRandomDiscoveryRelays(count = 2): string[] {
+  const shuffled = [...discoveryRelays].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(count, discoveryRelays.length));
+}
 
 export const fallbackRelays = ["wss://relay.primal.net"];
 
