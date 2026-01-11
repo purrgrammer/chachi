@@ -1,11 +1,14 @@
 import { createContext, useContext } from "react";
 import NDK, { NDKRelayAuthPolicies } from "@nostr-dev-kit/ndk";
 import { cache } from "@/lib/db";
-import { discoveryRelays } from "@/lib/relay";
+import { getRandomDiscoveryRelays } from "@/lib/relay";
+
+// Pick 2 random discovery relays at startup to reduce initial connection overhead
+export const startupDiscoveryRelays = getRandomDiscoveryRelays(2);
 
 export const ndk = new NDK({
-  explicitRelayUrls: discoveryRelays,
-  outboxRelayUrls: discoveryRelays,
+  explicitRelayUrls: startupDiscoveryRelays,
+  outboxRelayUrls: startupDiscoveryRelays,
   enableOutboxModel: false,
   cacheAdapter: cache,
   initialValidationRatio: 0.0,

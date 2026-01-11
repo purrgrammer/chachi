@@ -21,8 +21,7 @@ import NDK, {
 } from "@nostr-dev-kit/ndk";
 import { giftUnwrap } from "@/lib/nip-59";
 import { useRelaySet } from "@/lib/nostr";
-import { useNDK } from "@/lib/ndk";
-import { discoveryRelays } from "@/lib/relay";
+import { useNDK, startupDiscoveryRelays } from "@/lib/ndk";
 import { usePubkey, useFollows, useDMRelays } from "@/lib/account";
 import { PrivateGroup as Group, PrivateGroup } from "@/lib/types";
 import { useOnWebRTCSignal } from "@/components/webrtc";
@@ -101,7 +100,7 @@ function useStreamMap(
 
 export async function fetchDirectMessageRelays(ndk: NDK, pubkey: string) {
   // todo: look also in the users outbox relays
-  const relaySet = NDKRelaySet.fromRelayUrls(discoveryRelays, ndk);
+  const relaySet = NDKRelaySet.fromRelayUrls(startupDiscoveryRelays, ndk);
   const dmFilter = {
     kinds: [NDKKind.DirectMessageReceiveRelayList],
     authors: [pubkey],

@@ -193,7 +193,7 @@ export function useSyncEmojiSets() {
       },
       {
         cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
-        closeOnEose: false,
+        closeOnEose: true,
       },
       relaySet,
     );
@@ -257,7 +257,7 @@ export function useSyncEmojiSets() {
             filter,
             {
               cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
-              closeOnEose: false,
+              closeOnEose: true,
             },
             relaySet,
           );
