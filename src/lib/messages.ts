@@ -86,7 +86,12 @@ function useGroupSubscription(
     if (isSubbed) return;
 
     let sub: NDKSubscription | undefined;
+    let cancelled = false;
+
     getLastGroupMessage(group).then((last) => {
+      // Check if component was unmounted before subscription is created
+      if (cancelled) return;
+
       const filter = {
         kinds: [
           NDKKind.GroupChat,
@@ -128,6 +133,7 @@ function useGroupSubscription(
     });
 
     return () => {
+      cancelled = true;
       sub?.stop();
     };
   }, [isSubbed, group.id, group.relay]);

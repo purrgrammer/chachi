@@ -427,6 +427,12 @@ export function useRichText(
   options: RichTextOptions,
   tags: string[][],
 ): Fragment[] {
+  // Stringify options and tags for stable memoization
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const optionsKey = useMemo(() => JSON.stringify(options), [JSON.stringify(options)]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const tagsKey = useMemo(() => JSON.stringify(tags), [JSON.stringify(tags)]);
+
   const fragments = useMemo(() => {
     // Process text with all formatting in one go
     let result = toFragments(
@@ -456,7 +462,7 @@ export function useRichText(
     }
 
     return result;
-  }, [text, options, tags]);
+  }, [text, optionsKey, tagsKey]);
   return fragments;
 }
 
