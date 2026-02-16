@@ -84,6 +84,16 @@ export interface LastSeenSyncMeta {
   lastPublishedTimestamp: number; // last event timestamp we published
 }
 
+export interface DMGroupSummary {
+  id: string; // group id (sorted concatenated pubkeys)
+  pubkeys: string[]; // participant pubkeys (excluding current user for display)
+  lastMessageAt: number; // timestamp of last non-reaction message
+  lastMessageContent: string; // preview text
+  lastMessagePubkey: string; // who sent last message
+  lastMessageTags: string[][]; // tags for rich text rendering
+  senderPubkeys: string[]; // all pubkeys who have sent messages in this group
+}
+
 class ChachiDatabase extends Dexie {
   events!: Table<Event>;
   lastSeen!: Table<LastSeen>;
@@ -96,6 +106,7 @@ class ChachiDatabase extends Dexie {
   dms!: Table<PrivateEvent>;
   emojiSets!: Table<EmojiSet>;
   lastSeenSyncMeta!: Table<LastSeenSyncMeta>;
+  dmGroups!: Table<DMGroupSummary>;
 
   constructor(name: string) {
     super(name);
@@ -112,6 +123,53 @@ class ChachiDatabase extends Dexie {
       emojiSets: "&address",
       lastSeenSyncMeta: "&key",
     });
+    this.version(16)
+      .stores({
+        dmGroups: "&id,lastMessageAt,*senderPubkeys",
+      })
+      .upgrade(async (tx) => {
+        // Build dmGroups summary from existing DMs
+        const dms = tx.table<PrivateEvent>("dms");
+        const dmGroups = tx.table<DMGroupSummary>("dmGroups");
+
+        const groupMap = new Map<string, DMGroupSummary>();
+
+        await dms.each((dm) => {
+          const existing = groupMap.get(dm.group);
+          const isReaction = dm.kind === 7; // NDKKind.Reaction
+
+          if (existing) {
+            if (!existing.senderPubkeys.includes(dm.pubkey)) {
+              existing.senderPubkeys.push(dm.pubkey);
+            }
+            if (!isReaction && dm.created_at > existing.lastMessageAt) {
+              existing.lastMessageAt = dm.created_at;
+              existing.lastMessageContent = dm.content;
+              existing.lastMessagePubkey = dm.pubkey;
+              existing.lastMessageTags = dm.tags;
+            }
+          } else {
+            const pubkeys: string[] = [];
+            for (let i = 0; i < dm.group.length; i += 64) {
+              pubkeys.push(dm.group.slice(i, i + 64));
+            }
+            groupMap.set(dm.group, {
+              id: dm.group,
+              pubkeys,
+              lastMessageAt: isReaction ? 0 : dm.created_at,
+              lastMessageContent: isReaction ? "" : dm.content,
+              lastMessagePubkey: isReaction ? "" : dm.pubkey,
+              lastMessageTags: isReaction ? [] : dm.tags,
+              senderPubkeys: [dm.pubkey],
+            });
+          }
+        });
+
+        const summaries = Array.from(groupMap.values());
+        if (summaries.length > 0) {
+          await dmGroups.bulkPut(summaries);
+        }
+      });
   }
 }
 const db = new ChachiDatabase("chachi");
