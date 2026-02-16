@@ -5,12 +5,11 @@ import { useAtomValue } from "jotai";
 import { useEffect } from "react";
 import {
   getLastGroupMessage,
-  getGroupsSortedByLastMessage,
   getGroupReactions,
   getLastSeen,
   getUnreadMessages,
 } from "@/lib/dms/queries";
-import db from "@/lib/db";
+import db, { DMGroupSummary } from "@/lib/db";
 import { NostrEvent } from "nostr-tools";
 import NDK, {
   NDKRelaySet,
@@ -53,6 +52,7 @@ export function idToGroup(id: string, pubkey: string) {
 }
 
 export async function savePrivateEvent(event: NostrEvent, gift: NostrEvent) {
+  const gid = groupId(event);
   const record = {
     id: event.id,
     kind: event.kind,
@@ -60,10 +60,45 @@ export async function savePrivateEvent(event: NostrEvent, gift: NostrEvent) {
     content: event.content,
     tags: event.tags,
     pubkey: event.pubkey,
-    group: groupId(event),
+    group: gid,
     gift: gift.id,
   };
-  return db.dms.put(record);
+  await db.dms.put(record);
+  await updateDMGroupSummary(gid, event);
+}
+
+async function updateDMGroupSummary(gid: string, event: NostrEvent) {
+  const isReaction = event.kind === NDKKind.Reaction;
+  const existing = await db.dmGroups.get(gid);
+
+  if (existing) {
+    const updates: Partial<DMGroupSummary> = {};
+    // Track new sender
+    if (!existing.senderPubkeys.includes(event.pubkey)) {
+      updates.senderPubkeys = [...existing.senderPubkeys, event.pubkey];
+    }
+    // Update last message if this is newer and not a reaction
+    if (!isReaction && event.created_at > existing.lastMessageAt) {
+      updates.lastMessageAt = event.created_at;
+      updates.lastMessageContent = event.content;
+      updates.lastMessagePubkey = event.pubkey;
+      updates.lastMessageTags = event.tags;
+    }
+    if (Object.keys(updates).length > 0) {
+      await db.dmGroups.update(gid, updates);
+    }
+  } else {
+    const pubkeys = splitIntoChunks(gid, 64);
+    await db.dmGroups.put({
+      id: gid,
+      pubkeys,
+      lastMessageAt: isReaction ? 0 : event.created_at,
+      lastMessageContent: isReaction ? "" : event.content,
+      lastMessagePubkey: isReaction ? "" : event.pubkey,
+      lastMessageTags: isReaction ? [] : event.tags,
+      senderPubkeys: [event.pubkey],
+    });
+  }
 }
 
 function useStreamMap(
@@ -228,28 +263,23 @@ export function useGroups() {
 
   return useLiveQuery(
     async () => {
-      const groups = await db.dms.orderBy("group").uniqueKeys();
-      const dms = await db.dms.toArray();
-      return groups
-        .filter((id) => {
-          return (
-            id === pubkey ||
-            dms.some(
-              (dm) =>
-                dm.group === id &&
-                (dm.pubkey === pubkey || follows.includes(dm.pubkey)),
-            )
+      if (!pubkey) return [];
+      const followsSet = new Set(follows);
+      const allGroups = await db.dmGroups.toArray();
+      return allGroups
+        .filter((g) => {
+          // Accept if current user is a sender, or any followed user is a sender
+          return g.senderPubkeys.some(
+            (p) => p === pubkey || followsSet.has(p),
           );
         })
-        .map((id) => {
-          return {
-            id,
-            pubkeys:
-              id === pubkey
-                ? [pubkey]
-                : splitIntoChunks(String(id), 64).filter((p) => p !== pubkey),
-          };
-        })
+        .map((g) => ({
+          id: g.id,
+          pubkeys:
+            g.id === pubkey
+              ? [pubkey]
+              : g.pubkeys.filter((p) => p !== pubkey),
+        }))
         .filter((g) => g.pubkeys.length > 0) as Group[];
     },
     [pubkey, follows],
@@ -263,21 +293,20 @@ export function useGroupRequests() {
 
   return useLiveQuery(
     async () => {
-      const dms = await db.dms.toArray();
-      return Array.from(new Set(dms.map((dm) => dm.group)))
-        .filter((id) => {
-          return !dms.some(
-            (dm) =>
-              dm.group === id &&
-              (dm.pubkey === pubkey || follows.includes(dm.pubkey)),
+      if (!pubkey) return [];
+      const followsSet = new Set(follows);
+      const allGroups = await db.dmGroups.toArray();
+      return allGroups
+        .filter((g) => {
+          // Requests = groups where neither the user nor a follow has sent a message
+          return !g.senderPubkeys.some(
+            (p) => p === pubkey || followsSet.has(p),
           );
         })
-        .map((id) => {
-          return {
-            id,
-            pubkeys: splitIntoChunks(id, 64).filter((p) => p !== pubkey),
-          };
-        })
+        .map((g) => ({
+          id: g.id,
+          pubkeys: g.pubkeys.filter((p) => p !== pubkey),
+        }))
         .filter((g) => g.pubkeys.length > 0);
     },
     [pubkey, follows],
@@ -304,7 +333,20 @@ export function useGroupMessages(id: string) {
 export function useSortedGroups() {
   const groups = useGroups();
   return useLiveQuery(
-    () => getGroupsSortedByLastMessage(groups),
+    async () => {
+      if (groups.length === 0) return groups;
+      const groupIds = new Set(groups.map((g) => g.id));
+      const summaries = await db.dmGroups
+        .orderBy("lastMessageAt")
+        .reverse()
+        .filter((s) => groupIds.has(s.id))
+        .toArray();
+      // Map back to Group shape preserving summary order
+      const groupMap = new Map(groups.map((g) => [g.id, g]));
+      return summaries
+        .map((s) => groupMap.get(s.id))
+        .filter(Boolean) as Group[];
+    },
     [groups],
     groups,
   );
@@ -313,14 +355,38 @@ export function useSortedGroups() {
 export function useSortedGroupRequests() {
   const groups = useGroupRequests();
   return useLiveQuery(
-    () => getGroupsSortedByLastMessage(groups),
+    async () => {
+      if (groups.length === 0) return groups;
+      const groupIds = new Set(groups.map((g) => g.id));
+      const summaries = await db.dmGroups
+        .orderBy("lastMessageAt")
+        .reverse()
+        .filter((s) => groupIds.has(s.id))
+        .toArray();
+      const groupMap = new Map(groups.map((g) => [g.id, g]));
+      return summaries
+        .map((s) => groupMap.get(s.id))
+        .filter(Boolean) as Group[];
+    },
     [groups],
     groups,
   );
 }
 
 export function useLastMessage(group: Group) {
-  return useLiveQuery(() => getLastGroupMessage(group), [group.id]);
+  return useLiveQuery(
+    async () => {
+      const summary = await db.dmGroups.get(group.id);
+      if (!summary || !summary.lastMessageAt) return undefined;
+      return {
+        content: summary.lastMessageContent,
+        tags: summary.lastMessageTags,
+        pubkey: summary.lastMessagePubkey,
+        created_at: summary.lastMessageAt,
+      };
+    },
+    [group.id],
+  );
 }
 
 export function useGroupReactions(group: Group) {
