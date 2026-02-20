@@ -79,6 +79,7 @@ export function useGroupMessages(groups: Group[]) {
             9005 as NDKKind,
           ],
           "#h": [id],
+          limit: 50,
           ...(lastMessage ? { since: lastMessage.created_at + 1 } : {}),
         };
 

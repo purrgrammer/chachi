@@ -99,6 +99,7 @@ function useGroupSubscription(
           9005 as NDKKind,
         ],
         "#h": [group.id],
+        limit: MESSAGE_PAGE_SIZE,
         ...(last ? { since: last.created_at + 1 } : {}),
       };
       sub = ndk.subscribe(
@@ -205,6 +206,7 @@ export function useCommunitychat(pubkey: string) {
       const filter = {
         kinds: [NDKKind.GroupChat, NDKKind.Nutzap, RELATIONSHIP],
         "#h": [pubkey],
+        limit: MESSAGE_PAGE_SIZE,
         ...(last ? { since: last.created_at } : {}),
       };
       sub = ndk.subscribe(
