@@ -17,7 +17,6 @@ import { cn } from "@/lib/utils";
 import { ProfileDrawer } from "@/components/nostr/profile";
 import { Separator } from "@/components/ui/separator";
 import { Emoji } from "@/components/emoji";
-import { NewZapDialog } from "@/components/nostr/zap";
 import { Badge } from "@/components/ui/badge";
 import {
   useRichText,
@@ -38,7 +37,6 @@ import {
   ContextMenuShortcut,
 } from "@/components/ui/context-menu";
 import { Name } from "@/components/nostr/name";
-import { ReactionsList } from "@/components/nostr/reactions";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCopy } from "@/lib/hooks";
 import { useNDK } from "@/lib/ndk";
@@ -52,8 +50,6 @@ import type { PrivateGroup as Group } from "@/lib/types";
 import { giftWrap } from "@/lib/nip-59";
 import {
   savePrivateEvent,
-  useGroupRelaySetMap,
-  useGroupReactions,
 } from "@/lib/nostr/dm";
 import { useTranslation } from "react-i18next";
 import { Embed } from "../detail";
@@ -158,11 +154,11 @@ export function ChatMessage({
   const { t } = useTranslation();
   const [settings] = useSettings();
   const { data: mintList } = useMintList(event.pubkey);
-  const reactions = useGroupReactions(group);
+//   const reactions = null; // Removed: useGroupReactions(group);
   const ndk = useNDK();
   const [showMessageActions, setShowMessageActions] = useState(false);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
-  const [showingZapDialog, setShowingZapDialog] = useState(false);
+//   const [showingZapDialog, setShowingZapDialog] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
   const lastSeenRef = useRef<HTMLDivElement | null>(null);
   const isMobile = useIsMobile();
@@ -181,7 +177,7 @@ export function ChatMessage({
   const canSign = useCanSign();
   const isOnlyEmojis =
     /^\p{Emoji_Presentation}{1}\s*\p{Emoji_Presentation}{0,1}$/u.test(content);
-  const relaySetMap = useGroupRelaySetMap(group);
+  const relaySetMap = new Map(); // Removed: useGroupRelaySetMap(group);
 
   const fragments = useRichText(
     content,
@@ -460,24 +456,6 @@ export function ChatMessage({
                   {content}
                 </RichText>
               )}
-              {reactions ? (
-                <ReactionsList
-                  event={event}
-                  events={
-                    reactions.filter((r) =>
-                      r.tags.find((t) => t[1] === event.id),
-                    ) as unknown as NostrEvent[]
-                  }
-                />
-              ) : null}
-              {showingZapDialog ? (
-                <NewZapDialog
-                  open
-                  event={event}
-                  pubkey={event.pubkey}
-                  onClose={() => setShowingZapDialog(false)}
-                />
-              ) : null}
               <LazyEmojiPicker
                 open={showingEmojiPicker}
                 onOpenChange={(open) => setShowingEmojiPicker(open)}

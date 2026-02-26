@@ -20,7 +20,6 @@ import { cn } from "@/lib/utils";
 import { ProfileDrawer } from "@/components/nostr/profile";
 import { Separator } from "@/components/ui/separator";
 import { Emoji } from "@/components/emoji";
-import { NewZapDialog } from "@/components/nostr/zap";
 import { Badge } from "@/components/ui/badge";
 import {
   useRichText,
@@ -268,7 +267,7 @@ function MessageContent({
   const relaySet = useRelaySet(group ? [group.relay] : []);
   const [showMessageActions, setShowMessageActions] = useState(false);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
-  const [showingZapDialog, setShowingZapDialog] = useState(false);
+//   const [showingZapDialog, setShowingZapDialog] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
   const lastSeenRef = useRef<HTMLDivElement | null>(null);
   const isInView = useInView(ref);
@@ -561,17 +560,6 @@ function MessageContent({
                     relays={[...(relay ? [relay] : [])]}
                     kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
                     live={isInView}
-                  />
-                ) : null}
-                {showingZapDialog && group ? (
-                  <NewZapDialog
-                    open
-                    event={event}
-                    pubkey={event.pubkey}
-                    group={group}
-                    onClose={() => setShowingZapDialog(false)}
-                    onZap={() => setShowingZapDialog(false)}
-                    zapType="nip-57"
                   />
                 ) : null}
                 <LazyEmojiPicker

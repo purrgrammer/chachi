@@ -17,9 +17,7 @@ import {
   accountsAtom,
   followsAtom,
   mintListAtom,
-  dmRelaysAtom,
 } from "@/app/store";
-import { useRelays } from "@/lib/nostr";
 import { useCallback } from "react";
 
 export function useAccount(): Account | null {

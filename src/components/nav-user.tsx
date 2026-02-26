@@ -1,12 +1,9 @@
-import { useState } from "react";
-import { toast } from "sonner";
 import { useNavigate } from "@/lib/navigation";
 import { ChevronsUpDown, LogOut, Settings, Castle, User } from "lucide-react";
 import { Login } from "@/components/nostr/login";
 import { Avatar } from "@/components/nostr/avatar";
 import { Name } from "@/components/nostr/name";
 import { Nip05 } from "@/components/nostr/nip05";
-import { NewZapDialog } from "@/components/nostr/zap";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +28,6 @@ import {
   NDKWebLNWallet,
 } from "@nostr-dev-kit/wallet";
 import { useNDKWallets } from "@/lib/wallet";
-import { CHACHI_PUBKEY, CHACHI_GROUP } from "@/constants";
 import { useAtomValue } from "jotai";
 import { communikeyAtom } from "@/app/store";
 
@@ -54,7 +50,6 @@ function UserInfo({ pubkey }: { pubkey: string }) {
 export function NavUser() {
   const { isMobile, open, openMobile, state } = useSidebar();
   const [wallets] = useNDKWallets();
-  const [showDonateDialog, setShowDonateDialog] = useState(false);
   const logout = useLogout();
   const account = useAccount();
   const navigate = useNavigate();
@@ -71,11 +66,6 @@ export function NavUser() {
     } else if (wallet instanceof NDKWebLNWallet) {
       navigate(`/wallet/webln`);
     }
-  }
-
-  function onZap() {
-    setShowDonateDialog(false);
-    toast.success(t("user.thank-you"));
   }
 
   return (
@@ -141,19 +131,6 @@ export function NavUser() {
           <Login isCompact={!isExpanded} />
         )}
       </SidebarMenu>
-      {showDonateDialog ? (
-        <NewZapDialog
-          open
-          title={t("user.support-chachi")}
-          description={t("user.support-chachi-description")}
-          defaultAmount={420}
-          onClose={() => setShowDonateDialog(false)}
-          onZap={onZap}
-          pubkey={CHACHI_PUBKEY}
-          group={CHACHI_GROUP}
-          zapType="nip-57"
-        />
-      ) : null}
     </>
   );
 }

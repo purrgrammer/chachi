@@ -1,7 +1,5 @@
 import { Reorder } from "framer-motion";
-import { useAtomValue } from "jotai";
 import { useParams } from "react-router-dom";
-import { VenetianMask } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { Avatar as NostrAvatar } from "@/components/nostr/avatar";
 import { useSortedGroups } from "@/lib/messages";

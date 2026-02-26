@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { decode } from "light-bolt11-decoder";
-import { generateSecretKey, getPublicKey } from "nostr-tools";
 import { useQuery } from "@tanstack/react-query";
 import {
   queryClient,
@@ -14,7 +13,6 @@ import { useTranslation } from "react-i18next";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import { NostrEvent } from "nostr-tools";
 import NDK, {
-  NDKCashuToken,
   NDKUser,
   NDKKind,
   NDKEvent,
@@ -22,7 +20,6 @@ import NDK, {
   NDKFilter,
   NDKSubscriptionCacheUsage,
   NDKSubscription,
-  NDKCashuWalletTx,
 } from "@nostr-dev-kit/ndk";
 import {
   NDKWallet,
@@ -30,7 +27,6 @@ import {
   NDKWebLNWallet,
   NDKNWCWallet,
 } from "@nostr-dev-kit/wallet";
-import type { Proof } from "@cashu/cashu-ts";
 import { useNDK, useNWCNDK } from "@/lib/ndk";
 import { Zap, validateZapRequest } from "@/lib/nip-57";
 import { usePubkey, useMintList } from "@/lib/account";
@@ -41,7 +37,6 @@ import { useNutzapMonitor } from "@/lib/nutzaps";
 import { isRelayURL } from "@/lib/relay";
 import { getTokenEvents, saveTokenEvent } from "@/lib/db";
 import { Token } from "@cashu/cashu-ts";
-
 export type ChachiWallet =
   | { type: "nip60" }
   | { type: "nwc"; connection: string }

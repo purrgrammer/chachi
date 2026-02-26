@@ -15,6 +15,7 @@ import {
 } from "@/lib/zap";
 import type { Group } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { usePubkey } from "@/lib/account";
 
 export function ZapReply({
   event,

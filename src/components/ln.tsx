@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { Eye, EyeClosed, HandCoins, Coins, ReceiptText } from "lucide-react";
 import Amount from "@/components/amount";
 import { InputCopy } from "@/components/ui/input-copy";
-import { NewZapDialog } from "@/components/nostr/zap";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Wallet, Copy, Check, Zap } from "lucide-react";
@@ -157,24 +156,18 @@ export function Invoice({
 }
 
 export function LnAddress({
-  pubkey,
+
   address,
 }: {
-  pubkey: string;
+
   address: string;
 }) {
   return (
-    <NewZapDialog
-      zapType="nip-57"
-      pubkey={pubkey}
-      trigger={
-        <Button variant="ghost" size="tiny">
-          <div className="flex flex-row items-center gap-1">
-            <Zap className="size-4 text-muted-foreground" />
-            <span className="font-mono text-xs">{address}</span>
-          </div>
-        </Button>
-      }
-    />
+    <Button variant="ghost" size="tiny" disabled>
+      <div className="flex flex-row items-center gap-1">
+        <Zap className="size-4 text-muted-foreground" />
+        <span className="font-mono text-xs">{address}</span>
+      </div>
+    </Button>
   );
 }

@@ -6,7 +6,6 @@ import {
   LinkIcon,
   Users,
   Castle,
-  Zap,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { parseProfileIdentifier, resolveNip05 } from "@/lib/profile-identifier";
@@ -163,15 +162,6 @@ function ProfileWelcome({
 
           {/* Action Buttons - now positioned independently */}
           <div className="flex flex-row gap-2 -mb-11">
-            {/* Zap Button - only show if user can receive zaps */}
-            {profile?.lud16 && (
-              <NewZapDialog
-                      {t("zap.action.zap", "Zap")}
-                    </span>
-                  </Button>
-                }
-              />
-            )}
             {/* Communikey Button */}
             {communikeyEvent && (
               <Button

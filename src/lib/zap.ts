@@ -1,19 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import { useQuery } from "@tanstack/react-query";
 import {
   NDKEvent,
   NDKKind,
-  NDKNutzap,
-  NDKZapSplit,
   NDKUser,
   NDKZapper,
-  NDKPaymentConfirmation,
 } from "@nostr-dev-kit/ndk";
-import { useMintList } from "@/lib/cashu";
-import { useNDK } from "@/lib/ndk";
-import { useRelaySet, useStream, useRelays } from "@/lib/nostr";
+import { useStream, useRelays } from "@/lib/nostr";
 import { NostrEvent } from "nostr-tools";
 import { LNURL } from "@/lib/query";
 import { usePubkey } from "@/lib/account";

@@ -9,7 +9,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { TabContainer, TabItem } from "@/components/ui/tab-container";
 import { NameList } from "@/components/nostr/name-list";
-import { Appearance, Wallet, Media, Privacy } from "@/components/settings";
+import { Appearance, Media, Privacy } from "@/components/settings";
 import { Header } from "@/components/header";
 import { useSupporters } from "@/lib/nostr/zaps";
 import { OPENSATS_PUBKEY, CHACHI_PUBKEY, CHACHI_RELAYS } from "@/constants";
@@ -107,12 +107,6 @@ export default function Settings() {
       name: t("settings.media.title"),
       icon: <CloudUpload className="size-4 text-muted-foreground" />,
       children: <Media />,
-    },
-    {
-      id: "wallet",
-      name: t("settings.wallet.title"),
-      icon: <WalletIcon className="size-4 text-muted-foreground" />,
-      children: <Wallet />,
     },
     {
       id: "privacy",

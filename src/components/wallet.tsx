@@ -1,9 +1,5 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { InputCopy } from "@/components/ui/input-copy";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState, useMemo, useEffect } from "react";
 import { Token, getDecodedToken } from "@cashu/cashu-ts";
-import { NostrEvent } from "nostr-tools";
-import { nip19 } from "nostr-tools";
 import {
   Wallet as WalletIcon,
   Coins,
@@ -584,24 +580,7 @@ function CashuWallet({ wallet }: { wallet: NDKCashuWallet }) {
             size="wallet-balance"
           />
         </div>
-        <WalletActions
-          wallet={wallet}
-          onDeposit={onDeposit}
-          isDepositing={showDeposit}
-          onWithdraw={onWithdraw}
-          isWithdrawing={showWithdraw}
-        />
       </div>
-      <Deposit
-        wallet={wallet}
-        open={showDeposit}
-        onOpenChange={setShowDeposit}
-      />
-      <Withdraw
-        wallet={wallet}
-        open={showWithdraw}
-        onOpenChange={setShowWithdraw}
-      />
       {pubkey ? (
         <Tabs defaultValue="transactions">
           <TabsList className="w-full bg-background">
@@ -640,20 +619,9 @@ function WebLNWallet({ wallet }: { wallet: NDKWebLNWallet }) {
   const { data: balance } = useWebLNBalance(wallet);
   const { data: info } = useWebLNInfo(wallet);
 
-  const canDeposit = info?.methods.includes("makeInvoice");
-  const canWithdraw = info?.methods.includes("sendPayment");
+//   const canDeposit = info?.methods.includes("makeInvoice");
+//   const canWithdraw = info?.methods.includes("sendPayment");
   //const canListTransactions = info?.methods.includes("getTransactions");
-
-  const [showDeposit, setShowDeposit] = useState(false);
-  const [showWithdraw, setShowWithdraw] = useState(false);
-
-  async function onDeposit() {
-    setShowDeposit(true);
-  }
-
-  async function onWithdraw() {
-    setShowWithdraw(true);
-  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -666,26 +634,7 @@ function WebLNWallet({ wallet }: { wallet: NDKWebLNWallet }) {
             size="wallet-balance"
           />
         </div>
-        <WalletActions
-          wallet={wallet}
-          onDeposit={onDeposit}
-          canDeposit={canDeposit}
-          isDepositing={showDeposit}
-          onWithdraw={onWithdraw}
-          canWithdraw={canWithdraw}
-          isWithdrawing={showWithdraw}
-        />
       </div>
-      <Deposit
-        wallet={wallet}
-        open={showDeposit}
-        onOpenChange={setShowDeposit}
-      />
-      <Withdraw
-        wallet={wallet}
-        open={showWithdraw}
-        onOpenChange={setShowWithdraw}
-      />
     </div>
   );
 }
@@ -726,19 +675,10 @@ function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
 
 function NWCWallet({ wallet }: { wallet: NDKNWCWallet }) {
   const { data: amount } = useNWCBalance(wallet);
-  const { data: info } = useNWCInfo(wallet);
-  const isDepositSupported = info?.methods.includes("make_invoice");
-  const isWithdrawalSupported = info?.methods.includes("pay_invoice");
-  const [isDepositing, setIsDepositing] = useState(false);
-  const [isWithdrawing, setIsWithdrawing] = useState(false);
-
-  function onDeposit() {
-    setIsDepositing(true);
-  }
-
-  function onWithdraw() {
-    setIsWithdrawing(true);
-  }
+//   const { data: info } = useNWCInfo(wallet);
+//   const isDepositSupported = info?.methods.includes("make_invoice");
+//   const isWithdrawalSupported = info?.methods.includes("pay_invoice");
+//   const [isDepositing, setIsDepositing] = useState(false);
 
   return (
     <div className="flex flex-col gap-4">
@@ -763,26 +703,7 @@ function NWCWallet({ wallet }: { wallet: NDKNWCWallet }) {
             </div>
           )}
         </div>
-        <WalletActions
-          wallet={wallet}
-          onDeposit={onDeposit}
-          isDepositing={isDepositing}
-          canDeposit={isDepositSupported}
-          onWithdraw={onWithdraw}
-          isWithdrawing={isWithdrawing}
-          canWithdraw={isWithdrawalSupported}
-        />
       </div>
-      <Deposit
-        wallet={wallet}
-        open={isDepositing}
-        onOpenChange={setIsDepositing}
-      />
-      <Withdraw
-        wallet={wallet}
-        open={isWithdrawing}
-        onOpenChange={setIsWithdrawing}
-      />
       <NWCWalletTransactions wallet={wallet} />
     </div>
   );

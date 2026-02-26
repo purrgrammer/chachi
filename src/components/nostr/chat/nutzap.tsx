@@ -34,7 +34,6 @@ import { Reactions } from "@/components/nostr/reactions";
 import { useCashuWallet } from "@/lib/wallet";
 import { useNutzapStatus, saveNutzap } from "@/lib/nutzaps";
 import { formatShortNumber } from "@/lib/number";
-import { NewZapDialog } from "@/components/nostr/zap";
 import Amount from "@/components/amount";
 import {
   ContextMenu,
@@ -79,7 +78,7 @@ export function ChatNutzap({
   const isInView = useInView(ref);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
   const navigate = useNavigate();
-  const [showingZapDialog, setShowingZapDialog] = useState(false);
+//   const [showingZapDialog, setShowingZapDialog] = useState(false);
   const [isRedeeming, setIsRedeeming] = useState(false);
   const nutzapStatus = useNutzapStatus(event.id);
   const redeemed = nutzapStatus === "redeemed" || nutzapStatus === "spent";
@@ -408,15 +407,6 @@ export function ChatNutzap({
         onOpenChange={(open) => setShowingEmojiPicker(open)}
         onEmojiSelect={onEmojiSelect}
       />
-      {showingZapDialog ? (
-        <NewZapDialog
-          open
-          event={event}
-          pubkey={event.pubkey}
-          group={group}
-          onClose={() => setShowingZapDialog(false)}
-        />
-      ) : null}
     </>
   );
 }

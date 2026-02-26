@@ -41,7 +41,7 @@ function ProfileDrawerContent({
           <ProfileColor pubkey={pubkey} relays={relays || []} />
         </div>
         {profile?.lud16 ? (
-          <LnAddress pubkey={pubkey} address={profile.lud16} />
+          <LnAddress address={profile.lud16} />
         ) : null}
 
         {about ? (

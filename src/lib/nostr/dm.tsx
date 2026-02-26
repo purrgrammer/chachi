@@ -1,35 +1,15 @@
-import { useQuery, useQueries } from "@tanstack/react-query";
 import { useLiveQuery } from "dexie-react-hooks";
 import { NDKEvent } from "@nostr-dev-kit/ndk";
-import { useAtomValue } from "jotai";
-import { useEffect, useMemo } from "react";
-import {
-  getLastGroupMessage,
-  getGroupReactions,
-  getLastSeen,
-  getUnreadMessages,
-} from "@/lib/dms/queries";
 import db, { DMGroupSummary } from "@/lib/db";
 import { NostrEvent } from "nostr-tools";
 import NDK, {
   NDKRelaySet,
-  NDKFilter,
-  NDKUser,
   NDKKind,
   NDKSubscriptionCacheUsage,
 } from "@nostr-dev-kit/ndk";
-import { giftUnwrap } from "@/lib/nip-59";
-import { useRelaySet } from "@/lib/nostr";
-import { useNDK } from "@/lib/ndk";
 import { discoveryRelays } from "@/lib/relay";
-import { usePubkey, useFollows } from "@/lib/account";
-import { useRelays } from "@/lib/nostr";
-import { PrivateGroup as Group, PrivateGroup } from "@/lib/types";
-import { useOnWebRTCSignal } from "@/components/webrtc";
-import { WEBRTC_SIGNAL } from "@/lib/kinds";
-import { privateMessagesEnabledAtom } from "@/app/store";
+import { PrivateGroup } from "@/lib/types";
 import { triggerLastSeenSync } from "@/lib/lastSeenSyncTrigger";
-import Dexie from "dexie";
 
 export interface UserRelayList {
   pubkey: string;
@@ -52,6 +32,14 @@ export function groupId(event: NostrEvent) {
 
 export function useEvent(id: string) {
   return useLiveQuery(() => db.dms.get({ id }), [id]);
+}
+
+function splitIntoChunks(arr: string, chunkSize: number): string[] {
+  const res: string[] = [];
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    res.push(arr.slice(i, i + chunkSize));
+  }
+  return res;
 }
 
 export function idToGroup(id: string, pubkey: string) {
@@ -112,49 +100,6 @@ async function updateDMGroupSummary(gid: string, event: NostrEvent) {
   }
 }
 
-function useStreamMap(
-  filter: NDKFilter | NDKFilter[],
-  relaySet: NDKRelaySet,
-  transform: (ev: NDKEvent) => Promise<NostrEvent | null>,
-  pubkey?: string,
-  enabled = true,
-) {
-  const ndk = useNDK();
-
-  useEffect(() => {
-    if (!pubkey) return;
-    if (!enabled) return;
-
-    const sub = ndk.subscribe(
-      filter,
-      {
-        subId: "gift-wrap",
-        cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
-        closeOnEose: false,
-        skipOptimisticPublishEvent: true,
-        groupable: false,
-      },
-      relaySet,
-    );
-
-    console.log('[Gift Wrap] Subscription started');
-
-    sub.on("event", (event) => {
-      transform(event).catch(err => {
-        console.error('[Gift Wrap] Failed to process event:', event.id, err);
-      });
-    });
-
-    sub.on("eose", () => {
-      console.log('[Gift Wrap] Initial sync complete (EOSE received)');
-    });
-
-    return () => {
-      console.log('[Gift Wrap] Subscription stopped');
-      sub.stop();
-    };
-  }, [pubkey, enabled]);
-}
 
 export async function fetchDirectMessageRelays(
   ndk: NDK,

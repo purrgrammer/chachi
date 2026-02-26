@@ -20,7 +20,6 @@ import {
 } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { NDKRelaySet, NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
-import { NewZapDialog } from "@/components/nostr/zap";
 // todo: lazily load components
 import { Empty } from "@/components/empty";
 import { Name } from "@/components/nostr/name";
@@ -637,8 +636,8 @@ function EventMenu({
     group.id !== "_" &&
     event.tags.find((t) => t[0] === "h")?.[1] === group.id;
   const { t } = useTranslation();
-  const [showZapDialog, setShowZapDialog] = useState(false);
-  const { data: mintList } = useMintList(event.pubkey);
+//   const [showZapDialog, setShowZapDialog] = useState(false);
+//   const { data: mintList } = useMintList(event.pubkey);
   const { showReplyDialog, setShowReplyDialog, onReply, openReplyDialog } =
     useReply(event, group);
   const {
@@ -679,17 +678,6 @@ function EventMenu({
 
   return (
     <>
-      {showZapDialog ? (
-        <NewZapDialog
-          open={showZapDialog}
-          onClose={() => setShowZapDialog(false)}
-          event={event}
-          pubkey={event.pubkey}
-          group={group}
-          onZap={() => setShowZapDialog(false)}
-          zapType={mintList?.pubkey ? "nip-61" : "nip-57"}
-        />
-      ) : null}
       {shareGroup ? (
         <ShareDialog
           open={showShareDialog}
@@ -959,7 +947,7 @@ export function ReplyEmbed({
   const canSign = useCanSign();
   const [showThread, setShowThread] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [showZapDialog, setShowZapDialog] = useState(false);
+//   const [showZapDialog, setShowZapDialog] = useState(false);
   const [zapType, setZapType] = useState<"nip-57" | "nip-61">("nip-61");
   const components = eventDetails[event.kind];
   const [isDeleted, setIsDeleted] = useState(false);
@@ -970,7 +958,7 @@ export function ReplyEmbed({
   // NIP-31
   const { t } = useTranslation();
   const isRelayGroup = group?.id === "_";
-  const { data: mintList } = useMintList(event.pubkey);
+//   const { data: mintList } = useMintList(event.pubkey);
   const { events: comments } = useReplies(event, group);
   const hasReplies = comments.length > 0;
 
@@ -1204,17 +1192,6 @@ export function ReplyEmbed({
             <SmilePlus className="absolute right-2 top-3 z-0 size-6" />
           </>
         )}
-        {showZapDialog ? (
-          <NewZapDialog
-            open={showZapDialog}
-            onZap={() => setShowZapDialog(false)}
-            onClose={() => setShowZapDialog(false)}
-            event={event}
-            pubkey={event.pubkey}
-            group={group}
-            zapType={zapType}
-          />
-        ) : null}
         <LazyEmojiPicker
           open={showEmojiPicker && !!canSign}
           onOpenChange={setShowEmojiPicker}
@@ -1277,7 +1254,7 @@ export function FeedEmbed({
   const canSign = useCanSign();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [zapType, setZapType] = useState<"nip-57" | "nip-61">("nip-61");
-  const [showZapDialog, setShowZapDialog] = useState(false);
+//   const [showZapDialog, setShowZapDialog] = useState(false);
   const components = eventDetails[event.kind];
   const [isDeleted, setIsDeleted] = useState(false);
   // Use the shared hook for reply functionality
@@ -1287,7 +1264,7 @@ export function FeedEmbed({
   const alt = event.tags.find((t) => t[0] === "alt")?.[1];
   const { t } = useTranslation();
   const isRelayGroup = group?.id === "_";
-  const { data: mintList } = useMintList(event.pubkey);
+//   const { data: mintList } = useMintList(event.pubkey);
   const relaySet = useRelaySet(group ? [group.relay] : userRelays);
 
   function openEmojiPicker() {
@@ -1479,17 +1456,6 @@ export function FeedEmbed({
           <SmilePlus className="absolute right-2 top-3 z-0 size-6" />
         </>
       )}
-      {showZapDialog ? (
-        <NewZapDialog
-          open={showZapDialog}
-          onZap={() => setShowZapDialog(false)}
-          onClose={() => setShowZapDialog(false)}
-          event={event}
-          pubkey={event.pubkey}
-          group={group}
-          zapType={zapType}
-        />
-      ) : null}
       <LazyEmojiPicker
         open={showEmojiPicker && !!canSign}
         onOpenChange={setShowEmojiPicker}

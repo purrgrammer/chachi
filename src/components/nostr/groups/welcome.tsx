@@ -10,7 +10,7 @@ import {
   CloudUpload,
   Landmark,
   MapPin,
-  Zap,
+
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -21,7 +21,6 @@ import { useRecommendedApps } from "@/lib/nip-89";
 import { RichText } from "@/components/rich-text";
 import { Nip05 } from "@/components/nostr/nip05";
 import { Login } from "@/components/nostr/login";
-import { NewZapDialog } from "@/components/nostr/zap";
 import { usePinnedPosts } from "@/lib/nip-51";
 import { useProfile, useRelayList, useTag } from "@/lib/nostr";
 import { Community } from "@/lib/types";
@@ -182,21 +181,6 @@ export default function Welcome({ community }: { community: Community }) {
 
           {/* Action Buttons - now positioned independently */}
           <div className="flex flex-row gap-2 -mb-11">
-            {/* Zap Button - only show if community can receive zaps */}
-            {profile?.lud16 && (
-              <NewZapDialog
-                pubkey={community.pubkey}
-                zapType="nip-61"
-                trigger={
-                  <Button variant="default" size="sm">
-                    <Zap className="size-4" />
-                    <span className="hidden sm:inline ml-2">
-                      {t("zap.action.zap", "Zap")}
-                    </span>
-                  </Button>
-                }
-              />
-            )}
             {/* Join/Joined Button */}
             {isMember ? (
               <Button disabled variant="outline" size="sm">

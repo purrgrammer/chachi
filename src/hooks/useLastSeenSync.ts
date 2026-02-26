@@ -1,7 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
-import { useAtom } from "jotai";
 import { NDKEvent, NDKSubscription } from "@nostr-dev-kit/ndk";
-import { unreadSyncEnabledAtom } from "@/app/store";
 import { useNDK } from "@/lib/ndk";
 import db, {
   getLastSeenSyncMeta,
@@ -32,7 +30,7 @@ import {
  * - Provides function to publish local changes
  */
 export function useLastSeenSync() {
-  const [syncEnabled] = useAtom(unreadSyncEnabledAtom);
+  const syncEnabled = false; // Removed: unread sync feature disabled
   const ndk = useNDK();
   const subscriptionRef = useRef<NDKSubscription | null>(null);
   const publishTimeoutRef = useRef<NodeJS.Timeout | null>(null);
