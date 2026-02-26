@@ -1,34 +1,20 @@
-import { useState, useMemo, useEffect } from "react";
-import { Token, getDecodedToken } from "@cashu/cashu-ts";
+import { useState, useMemo } from "react";
 import {
   Wallet as WalletIcon,
-  Coins,
   PlugZap,
   Puzzle,
-  Cable,
   RotateCw,
   RefreshCw,
   Network,
   ServerCrash,
-  Plus,
-  Landmark,
-  Server,
-  Bitcoin,
   Banknote,
   ArrowDownRight,
   ArrowUpRight,
   CircleSlash2,
   List,
-  Settings,
-  Zap as ZapIcon,
-  //KeySquare,
 } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Pubkey } from "@/components/nostr/pubkey";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { NDKEvent, NDKKind, NDKRelaySet } from "@nostr-dev-kit/ndk";
 import {
   NDKWallet,
   NDKCashuWallet,
@@ -37,25 +23,17 @@ import {
 } from "@nostr-dev-kit/wallet";
 import { RichText } from "@/components/rich-text";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Event, A } from "@/components/nostr/event";
-import { Label } from "@/components/ui/label";
-import { Invoice } from "@/components/ln";
-import { useNDK, useNWCNDK } from "@/lib/ndk";
-import { useRelays, useEvent, useProfile } from "@/lib/nostr";
+import { useRelays, useEvent } from "@/lib/nostr";
 import Amount from "@/components/amount";
-import { useHost } from "@/lib/hooks";
 import {
   useNDKWallet,
   useNDKWallets,
   useCashuWallet,
   useTransactions,
   useNWCBalance,
-  useNWCInfo,
   useNWCTransactions,
   useWebLNBalance,
-  useWebLNInfo,
-  //useWebLNTransactions,
   useCashuBalance,
   refreshWallet,
   walletId,
@@ -66,13 +44,10 @@ import { usePubkey } from "@/lib/account";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { User } from "@/components/nostr/user";
-import { MintIcon, MintName, MintLink } from "@/components/mint";
+import { MintLink } from "@/components/mint";
 import {
   Select,
   SelectContent,
@@ -80,59 +55,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { EcashToken } from "@/components/cashu";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { cashuRegex } from "@/lib/cashu";
 
-function Relay({
-  url,
-  isSelected,
-  disabled,
-  onSelectChange,
-}: {
-  url: string;
-  isSelected: boolean;
-  disabled?: boolean;
-  onSelectChange: (selected: boolean) => void;
-}) {
-  const host = useHost(url);
-  return (
-    <div className="flex flex-row gap-1.5 items-center">
-      <Checkbox
-        disabled={disabled}
-        checked={isSelected}
-        onCheckedChange={onSelectChange}
-      />
-      <Server className="size-4 text-muted-foreground" />
-      <span className="text-sm font-mono">{host}</span>
-    </div>
-  );
-}
 
-function Mint({
-  url,
-  isSelected,
-  disabled,
-  onSelectChange,
-}: {
-  url: string;
-  isSelected: boolean;
-  disabled?: boolean;
-  onSelectChange: (selected: boolean) => void;
-}) {
-  const host = useHost(url);
-  return (
-    <div className="flex flex-row gap-1.5 items-center">
-      <Checkbox
-        disabled={disabled}
-        checked={isSelected}
-        onCheckedChange={onSelectChange}
-      />
-      <Landmark className="size-4 text-muted-foreground" />
-      <span className="text-sm font-mono">{host}</span>
-    </div>
-  );
-}
 
 function Tx({ tx }: { tx: Transaction }) {
   const { t } = useTranslation();
@@ -486,88 +417,21 @@ function CashuWalletTransactions({
 //  );
 //}
 
-interface ReceiveEcashProps {
-  token: string;
-  onOpenChange: (open: boolean) => void;
-}
-
-function ReceiveEcash({ token, onOpenChange }: ReceiveEcashProps) {
-  const { t } = useTranslation();
-  const cashuWallet = useCashuWallet();
-  const [ecash, setEcash] = useState<Token | null>(null);
-
-  useEffect(() => {
-    const decoded = getDecodedToken(token);
-    if (decoded) {
-      setEcash(decoded);
-    }
-  }, [token]);
-
-  async function redeemEcash() {
-    if (!cashuWallet || !ecash) {
-      return;
-    }
-    try {
-      const ev = await cashuWallet.receiveToken(token);
-      if (ev) {
-        toast.success(t("wallet.ecash.redeem-success"));
-      }
-      onOpenChange(false);
-    } catch (err) {
-      console.error(err);
-      toast.error(t("wallet.ecash.redeem-error"));
-    }
-  }
-
-  return (
-    <div className="flex flex-col gap-2">
-      {token ? <EcashToken token={token} /> : null}
-      <Button disabled={!cashuWallet || !ecash} onClick={redeemEcash}>
-        {t("wallet.ecash.redeem")}
-      </Button>
-    </div>
-  );
-}
-
-
-function AmountInput({
-  amount,
-  setAmount,
-  max,
-}: {
-  amount: string;
-  setAmount: (amount: string) => void;
-  max?: number;
-}) {
-  // todo: multi-currency, use users preferred unit
-  return (
-    <div className="flex flex-row gap-4 items-center mx-2">
-      <Bitcoin className="size-14 text-muted-foreground" />
-      <Input
-        max={max}
-        type="number"
-        className="w-full text-center font-mono text-6xl h-15"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-      />
-    </div>
-  );
-}
 
 function CashuWallet({ wallet }: { wallet: NDKCashuWallet }) {
-  const [showDeposit, setShowDeposit] = useState(false);
-  const [showWithdraw, setShowWithdraw] = useState(false);
+  // const [showDeposit, setShowDeposit] = useState(false);
+  // const [showWithdraw, setShowWithdraw] = useState(false);
   const pubkey = usePubkey();
   const { t } = useTranslation();
   const balance = useCashuBalance(wallet);
 
-  async function onDeposit() {
-    setShowDeposit(true);
-  }
+//   async function onDeposit() {
+//     setShowDeposit(true);
+//   }
 
-  async function onWithdraw() {
-    setShowWithdraw(true);
-  }
+//   async function onWithdraw() {
+//     setShowWithdraw(true);
+//   }
 
   return (
     <div className="flex flex-col gap-4">
@@ -617,7 +481,7 @@ function CashuWallet({ wallet }: { wallet: NDKCashuWallet }) {
 
 function WebLNWallet({ wallet }: { wallet: NDKWebLNWallet }) {
   const { data: balance } = useWebLNBalance(wallet);
-  const { data: info } = useWebLNInfo(wallet);
+  // const { data: info } = useWebLNInfo(wallet);
 
 //   const canDeposit = info?.methods.includes("makeInvoice");
 //   const canWithdraw = info?.methods.includes("sendPayment");
@@ -675,7 +539,7 @@ function NWCWalletTransactions({ wallet }: { wallet: NDKNWCWallet }) {
 
 function NWCWallet({ wallet }: { wallet: NDKNWCWallet }) {
   const { data: amount } = useNWCBalance(wallet);
-//   const { data: info } = useNWCInfo(wallet);
+//   // const { data: info } = useNWCInfo(wallet);
 //   const isDepositSupported = info?.methods.includes("make_invoice");
 //   const isWithdrawalSupported = info?.methods.includes("pay_invoice");
 //   const [isDepositing, setIsDepositing] = useState(false);
@@ -784,14 +648,11 @@ function WebLNWalletBalance({
   size?: "wallet-balance" | "sm";
 }) {
   const { data: balance } = useWebLNBalance(wallet);
-  const { data: info } = useWebLNInfo(wallet);
   return (
     <div className="flex flex-row gap-10 w-full items-center justify-between">
       <div className="flex flex-row gap-2 items-center">
         <Puzzle className="size-4 text-muted-foreground" />
-        <span className="line-clamp-1">
-          {info?.node?.alias ? info.node.alias : "WebLN"}
-        </span>
+        <span className="line-clamp-1">WebLN</span>
       </div>
       <Balance short={short} amount={balance} unit="sat" size={size} />
     </div>
@@ -960,12 +821,9 @@ export function WalletBalance({
   }
 }
 
-function WebLNWalletName({ wallet }: { wallet: NDKWebLNWallet }) {
-  const { data: info } = useWebLNInfo(wallet);
+function WebLNWalletName() {
   return (
-    <span className="line-clamp-1">
-      {info?.node?.alias ? info.node.alias : "WebLN"}
-    </span>
+    <span className="line-clamp-1">WebLN</span>
   );
 }
 
@@ -973,7 +831,7 @@ export function WalletName({ wallet }: { wallet: NDKWallet }) {
   if (wallet instanceof NDKCashuWallet) {
     return <CashuWalletName />;
   } else if (wallet instanceof NDKWebLNWallet) {
-    return <WebLNWalletName wallet={wallet} />;
+    return <WebLNWalletName />;
   } else if (wallet instanceof NDKNWCWallet) {
     return <NWCWalletName wallet={wallet} />;
   } else {

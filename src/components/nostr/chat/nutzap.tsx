@@ -7,7 +7,6 @@ import {
   SmilePlus,
   Trash,
   ShieldBan,
-  Bitcoin,
   Coins,
   Check,
   X,
@@ -299,15 +298,6 @@ export function ChatNutzap({
             {t("chat.message.react.action")}
             <ContextMenuShortcut>
               <SmilePlus className="w-4 h-4" />
-            </ContextMenuShortcut>
-          </ContextMenuItem>
-          <ContextMenuItem
-            className="cursor-pointer"
-            onClick={() => setShowingZapDialog(true)}
-          >
-            {t("chat.message.tip.action")}
-            <ContextMenuShortcut>
-              <Bitcoin className="w-4 h-4" />
             </ContextMenuShortcut>
           </ContextMenuItem>
           {isToMe ? (

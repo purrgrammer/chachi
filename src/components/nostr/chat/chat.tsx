@@ -9,7 +9,6 @@ import {
   Trash,
   Ban,
   ShieldBan,
-  Bitcoin,
   Loader2,
   History,
 } from "lucide-react";
@@ -599,15 +598,6 @@ function MessageContent({
               {t("chat.message.react.action")}
               <ContextMenuShortcut>
                 <SmilePlus className="w-4 h-4" />
-              </ContextMenuShortcut>
-            </ContextMenuItem>
-            <ContextMenuItem
-              className="cursor-pointer"
-              onClick={() => setShowingZapDialog(true)}
-            >
-              {t("chat.message.tip.action")}
-              <ContextMenuShortcut>
-                <Bitcoin className="w-4 h-4" />
               </ContextMenuShortcut>
             </ContextMenuItem>
             <ContextMenuSeparator />

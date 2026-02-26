@@ -15,7 +15,6 @@ import {
   Crown,
   Reply as ReplyIcon,
   SmilePlus,
-  Bitcoin,
   Copy,
   ShieldBan,
   Trash,
@@ -41,11 +40,8 @@ import type { Emoji as EmojiType } from "@/components/emoji-picker";
 import { LazyEmojiPicker } from "@/components/lazy/LazyEmojiPicker";
 import { Chat } from "@/components/nostr/chat/chat";
 import { New } from "@/components/nostr/new";
-import { NewZapDialog } from "@/components/nostr/zap";
-import { NewZap } from "@/components/nostr/zap";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet } from "@/lib/nostr";
-import { useMintList } from "@/lib/cashu";
 import { usePubkey, useCanSign } from "@/lib/account";
 import type { Group } from "@/lib/types";
 import { useCopy } from "@/lib/hooks";
@@ -110,7 +106,6 @@ function ChatZap({
   const isInView = useInView(ref);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
   const navigate = useNavigate();
-  const [showingZapDialog, setShowingZapDialog] = useState(false);
   const pubkey = usePubkey();
   const isMine = zap?.pubkey === pubkey;
   const amIAdmin = pubkey && admins.includes(pubkey);
@@ -269,15 +264,6 @@ function ChatZap({
               <SmilePlus className="w-4 h-4" />
             </ContextMenuShortcut>
           </ContextMenuItem>
-          <ContextMenuItem
-            className="cursor-pointer"
-            onClick={() => setShowingZapDialog(true)}
-          >
-            {t("chat.message.tip.action")}
-            <ContextMenuShortcut>
-              <Bitcoin className="w-4 h-4" />
-            </ContextMenuShortcut>
-          </ContextMenuItem>
           <ContextMenuSeparator />
           <ContextMenuItem
             className="cursor-pointer"
@@ -353,15 +339,6 @@ function ChatZap({
         onOpenChange={(open) => setShowingEmojiPicker(open)}
         onEmojiSelect={onEmojiSelect}
       />
-      {showingZapDialog ? (
-        <NewZapDialog
-          open
-          event={event}
-          pubkey={event.pubkey}
-          group={group}
-          onClose={() => setShowingZapDialog(false)}
-        />
-      ) : null}
     </>
   );
 }
@@ -384,9 +361,7 @@ function ChatNutzap({
   const isInView = useInView(ref);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
   const navigate = useNavigate();
-  const [showingZapDialog, setShowingZapDialog] = useState(false);
   const [isRedeeming, setIsRedeeming] = useState(false);
-  const { data: mintList } = useMintList(event.pubkey);
   const nutzapStatus = useNutzapStatus(event.id);
   const redeemed = nutzapStatus === "redeemed" || nutzapStatus === "spent";
   const failed = nutzapStatus === "failed";
@@ -607,17 +582,6 @@ function ChatNutzap({
               <SmilePlus className="w-4 h-4" />
             </ContextMenuShortcut>
           </ContextMenuItem>
-          {mintList?.pubkey ? (
-            <ContextMenuItem
-              className="cursor-pointer"
-              onClick={() => setShowingZapDialog(true)}
-            >
-              {t("chat.message.tip.action")}
-              <ContextMenuShortcut>
-                <Bitcoin className="w-4 h-4" />
-              </ContextMenuShortcut>
-            </ContextMenuItem>
-          ) : null}
           {isToMe ? (
             <ContextMenuItem
               className="cursor-pointer"
@@ -715,15 +679,6 @@ function ChatNutzap({
         onOpenChange={(open) => setShowingEmojiPicker(open)}
         onEmojiSelect={onEmojiSelect}
       />
-      {showingZapDialog ? (
-        <NewZapDialog
-          open
-          event={event}
-          pubkey={event.pubkey}
-          group={group}
-          onClose={() => setShowingZapDialog(false)}
-        />
-      ) : null}
     </>
   );
 }
@@ -859,12 +814,6 @@ export const GroupChat = forwardRef(
       newMessage(ev);
     }
 
-    function onZap(z?: NostrEvent) {
-      if (z) {
-        onNewMessage(z);
-      }
-    }
-
     function canDelete(event: NostrEvent) {
       return isAdmin || event.pubkey === me;
     }
@@ -971,11 +920,7 @@ export const GroupChat = forwardRef(
               !canIPoast && relayInfo?.supported_nips?.includes(29)
             }
           >
-            {replyingTo ? (
-              <NewZap event={replyingTo} group={group} onZap={onZap} />
-            ) : (
-              <New group={group} />
-            )}
+            <New group={group} />
           </ChatInput>
         )}
       </div>
@@ -1022,12 +967,6 @@ export const CommunityChat = forwardRef(
     function onNewMessage(ev: NostrEvent) {
       setSentMessage(ev);
       newMessage(ev);
-    }
-
-    function onZap(z?: NostrEvent) {
-      if (z) {
-        onNewMessage(z);
-      }
     }
 
     function canDelete(event: NostrEvent) {
@@ -1123,11 +1062,7 @@ export const CommunityChat = forwardRef(
             setReplyingTo={setReplyingTo}
             tags={[["h", pubkey]]}
           >
-            {replyingTo ? (
-              <NewZap event={replyingTo} group={group} onZap={onZap} />
-            ) : (
-              <New group={group} />
-            )}
+            <New group={group} />
           </ChatInput>
         )}
       </div>

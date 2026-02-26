@@ -7,11 +7,9 @@ import {
   SmilePlus,
   Copy,
   Ban,
-  Bitcoin,
   Pin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useMintList } from "@/lib/cashu";
 import { NDKEvent, NDKKind, NDKUser } from "@nostr-dev-kit/ndk";
 import { cn } from "@/lib/utils";
 import { ProfileDrawer } from "@/components/nostr/profile";
@@ -153,7 +151,7 @@ export function ChatMessage({
 }) {
   const { t } = useTranslation();
   const [settings] = useSettings();
-  const { data: mintList } = useMintList(event.pubkey);
+  // const { data: mintList } = useMintList(event.pubkey);
 //   const reactions = null; // Removed: useGroupReactions(group);
   const ndk = useNDK();
   const [showMessageActions, setShowMessageActions] = useState(false);
@@ -493,17 +491,6 @@ export function ChatMessage({
                 <SmilePlus className="w-4 h-4" />
               </ContextMenuShortcut>
             </ContextMenuItem>
-            {mintList?.pubkey ? (
-              <ContextMenuItem
-                className="cursor-pointer"
-                onClick={() => setShowingZapDialog(true)}
-              >
-                {t("chat.message.tip.action")}
-                <ContextMenuShortcut>
-                  <Bitcoin className="w-4 h-4" />
-                </ContextMenuShortcut>
-              </ContextMenuItem>
-            ) : null}
             <ContextMenuSeparator />
             <ContextMenuItem
               className="cursor-pointer"

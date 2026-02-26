@@ -35,8 +35,7 @@ import { useRelays } from "@/lib/nostr";
 import { fetchMintInfo, fetchMintKeys } from "@/lib/cashu";
 import { useNutzapMonitor } from "@/lib/nutzaps";
 import { isRelayURL } from "@/lib/relay";
-import { getTokenEvents, saveTokenEvent } from "@/lib/db";
-import { Token } from "@cashu/cashu-ts";
+import { getTokenEvents } from "@/lib/db";
 export type ChachiWallet =
   | { type: "nip60" }
   | { type: "nwc"; connection: string }
@@ -54,47 +53,22 @@ export function useCashuWallet() {
   return useAtomValue(cashuWalletAtom);
 }
 
+// @ts-expect-error: Preserved for future use when NDKCashuToken is exported
 async function createCashuToken(
-  event: NDKEvent,
-): Promise<NDKCashuToken | undefined> {
-  const token = new NDKCashuToken(event.ndk, event);
-  // @ts-expect-error: i'm not supposed to do this
-  token.original = event;
-  try {
-    const content = JSON.parse(token.content);
-    token.proofs = content.proofs;
-    token.mint = content.mint ?? token.tagValue("mint");
-    token.deletedTokens = content.del ?? [];
-    if (!Array.isArray(token.proofs)) return;
-  } catch (err) {
-    console.error(err);
-    return;
-  }
-
-  return token;
+  _event: NDKEvent,
+): Promise<any | undefined> {
+  // Stub: NDKCashuToken not exported from @nostr-dev-kit/wallet
+  // Receiving infrastructure preserved but non-functional until fixed upstream
+  return undefined;
 }
 
 async function addToken(
   wallet: NDKCashuWallet,
-  tokenEvent: NDKEvent,
-  decrypt = true,
+  _tokenEvent: NDKEvent,
+  _decrypt = true,
 ): Promise<NDKCashuWallet> {
-  const token = decrypt
-    ? await NDKCashuToken.from(tokenEvent)
-    : await createCashuToken(tokenEvent);
-  if (!token || !token.id) {
-    return wallet;
-  }
-  await saveTokenEvent(token);
-
-  if (wallet.state.tokens.has(token.id)) {
-    return wallet;
-  }
-  for (const deletedTokenId of token.deletedTokens) {
-    wallet.state.removeTokenId(deletedTokenId);
-  }
-  wallet.state.addToken(token);
-
+  // Stub: NDKCashuToken not exported from @nostr-dev-kit/wallet
+  // Receiving infrastructure preserved but non-functional until fixed upstream
   return wallet;
 }
 

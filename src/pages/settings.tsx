@@ -2,7 +2,6 @@ import {
   HandHeart,
   Settings as SettingsIcon,
   SunMoon,
-  Wallet as WalletIcon,
   CloudUpload,
   VenetianMask,
 } from "lucide-react";

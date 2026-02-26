@@ -6,7 +6,6 @@ import CodeSnippet from "@/components/nostr/code-snippet";
 import {
   SquareArrowOutUpRight,
   Maximize,
-  Bitcoin,
   Reply,
   SmilePlus,
   Trash,
@@ -82,7 +81,6 @@ import { LazyEmojiPicker } from "@/components/lazy/LazyEmojiPicker";
 import { Poll, PollResults } from "@/components/nostr/poll";
 import { Calendar, CalendarEvent } from "@/components/nostr/calendar";
 import { ReplyDialog } from "@/components/nostr/reply";
-import { useMintList } from "@/lib/cashu";
 import { eventLink } from "@/lib/links";
 import { useNDK } from "@/lib/ndk";
 import { useRelaySet, useRelays, useA } from "@/lib/nostr";
@@ -757,10 +755,6 @@ function EventMenu({
               <Reply />
               <span>{t("chat.message.reply.action")}</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setShowZapDialog(true)}>
-              <Bitcoin />
-              <span>{t("action-zap")}</span>
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={openEmojiPicker}>
               <SmilePlus />
               <span>{t("chat.message.react.action")}</span>
@@ -948,7 +942,7 @@ export function ReplyEmbed({
   const [showThread, setShowThread] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 //   const [showZapDialog, setShowZapDialog] = useState(false);
-  const [zapType, setZapType] = useState<"nip-57" | "nip-61">("nip-61");
+  // const [zapType, setZapType] = useState<"nip-57" | "nip-61">("nip-61");
   const components = eventDetails[event.kind];
   const [isDeleted, setIsDeleted] = useState(false);
   const relaySet = useRelaySet(group ? [group.relay] : userRelays);
@@ -957,7 +951,7 @@ export function ReplyEmbed({
     useReply(event, group);
   // NIP-31
   const { t } = useTranslation();
-  const isRelayGroup = group?.id === "_";
+  // const isRelayGroup = group?.id === "_";
 //   const { data: mintList } = useMintList(event.pubkey);
   const { events: comments } = useReplies(event, group);
   const hasReplies = comments.length > 0;
@@ -979,10 +973,10 @@ export function ReplyEmbed({
     setShowThread(true);
   }
 
-  function openZapDialog(type: "nip-61" | "nip-57") {
-    setZapType(type);
-    setShowZapDialog(true);
-  }
+  // function openZapDialog(type: "nip-61" | "nip-57") {
+  //   setZapType(type);
+  //   setShowZapDialog(true);
+  // }
 
   async function onEmojiSelect(e: PickerEmoji) {
     try {
@@ -1138,27 +1132,6 @@ export function ReplyEmbed({
                     <SmilePlus className="w-4 h-4" />
                   </ContextMenuShortcut>
                 </ContextMenuItem>
-                {isRelayGroup ? (
-                  <ContextMenuItem
-                    className="cursor-pointer"
-                    onClick={() => openZapDialog("nip-57")}
-                  >
-                    {t("chat.message.zap.action")}
-                    <ContextMenuShortcut>
-                      <Bitcoin className="w-4 h-4" />
-                    </ContextMenuShortcut>
-                  </ContextMenuItem>
-                ) : mintList?.pubkey ? (
-                  <ContextMenuItem
-                    className="cursor-pointer"
-                    onClick={() => openZapDialog("nip-61")}
-                  >
-                    {t("chat.message.zap.action")}
-                    <ContextMenuShortcut>
-                      <Bitcoin className="w-4 h-4" />
-                    </ContextMenuShortcut>
-                  </ContextMenuItem>
-                ) : null}
                 {group ? (
                   <DeleteGroupEventItem
                     event={event}
@@ -1253,7 +1226,7 @@ export function FeedEmbed({
   const userRelays = useRelays();
   const canSign = useCanSign();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [zapType, setZapType] = useState<"nip-57" | "nip-61">("nip-61");
+  // const [zapType, setZapType] = useState<"nip-57" | "nip-61">("nip-61");
 //   const [showZapDialog, setShowZapDialog] = useState(false);
   const components = eventDetails[event.kind];
   const [isDeleted, setIsDeleted] = useState(false);
@@ -1263,7 +1236,7 @@ export function FeedEmbed({
   // NIP-31
   const alt = event.tags.find((t) => t[0] === "alt")?.[1];
   const { t } = useTranslation();
-  const isRelayGroup = group?.id === "_";
+  // const isRelayGroup = group?.id === "_";
 //   const { data: mintList } = useMintList(event.pubkey);
   const relaySet = useRelaySet(group ? [group.relay] : userRelays);
 
@@ -1271,10 +1244,10 @@ export function FeedEmbed({
     setShowEmojiPicker(true);
   }
 
-  function openZapDialog(type: "nip-61" | "nip-57") {
-    setZapType(type);
-    setShowZapDialog(true);
-  }
+  // function openZapDialog(type: "nip-61" | "nip-57") {
+  //   setZapType(type);
+  //   setShowZapDialog(true);
+  // }
 
   async function onEmojiSelect(e: PickerEmoji) {
     try {
@@ -1402,27 +1375,6 @@ export function FeedEmbed({
                   <SmilePlus className="w-4 h-4" />
                 </ContextMenuShortcut>
               </ContextMenuItem>
-              {isRelayGroup ? (
-                <ContextMenuItem
-                  className="cursor-pointer"
-                  onClick={() => openZapDialog("nip-57")}
-                >
-                  {t("chat.message.zap.action")}
-                  <ContextMenuShortcut>
-                    <Bitcoin className="w-4 h-4" />
-                  </ContextMenuShortcut>
-                </ContextMenuItem>
-              ) : mintList?.pubkey ? (
-                <ContextMenuItem
-                  className="cursor-pointer"
-                  onClick={() => openZapDialog("nip-61")}
-                >
-                  {t("chat.message.zap.action")}
-                  <ContextMenuShortcut>
-                    <Bitcoin className="w-4 h-4" />
-                  </ContextMenuShortcut>
-                </ContextMenuItem>
-              ) : null}
               {group ? (
                 <DeleteGroupEventItem
                   event={event}
