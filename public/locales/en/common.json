@@ -1,4 +1,12 @@
 {
+  "auth": {
+    "request": "This relay is requesting authentication",
+    "allow": "Allow",
+    "deny": "Deny",
+    "remember": "Remember this choice",
+    "authenticating": "Signing...",
+    "failed": "Authentication failed for {{relay}}"
+  },
   "locale": {
     "today": "Today"
   },
@@ -888,6 +896,20 @@
       "unreadSync": {
         "title": "Unread sync",
         "description": "Sync read status across devices using encrypted Nostr events"
+      },
+      "relay-auth": {
+        "title": "Relay authentication",
+        "description": "Manage which relays are allowed to authenticate with your identity",
+        "no-preferences": "No saved relay authentication preferences",
+        "always": "Always allow",
+        "never": "Always deny",
+        "ask": "Ask every time",
+        "allow": "Allow",
+        "deny": "Deny",
+        "remove": "Remove preference",
+        "clear-all": "Clear all preferences",
+        "select-label": "Authentication preference",
+        "delete-label": "Delete preference"
       }
     },
     "title": "Settings",

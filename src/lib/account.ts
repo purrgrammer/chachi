@@ -7,7 +7,8 @@ import NDK, {
   NDKNip07Signer,
   NDKNip46Signer,
 } from "@nostr-dev-kit/ndk";
-import { useNDK } from "@/lib/ndk";
+import { useNDK, authSigner$ } from "@/lib/ndk";
+import { updateAuthSigner } from "@/lib/ndk-auth-adapter";
 import type { Account, LoginMethod } from "@/lib/types";
 import {
   useResetState,
@@ -57,6 +58,7 @@ export function useNip07Login() {
       const signer = new NDKNip07Signer();
       const user = await signer.blockUntilReady();
       ndk.signer = signer;
+      updateAuthSigner(authSigner$, ndk);
       const account = { method: "nip07" as LoginMethod, pubkey: user.pubkey };
       setAccount(account);
       setAccounts([account, ...accounts]);
@@ -120,6 +122,7 @@ export function useNip46Login() {
         });
         const user = await signer.blockUntilReady();
         ndk.signer = signer;
+        updateAuthSigner(authSigner$, ndk);
         const account = {
           method: "nip46" as LoginMethod,
           pubkey: user.pubkey,
@@ -156,6 +159,7 @@ export function useNsecLogin() {
       const signer = new NDKPrivateKeySigner(privkey);
       const user = await signer.blockUntilReady();
       ndk.signer = signer;
+      updateAuthSigner(authSigner$, ndk);
       const account = {
         method: "nsec" as LoginMethod,
         pubkey: user.pubkey,

@@ -11,7 +11,8 @@ import NDK, {
   NDKNip46Signer,
   NDKPrivateKeySigner,
 } from "@nostr-dev-kit/ndk";
-import { useNDK } from "@/lib/ndk";
+import { useNDK, authSigner$ } from "@/lib/ndk";
+import { updateAuthSigner } from "@/lib/ndk-auth-adapter";
 import {
   accountAtom,
   accountsAtom,
@@ -70,6 +71,7 @@ function useUserEvents({
         .blockUntilReady()
         .then((user) => {
           ndk.signer = signer;
+          updateAuthSigner(authSigner$, ndk);
           setAccount({ method: "nip07", pubkey: user.pubkey });
           onLogin?.();
         })
@@ -98,6 +100,7 @@ function useUserEvents({
           .blockUntilReady()
           .then(() => {
             ndk.signer = signer;
+            updateAuthSigner(authSigner$, ndk);
             setAccount(nip46account);
             onLogin?.();
           })
@@ -112,6 +115,7 @@ function useUserEvents({
         if (nsecaccount && nsecaccount.privkey) {
           const signer = new NDKPrivateKeySigner(nsecaccount.privkey);
           ndk.signer = signer;
+          updateAuthSigner(authSigner$, ndk);
           setAccount(nsecaccount);
           onLogin?.();
         }

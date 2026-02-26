@@ -4,6 +4,7 @@ import {
   MessageSquare,
   MessageSquareDot,
   Server,
+  Shield,
   Plus,
   Trash2,
   RotateCcw,
@@ -21,22 +22,30 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useAtom } from "jotai";
 import {
   privateMessagesEnabledAtom,
   dmRelayListAtom,
   unreadSyncEnabledAtom,
 } from "@/app/store";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
-import { useNDK } from "@/lib/ndk";
+import { useNDK, authManager } from "@/lib/ndk";
 import { useRelays } from "@/lib/nostr";
 import { useRelaySet } from "@/lib/nostr";
 import { RelayLink } from "../nostr/relay";
+import type { AuthPreference } from "@/lib/relay-auth-manager";
 
 function DmRelay({
   url,
@@ -205,6 +214,116 @@ function DmRelayList({
   );
 }
 
+function RelayAuthPreferences() {
+  const { t } = useTranslation();
+  const [preferences, setPreferences] = useState<[string, AuthPreference][]>(
+    [],
+  );
+
+  useEffect(() => {
+    const prefs = authManager.getAllPreferences();
+    setPreferences(Array.from(prefs.entries()));
+  }, []);
+
+  function updatePreference(url: string, newPref: AuthPreference) {
+    authManager.setPreference(url, newPref);
+    setPreferences((prev) =>
+      prev.map(([u, p]) => (u === url ? [u, newPref] : [u, p])),
+    );
+  }
+
+  function removePreference(url: string) {
+    authManager.removePreference(url);
+    setPreferences((prev) => prev.filter(([u]) => u !== url));
+  }
+
+  function clearAll() {
+    for (const [url] of preferences) {
+      authManager.removePreference(url);
+    }
+    setPreferences([]);
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-0.5">
+        <div className="flex flex-row gap-1.5 items-center">
+          <Shield className="size-4 text-muted-foreground" />
+          <h3 className="text-sm uppercase font-light text-muted-foreground">
+            {t("settings.privacy.relay-auth.title")}
+          </h3>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {t("settings.privacy.relay-auth.description")}
+        </p>
+      </div>
+
+      {preferences.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          {t("settings.privacy.relay-auth.no-preferences")}
+        </p>
+      ) : (
+        <div className="flex flex-col gap-1">
+          {preferences.map(([url, pref]) => (
+            <div
+              key={url}
+              className="flex flex-row items-center justify-between gap-2 py-1"
+            >
+              <RelayLink
+                relay={url}
+                classNames={{
+                  name: "text-sm font-mono hover:underline hover:decoration-dotted truncate",
+                }}
+              />
+              <div className="flex flex-row items-center gap-2">
+                <Select
+                  value={pref}
+                  onValueChange={(value: AuthPreference) =>
+                    updatePreference(url, value)
+                  }
+                  aria-label={t("settings.privacy.relay-auth.select-label")}
+                >
+                  <SelectTrigger className="w-[80px] h-8">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="always">
+                      {t("settings.privacy.relay-auth.allow")}
+                    </SelectItem>
+                    <SelectItem value="never">
+                      {t("settings.privacy.relay-auth.deny")}
+                    </SelectItem>
+                    <SelectItem value="ask">
+                      {t("settings.privacy.relay-auth.ask")}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8"
+                  onClick={() => removePreference(url)}
+                  aria-label={t("settings.privacy.relay-auth.delete-label")}
+                >
+                  <Trash2 className="size-4 text-destructive" />
+                </Button>
+              </div>
+            </div>
+          ))}
+          <Button
+            variant="destructive"
+            size="sm"
+            className="self-end mt-1"
+            onClick={clearAll}
+          >
+            {t("settings.privacy.relay-auth.clear-all")}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const privacySchema = z.object({
   privateMessagesEnabled: z.boolean().default(false),
   unreadSyncEnabled: z.boolean().default(false),
@@ -328,6 +447,10 @@ export function Privacy() {
               </FormItem>
             )}
           />
+        </div>
+
+        <div className="mt-3">
+          <RelayAuthPreferences />
         </div>
       </form>
     </Form>
