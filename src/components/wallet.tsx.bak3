@@ -1,13 +1,19 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { InputCopy } from "@/components/ui/input-copy";
+import { decode } from "light-bolt11-decoder";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Token, getDecodedToken } from "@cashu/cashu-ts";
+import debounce from "lodash.debounce";
+import { Token, getDecodedToken, getEncodedToken } from "@cashu/cashu-ts";
 import { NostrEvent } from "nostr-tools";
+import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
 import { nip19 } from "nostr-tools";
+import { QRScanner } from "@/components/qr-scanner";
 import {
   Wallet as WalletIcon,
   Coins,
+  HandCoins,
   PlugZap,
+  Save,
   Puzzle,
   Cable,
   RotateCw,
@@ -15,6 +21,7 @@ import {
   Network,
   ServerCrash,
   Plus,
+  PackagePlus,
   Landmark,
   Server,
   Bitcoin,
@@ -48,12 +55,24 @@ import { Invoice } from "@/components/ln";
 import { useNDK, useNWCNDK } from "@/lib/ndk";
 import { useRelays, useEvent, useProfile } from "@/lib/nostr";
 import Amount from "@/components/amount";
+import {
+  useLnurl,
+  fetchInvoice,
+  isLightningAddress,
+  isLnInvoice,
+  isLnurl,
+} from "@/lib/lnurl";
 import { useHost } from "@/lib/hooks";
 import {
+  mintEcash,
   useNDKWallet,
   useNDKWallets,
   useCashuWallet,
+  useDeposit,
+  DepositOptions,
+  useCreateWallet,
   useTransactions,
+  useWallets,
   useNWCBalance,
   useNWCInfo,
   useNWCTransactions,
@@ -465,6 +484,222 @@ function CashuWalletTransactions({
   );
 }
 
+interface WalletActionsProps {
+  wallet: NDKWallet;
+  onDeposit: () => void;
+  isDepositing: boolean;
+  canDeposit?: boolean;
+  onWithdraw: () => void;
+  isWithdrawing: boolean;
+  canWithdraw?: boolean;
+}
+
+function WalletActions({
+  wallet,
+  onDeposit,
+  isDepositing,
+  canDeposit = true,
+  onWithdraw,
+  isWithdrawing,
+  canWithdraw = true,
+}: WalletActionsProps) {
+  const { t } = useTranslation();
+  const [pubkey, setPubkey] = useState("");
+  const [lnAddress, setLnAddress] = useState("");
+  const [lnurl, setLnurl] = useState("");
+  const [ecash, setEcash] = useState<string | null>(null);
+  const [invoice, setInvoice] = useState("");
+  const canPay = pubkey || lnAddress || lnurl || invoice;
+
+  function onPayOpenChange(open: boolean) {
+    if (!open) {
+      setPubkey("");
+      setLnAddress("");
+      setLnurl("");
+      setInvoice("");
+    }
+  }
+
+  async function onScan(content: string) {
+    try {
+      await analyzeTarget(content.trim(), {
+        onPubkey: (pubkey) => {
+          setPubkey(pubkey);
+        },
+        onLnAddress: (address) => {
+          setLnAddress(address);
+        },
+        onLnurl: (url) => {
+          setLnurl(url);
+        },
+        onInvoice: setInvoice,
+        onEcash:
+          wallet instanceof NDKCashuWallet
+            ? (token) => {
+                setEcash(token);
+              }
+            : undefined,
+      });
+    } catch (err) {
+      toast.error(t("qr.unknown"));
+      console.error(err);
+    }
+  }
+
+  return (
+    <div className="flex flex-row gap-2 justify-around">
+      <Button
+        variant="outline"
+        className="flex-1"
+        disabled={isDepositing || !canDeposit}
+        onClick={onDeposit}
+      >
+        {isDepositing ? (
+          <RotateCw className="animate-spin" />
+        ) : (
+          <ArrowDownRight />
+        )}
+        {t("wallet.deposit.title")}
+      </Button>
+      <QRScanner onScan={onScan} />
+      {canPay ? (
+        <Dialog open={Boolean(canPay)} onOpenChange={onPayOpenChange}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                <div className="flex flex-row items-center gap-1">
+                  {t("wallet.withdraw.title")}{" "}
+                  <ArrowUpRight className="text-muted-foreground" />
+                </div>
+              </DialogTitle>
+              <DialogDescription>
+                {t("wallet.withdraw.description")}
+              </DialogDescription>
+            </DialogHeader>
+            {pubkey ? (
+              <SendToPubkey
+                wallet={wallet}
+                pubkey={pubkey}
+                isWithdrawing={isWithdrawing}
+                setIsWithdrawing={() => {}}
+                onOpenChange={onPayOpenChange}
+              />
+            ) : lnAddress ? (
+              <SendToLnAddress
+                wallet={wallet}
+                lnAddress={lnAddress}
+                isWithdrawing={isWithdrawing}
+                setIsWithdrawing={() => {}}
+                onOpenChange={onPayOpenChange}
+              />
+            ) : lnurl ? (
+              <SendToLnurl
+                wallet={wallet}
+                url={lnurl}
+                isWithdrawing={isWithdrawing}
+                setIsWithdrawing={() => {}}
+                onOpenChange={onPayOpenChange}
+              />
+            ) : invoice ? (
+              <PayInvoice
+                wallet={wallet}
+                invoice={invoice}
+                isWithdrawing={isWithdrawing}
+                setIsWithdrawing={() => {}}
+                onOpenChange={onPayOpenChange}
+              />
+            ) : ecash ? (
+              <ReceiveEcash token={ecash} onOpenChange={onPayOpenChange} />
+            ) : null}
+          </DialogContent>
+        </Dialog>
+      ) : null}
+      <Button
+        variant="outline"
+        className="flex-1"
+        disabled={isWithdrawing || !canWithdraw}
+        onClick={onWithdraw}
+      >
+        {isWithdrawing ? (
+          <RotateCw className="animate-spin" />
+        ) : (
+          <ArrowUpRight />
+        )}
+        {t("wallet.withdraw.title")}
+      </Button>
+    </div>
+  );
+}
+
+interface AnalyzeTargetCallbacks {
+  onPubkey: (pubkey: string) => void;
+  onLnAddress: (lnAddress: string) => void;
+  onLnurl: (lnurl: string) => void;
+  onInvoice: (invoice: string) => void;
+  onEcash?: (ecash: string) => void;
+  //onCashuRequest?: (request: CashuRequest) => void;
+}
+
+async function _analyzeTarget(
+  content: string,
+  callbacks: AnalyzeTargetCallbacks,
+) {
+  const { onPubkey, onLnAddress, onLnurl, onInvoice, onEcash } = callbacks;
+  const isNostrProfile =
+    content.startsWith("nostr:npub") ||
+    content.startsWith("npub") ||
+    content.startsWith("nostr:nprofile") ||
+    content.startsWith("profile");
+  const lnurl = isLnurl(content);
+  const lnAddress = isLightningAddress(content);
+  const invoice = isLnInvoice(content);
+  const isEcash = cashuRegex.test(content);
+  // todo: cashu request
+  if (isNostrProfile) {
+    try {
+      const decoded = nip19.decode(content.replace(/^nostr:/, ""));
+      if (decoded?.type === "npub") {
+        onPubkey(decoded.data);
+      }
+      if (decoded?.type === "nprofile") {
+        onPubkey(decoded.data.pubkey);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  } else if (lnurl) {
+    try {
+      onLnurl(content);
+    } catch (err) {
+      console.error(err);
+    }
+  } else if (lnAddress) {
+    try {
+      onLnAddress(content);
+    } catch (err) {
+      console.error(err);
+    }
+  } else if (invoice) {
+    try {
+      const cleanInvoice = content.replace(/^lightning:/, "");
+      const decoded = decode(cleanInvoice);
+      if (decoded) {
+        onInvoice(cleanInvoice);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  } else if (isEcash && onEcash) {
+    try {
+      if (content) {
+        onEcash(content);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+}
+const analyzeTarget = debounce(_analyzeTarget, 200);
 
 //function RelayList({ relays }: { relays: string[] }) {
 //  const { t } = useTranslation();
@@ -489,6 +724,398 @@ function CashuWalletTransactions({
 //    </div>
 //  );
 //}
+interface SendProps {
+  wallet: NDKWallet;
+  isWithdrawing: boolean;
+  setIsWithdrawing: (isWithdrawing: boolean) => void;
+  onOpenChange: (open: boolean) => void;
+}
+
+interface SendToPubkeyProps extends SendProps {
+  pubkey: string;
+}
+
+function SendToPubkey({
+  wallet,
+  pubkey,
+  isWithdrawing,
+  setIsWithdrawing,
+  onOpenChange,
+}: SendToPubkeyProps) {
+  const { t } = useTranslation();
+  const { data: profile } = useProfile(pubkey);
+  const { data: lnurl } = useLnurl(profile?.lud16);
+  const [amount, setAmount] = useState("21");
+  const [message, setMessage] = useState("");
+  const isAmountValid = amount && Number(amount) > 0;
+
+  async function payToPubkey() {
+    try {
+      setIsWithdrawing(true);
+      if (!lnurl) {
+        return;
+      }
+      const invoice = await fetchInvoice(lnurl, Number(amount), message);
+      // @ts-expect-error: ree
+      await wallet.lnPay({ pr: invoice });
+      toast.success(
+        t("wallet.withdraw.p2pk-success", {
+          amount: amount,
+          name: profile?.name || profile?.display_name || pubkey.slice(0, 8),
+        }),
+      );
+      refreshWallet(wallet);
+      onOpenChange(false);
+    } catch (err) {
+      console.error(err);
+      toast.error(t("wallet.withdraw.error"));
+    } finally {
+      setIsWithdrawing(false);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-row items-center justify-between">
+        <User
+          pubkey={pubkey}
+          classNames={{
+            avatar: "size-6",
+            name: "font-normal",
+            wrapper: "gap-2",
+          }}
+        />
+        {profile?.pubkey === pubkey && profile.lud16 ? (
+          <div className="flex flex-row items-center gap-1.5">
+            <ZapIcon className="size-3 text-muted-foreground" />
+            <span className="font-mono text-xs">{profile.lud16}</span>
+          </div>
+        ) : null}
+      </div>
+      <div className="flex flex-col gap-1">
+        <Label>{t("wallet.deposit.amount")}</Label>
+        <AmountInput amount={amount} setAmount={setAmount} />
+      </div>
+      <div className="flex flex-col gap-0">
+        <Label className="mx-2">{t("wallet.withdraw.message")}</Label>
+        <AutocompleteTextarea
+          disabled={lnurl?.commentAllowed === 0}
+          className="rounded-sm shadow-none text-sm"
+          message={message}
+          placeholder={t("wallet.withdraw.message-placeholder")}
+          setMessage={setMessage}
+          minRows={3}
+          maxRows={6}
+          submitOnEnter={false}
+        />
+      </div>
+      <div className="mx-2 flex flex-row items-center gap-2">
+        <Button
+          disabled={isWithdrawing || !lnurl || !isAmountValid}
+          onClick={payToPubkey}
+          className="w-full flex-1"
+          variant="outline"
+        >
+          {isWithdrawing ? <RotateCw className="animate-spin" /> : <Coins />}
+          {t("wallet.withdraw.confirm")}
+          <User
+            pubkey={pubkey}
+            notClickable
+            classNames={{
+              wrapper: "gap-1",
+              avatar: "size-4",
+              name: "text-xs",
+            }}
+          />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+interface SendToLnAddressProps extends SendProps {
+  lnAddress: string;
+}
+
+function SendToLnAddress({
+  wallet,
+  lnAddress,
+  isWithdrawing,
+  setIsWithdrawing,
+  onOpenChange,
+}: SendToLnAddressProps) {
+  const { t } = useTranslation();
+  const { data: lnurl } = useLnurl(lnAddress);
+  const [amount, setAmount] = useState("21");
+  const [message, setMessage] = useState("");
+  const isAmountValid = amount && Number(amount) > 0;
+
+  async function payToLnAddress() {
+    try {
+      setIsWithdrawing(true);
+      if (!lnurl) {
+        return;
+      }
+      const invoice = await fetchInvoice(lnurl, Number(amount), message);
+      // @ts-expect-error: ree
+      await wallet.lnPay({ pr: invoice });
+      toast.success(
+        t("wallet.withdraw.lud16-success", {
+          amount: amount,
+          lud16: lnAddress,
+        }),
+      );
+      refreshWallet(wallet);
+      onOpenChange(false);
+    } catch (err) {
+      console.error(err);
+      toast.error(t("wallet.withdraw.error"));
+    } finally {
+      setIsWithdrawing(false);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-row items-center gap-1.5">
+        <ZapIcon className="size-3 text-muted-foreground" />
+        <span className="font-mono text-sm">{lnAddress}</span>
+      </div>
+      <div className="flex flex-col gap-1">
+        <Label>{t("wallet.deposit.amount")}</Label>
+        <AmountInput amount={amount} setAmount={setAmount} />
+      </div>
+      <div className="flex flex-col gap-0">
+        <Label className="mx-2">{t("wallet.withdraw.message")}</Label>
+        <AutocompleteTextarea
+          disabled={lnurl?.commentAllowed === 0}
+          className="rounded-sm shadow-none text-sm"
+          message={message}
+          placeholder={t("wallet.withdraw.message-placeholder")}
+          setMessage={setMessage}
+          minRows={3}
+          maxRows={6}
+          submitOnEnter={false}
+        />
+      </div>
+      <div className="mx-2 flex flex-row items-center gap-2">
+        <Button
+          disabled={isWithdrawing || !lnurl || !isAmountValid}
+          onClick={payToLnAddress}
+          className="w-full flex-1"
+          variant="outline"
+        >
+          {isWithdrawing ? <RotateCw className="animate-spin" /> : <ZapIcon />}
+          {t("wallet.withdraw.confirm")}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+interface SendToLnurlProps extends SendProps {
+  url: string;
+}
+
+function SendToLnurl({
+  wallet,
+  url,
+  isWithdrawing,
+  setIsWithdrawing,
+  onOpenChange,
+}: SendToLnurlProps) {
+  const { t } = useTranslation();
+  const [amount, setAmount] = useState("21");
+  const [message, setMessage] = useState("");
+  const isAmountValid = amount && Number(amount) > 0;
+  const { data: lnurl } = useLnurl(url);
+
+  async function payToLnurl() {
+    try {
+      setIsWithdrawing(true);
+      if (!lnurl) {
+        return;
+      }
+      const invoice = await fetchInvoice(lnurl, Number(amount), message);
+      // @ts-expect-error: ree
+      await wallet.lnPay({ pr: invoice });
+      toast.success(
+        t("wallet.withdraw.amount-success", {
+          amount: amount,
+        }),
+      );
+      refreshWallet(wallet);
+      onOpenChange(false);
+    } catch (err) {
+      console.error(err);
+      toast.error(t("wallet.withdraw.error"));
+    } finally {
+      setIsWithdrawing(false);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-row items-center gap-1.5">
+        <ZapIcon className="size-3 text-muted-foreground" />
+        <span className="font-mono line-clamp-1 text-sm">{lnurl}</span>
+      </div>
+      <div className="flex flex-col gap-1">
+        <Label>{t("wallet.deposit.amount")}</Label>
+        <AmountInput amount={amount} setAmount={setAmount} />
+      </div>
+      <div className="flex flex-col gap-0">
+        <Label className="mx-2">{t("wallet.withdraw.message")}</Label>
+        <AutocompleteTextarea
+          disabled={lnurl?.commentAllowed === 0}
+          className="rounded-sm shadow-none text-sm"
+          message={message}
+          placeholder={t("wallet.withdraw.message-placeholder")}
+          setMessage={setMessage}
+          minRows={3}
+          maxRows={6}
+          submitOnEnter={false}
+        />
+      </div>
+      <div className="mx-2 flex flex-row items-center gap-2">
+        <Button
+          disabled={isWithdrawing || !lnurl || !isAmountValid}
+          onClick={payToLnurl}
+          className="w-full flex-1"
+          variant="outline"
+        >
+          {isWithdrawing ? <RotateCw className="animate-spin" /> : <ZapIcon />}
+          {t("wallet.withdraw.confirm")}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+interface PayInvoiceProps extends SendProps {
+  invoice: string;
+}
+
+function PayInvoice({
+  wallet,
+  invoice,
+  isWithdrawing,
+  setIsWithdrawing,
+  onOpenChange,
+}: PayInvoiceProps) {
+  const { t } = useTranslation();
+
+  async function payInvoice() {
+    try {
+      setIsWithdrawing(true);
+      // @ts-expect-error: ree
+      await wallet.lnPay({ pr: invoice });
+      refreshWallet(wallet);
+      onOpenChange(false);
+    } catch (err) {
+      console.error(err);
+      toast.error(t("wallet.withdraw.error"));
+    } finally {
+      setIsWithdrawing(false);
+    }
+  }
+
+  return (
+    <Invoice
+      invoice={invoice}
+      showSummary
+      onConfirm={payInvoice}
+      canPay={!isWithdrawing}
+    />
+  );
+}
+
+function SendToWallet({
+  wallet,
+  isWithdrawing,
+  setIsWithdrawing,
+  onOpenChange,
+}: SendProps) {
+  const { t } = useTranslation();
+  const [amount, setAmount] = useState("21");
+  const [ndkWallets] = useNDKWallets();
+  const otherWallets = ndkWallets.filter(
+    (w) => walletId(w) !== walletId(wallet),
+  );
+  const [toWallet, setToWallet] = useState<NDKWallet | null>(null);
+  const isAmountValid = amount && Number(amount) > 0;
+
+  async function onWithdrawToWallet() {
+    if (!toWallet) {
+      toast.error(t("wallet.withdraw.no-wallet"));
+      return;
+    }
+    try {
+      setIsWithdrawing(true);
+      // todo: out tx if cashu
+      if (toWallet instanceof NDKNWCWallet) {
+        const result = await toWallet.makeInvoice(Number(amount) * 1000, "");
+        // @ts-expect-error: incorrect return type
+        await wallet.lnPay({ pr: result.invoice });
+        toast.success(t("wallet.withdraw.success"));
+      } else if (toWallet instanceof NDKWebLNWallet) {
+        const result = await toWallet.provider?.makeInvoice({
+          amount: Number(amount),
+        });
+        // @ts-expect-error: incorrect return type
+        await wallet.lnPay({ pr: result.paymentRequest });
+        toast.success(t("wallet.withdraw.success"));
+      } else if (toWallet instanceof NDKCashuWallet) {
+        const deposit = toWallet.deposit(
+          Number(amount) * 1000,
+          toWallet.mints[0],
+        );
+        deposit.on("success", () =>
+          toast.success(t("wallet.withdraw.success")),
+        );
+        deposit.on("error", () => toast.error(t("wallet.withdraw.error")));
+        const result = await deposit.start();
+        // @ts-expect-error: incorrect return type
+        await wallet.lnPay({ pr: result.paymentRequest });
+        toast.success(t("wallet.withdraw.success"));
+      }
+      refreshWallet(wallet);
+      refreshWallet(toWallet);
+      onOpenChange(false);
+    } catch (err) {
+      toast.error(t("wallet.withdraw.error"));
+      console.error(err);
+    } finally {
+      setIsWithdrawing(false);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        <Label>{t("wallet.deposit.amount")}</Label>
+        <AmountInput amount={amount} setAmount={setAmount} />
+      </div>
+      <CustomWalletSelector
+        placeholder={t("wallet.withdraw.to-wallet")}
+        wallets={otherWallets}
+        onWalletSelected={(w) => {
+          setToWallet(w);
+        }}
+      />
+      <Button
+        disabled={isWithdrawing || !isAmountValid || !toWallet}
+        onClick={onWithdrawToWallet}
+        className="w-full flex-1"
+        variant="outline"
+      >
+        {isWithdrawing ? <RotateCw className="animate-spin" /> : <WalletIcon />}
+        {t("wallet.withdraw.confirm")}
+        {toWallet ? <WalletName wallet={toWallet} /> : null}
+      </Button>
+    </div>
+  );
+}
 
 interface ReceiveEcashProps {
   token: string;

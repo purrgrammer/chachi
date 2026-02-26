@@ -11,6 +11,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { parseProfileIdentifier, resolveNip05 } from "@/lib/profile-identifier";
 import { useProfile, useRelayList, useAddress } from "@/lib/nostr";
+import { NewZapDialog } from "@/components/nostr/zap";
 import { useUserGroups } from "@/lib/nostr/groups";
 import { COMMUNIKEY } from "@/lib/kinds";
 import { Header } from "@/components/header";
@@ -166,6 +167,12 @@ function ProfileWelcome({
             {/* Zap Button - only show if user can receive zaps */}
             {profile?.lud16 && (
               <NewZapDialog
+                pubkey={pubkey}
+                zapType="nip-61"
+                trigger={
+                  <Button variant="default" size="sm">
+                    <Zap className="size-4" />
+                    <span className="hidden sm:inline ml-2">
                       {t("zap.action.zap", "Zap")}
                     </span>
                   </Button>

@@ -359,6 +359,55 @@ export interface DepositOptions {
   mint?: string; // cashu wallets
 }
 
+export function useDeposit(wallet: NDKWallet) {
+  const { t } = useTranslation();
+  return useCallback(
+    async (
+      options: DepositOptions,
+      onSuccess: () => void,
+      onError?: (err?: Error | string) => void,
+    ) => {
+      if (!wallet) throw new Error("No wallet");
+      if (wallet instanceof NDKCashuWallet) {
+        const deposit = wallet.deposit(options.amount, options.mint);
+        deposit.on("success", onSuccess);
+        if (onError) {
+          deposit.on("error", onError);
+        }
+        return deposit.start();
+      } else if (wallet instanceof NDKNWCWallet) {
+        // todo: detect deposit
+        try {
+          const res = await wallet.makeInvoice(
+            options.amount,
+            options.description || t("wallet.deposit"),
+          );
+          return res.invoice;
+        } catch (err) {
+          if (err instanceof Error) {
+            onError?.(err);
+          }
+        }
+      } else if (wallet instanceof NDKWebLNWallet) {
+        try {
+          const res = await wallet.provider
+            ?.makeInvoice({
+              amount: options.amount,
+              defaultMemo: options.description || t("wallet.deposit"),
+            })
+            .catch(onError);
+          return res?.paymentRequest;
+        } catch (err) {
+          if (err instanceof Error) {
+            onError?.(err);
+          }
+        }
+      }
+    },
+    [wallet],
+  );
+}
+
 export function useNWCBalance(wallet: NDKNWCWallet) {
   return useQuery({
     queryKey: [WALLET_BALANCE, walletId(wallet)],

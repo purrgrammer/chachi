@@ -1,10 +1,9 @@
 import * as React from "react";
-import { useLocation, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import Logo from "@/components/logo";
 import { NavUser } from "@/components/nav-user";
 import { NavGroups } from "@/components/nav-groups";
-import { NavPrivateGroups } from "@/components/nav-private-groups";
 import {
   Sidebar,
   SidebarContent,
@@ -16,7 +15,6 @@ import {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isMobile, setOpenMobile } = useSidebar();
-  const { pathname } = useLocation();
   return (
     <Sidebar collapsible="icon" {...props} className="z-50">
       <SidebarHeader>
@@ -33,11 +31,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </Link>
       </SidebarHeader>
       <SidebarContent>
-        {pathname === "/dm" || pathname.startsWith("/dm/") ? (
-          <NavPrivateGroups />
-        ) : (
-          <NavGroups />
-        )}
+        <NavGroups />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

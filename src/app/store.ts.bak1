@@ -83,6 +83,18 @@ export const relaysAtom = atom<Relay[]>((get) => {
   return get(relayListAtom).relays;
 });
 
+export const dmRelayListAtom = atomWithStorage<RelayList>(
+  "dm-relay-list",
+  {
+    created_at: 0,
+    relays: [],
+  },
+  createJSONStorage<RelayList>(() => localStorage),
+  { getOnInit: true },
+);
+export const dmRelaysAtom = atom<Relay[]>((get) => {
+  return get(dmRelayListAtom).relays;
+});
 
 // Cashu mints
 interface MintList {
@@ -205,4 +217,16 @@ export function useResetState() {
   };
 }
 
+export const privateMessagesEnabledAtom = atomWithStorage<boolean>(
+  "nip-17",
+  false, // Disabled by default
+  undefined,
+  { getOnInit: true },
+);
 
+export const unreadSyncEnabledAtom = atomWithStorage<boolean>(
+  "unread-sync",
+  false, // Disabled by default
+  undefined,
+  { getOnInit: true },
+);

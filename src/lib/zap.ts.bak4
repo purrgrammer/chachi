@@ -31,6 +31,20 @@ export const zapAmountsAtom = atomWithStorage<ZapAmounts>(
   { getOnInit: true },
 );
 
+function increaseZapAmount(amounts: ZapAmounts, amount: number) {
+  const n = amounts[amount] || 0;
+  return { ...amounts, [amount]: n + 1 };
+}
+
+export function useIncreaseZapAmount() {
+  const [, setAmounts] = useAtom(zapAmountsAtom);
+  return useCallback(
+    (amount: number) => {
+      setAmounts((amounts) => increaseZapAmount(amounts, amount));
+    },
+    [setAmounts],
+  );
+}
 
 export function useZapAmounts(): number[] {
   const amounts = useAtomValue(zapAmountsAtom);
@@ -92,6 +106,78 @@ export function fetchInvoice(
   ).then((r) => r.json());
 }
 
+function shuffle<T>(array: T[]): T[] {
+  return array.sort(() => Math.random() - 0.5);
+}
+
+export function useNutzap(
+  pubkey: string,
+  relays: string[],
+  event?: NostrEvent,
+) {
+  const ndk = useNDK();
+  const myRelays = useRelays();
+  const { data: mintList } = useMintList(pubkey);
+  const relaySet = useRelaySet(Array.from(new Set(relays.concat(myRelays))));
+  return useCallback(
+    async (
+      content: string,
+      amount: number,
+      tags: string[][],
+      onZap: (z: NDKNutzap) => void,
+    ) => {
+      // todo: filter mint list for mints that can mitn tokens
+      return new Promise(async (resolve, reject) => {
+        try {
+          if (!mintList) {
+            reject("No mint list found");
+            return;
+          }
+          if (!mintList?.pubkey) {
+            reject("No P2PK pubkey found");
+            return;
+          }
+
+          const zapped = event ? new NDKEvent(ndk, event) : null;
+          const zapper = new Zapper(
+            zapped ? zapped : new NDKUser({ pubkey }),
+            Number(amount) * 1000,
+            {
+              comment: content,
+              ndk,
+              tags,
+            },
+            { relays, tags },
+          );
+          zapper.on("complete", (res) => {
+            resolve(res);
+          });
+          const nutzap = await zapper.zapNip61(
+            {
+              amount: Number(amount) * 1000,
+              pubkey,
+            },
+            {
+              // @ts-expect-error: needed to override default comment
+              paymentDescription: content,
+              relays: mintList.relays,
+              mints: shuffle(mintList.mints),
+              p2pk: mintList.pubkey,
+              allowIntramintFallback: true,
+            },
+          );
+          if (nutzap instanceof NDKNutzap) {
+            onZap(nutzap);
+            nutzap.publish(relaySet);
+          }
+        } catch (err) {
+          reject(err);
+        }
+      });
+    },
+    [pubkey, relays, event],
+  );
+}
 
 
 

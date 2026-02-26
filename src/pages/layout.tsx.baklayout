@@ -57,6 +57,7 @@ function useUserEvents({
   const [communikey, setCommunikey] = useAtom(communikeyAtom);
   const [groupList, setGroupList] = useAtom(groupListAtom);
   const [relayList, setRelayList] = useAtom(relayListAtom);
+  const [dmRelayList, setDmRelayList] = useAtom(dmRelayListAtom);
   const [contactList, setContactList] = useAtom(contactListAtom);
   const [mediaServerList, setMediaServerList] = useAtom(mediaServerListAtom);
 

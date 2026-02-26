@@ -166,6 +166,12 @@ function ProfileWelcome({
             {/* Zap Button - only show if user can receive zaps */}
             {profile?.lud16 && (
               <NewZapDialog
+                pubkey={pubkey}
+                zapType="nip-61"
+                trigger={
+                  <Button variant="default" size="sm">
+                    <Zap className="size-4" />
+                    <span className="hidden sm:inline ml-2">
                       {t("zap.action.zap", "Zap")}
                     </span>
                   </Button>

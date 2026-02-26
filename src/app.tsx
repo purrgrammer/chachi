@@ -6,7 +6,6 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
-import { PrivateRoute } from "@/components/private-route";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -20,14 +19,9 @@ import { queryClient } from "@/lib/query";
 
 const Layout = lazy(() => import("@/pages/layout"));
 const Home = lazy(() => import("@/pages/home"));
-const DirectMessages = lazy(() => import("@/pages/dms"));
-const DirectMessageGroup = lazy(() => import("@/pages/dm-group"));
 const Group = lazy(() => import("@/pages/group"));
 const Event = lazy(() => import("@/pages/event"));
 const CommunityEvent = lazy(() => import("@/pages/community-event"));
-const Wallet = lazy(() => import("@/pages/wallet"));
-const NWCWallet = lazy(() => import("@/pages/wallet/nwc"));
-const WebLNWallet = lazy(() => import("@/pages/wallet/webln"));
 const Settings = lazy(() => import("@/pages/settings"));
 const Mint = lazy(() => import("@/pages/mint"));
 const Relay = lazy(() => import("@/pages/relay"));
@@ -61,22 +55,6 @@ const router = createBrowserRouter([
       {
         path: "/join/:code/:relay/:groupId",
         element: <Join />,
-      },
-      {
-        path: "/dm",
-        element: (
-          <PrivateRoute>
-            <DirectMessages />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "/dm/:id",
-        element: (
-          <PrivateRoute>
-            <DirectMessageGroup />
-          </PrivateRoute>
-        ),
       },
       {
         path: ":host",
@@ -153,18 +131,6 @@ const router = createBrowserRouter([
       {
         path: ":host/:id/e/:nlink",
         element: <Event />,
-      },
-      {
-        path: "/wallet",
-        element: <Wallet />,
-      },
-      {
-        path: "/wallet/nwc/:connection",
-        element: <NWCWallet />,
-      },
-      {
-        path: "/wallet/webln",
-        element: <WebLNWallet />,
       },
       {
         path: "/settings",

@@ -359,6 +359,88 @@ export interface DepositOptions {
   mint?: string; // cashu wallets
 }
 
+export function useDeposit(wallet: NDKWallet) {
+  const { t } = useTranslation();
+  return useCallback(
+    async (
+      options: DepositOptions,
+      onSuccess: () => void,
+      onError?: (err?: Error | string) => void,
+    ) => {
+      if (!wallet) throw new Error("No wallet");
+      if (wallet instanceof NDKCashuWallet) {
+        const deposit = wallet.deposit(options.amount, options.mint);
+        deposit.on("success", onSuccess);
+        if (onError) {
+          deposit.on("error", onError);
+        }
+        return deposit.start();
+      } else if (wallet instanceof NDKNWCWallet) {
+        // todo: detect deposit
+        try {
+          const res = await wallet.makeInvoice(
+            options.amount,
+            options.description || t("wallet.deposit"),
+          );
+          return res.invoice;
+        } catch (err) {
+          if (err instanceof Error) {
+            onError?.(err);
+          }
+        }
+      } else if (wallet instanceof NDKWebLNWallet) {
+        try {
+          const res = await wallet.provider
+            ?.makeInvoice({
+              amount: options.amount,
+              defaultMemo: options.description || t("wallet.deposit"),
+            })
+            .catch(onError);
+          return res?.paymentRequest;
+        } catch (err) {
+          if (err instanceof Error) {
+            onError?.(err);
+          }
+        }
+      }
+    },
+    [wallet],
+  );
+}
+
+export function useCreateWallet() {
+  const ndk = useNDK();
+  const myRelays = useRelays();
+  const [, setWallets] = useAtom(walletsAtom);
+  return async (mints: string[], relays: string[]) => {
+    const wallet = new NDKCashuWallet(ndk);
+    wallet.mints = mints;
+    wallet.relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
+    let p2pk = wallet.p2pks[0];
+    if (!p2pk) {
+      const secret = generateSecretKey();
+      p2pk = getPublicKey(secret);
+      await wallet.addPrivkey(Buffer.from(secret).toString("hex"));
+    }
+    if (!p2pk) {
+      throw new Error("Failed to create wallet");
+    }
+    const ev = new NDKEvent(ndk, {
+      kind: NDKKind.CashuMintList,
+      tags: [
+        ...relays.map((r) => ["relay", r]),
+        ...mints.map((m) => ["mint", m]),
+        ["pubkey", p2pk],
+      ],
+    } as NostrEvent);
+    const allRelays = Array.from(new Set([...relays, ...myRelays]));
+    await ev.publish(NDKRelaySet.fromRelayUrls(allRelays, ndk));
+    await wallet.publish();
+    // Wallet created successfully
+    setWallets((wallets) => [...wallets, { type: "nip60" }]);
+  };
+}
+
 export function useNWCBalance(wallet: NDKNWCWallet) {
   return useQuery({
     queryKey: [WALLET_BALANCE, walletId(wallet)],
@@ -571,3 +653,76 @@ export function walletId(w: NDKWallet): string {
   return w.walletId;
 }
 
+export async function createOutTxEvent(
+  ndk: NDK,
+  paymentRequest: { amount: number; description: string },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  paymentResult: any,
+  relaySet?: NDKRelaySet,
+): Promise<NDKCashuWalletTx> {
+  const { description, amount } = paymentRequest;
+  const txEvent = new NDKCashuWalletTx(ndk);
+
+  txEvent.direction = "out";
+  txEvent.amount = amount ?? 0;
+  txEvent.mint = paymentResult.mint;
+  txEvent.description = description;
+  if (paymentResult.fee) txEvent.fee = paymentResult.fee;
+
+  if (paymentResult.stateUpdate?.created)
+    txEvent.createdTokens = [paymentResult.stateUpdate.created];
+  if (paymentResult.stateUpdate?.deleted)
+    txEvent.destroyedTokenIds = paymentResult.stateUpdate.deleted;
+  if (paymentResult.stateUpdate?.reserved)
+    txEvent.reservedTokens = [paymentResult.stateUpdate.reserved];
+
+  await txEvent.sign();
+  txEvent.publish(relaySet);
+
+  return txEvent;
+}
+
+export async function mintEcash(
+  wallet: NDKCashuWallet,
+  mint: string,
+  amount: number,
+  description = "",
+): Promise<Token | undefined> {
+  const cashuWallet = await wallet.getCashuWallet(mint);
+  const mintProofs = await wallet.state.getProofs({ mint });
+  const result = await cashuWallet.send(amount, mintProofs, {
+    proofsWeHave: mintProofs,
+    includeFees: true,
+    outputAmounts: {
+      sendAmounts: [amount],
+    },
+  });
+
+  if (result?.send.length > 0) {
+    const destroy = result.send.filter((p: Proof) =>
+      wallet.state.proofs.get(p.C),
+    );
+    const change = { store: result?.keep ?? [], destroy, mint };
+    const updateRes = await wallet.state.update(change);
+
+    // create a change event
+    createOutTxEvent(
+      wallet.ndk,
+      {
+        description,
+        amount,
+      },
+      {
+        result: { proofs: result.send, mint },
+        proofsChange: change,
+        stateUpdate: updateRes,
+        mint,
+        fee: 0,
+      },
+      wallet.relaySet,
+    );
+    wallet.emit("balance_updated");
+
+    return { mint, proofs: result.send, memo: description, unit: "sat" };
+  }
+}

@@ -7,7 +7,6 @@ import {
   SmilePlus,
   Trash,
   ShieldBan,
-  Bitcoin,
 } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { useNavigate } from "react-router-dom";
@@ -28,7 +27,6 @@ import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import { Reactions } from "@/components/nostr/reactions";
 import { Zap } from "@/components/nostr/zap";
-import { NewZapDialog } from "@/components/nostr/zap";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -70,7 +68,6 @@ export function ChatZap({
   const isInView = useInView(ref);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
   const navigate = useNavigate();
-  const [showingZapDialog, setShowingZapDialog] = useState(false);
   const pubkey = usePubkey();
   const isMine = zap?.pubkey === pubkey;
   const amIAdmin = pubkey && admins.includes(pubkey);
@@ -229,15 +226,6 @@ export function ChatZap({
               <SmilePlus className="w-4 h-4" />
             </ContextMenuShortcut>
           </ContextMenuItem>
-          <ContextMenuItem
-            className="cursor-pointer"
-            onClick={() => setShowingZapDialog(true)}
-          >
-            {t("chat.message.tip.action")}
-            <ContextMenuShortcut>
-              <Bitcoin className="w-4 h-4" />
-            </ContextMenuShortcut>
-          </ContextMenuItem>
           <ContextMenuSeparator />
           <ContextMenuItem
             className="cursor-pointer"
@@ -305,15 +293,6 @@ export function ChatZap({
         onOpenChange={(open) => setShowingEmojiPicker(open)}
         onEmojiSelect={onEmojiSelect}
       />
-      {showingZapDialog ? (
-        <NewZapDialog
-          open
-          event={event}
-          pubkey={event.pubkey}
-          group={group}
-          onClose={() => setShowingZapDialog(false)}
-        />
-      ) : null}
     </>
   );
 }

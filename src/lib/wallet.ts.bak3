@@ -359,6 +359,88 @@ export interface DepositOptions {
   mint?: string; // cashu wallets
 }
 
+export function useDeposit(wallet: NDKWallet) {
+  const { t } = useTranslation();
+  return useCallback(
+    async (
+      options: DepositOptions,
+      onSuccess: () => void,
+      onError?: (err?: Error | string) => void,
+    ) => {
+      if (!wallet) throw new Error("No wallet");
+      if (wallet instanceof NDKCashuWallet) {
+        const deposit = wallet.deposit(options.amount, options.mint);
+        deposit.on("success", onSuccess);
+        if (onError) {
+          deposit.on("error", onError);
+        }
+        return deposit.start();
+      } else if (wallet instanceof NDKNWCWallet) {
+        // todo: detect deposit
+        try {
+          const res = await wallet.makeInvoice(
+            options.amount,
+            options.description || t("wallet.deposit"),
+          );
+          return res.invoice;
+        } catch (err) {
+          if (err instanceof Error) {
+            onError?.(err);
+          }
+        }
+      } else if (wallet instanceof NDKWebLNWallet) {
+        try {
+          const res = await wallet.provider
+            ?.makeInvoice({
+              amount: options.amount,
+              defaultMemo: options.description || t("wallet.deposit"),
+            })
+            .catch(onError);
+          return res?.paymentRequest;
+        } catch (err) {
+          if (err instanceof Error) {
+            onError?.(err);
+          }
+        }
+      }
+    },
+    [wallet],
+  );
+}
+
+export function useCreateWallet() {
+  const ndk = useNDK();
+  const myRelays = useRelays();
+  const [, setWallets] = useAtom(walletsAtom);
+  return async (mints: string[], relays: string[]) => {
+    const wallet = new NDKCashuWallet(ndk);
+    wallet.mints = mints;
+    wallet.relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
+    let p2pk = wallet.p2pks[0];
+    if (!p2pk) {
+      const secret = generateSecretKey();
+      p2pk = getPublicKey(secret);
+      await wallet.addPrivkey(Buffer.from(secret).toString("hex"));
+    }
+    if (!p2pk) {
+      throw new Error("Failed to create wallet");
+    }
+    const ev = new NDKEvent(ndk, {
+      kind: NDKKind.CashuMintList,
+      tags: [
+        ...relays.map((r) => ["relay", r]),
+        ...mints.map((m) => ["mint", m]),
+        ["pubkey", p2pk],
+      ],
+    } as NostrEvent);
+    const allRelays = Array.from(new Set([...relays, ...myRelays]));
+    await ev.publish(NDKRelaySet.fromRelayUrls(allRelays, ndk));
+    await wallet.publish();
+    // Wallet created successfully
+    setWallets((wallets) => [...wallets, { type: "nip60" }]);
+  };
+}
+
 export function useNWCBalance(wallet: NDKNWCWallet) {
   return useQuery({
     queryKey: [WALLET_BALANCE, walletId(wallet)],

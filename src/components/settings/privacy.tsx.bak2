@@ -1,5 +1,9 @@
 import { useTranslation } from "react-i18next";
 import {
+  VenetianMask,
+  MessageSquare,
+  MessageSquareDot,
+  Server,
   Shield,
   Plus,
   Trash2,
@@ -10,7 +14,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
   Form,
+  FormField,
+  FormItem,
+  FormControl,
+  FormLabel,
+  FormDescription,
+  FormMessage,
 } from "@/components/ui/form";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -18,9 +29,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAtom } from "jotai";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { useNDK, authManager } from "@/lib/ndk";
@@ -264,6 +277,81 @@ export function Privacy() {
               {t("settings.privacy.title")}
             </h4>
           </div>
+
+          <FormField
+            control={form.control}
+            name="privateMessagesEnabled"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between p-1">
+                <div className="space-y-0.5">
+                  <FormLabel className="flex items-center gap-2">
+                    <MessageSquare className="size-4 text-muted-foreground" />
+                    {t("settings.privacy.privateMessages.title")}
+                  </FormLabel>
+                  <FormDescription>
+                    {t("settings.privacy.privateMessages.description")}
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={(checked) => {
+                      field.onChange(checked);
+                      togglePrivateMessages(checked);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {privateMessagesEnabled && (
+          <div className="flex flex-col gap-3 mt-2">
+            <div className="flex flex-col gap-0.5">
+              <div className="flex flex-row gap-1.5 items-center">
+                <Server className="size-4 text-muted-foreground" />
+                <h3 className="text-sm uppercase font-light text-muted-foreground">
+                  {t("settings.privacy.dm-relays.title")}
+                </h3>
+              </div>
+              <p className="text-xs">
+                {t("settings.privacy.dm-relays.description")}
+              </p>
+            </div>
+            <DmRelayList relays={dmRelayList.relays} />
+          </div>
+        )}
+
+        <div className="flex flex-col gap-1.5 mt-3">
+          <FormField
+            control={form.control}
+            name="unreadSyncEnabled"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between p-1">
+                <div className="space-y-0.5">
+                  <FormLabel className="flex items-center gap-2">
+                    <MessageSquareDot className="size-4 text-muted-foreground" />
+                    {t("settings.privacy.unreadSync.title")}
+                  </FormLabel>
+                  <FormDescription>
+                    {t("settings.privacy.unreadSync.description")}
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={(checked) => {
+                      field.onChange(checked);
+                      toggleUnreadSync(checked);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <div className="mt-3">

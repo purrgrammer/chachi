@@ -31,6 +31,20 @@ export const zapAmountsAtom = atomWithStorage<ZapAmounts>(
   { getOnInit: true },
 );
 
+function increaseZapAmount(amounts: ZapAmounts, amount: number) {
+  const n = amounts[amount] || 0;
+  return { ...amounts, [amount]: n + 1 };
+}
+
+export function useIncreaseZapAmount() {
+  const [, setAmounts] = useAtom(zapAmountsAtom);
+  return useCallback(
+    (amount: number) => {
+      setAmounts((amounts) => increaseZapAmount(amounts, amount));
+    },
+    [setAmounts],
+  );
+}
 
 export function useZapAmounts(): number[] {
   const amounts = useAtomValue(zapAmountsAtom);
