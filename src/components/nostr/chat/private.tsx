@@ -196,6 +196,13 @@ export function ChatMessage({
     },
     event.tags,
   );
+  // Create stable identifier for fragments array
+  const fragmentsKey = useMemo(
+    () => fragments.map(f => `${f.type}:${f.type === 'block' ? f.nodes.length : 0}`).join('|'),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [fragments.length]
+  );
+
   const eventFragmentIds = useMemo(() => {
     return fragments.flatMap((f) => {
       if (f.type === "block") {
@@ -208,7 +215,8 @@ export function ChatMessage({
         return [];
       }
     });
-  }, [fragments]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fragmentsKey]);
   const showReply = replyTo && !eventFragmentIds.includes(replyTo);
   const isSingleCustomEmoji =
     fragments.length === 1 &&

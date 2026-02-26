@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
@@ -294,9 +294,16 @@ export function useNewMessage(group: Group) {
 
 export function useSortedGroups() {
   const groups = useAtomValue(groupsAtom);
+
+  // Create stable identifier for groups array
+  const groupIds = useMemo(
+    () => groups.map(g => g.id).sort().join(','),
+    [groups.length]
+  );
+
   return useLiveQuery(
     () => getGroupsSortedByLastMessage(groups),
-    groups,
+    [groupIds],
     groups,
   );
 }

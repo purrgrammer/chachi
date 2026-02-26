@@ -778,6 +778,13 @@ export function useGroupInviteCodes(group: Group) {
     [group.relay],
   );
 
+  // Create stable identifier for deletion events array
+  const deletionEventIds = useMemo(
+    () => deletionEvents.events.map(e => e.id).sort().join(','),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [deletionEvents.eose, deletionEvents.events.length]
+  );
+
   // Get codes that have been deleted
   const deletedCodes = useMemo(() => {
     return deletionEvents.events
@@ -786,7 +793,15 @@ export function useGroupInviteCodes(group: Group) {
         return codeTag ? codeTag[1] : null;
       })
       .filter(Boolean);
-  }, [deletionEvents.events]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deletionEventIds]);
+
+  // Create stable identifier for invite events array
+  const inviteEventIds = useMemo(
+    () => inviteEvents.events.map(e => e.id).sort().join(','),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [inviteEvents.eose, inviteEvents.events.length]
+  );
 
   // Filter and process invite codes
   const inviteCodes = useMemo(() => {
@@ -810,7 +825,8 @@ export function useGroupInviteCodes(group: Group) {
       })
       .filter((invite) => invite.code && !deletedCodes.includes(invite.code)) // Filter out deleted codes
       .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)); // Sort by newest first
-  }, [inviteEvents.events, deletedCodes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inviteEventIds, deletedCodes]);
 
   return { data: inviteCodes };
 }

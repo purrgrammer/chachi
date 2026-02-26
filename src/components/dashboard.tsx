@@ -53,13 +53,21 @@ function Communities() {
   const { t } = useTranslation();
 
   const relays = useRelays();
-  const { events } = useRequest(
+  const { events, eose } = useRequest(
     {
       kinds: [COMMUNIKEY],
       limit: 50,
     },
     relays,
   );
+
+  // Create stable identifier for events array
+  const eventIds = useMemo(
+    () => events.map(e => e.id).sort().join(','),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [events.length, eose]
+  );
+
   const communities = useMemo(() => {
     const byPubkey = Object.groupBy(events, (e: NostrEvent) => e.pubkey);
     return Object.values(byPubkey).map((evs) => {
@@ -68,7 +76,8 @@ function Communities() {
         return acc;
       }, evs[0]);
     }) as NostrEvent[];
-  }, [events]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventIds]);
   return communities.length > 0 ? (
     <div className="space-y-2">
       <Heading

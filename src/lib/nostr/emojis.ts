@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { useLiveQuery } from "dexie-react-hooks";
 import NDK, {
@@ -212,8 +212,8 @@ export function useSyncEmojiSets() {
     return () => sub.stop();
   }, [pubkey]);
 
-  // Memoize emoji addresses to prevent unnecessary re-subscriptions
-  const emojiAddresses = useMemo(() => emojiList.emojis, [emojiList.emojis]);
+  // Direct assignment - emojiList.emojis is already stable from emojiList object
+  const emojiAddresses = emojiList.emojis;
 
   useEffect(() => {
     if (!ndk || emojiAddresses.length === 0) return;

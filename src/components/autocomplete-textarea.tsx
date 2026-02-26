@@ -125,8 +125,8 @@ export function AutocompleteTextarea({
 
   // Emojis
   const { data: myCustomEmojis } = useCustomEmojis();
-  const customEmoji = myCustomEmojis?.map((coll) => coll.emojis).flat() || [];
   const allEmojis = useMemo(() => {
+    const customEmoji = myCustomEmojis?.map((coll) => coll.emojis).flat() || [];
     return dedupeBy((customEmoji as Emoji[]).concat(emojis), "name");
   }, [myCustomEmojis]);
   const [customEmojis, setCustomEmojis] = useState<Emoji[]>([]);
