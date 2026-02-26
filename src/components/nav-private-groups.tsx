@@ -1,5 +1,5 @@
+import { memo } from "react";
 import { Bookmark, MessageSquarePlus, Users } from "lucide-react";
-import { Reorder } from "framer-motion";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { LazyRichText } from "@/components/lazy/LazyRichText";
@@ -11,16 +11,9 @@ import { CreateGroup } from "@/components/nostr/dm/create";
 import { SidebarMenu, SidebarMenuItem } from "@/components/ui/sidebar";
 import { useNavigate } from "@/lib/navigation";
 import {
-  //  useLastMessage,
-  useUnreadMessages,
-  //  //useUnreadMentions,
+  useSortedGroupsWithData,
+  type GroupWithData,
 } from "@/lib/nostr/dm";
-import {
-  useSortedGroups,
-  useSortedGroupRequests,
-  useLastMessage,
-} from "@/lib/nostr/dm";
-import type { PrivateGroup } from "@/lib/types";
 import { useMyGroups } from "@/lib/groups";
 import { useUnreads } from "@/lib/messages";
 import { usePubkey } from "@/lib/account";
@@ -83,102 +76,114 @@ function GroupAvatar({ pubkeys }: { pubkeys: string[] }) {
   );
 }
 
-function GroupItem({ group }: { group: PrivateGroup }) {
-  const lastMessage = useLastMessage(group);
-  const navigate = useNavigate();
-  const { id } = useParams();
-  const unreadMessages = useUnreadMessages(group);
-  const isActive = id === group.id;
-  const isSingle = group.pubkeys.length === 1;
-  const me = usePubkey();
-  const recipients = group.pubkeys.filter((p) => p !== me);
-  const firstPubkey = recipients[0];
-  const { t } = useTranslation();
-  const isSavedMessages = isSingle && group.pubkeys[0] === me;
+const GroupItem = memo(
+  function GroupItem({
+    group,
+    lastMessage,
+    unreadCount,
+  }: {
+    group: GroupWithData;
+    lastMessage: GroupWithData["lastMessage"];
+    unreadCount: number;
+  }) {
+    const navigate = useNavigate();
+    const { id } = useParams();
+    const isActive = id === group.id;
+    const isSingle = group.pubkeys.length === 1;
+    const me = usePubkey();
+    const recipients = group.pubkeys.filter((p) => p !== me);
+    const firstPubkey = recipients[0];
+    const { t } = useTranslation();
+    const isSavedMessages = isSingle && group.pubkeys[0] === me;
 
-  function openGroup() {
-    navigate(`/dm/${group.id}`);
-  }
+    function openGroup() {
+      navigate(`/dm/${group.id}`);
+    }
 
-  return (
-    <div
-      className={`flex flex-row gap-2 items-center p-1 py-2 cursor-pointer ${isActive ? "bg-accent/50" : "bg-background"} hover:bg-accent/80 overflow-hidden group-has-[[data-collapsible=icon]]/sidebar-wrapper:bg-transparent group-has-[[data-collapsible=icon]]/sidebar-wrapper:py-1`}
-      onClick={openGroup}
-    >
+    return (
       <div
-        className={`size-10 ${isActive ? "group-has-[[data-collapsible=icon]]/sidebar-wrapper:ring-2 ring-primary ring-offset-1 ring-offset-background" : ""} relative`}
+        className={`flex flex-row gap-2 items-center p-1 py-2 cursor-pointer ${isActive ? "bg-accent/50" : "bg-background"} hover:bg-accent/80 overflow-hidden group-has-[[data-collapsible=icon]]/sidebar-wrapper:bg-transparent group-has-[[data-collapsible=icon]]/sidebar-wrapper:py-1`}
+        onClick={openGroup}
       >
-        {isSavedMessages ? (
-          <Bookmark className="size-10 text-muted-foreground" />
-        ) : isSingle ? (
-          <Avatar
-            pubkey={firstPubkey ? firstPubkey : group.pubkeys[0]}
-            className="size-10"
-          />
-        ) : (
-          <GroupAvatar pubkeys={group.pubkeys} />
-        )}
-      </div>
-      <div
-        className={`flex flex-row gap-1 absolute top-3 right-2 group-has-[[data-collapsible=icon]]/sidebar-wrapper:top-0 group-has-[[data-collapsible=icon]]/sidebar-wrapper:right-0`}
-      >
-        {unreadMessages && unreadMessages > 0 ? (
-          <Badge variant="counter">
-            <span className="font-mono text-xs font-light">
-              {unreadMessages >= 100 ? "99+" : unreadMessages}
-            </span>
-          </Badge>
-        ) : null}
-      </div>
-      <div className="flex flex-row gap-2 items-center">
-        <div className="flex flex-col">
-          <h3 className="line-clamp-1">
-            {isSavedMessages ? (
-              <span className="text-muted-foreground">
-                {t("private-group.saved-messages")}
+        <div
+          className={`size-10 ${isActive ? "group-has-[[data-collapsible=icon]]/sidebar-wrapper:ring-2 ring-primary ring-offset-1 ring-offset-background" : ""} relative`}
+        >
+          {isSavedMessages ? (
+            <Bookmark className="size-10 text-muted-foreground" />
+          ) : isSingle ? (
+            <Avatar
+              pubkey={firstPubkey ? firstPubkey : group.pubkeys[0]}
+              className="size-10"
+            />
+          ) : (
+            <GroupAvatar pubkeys={group.pubkeys} />
+          )}
+        </div>
+        <div
+          className={`flex flex-row gap-1 absolute top-3 right-2 group-has-[[data-collapsible=icon]]/sidebar-wrapper:top-0 group-has-[[data-collapsible=icon]]/sidebar-wrapper:right-0`}
+        >
+          {unreadCount > 0 ? (
+            <Badge variant="counter">
+              <span className="font-mono text-xs font-light">
+                {unreadCount >= 100 ? "99+" : unreadCount}
               </span>
-            ) : isSingle ? (
-              <Name pubkey={firstPubkey ? firstPubkey : group.pubkeys[0]} />
-            ) : (
-              <NameList
-                notClickable
-                className="line-clamp-1"
-                pubkeys={group.pubkeys}
-                avatarClassName="hidden"
-                textClassName="font-normal"
-              />
-            )}
-          </h3>
-          {lastMessage ? (
-            <LazyRichText
-              className="text-xs text-muted-foreground leading-none line-clamp-1"
-              options={{
-                inline: true,
-                emojis: true,
-                mentions: true,
-                events: false,
-                urls: false,
-                hashtags: true,
-                ecash: false,
-                images: false,
-                audio: false,
-                video: false,
-                youtube: false,
-              }}
-              classNames={{
-                emojis: "pointer-events-none size-4 opacity-70",
-                spans: "break-all",
-              }}
-              tags={lastMessage.tags}
-            >
-              {lastMessage.content}
-            </LazyRichText>
+            </Badge>
           ) : null}
         </div>
+        <div className="flex flex-row gap-2 items-center">
+          <div className="flex flex-col">
+            <h3 className="line-clamp-1">
+              {isSavedMessages ? (
+                <span className="text-muted-foreground">
+                  {t("private-group.saved-messages")}
+                </span>
+              ) : isSingle ? (
+                <Name pubkey={firstPubkey ? firstPubkey : group.pubkeys[0]} />
+              ) : (
+                <NameList
+                  notClickable
+                  className="line-clamp-1"
+                  pubkeys={group.pubkeys}
+                  avatarClassName="hidden"
+                  textClassName="font-normal"
+                />
+              )}
+            </h3>
+            {lastMessage ? (
+              <LazyRichText
+                className="text-xs text-muted-foreground leading-none line-clamp-1"
+                options={{
+                  inline: true,
+                  emojis: true,
+                  mentions: true,
+                  events: false,
+                  urls: false,
+                  hashtags: true,
+                  ecash: false,
+                  images: false,
+                  audio: false,
+                  video: false,
+                  youtube: false,
+                }}
+                classNames={{
+                  emojis: "pointer-events-none size-4 opacity-70",
+                  spans: "break-all",
+                }}
+                tags={lastMessage.tags}
+              >
+                {lastMessage.content}
+              </LazyRichText>
+            ) : null}
+          </div>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  },
+  (prev, next) =>
+    prev.group.id === next.group.id &&
+    prev.unreadCount === next.unreadCount &&
+    prev.lastMessage?.created_at === next.lastMessage?.created_at,
+);
 
 function PublicGroups() {
   const navigate = useNavigate();
@@ -219,7 +224,7 @@ function MyGroupList({
   groups,
   showPublicGroups = true,
 }: {
-  groups: PrivateGroup[];
+  groups: GroupWithData[];
   showPublicGroups?: boolean;
 }) {
   const { t } = useTranslation();
@@ -227,20 +232,15 @@ function MyGroupList({
     <SidebarMenu className="gap-0">
       {showPublicGroups ? <PublicGroups /> : null}
       {groups.length > 0 ? (
-        <Reorder.Group
-          axis="y"
-          layoutScroll
-          values={groups}
-          onReorder={() => console.log("reorder")}
-        >
-          {groups.map((group) => (
-            <Reorder.Item dragListener={false} key={group.id} value={group}>
-              <SidebarMenuItem>
-                <GroupItem group={group} />
-              </SidebarMenuItem>
-            </Reorder.Item>
-          ))}
-        </Reorder.Group>
+        groups.map((group) => (
+          <SidebarMenuItem key={group.id}>
+            <GroupItem
+              group={group}
+              lastMessage={group.lastMessage}
+              unreadCount={group.unreadCount}
+            />
+          </SidebarMenuItem>
+        ))
       ) : (
         <div className="flex justify-center items-center">
           <span className="text-sm text-muted-foreground">
@@ -252,7 +252,7 @@ function MyGroupList({
   );
 }
 
-function MyGroupRequests({ groups }: { groups: PrivateGroup[] }) {
+function MyGroupRequests({ groups }: { groups: GroupWithData[] }) {
   const { t } = useTranslation();
   return (
     <>
@@ -279,13 +279,12 @@ function MyGroupRequests({ groups }: { groups: PrivateGroup[] }) {
 }
 
 export function NavPrivateGroups() {
-  const myGroups = useSortedGroups();
-  const myGroupRequests = useSortedGroupRequests();
+  const { groups, requests } = useSortedGroupsWithData();
   return (
     <>
-      <MyGroupList groups={myGroups} />
+      <MyGroupList groups={groups} />
       <CreateGroup className="group-has-[[data-collapsible=icon]]/sidebar-wrapper:hidden" />
-      <MyGroupRequests groups={myGroupRequests || []} />
+      <MyGroupRequests groups={requests} />
     </>
   );
 }

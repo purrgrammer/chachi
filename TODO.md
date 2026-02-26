@@ -17,6 +17,18 @@
 - ✅ **CLOSED #65** - Only AUTH when relay requests it (reactive, not proactive)
 - 📝 Note: AUTH infinite loops (#80) still requires investigation
 
+### Direct Messages (NIP-17) Improvements ✅
+- ✅ Fixed gift wrap receiving (messages now appear on receiver side)
+- ✅ Added comprehensive relay discovery with 7-step fallback chain
+- ✅ Improved DM subscription logging and error visibility
+- ✅ Switched to limit-based sync (500 messages) instead of time-based filters
+- ✅ Added signer and relay availability checks before subscription
+- ✅ Simplified send error handling (removed dangerous "treat failure as success" logic)
+- ✅ Performance optimizations using compound indexes for unread counts
+- ✅ Created `useGroupRelaySetMap` for efficient per-recipient relay routing
+- 🔧 **PROGRESS #84** - NIP-17 relay improvements (receiving fixed, discovery enhanced)
+- 🔧 **PROGRESS #72** - Better DM UX (comprehensive logging, error visibility)
+
 ## LG - High Priority
 
 Critical bugs, security/privacy concerns, and core UX blockers.

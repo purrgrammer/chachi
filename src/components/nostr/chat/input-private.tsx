@@ -2,11 +2,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Send } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
-import { NDKRelaySet, NDKEvent, NDKKind, NDKUser } from "@nostr-dev-kit/ndk";
+import { NDKEvent, NDKKind, NDKUser } from "@nostr-dev-kit/ndk";
 //import { UploadEncryptedFile } from "@/components/upload-file";
 import { GIFPicker } from "@/components/gif-picker";
 import { Button } from "@/components/ui/button";
-import { useGroupRelays } from "@/lib/nostr/dm";
+import { useGroupRelaySetMap } from "@/lib/nostr/dm";
 import { cn } from "@/lib/utils";
 import { usePubkey } from "@/lib/account";
 import { giftWrap } from "@/lib/nip-59";
@@ -45,7 +45,7 @@ export function ChatInput({
 }) {
   const [isPosting, setIsPosting] = useState(false);
   const ndk = useNDK();
-  const relayList = useGroupRelays(group);
+  const relaySetMap = useGroupRelaySetMap(group);
   const me = usePubkey();
   const canPoast = Boolean(ndk.signer);
   // message
@@ -89,15 +89,15 @@ export function ChatInput({
         event.pubkey = me!;
         event.created_at = Math.floor(Date.now() / 1000);
         event.id = event.getEventHash();
-        await Promise.allSettled(
+        const results = await Promise.allSettled(
           group.pubkeys.map(async (pubkey) => {
-            const list = relayList
-              .filter((r) => r)
-              .find((r) => r!.pubkey === pubkey);
-            if (!list) return;
-            const relays = list.dm || list.fallback;
+            const relaySet = relaySetMap.get(pubkey);
+            if (!relaySet) {
+              throw new Error(`No relays for ${pubkey.slice(0, 8)}`);
+            }
+
             const gift = await giftWrap(event, new NDKUser({ pubkey }));
-            const relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
+
             if (pubkey === me) {
               await savePrivateEvent(
                 event.rawEvent() as unknown as NostrEvent,
@@ -105,9 +105,21 @@ export function ChatInput({
               );
               onNewMessage?.(event.rawEvent() as NostrEvent);
             }
-            return gift.publish(relaySet);
+
+            await gift.publish(relaySet);
           }),
         );
+
+        // Check for failures
+        const failures = results.filter(r => r.status === 'rejected');
+        if (failures.length > 0) {
+          const succeeded = results.length - failures.length;
+          if (succeeded === 0) {
+            toast.error(t("send.all-failed"));
+          } else {
+            toast.warning(t("send.partial-failure", { succeeded, failed: failures.length }));
+          }
+        }
       } catch (err) {
         console.error(err);
         toast.error(t("send.error"));

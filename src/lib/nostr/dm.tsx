@@ -2,7 +2,7 @@ import { useQuery, useQueries } from "@tanstack/react-query";
 import { useLiveQuery } from "dexie-react-hooks";
 import { NDKEvent } from "@nostr-dev-kit/ndk";
 import { useAtomValue } from "jotai";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import {
   getLastGroupMessage,
   getGroupReactions,
@@ -22,13 +22,24 @@ import { giftUnwrap } from "@/lib/nip-59";
 import { useRelaySet } from "@/lib/nostr";
 import { useNDK } from "@/lib/ndk";
 import { discoveryRelays } from "@/lib/relay";
-import { usePubkey, useFollows, useDMRelays } from "@/lib/account";
+import { usePubkey, useFollows } from "@/lib/account";
+import { useRelays } from "@/lib/nostr";
 import { PrivateGroup as Group, PrivateGroup } from "@/lib/types";
 import { useOnWebRTCSignal } from "@/components/webrtc";
 import { WEBRTC_SIGNAL } from "@/lib/kinds";
 import { privateMessagesEnabledAtom } from "@/app/store";
 import { triggerLastSeenSync } from "@/lib/lastSeenSyncTrigger";
 import Dexie from "dexie";
+
+export interface UserRelayList {
+  pubkey: string;
+  dm: string[];           // NIP-17 kind 10050 relays
+  outbox: string[];       // NIP-65 kind 10002 relays
+  fallback: string[];     // Discovery/user relay fallback
+  source: 'nip17' | 'nip65' | 'discovery' | 'user-relays';
+  timestamp: number;
+  error?: string;
+}
 
 export function groupId(event: NostrEvent) {
   const p = event.tags
@@ -126,72 +137,174 @@ function useStreamMap(
       relaySet,
     );
 
+    console.log('[Gift Wrap] Subscription started');
+
     sub.on("event", (event) => {
-      transform(event);
+      transform(event).catch(err => {
+        console.error('[Gift Wrap] Failed to process event:', event.id, err);
+      });
     });
 
-    return () => sub.stop();
+    sub.on("eose", () => {
+      console.log('[Gift Wrap] Initial sync complete (EOSE received)');
+    });
+
+    return () => {
+      console.log('[Gift Wrap] Subscription stopped');
+      sub.stop();
+    };
   }, [pubkey, enabled]);
 }
 
-export async function fetchDirectMessageRelays(ndk: NDK, pubkey: string) {
-  // todo: look also in the users outbox relays
-  const relaySet = NDKRelaySet.fromRelayUrls(discoveryRelays, ndk);
-  const dmFilter = {
-    kinds: [NDKKind.DirectMessageReceiveRelayList],
-    authors: [pubkey],
-  };
-  const dmRelayList = await ndk.fetchEvent(
-    dmFilter,
-    { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
-    relaySet,
-  );
-  if (dmRelayList) {
-    const dm = Array.from(
-      new Set(
-        dmRelayList.tags
-          .filter((tag) => tag[0] === "relay")
-          .map((tag) => tag[1]),
-      ),
-    );
-    return { pubkey, dm, fallback: [] };
-  } else {
-    const readRelays = await ndk.fetchEvent(
-      {
-        kinds: [NDKKind.RelayList],
-        authors: [pubkey],
-      },
-      { closeOnEose: true, cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST },
-      relaySet,
-    );
-    if (readRelays) {
-      const relays = Array.from(
+export async function fetchDirectMessageRelays(
+  ndk: NDK,
+  pubkey: string,
+  userMainRelays?: string[]
+): Promise<UserRelayList> {
+
+  // Step 1: Get user's outbox relays (kind 10002)
+  const { fetchRelayList } = await import("@/lib/nostr");
+  const outboxRelays = await fetchRelayList(ndk, pubkey);
+
+  // Step 2: Combine discovery relays + user's outbox relays for searching
+  const searchRelays = [...new Set([...discoveryRelays, ...outboxRelays])];
+  const searchRelaySet = NDKRelaySet.fromRelayUrls(searchRelays, ndk);
+
+  console.log(`[Relay Discovery] Searching for kind 10050 on ${searchRelays.length} relays (${discoveryRelays.length} discovery + ${outboxRelays.length} outbox)`);
+
+  // Step 3: Try to find NIP-17 kind 10050 on combined relay set
+  try {
+    const dmRelayList = await ndk.fetchEvent({
+      kinds: [NDKKind.DirectMessageReceiveRelayList],
+      authors: [pubkey],
+    }, {
+      closeOnEose: true,
+      cacheUsage: NDKSubscriptionCacheUsage.CACHE_FIRST
+    }, searchRelaySet);
+
+    if (dmRelayList) {
+      const dm = Array.from(
         new Set(
-          readRelays.tags.filter((tag) => tag[0] === "r").map((tag) => tag[1]),
-        ),
+          dmRelayList.tags
+            .filter((tag) => tag[0] === "relay")
+            .map((tag) => tag[1])
+        )
       );
-      return { pubkey, dm: [], fallback: relays };
+
+      if (dm.length > 0) {
+        console.log(`[NIP-17] Found ${dm.length} DM relays for ${pubkey.slice(0, 8)}`);
+        return {
+          pubkey,
+          dm,
+          outbox: outboxRelays,
+          fallback: [],
+          source: 'nip17',
+          timestamp: Date.now()
+        };
+      }
     }
-    throw new Error("No relays found");
+  } catch (err) {
+    console.warn(`[Relay Discovery] Failed to fetch kind 10050: ${err}`);
   }
+
+  // Step 4: Fall back to outbox relays if kind 10050 not found
+  if (outboxRelays.length > 0) {
+    console.log(`[NIP-65] Using ${outboxRelays.length} outbox relays for ${pubkey.slice(0, 8)}`);
+    return {
+      pubkey,
+      dm: [],
+      outbox: outboxRelays,
+      fallback: [],
+      source: 'nip65',
+      timestamp: Date.now()
+    };
+  }
+
+  // Step 5: Fall back to discovery relays
+  if (discoveryRelays.length > 0) {
+    console.log(`[Fallback] Using discovery relays for ${pubkey.slice(0, 8)}`);
+    return {
+      pubkey,
+      dm: [],
+      outbox: [],
+      fallback: discoveryRelays,
+      source: 'discovery',
+      timestamp: Date.now()
+    };
+  }
+
+  // Step 6: Fall back to user's main relays
+  if (userMainRelays && userMainRelays.length > 0) {
+    console.log(`[Fallback] Using user main relays for ${pubkey.slice(0, 8)}`);
+    return {
+      pubkey,
+      dm: [],
+      outbox: [],
+      fallback: userMainRelays,
+      source: 'user-relays',
+      timestamp: Date.now()
+    };
+  }
+
+  // Step 7: Return empty with error (never throw)
+  console.error(`[Error] No relays found for ${pubkey.slice(0, 8)} after exhaustive search`);
+  return {
+    pubkey,
+    dm: [],
+    outbox: [],
+    fallback: [],
+    source: 'discovery',
+    error: 'No relays found after exhaustive search',
+    timestamp: Date.now()
+  };
 }
 
 export function useGroupRelays(group: Group) {
   const ndk = useNDK();
+  const userMainRelays = useRelays();
   const q = useQueries({
     queries: group.pubkeys.map((pubkey) => ({
       queryKey: ["direct-message-relays", pubkey],
-      queryFn: () => fetchDirectMessageRelays(ndk, pubkey),
+      queryFn: () => fetchDirectMessageRelays(ndk, pubkey, userMainRelays),
+      retry: 2,
+      staleTime: 1000 * 60 * 5, // 5 minutes
     })),
   });
-  return Array.from(
-    new Set(
-      q
-        .map((q) => q.data)
-        .filter(Boolean)
-        .flat(),
-    ),
-  );
+  return q.map(q => q.data).filter(Boolean);
+}
+
+export function useGroupRelaySetMap(group: Group): Map<string, NDKRelaySet> {
+  const ndk = useNDK();
+  const relayList = useGroupRelays(group);
+
+  const relaySetMap = useMemo(() => {
+    const map = new Map<string, NDKRelaySet>();
+
+    for (const pubkey of group.pubkeys) {
+      const list = relayList.find(r => r?.pubkey === pubkey);
+      if (!list) continue;
+
+      // Priority: dm → outbox → fallback
+      const relays = list.dm.length > 0
+        ? list.dm
+        : list.outbox.length > 0
+          ? list.outbox
+          : list.fallback;
+
+      if (relays.length === 0) continue;
+
+      const relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
+      map.set(pubkey, relaySet);
+    }
+
+    return map;
+  }, [
+    group.pubkeys.join(','), // Stable string for array comparison
+    relayList,
+    ndk
+  ]);
+
+  return relaySetMap;
 }
 
 export function useDirectMessageRelays(pubkey: string) {
@@ -205,20 +318,62 @@ export function useDirectMessageRelays(pubkey: string) {
 export function useDirectMessages() {
   const ndk = useNDK();
   const pubkey = usePubkey();
-  const dmRelays = useDMRelays();
   const onWebRTCSignal = useOnWebRTCSignal();
   const privateMessagesEnabled = useAtomValue(privateMessagesEnabledAtom);
-  const relaySet = useRelaySet(dmRelays.dm || dmRelays.fallback);
-  // todo: sync from latest - 2 weeks
+
+  // Wait for signer to be ready
+  const hasSigner = Boolean(ndk.signer);
+
+  // Use the same relay discovery logic that senders use
+  // This ensures we're listening on the relays where senders will publish
+  const userMainRelays = useRelays();
+  const { data: myRelayList } = useQuery({
+    queryKey: ["my-dm-inbox-relays", pubkey],
+    queryFn: () => pubkey ? fetchDirectMessageRelays(ndk, pubkey, userMainRelays) : null,
+    enabled: Boolean(pubkey),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  // Listen on: dm relays → outbox relays → fallback relays
+  const relays = myRelayList
+    ? myRelayList.dm.length > 0
+      ? myRelayList.dm
+      : myRelayList.outbox.length > 0
+        ? myRelayList.outbox
+        : myRelayList.fallback
+    : userMainRelays;
+
+  const relaySet = useRelaySet(relays);
+
+  // Log subscription details
+  useEffect(() => {
+    if (relaySet && relays.length > 0) {
+      console.log('[DM Subscription] Listening on:', relays.length, 'relays', relays.map(r => new URL(r).hostname));
+      console.log('[DM Subscription] Will fetch most recent 500 messages, then stream new ones');
+    } else {
+      console.warn('[DM Subscription] No relays available, waiting...');
+    }
+  }, [relaySet, relays]);
+
+  // Only subscribe if we have signer and relays
+  const shouldSubscribe = privateMessagesEnabled && hasSigner && relays.length > 0;
+
+  // Use limit instead of time-based filter to avoid clock drift issues
+  // Fetches most recent N messages on initial load, then streams new ones in real-time
   const filter = {
     kinds: [NDKKind.GiftWrap],
     "#p": [pubkey!],
+    limit: 500,
   };
   useStreamMap(
     filter,
     relaySet!,
     async (event) => {
-      if (await db.dms.get({ gift: event.id })) return null;
+      // Check deduplication
+      if (await db.dms.get({ gift: event.id })) {
+        console.log('[Gift Wrap] Already processed:', event.id);
+        return null;
+      }
 
       try {
         const unwrapped = await giftUnwrap(
@@ -226,25 +381,35 @@ export function useDirectMessages() {
           new NDKUser({ pubkey: event.pubkey }),
           ndk.signer,
         );
-        if (unwrapped) {
-          const raw = unwrapped.rawEvent() as unknown as NostrEvent;
-          savePrivateEvent(raw, event.rawEvent() as unknown as NostrEvent);
-          if (raw.kind === WEBRTC_SIGNAL) {
-            try {
-              onWebRTCSignal(raw);
-            } catch (err) {
-              console.error(err);
-            }
-          }
-          return raw;
+
+        if (!unwrapped) {
+          console.warn('[Gift Wrap] Decryption returned null for:', event.id);
+          return null;
         }
-      } catch (err) {
-        console.error(err);
+
+        const raw = unwrapped.rawEvent() as unknown as NostrEvent;
+        await savePrivateEvent(raw, event.rawEvent() as unknown as NostrEvent);
+        console.log('[Gift Wrap] ✓ Processed message:', raw.id, 'from', raw.pubkey.slice(0, 8));
+
+        // Handle WebRTC signals
+        if (raw.kind === WEBRTC_SIGNAL) {
+          try {
+            onWebRTCSignal(raw);
+          } catch (err) {
+            console.error('[Gift Wrap] WebRTC signal error:', err);
+          }
+        }
+
+        return raw;
+      } catch (err: any) {
+        console.error('[Gift Wrap] Processing failed for event:', event.id);
+        console.error('[Gift Wrap] Error details:', err.message || err);
+        console.error('[Gift Wrap] Has signer:', Boolean(ndk.signer));
+        return null;
       }
-      return null;
     },
     pubkey,
-    privateMessagesEnabled,
+    shouldSubscribe,
   );
   return null;
 }
@@ -349,6 +514,84 @@ export function useSortedGroups() {
     },
     [groups],
     groups,
+  );
+}
+
+export interface GroupWithData extends PrivateGroup {
+  lastMessage?: {
+    content: string;
+    tags: string[][];
+    pubkey: string;
+    created_at: number;
+  };
+  unreadCount: number;
+}
+
+interface SortedGroupsData {
+  groups: GroupWithData[];
+  requests: GroupWithData[];
+}
+
+const emptySortedGroupsData: SortedGroupsData = { groups: [], requests: [] };
+
+export function useSortedGroupsWithData(): SortedGroupsData {
+  const pubkey = usePubkey();
+  const follows = useFollows();
+
+  return useLiveQuery(
+    async () => {
+      if (!pubkey) return emptySortedGroupsData;
+      const followsSet = new Set(follows);
+
+      const allSummaries = await db.dmGroups
+        .orderBy("lastMessageAt")
+        .reverse()
+        .toArray();
+
+      const accepted: GroupWithData[] = [];
+      const requests: GroupWithData[] = [];
+
+      // Compute unreads in parallel for all groups
+      const unreads = await Promise.all(
+        allSummaries.map((s) =>
+          getUnreadMessages({ id: s.id, pubkeys: s.pubkeys }, pubkey),
+        ),
+      );
+
+      for (let i = 0; i < allSummaries.length; i++) {
+        const s = allSummaries[i];
+        const groupPubkeys =
+          s.id === pubkey
+            ? [pubkey]
+            : s.pubkeys.filter((p) => p !== pubkey);
+        if (groupPubkeys.length === 0) continue;
+
+        const isAccepted = s.senderPubkeys.some(
+          (p) => p === pubkey || followsSet.has(p),
+        );
+
+        const entry: GroupWithData = {
+          id: s.id,
+          pubkeys: groupPubkeys,
+          lastMessage: s.lastMessageAt
+            ? {
+                content: s.lastMessageContent,
+                tags: s.lastMessageTags,
+                pubkey: s.lastMessagePubkey,
+                created_at: s.lastMessageAt,
+              }
+            : undefined,
+          unreadCount: unreads[i],
+        };
+
+        if (isAccepted) accepted.push(entry);
+        else requests.push(entry);
+      }
+
+      return { groups: accepted, requests };
+    },
+    [pubkey, follows],
+    emptySortedGroupsData,
   );
 }
 

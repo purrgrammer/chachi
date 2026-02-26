@@ -685,7 +685,11 @@
   "write-a-message": "Write a message...",
   "send": {
     "login-required": "Log in to send message",
-    "error": "Failed to send message"
+    "error": "Failed to send message",
+    "recipient-relay-error": "Could not find relays for recipient {{recipient}}",
+    "no-relays-warning": "No relays available for recipient, message may not be delivered",
+    "all-failed": "Failed to send message to all recipients",
+    "partial-failure": "Message sent to {{succeeded}} recipients, {{failed}} failed"
   },
   "event": {
     "content": "Content",

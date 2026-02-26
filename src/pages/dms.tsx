@@ -1,4 +1,8 @@
-import { useUnreadMessages, useSortedGroups } from "@/lib/nostr/dm";
+import { memo } from "react";
+import {
+  useSortedGroupsWithData,
+  type GroupWithData,
+} from "@/lib/nostr/dm";
 import { Link } from "react-router-dom";
 import { RelayIcon } from "@/components/nostr/relay";
 import { useDMRelays, usePubkey } from "@/lib/account";
@@ -7,8 +11,6 @@ import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/header";
 import { useRelayInfo } from "@/lib/relay";
-import { PrivateGroup } from "@/lib/types";
-import { Reorder } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Avatar } from "@/components/nostr/avatar";
@@ -26,65 +28,73 @@ function Heading({ icon, text }: { icon: React.ReactNode; text: string }) {
 
 // Activity
 
-function GroupMessages({ group }: { group: PrivateGroup }) {
-  const unread = useUnreadMessages(group);
-  const { t } = useTranslation();
-  const isSingle = group.pubkeys.length === 1;
-  const me = usePubkey();
-  const firstPubkey = group.pubkeys.filter((p) => p !== me)[0];
-  const navigate = useNavigate();
-  return unread && unread > 0 ? (
-    <Reorder.Item dragListener={false} key={group.id} value={group}>
-      <Button
-        variant="ghost"
-        className="relative h-fit min-w-32 w-fit"
-        onClick={() => navigate(`/dm/${group.id}`)}
-      >
-        <div className="flex flex-col gap-1 items-center">
-          {isSingle ? (
-            <Avatar
-              pubkey={firstPubkey ? firstPubkey : group.pubkeys[0]}
-              className="size-10"
-            />
-          ) : null}
-          <h3 className="text-lg">
+const GroupMessages = memo(
+  function GroupMessages({
+    group,
+    unreadCount,
+  }: {
+    group: GroupWithData;
+    unreadCount: number;
+  }) {
+    const { t } = useTranslation();
+    const isSingle = group.pubkeys.length === 1;
+    const me = usePubkey();
+    const firstPubkey = group.pubkeys.filter((p) => p !== me)[0];
+    const navigate = useNavigate();
+    return unreadCount > 0 ? (
+      <div key={group.id}>
+        <Button
+          variant="ghost"
+          className="relative h-fit min-w-32 w-fit"
+          onClick={() => navigate(`/dm/${group.id}`)}
+        >
+          <div className="flex flex-col gap-1 items-center">
             {isSingle ? (
-              <Name pubkey={firstPubkey ? firstPubkey : group.pubkeys[0]} />
-            ) : (
-              <NameList pubkeys={group.pubkeys} />
-            )}
-          </h3>
-          <div className="flex flex-col gap-1 items-center text-xs">
-            <div
-              className={`flex flex-row gap-1 ${unread === 0 ? "opacity-50" : ""}`}
-            >
-              <span className="font-mono">
-                {unread >= 100 ? "99+" : unread}
-              </span>
-              <span className="text-muted-foreground">
-                {t("dashboard.activity.unread")}
-              </span>
+              <Avatar
+                pubkey={firstPubkey ? firstPubkey : group.pubkeys[0]}
+                className="size-10"
+              />
+            ) : null}
+            <h3 className="text-lg">
+              {isSingle ? (
+                <Name pubkey={firstPubkey ? firstPubkey : group.pubkeys[0]} />
+              ) : (
+                <NameList pubkeys={group.pubkeys} />
+              )}
+            </h3>
+            <div className="flex flex-col gap-1 items-center text-xs">
+              <div
+                className={`flex flex-row gap-1 ${unreadCount === 0 ? "opacity-50" : ""}`}
+              >
+                <span className="font-mono">
+                  {unreadCount >= 100 ? "99+" : unreadCount}
+                </span>
+                <span className="text-muted-foreground">
+                  {t("dashboard.activity.unread")}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-      </Button>
-    </Reorder.Item>
-  ) : null;
-}
+        </Button>
+      </div>
+    ) : null;
+  },
+  (prev, next) =>
+    prev.group.id === next.group.id && prev.unreadCount === next.unreadCount,
+);
 
 function GroupActivityList() {
-  const sortedGroups = useSortedGroups();
+  const { groups } = useSortedGroupsWithData();
   return (
-    <Reorder.Group
-      axis="x"
-      className="flex overflow-x-auto flex-row gap-1 items-center px-0 no-scrollbar w-[calc(100dvw-1.5rem)] md:w-[calc(100dvw-20rem)]"
-      values={sortedGroups}
-      onReorder={() => console.log("reorder")}
-    >
-      {sortedGroups.map((group) => (
-        <GroupMessages key={group.id} group={group} />
+    <div className="flex overflow-x-auto flex-row gap-1 items-center px-0 no-scrollbar w-[calc(100dvw-1.5rem)] md:w-[calc(100dvw-20rem)]">
+      {groups.map((group) => (
+        <GroupMessages
+          key={group.id}
+          group={group}
+          unreadCount={group.unreadCount}
+        />
       ))}
-    </Reorder.Group>
+    </div>
   );
 }
 

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMintList } from "@/lib/cashu";
-import { NDKEvent, NDKRelaySet, NDKKind, NDKUser } from "@nostr-dev-kit/ndk";
+import { NDKEvent, NDKKind, NDKUser } from "@nostr-dev-kit/ndk";
 import { cn } from "@/lib/utils";
 import { ProfileDrawer } from "@/components/nostr/profile";
 import { Separator } from "@/components/ui/separator";
@@ -52,7 +52,7 @@ import type { PrivateGroup as Group } from "@/lib/types";
 import { giftWrap } from "@/lib/nip-59";
 import {
   savePrivateEvent,
-  useGroupRelays,
+  useGroupRelaySetMap,
   useGroupReactions,
 } from "@/lib/nostr/dm";
 import { useTranslation } from "react-i18next";
@@ -181,7 +181,7 @@ export function ChatMessage({
   const canSign = useCanSign();
   const isOnlyEmojis =
     /^\p{Emoji_Presentation}{1}\s*\p{Emoji_Presentation}{0,1}$/u.test(content);
-  const relayList = useGroupRelays(group);
+  const relaySetMap = useGroupRelaySetMap(group);
 
   const fragments = useRichText(
     content,
@@ -309,14 +309,15 @@ export function ChatMessage({
       await ev.sign();
       await Promise.all(
         group.pubkeys.map(async (pubkey) => {
-          const list = relayList
-            .filter((r) => r)
-            .find((r) => r!.pubkey === pubkey);
-          if (!list) return;
-          const relays = list.dm || list.fallback;
-          const relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
+          const relaySet = relaySetMap.get(pubkey);
+          if (!relaySet) {
+            console.warn(`[Reaction] No relay set for ${pubkey.slice(0, 8)}, skipping`);
+            return; // Skip silently for reactions
+          }
+
           const gift = await giftWrap(ev, new NDKUser({ pubkey }));
           await gift.publish(relaySet);
+
           if (pubkey === me) {
             await savePrivateEvent(
               ev.rawEvent() as unknown as NostrEvent,

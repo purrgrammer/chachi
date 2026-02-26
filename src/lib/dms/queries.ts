@@ -43,11 +43,14 @@ export async function getLastGroupMessage(group: Group) {
 
 export async function getLastUserMessage(group: Group, userPubkey: string) {
   const id = groupId(group);
-  return db.dms
-    .where("[group+created_at]")
-    .between([id, Dexie.minKey], [id, Dexie.maxKey])
-    .filter((e) => e.kind !== NDKKind.Reaction && e.pubkey === userPubkey)
-    .last();
+  // Use [group+pubkey] compound index to narrow to this user's messages only,
+  // then sort by created_at to find the most recent non-reaction
+  const messages = await db.dms
+    .where("[group+pubkey]")
+    .equals([id, userPubkey])
+    .filter((e) => e.kind !== NDKKind.Reaction)
+    .sortBy("created_at");
+  return messages.length > 0 ? messages[messages.length - 1] : undefined;
 }
 
 export async function getGroupMessagesAfter(
@@ -56,16 +59,27 @@ export async function getGroupMessagesAfter(
   excludePubkey?: string,
 ) {
   const id = groupId(group);
-  let query = db.dms
-    .where("[group+created_at]")
-    .between([id, timestamp + 1], [id, Dexie.maxKey])
-    .filter((e) => e.kind !== NDKKind.Reaction);
 
-  if (excludePubkey) {
-    query = query.and((ev) => ev.pubkey !== excludePubkey);
-  }
+  // Use [group+kind+created_at] compound index for direct range scans
+  // instead of post-filtering reactions from [group+created_at]
+  const countKind = async (kind: number) => {
+    let query = db.dms
+      .where("[group+kind+created_at]")
+      .between([id, kind, timestamp + 1], [id, kind, Dexie.maxKey]);
 
-  return query.count();
+    if (excludePubkey) {
+      query = query.filter((ev) => ev.pubkey !== excludePubkey);
+    }
+
+    return query.count();
+  };
+
+  const [dmCount, nutzapCount] = await Promise.all([
+    countKind(NDKKind.PrivateDirectMessage),
+    countKind(NDKKind.Nutzap),
+  ]);
+
+  return dmCount + nutzapCount;
 }
 
 export async function getGroupReactions(group: Group) {
@@ -120,15 +134,16 @@ export async function getUnreadMessages(
   group: Group,
   currentUserPubkey?: string,
 ) {
-  const lastSeen = await getLastSeen(group);
-  let baseline = lastSeen?.created_at || 0;
+  const [lastSeen, lastUserMessage] = await Promise.all([
+    getLastSeen(group),
+    currentUserPubkey
+      ? getLastUserMessage(group, currentUserPubkey)
+      : Promise.resolve(undefined),
+  ]);
 
-  // If we have a current user, use the later of last seen or last user message
-  if (currentUserPubkey) {
-    const lastUserMessage = await getLastUserMessage(group, currentUserPubkey);
-    if (lastUserMessage) {
-      baseline = Math.max(baseline, lastUserMessage.created_at);
-    }
+  let baseline = lastSeen?.created_at || 0;
+  if (lastUserMessage) {
+    baseline = Math.max(baseline, lastUserMessage.created_at);
   }
 
   return getGroupMessagesAfter(group, baseline, currentUserPubkey);
