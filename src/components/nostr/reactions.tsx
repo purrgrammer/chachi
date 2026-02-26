@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { NDKRelaySet, NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { Avatar } from "@/components/nostr/avatar";
@@ -336,7 +336,8 @@ export function ReactionsList({
 
 // todo: configurable sizes, bg
 // todo: implement lazy reactions
-export function Reactions({
+// todo: centralize reaction subscriptions to avoid N subscriptions per N messages
+export const Reactions = React.memo(function Reactions({
   event,
   relays = [],
   kinds = [NDKKind.Reaction],
@@ -351,7 +352,14 @@ export function Reactions({
 }) {
   const { events } = useReactions(event, kinds, relays, live);
   return <ReactionsList event={event} events={events} className={className} />;
-}
+}, (prevProps, nextProps) => {
+  // Only re-render if event ID, live status, or className changes
+  return (
+    prevProps.event.id === nextProps.event.id &&
+    prevProps.live === nextProps.live &&
+    prevProps.className === nextProps.className
+  );
+});
 
 export function Zaps({
   event,

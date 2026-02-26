@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -22,6 +22,7 @@ import { Separator } from "@/components/ui/separator";
 import { Emoji } from "@/components/emoji";
 import { NewZapDialog } from "@/components/nostr/zap";
 import { Badge } from "@/components/ui/badge";
+import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import {
   useRichText,
   EventFragment,
@@ -138,7 +139,7 @@ function Reply({
 }
 
 // Component for user's own messages that checks unpublished status
-function UserMessage({
+const UserMessage = React.memo(function UserMessage({
   group,
   event,
   admins,
@@ -211,10 +212,23 @@ function UserMessage({
       />
     </>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison to prevent unnecessary re-renders
+  return (
+    prevProps.event.id === nextProps.event.id &&
+    prevProps.isNew === nextProps.isNew &&
+    prevProps.isChain === nextProps.isChain &&
+    prevProps.isLastSeen === nextProps.isLastSeen &&
+    prevProps.isFirstInChain === nextProps.isFirstInChain &&
+    prevProps.isLast === nextProps.isLast &&
+    prevProps.isDeleted === nextProps.isDeleted &&
+    prevProps.scrollTo?.id === nextProps.scrollTo?.id &&
+    prevProps.showReactions === nextProps.showReactions
+  );
+});
 
 // Core message component without unpublished status check
-function MessageContent({
+const MessageContent = React.memo(function MessageContent({
   group,
   event,
   admins,
@@ -706,10 +720,24 @@ function MessageContent({
       ) : null}
     </>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison to prevent unnecessary re-renders
+  return (
+    prevProps.event.id === nextProps.event.id &&
+    prevProps.isNew === nextProps.isNew &&
+    prevProps.isChain === nextProps.isChain &&
+    prevProps.isLastSeen === nextProps.isLastSeen &&
+    prevProps.isFirstInChain === nextProps.isFirstInChain &&
+    prevProps.isLast === nextProps.isLast &&
+    prevProps.isDeleted === nextProps.isDeleted &&
+    prevProps.isMine === nextProps.isMine &&
+    prevProps.scrollTo?.id === nextProps.scrollTo?.id &&
+    prevProps.showReactions === nextProps.showReactions
+  );
+});
 
 // Main ChatMessage component that conditionally renders the appropriate message component
-export function ChatMessage(props: {
+export const ChatMessage = React.memo(function ChatMessage(props: {
   group?: Group;
   event: NostrEvent;
   admins: string[];
@@ -741,7 +769,21 @@ export function ChatMessage(props: {
   }
 
   return <MessageContent {...props} isMine={!!isMine} />;
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison to prevent unnecessary re-renders
+  return (
+    prevProps.event.id === nextProps.event.id &&
+    prevProps.isNew === nextProps.isNew &&
+    prevProps.isChain === nextProps.isChain &&
+    prevProps.isLastSeen === nextProps.isLastSeen &&
+    prevProps.isFirstInChain === nextProps.isFirstInChain &&
+    prevProps.isLast === nextProps.isLast &&
+    prevProps.isDeleted === nextProps.isDeleted &&
+    prevProps.isMine === nextProps.isMine &&
+    prevProps.scrollTo?.id === nextProps.scrollTo?.id &&
+    prevProps.showReactions === nextProps.showReactions
+  );
+});
 
 // todo
 // join/request access
@@ -755,6 +797,11 @@ export function ChatMessage(props: {
 //  - user
 
 type MotionProps = React.ComponentProps<typeof motion.div>;
+
+type ChatListItem =
+  | { type: "day-separator"; day: string; key: string }
+  | { type: "message"; event: NostrEvent; messageIndex: number; groupIndex: number; key: string }
+  | { type: "load-more"; key: string };
 
 interface ChatProps extends MotionProps {
   group?: Group;
@@ -815,74 +862,84 @@ export function Chat({
 }: ChatProps) {
   // todo: check admin events against relay pubkey
   const { t } = useTranslation();
-  const groupedMessages = groupByDay(events);
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
+  const groupedMessages = useMemo(() => groupByDay(events), [events]);
   const lastMessage = events.filter((e) => e.kind === NDKKind.GroupChat).at(0);
   const me = usePubkey();
+  const prevEventsLength = useRef(events.length);
+
+  // Flatten grouped messages into a single array for virtualization
+  const flattenedItems = useMemo<ChatListItem[]>(() => {
+    const items: ChatListItem[] = [];
+
+    // Add "Load older messages" button at the top (shown first in reverse order)
+    if (hasMore && loadMore) {
+      items.push({ type: "load-more", key: "load-more" });
+    }
+
+    // Iterate through groups in reverse order (oldest first for bottom-up display)
+    for (let groupIdx = groupedMessages.length - 1; groupIdx >= 0; groupIdx--) {
+      const { day, messages } = groupedMessages[groupIdx];
+
+      // Add day separator
+      if (showTimestamps && messages.length > 0) {
+        items.push({ type: "day-separator", day, key: `day-${groupIdx}` });
+      }
+
+      // Add messages in reverse order (oldest first)
+      for (let idx = messages.length - 1; idx >= 0; idx--) {
+        const event = messages[idx];
+        items.push({
+          type: "message",
+          event,
+          messageIndex: idx,
+          groupIndex: groupIdx,
+          key: event.id,
+        });
+      }
+    }
+
+    return items;
+  }, [groupedMessages, hasMore, loadMore, showTimestamps]);
+
+  // Scroll to bottom on new messages
+  useEffect(() => {
+    if (newMessage && events.length > prevEventsLength.current) {
+      virtuosoRef.current?.scrollToIndex({
+        index: flattenedItems.length - 1,
+        behavior: "smooth",
+        align: "end",
+      });
+    }
+    prevEventsLength.current = events.length;
+  }, [newMessage, events.length, flattenedItems.length]);
+
+  // Handle scroll to specific message
+  useEffect(() => {
+    if (scrollTo) {
+      const itemIndex = flattenedItems.findIndex(
+        (item) => item.type === "message" && item.event.id === scrollTo.id,
+      );
+      if (itemIndex !== -1) {
+        virtuosoRef.current?.scrollToIndex({
+          index: itemIndex,
+          behavior: "smooth",
+          align: "center",
+        });
+      }
+    }
+  }, [scrollTo, flattenedItems]);
 
   useEffect(() => {
     return () => setScrollTo?.(undefined);
   }, [group?.id, group?.relay]);
 
-  return (
-    <div
-      className={cn(
-        "flex flex-col-reverse overflow-x-hidden overflow-y-auto px-2 w-full transition-height relative pretty-scrollbar",
-        className,
-      )}
-      style={style}
-    >
-      {groupedMessages.map(({ day, messages }, groupIdx) => (
-        <div className="flex flex-col w-full" key={groupIdx}>
-          {showTimestamps && messages.length > 0 ? (
-            <div className="flex justify-center my-2 w-full">
-              <Badge variant="outline" className="self-center">
-                {formatDay(day)}
-              </Badge>
-            </div>
-          ) : null}
-          {messages.map((event, idx) => {
-            const Component = components?.[event.kind];
-            return messageKinds.includes(event.kind) ? (
-              <ChatMessage
-                key={event.id}
-                group={group}
-                event={event}
-                canDelete={canDelete}
-                deleteEvent={deleteEvent}
-                admins={admins}
-                isDeleted={Boolean("deleted" in event && event.deleted)}
-                isChain={messages[idx + 1]?.pubkey === event.pubkey}
-                isLastSeen={
-                  event.id === lastSeen?.ref && event.id !== lastMessage?.id
-                }
-                isFirstInChain={messages[idx - 1]?.pubkey !== event.pubkey}
-                isMine={event.pubkey === me}
-                isLast={
-                  idx === messages.length - 1 &&
-                  groupIdx === groupedMessages.length - 1
-                }
-                setReplyingTo={setReplyingTo}
-                isNew={newMessage?.id === event.id}
-                showRootReply={showRootReply}
-                scrollTo={scrollTo}
-                setScrollTo={setScrollTo}
-                showReactions={showReactions}
-              />
-            ) : Component ? (
-              <Component
-                key={event.id}
-                event={event}
-                admins={admins}
-                setReplyingTo={setReplyingTo}
-                scrollTo={scrollTo}
-                setScrollTo={setScrollTo}
-                showReactions={false}
-              />
-            ) : null;
-          })}
-        </div>
-      ))}
-      {hasMore && loadMore ? (
+  // Render each list item
+  const renderItem = (index: number) => {
+    const item = flattenedItems[index];
+
+    if (item.type === "load-more") {
+      return (
         <div className="flex justify-center my-4">
           <Button
             variant="outline"
@@ -898,7 +955,85 @@ export function Chat({
             {t("chat.load-older")}
           </Button>
         </div>
-      ) : null}
+      );
+    }
+
+    if (item.type === "day-separator") {
+      return (
+        <div className="flex justify-center my-2 w-full">
+          <Badge variant="outline" className="self-center">
+            {formatDay(item.day)}
+          </Badge>
+        </div>
+      );
+    }
+
+    // Message item
+    const { event, messageIndex: idx, groupIndex: groupIdx } = item;
+    const messages = groupedMessages[groupIdx].messages;
+    const Component = components?.[event.kind];
+
+    if (messageKinds.includes(event.kind)) {
+      return (
+        <ChatMessage
+          group={group}
+          event={event}
+          canDelete={canDelete}
+          deleteEvent={deleteEvent}
+          admins={admins}
+          isDeleted={Boolean("deleted" in event && event.deleted)}
+          isChain={messages[idx + 1]?.pubkey === event.pubkey}
+          isLastSeen={
+            event.id === lastSeen?.ref && event.id !== lastMessage?.id
+          }
+          isFirstInChain={messages[idx - 1]?.pubkey !== event.pubkey}
+          isMine={event.pubkey === me}
+          isLast={
+            idx === messages.length - 1 &&
+            groupIdx === 0 &&
+            index === flattenedItems.length - 1
+          }
+          setReplyingTo={setReplyingTo}
+          isNew={newMessage?.id === event.id}
+          showRootReply={showRootReply}
+          scrollTo={scrollTo}
+          setScrollTo={setScrollTo}
+          showReactions={showReactions}
+        />
+      );
+    } else if (Component) {
+      return (
+        <Component
+          event={event}
+          admins={admins}
+          setReplyingTo={setReplyingTo}
+          scrollTo={scrollTo}
+          setScrollTo={setScrollTo}
+          showReactions={false}
+        />
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <div
+      className={cn(
+        "w-full transition-height relative",
+        className,
+      )}
+      style={style}
+    >
+      <Virtuoso
+        ref={virtuosoRef}
+        data={flattenedItems}
+        initialTopMostItemIndex={flattenedItems.length - 1}
+        followOutput="smooth"
+        itemContent={(index) => renderItem(index)}
+        className="px-2 pretty-scrollbar"
+        style={{ height: "100%" }}
+      />
     </div>
   );
 }
