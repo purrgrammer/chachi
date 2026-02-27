@@ -85,8 +85,11 @@ export async function getGroupMessagesAfter(
 ) {
   const id = groupId(group);
   let query = db.events
-    .where("[group+created_at]")
-    .between([id, timestamp + 1], [id, Dexie.maxKey]);
+    .where("[group+kind+created_at]")
+    .between(
+      [id, NDKKind.GroupChat, timestamp + 1],
+      [id, NDKKind.GroupChat, Dexie.maxKey],
+    );
 
   if (excludePubkey) {
     query = query.and((ev) => ev.pubkey !== excludePubkey);
