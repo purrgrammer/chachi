@@ -1,6 +1,5 @@
 import path from "path";
 import { defineConfig } from "vite";
-import { nodePolyfills } from "vite-plugin-node-polyfills";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { visualizer } from "rollup-plugin-visualizer";
@@ -8,7 +7,6 @@ import { visualizer } from "rollup-plugin-visualizer";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    nodePolyfills({ include: ["stream"] }),
     react(),
     VitePWA({
       registerType: "autoUpdate",
@@ -84,10 +82,6 @@ export default defineConfig({
             "react-player",
             "framer-motion",
             "react-awesome-slider",
-          ],
-          "crypto-vendor": [
-            "@cashu/cashu-ts",
-            "light-bolt11-decoder",
           ],
           "utils-vendor": [
             "date-fns",

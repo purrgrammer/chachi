@@ -557,7 +557,7 @@ function MessageContent({
                     className="pt-1"
                     event={event}
                     relays={[...(relay ? [relay] : [])]}
-                    kinds={[NDKKind.Nutzap, NDKKind.Zap, NDKKind.Reaction]}
+                    kinds={[NDKKind.Zap, NDKKind.Reaction]}
                     live={isInView}
                   />
                 ) : null}

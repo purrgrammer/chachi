@@ -4,7 +4,6 @@ import { useNDK } from "@/lib/ndk";
 import { useStream } from "@/lib/nostr";
 import type { Group } from "@/lib/types";
 import { validateZap } from "@/lib/nip-57";
-import { validateNutzap } from "@/lib/nip-61";
 
 export function useReplies(event: NostrEvent, group?: Group, live = true) {
   const ndk = useNDK();
@@ -29,7 +28,7 @@ export function useReplies(event: NostrEvent, group?: Group, live = true) {
           limit: 200,
         },
     {
-      kinds: [NDKKind.Zap, NDKKind.Nutzap],
+      kinds: [NDKKind.Zap],
       ...(isFromGroup && group ? { "#h": [group.id] } : {}),
       ...ev.filter(),
       limit: 100,
@@ -79,7 +78,7 @@ export function useDirectReplies(
           limit: 100,
         },
     {
-      kinds: [NDKKind.Zap, NDKKind.Nutzap],
+      kinds: [NDKKind.Zap],
       ...(isFromGroup && group ? { "#h": [group.id] } : {}),
       ...ev.filter(),
       limit: 100,
@@ -147,19 +146,9 @@ export function sortComments(
     if (!aIsAuthorReply && bIsAuthorReply) return 1;
 
     // If both are author replies or both aren't, proceed with the existing sorting logic
-    // Check if events are zaps or nutzaps
-    const aZapInfo =
-      a.kind === NDKKind.Zap
-        ? validateZap(a)
-        : a.kind === NDKKind.Nutzap
-          ? validateNutzap(a)
-          : null;
-    const bZapInfo =
-      b.kind === NDKKind.Zap
-        ? validateZap(b)
-        : b.kind === NDKKind.Nutzap
-          ? validateNutzap(b)
-          : null;
+    // Check if events are zaps
+    const aZapInfo = a.kind === NDKKind.Zap ? validateZap(a) : null;
+    const bZapInfo = b.kind === NDKKind.Zap ? validateZap(b) : null;
 
     const aIsZap = Boolean(aZapInfo);
     const bIsZap = Boolean(bZapInfo);

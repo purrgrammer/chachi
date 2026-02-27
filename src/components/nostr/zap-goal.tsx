@@ -7,7 +7,6 @@ import { RichText } from "@/components/rich-text";
 import { formatDateTime } from "@/lib/time";
 import Amount from "@/components/amount";
 import { validateZap } from "@/lib/nip-57";
-import { validateNutzap } from "@/lib/nip-61";
 import type { Group } from "@/lib/types";
 import { useReactions } from "@/lib/nostr";
 import { NDKKind } from "@nostr-dev-kit/ndk";
@@ -30,12 +29,12 @@ export function ZapGoal({
   const description = event.tags.find((t) => t[0] === "summary")?.[1]?.trim();
   const zaps = useReactions(
     event,
-    [NDKKind.Zap, NDKKind.Nutzap],
+    [NDKKind.Zap],
     relays,
     !isExpired,
   );
   const zapEvents = zaps.events
-    .map((z) => (z.kind === NDKKind.Zap ? validateZap(z) : validateNutzap(z)))
+    .map((z) => (validateZap(z)))
     .filter(Boolean) as { amount: number }[];
   const totalZapped = zapEvents.reduce((acc, z) => acc + z.amount, 0);
   const totalGoal = Number(amount) / 1000;

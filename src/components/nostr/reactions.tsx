@@ -13,10 +13,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { validateZap, Zap } from "@/lib/nip-57";
-import { validateNutzap, Nutzap } from "@/lib/nip-61";
 import { cn, groupBy } from "@/lib/utils";
 import { CUSTOM_EMOJI_CONTENT_REGEX } from "@/lib/emoji";
-import { HUGE_AMOUNT } from "@/lib/zap";
 import { useMintList } from "@/lib/cashu";
 import { useTranslation } from "react-i18next";
 import Amount from "@/components/amount";
@@ -159,56 +157,6 @@ function Reaction({
   );
 }
 
-function NutzapReaction({ nutzap }: { nutzap: Nutzap }) {
-  // todo: USD/EUR amounts
-  return (
-    <div
-      className={`p-1 text-foreground transition-color ${nutzap.amount >= HUGE_AMOUNT ? "bg-animated-gradient" : "bg-gradient"} rounded-xl`}
-    >
-      <div className="flex flex-row items-center gap-1.5">
-        {nutzap.content ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <RichText
-                className="max-w-16 text-xs break-all line-clamp-1"
-                options={{
-                  inline: true,
-                  events: false,
-                  ecash: false,
-                  video: false,
-                  images: false,
-                  audio: false,
-                }}
-                tags={nutzap.tags}
-              >
-                {nutzap.content.trim()}
-              </RichText>
-            </TooltipTrigger>
-            <TooltipContent>
-              <RichText
-                className="text-xs break-all"
-                options={{
-                  inline: true,
-                  events: false,
-                  ecash: false,
-                  video: false,
-                  images: false,
-                  audio: false,
-                }}
-                tags={nutzap.tags}
-              >
-                {nutzap.content.trim()}
-              </RichText>
-            </TooltipContent>
-          </Tooltip>
-        ) : null}
-        <Amount amount={nutzap.amount} size="sm" />
-        <Avatar pubkey={nutzap.pubkey} className="size-4" />
-      </div>
-    </div>
-  );
-}
-
 function ZapReaction({ zap }: { zap: Zap }) {
   const me = usePubkey();
   const iZapped = zap.pubkey === me;
@@ -286,14 +234,8 @@ export function ReactionsList({
     .map(validateZap)
     .filter((z) => z !== null)
     .sort((a, b) => b.amount - a.amount) as Zap[];
-  const nutzaps = events
-    .filter((r) => r.kind === NDKKind.Nutzap)
-    .map(validateNutzap)
-    .filter((z) => z !== null)
-    .sort((a, b) => b.amount - a.amount) as Nutzap[];
   const reactions = events.filter((r) => r.kind === NDKKind.Reaction);
-  const hasReactions =
-    zaps.length > 0 || reactions.length > 0 || nutzaps.length > 0;
+  const hasReactions = zaps.length > 0 || reactions.length > 0;
 
   const byContent = groupBy(reactions, (r: NostrEvent) => {
     return r.content === "+" ? "👍" : r.content === "-" ? "👎" : r.content;
@@ -309,9 +251,6 @@ export function ReactionsList({
     >
       {zaps.map((zap) => (
         <ZapReaction key={zap.id} zap={zap} />
-      ))}
-      {nutzaps.map((zap) => (
-        <NutzapReaction key={zap.id} nutzap={zap} />
       ))}
       {Object.entries(byContent)
         .sort((a, b) => {

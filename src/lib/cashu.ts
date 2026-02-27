@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { useLiveQuery } from "dexie-react-hooks";
 import { useQuery } from "@tanstack/react-query";
 import {
   NDKEvent,
@@ -13,7 +12,6 @@ import { useRelays, useRelayList, useRequest } from "@/lib/nostr";
 import { dedupeBy } from "@/lib/utils";
 import { usePubkey } from "@/lib/account";
 import { queryClient, MINT_INFO, MINT_KEYS, MINT_LIST } from "@/lib/query";
-import { getNutzaps } from "@/lib/nutzaps";
 
 export const cashuRegex = /(cashu[AB][A-Za-z0-9_-]{0,10000}={0,3})/g;
 export const cashuRequestRegex = /(creqA[A-Za-z0-9_-]{0,10000}={0,3})/g;
@@ -113,26 +111,3 @@ export function useSentNutzaps() {
   return sorted;
 }
 
-export function useNutzaps() {
-  // todo: also query nostr nutzaps
-  return useLiveQuery(() => getNutzaps(), [], []);
-}
-
-export function useRedeemedNutzaps(): Set<string> {
-  const pubkey = usePubkey();
-  const { data: relayList } = useRelayList(pubkey!);
-  const { data: mintList } = useMintList(pubkey!);
-  const relays = mintList ? mintList.relays : relayList || [];
-  const filter = {
-    kinds: [NDKKind.CashuWalletTx],
-    authors: [pubkey!],
-  };
-  const { events } = useRequest(filter, relays);
-  const redeemed = useMemo(() => {
-    const redemptions = events
-      .map((c) => c.tags.find((t) => t[0] === "e" && t[3] === "redeemed")?.[1])
-      .filter(Boolean) as string[];
-    return new Set(redemptions);
-  }, [events]);
-  return redeemed;
-}

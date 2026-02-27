@@ -5,7 +5,6 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Chat } from "@/components/nostr/chat/chat";
 import { ChatInput } from "@/components/nostr/chat/input";
 import { ChatZap } from "@/components/nostr/chat/zap";
-import { ChatNutzap } from "@/components/nostr/chat/nutzap";
 import { useGroupAdminsList } from "@/lib/nostr/groups";
 import { usePubkey } from "@/lib/account";
 import type { Group } from "@/lib/types";
@@ -73,13 +72,6 @@ export function Thread({
     ),
     [NDKKind.Zap]: (props: ThreadComponentProps) => (
       <ChatZap
-        key={props.event.id}
-        {...props}
-        group={isFromGroup ? group : undefined}
-      />
-    ),
-    [NDKKind.Nutzap]: (props: ThreadComponentProps) => (
-      <ChatNutzap
         key={props.event.id}
         {...props}
         group={isFromGroup ? group : undefined}

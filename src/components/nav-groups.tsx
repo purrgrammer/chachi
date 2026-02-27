@@ -23,7 +23,6 @@ import {
 import type { Group, Event } from "@/lib/types";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { validateZap, Zap } from "@/lib/nip-57";
-import { validateNutzap, Nutzap } from "@/lib/nip-61";
 import { useMemo } from "react";
 import Amount from "@/components/amount";
 
@@ -37,7 +36,7 @@ interface MessageEvent {
   tags: string[][];
 }
 
-function PaymentPreview({ group, zap }: { group: Group; zap: Zap | Nutzap }) {
+function PaymentPreview({ group, zap }: { group: Group; zap: Zap }) {
   return zap.content ? (
     <div className="flex flex-row items-baseline gap-1 text-xs line-clamp-1 text-muted-foreground">
       <span className="font-semibold">
@@ -82,15 +81,6 @@ function PaymentPreview({ group, zap }: { group: Group; zap: Zap | Nutzap }) {
       </span>
     </div>
   );
-}
-
-function NutzapPreview({ group, event }: { group: Group; event: Event }) {
-  const zap = useMemo(
-    () => validateNutzap(event as unknown as NostrEvent),
-    [event],
-  );
-  if (!zap) return null;
-  return <PaymentPreview group={group} zap={zap} />;
 }
 
 function ZapPreview({ group, event }: { group: Group; event: Event }) {
@@ -151,10 +141,6 @@ const LastMessagePreview = ({
 
   if (lastMessage.kind === NDKKind.Zap) {
     return <ZapPreview group={group} event={lastMessage} />;
-  }
-
-  if (lastMessage.kind === NDKKind.Nutzap) {
-    return <NutzapPreview group={group} event={lastMessage} />;
   }
 
   // todo: relationship

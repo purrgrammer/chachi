@@ -56,11 +56,6 @@ import {
   GroupPicture,
 } from "@/components/nostr/groups/metadata";
 import { ZapPreview, ZapDetail, ZapReply } from "@/components/nostr/zap";
-import {
-  NutzapPreview,
-  NutzapDetail,
-  NutzapReply,
-} from "@/components/nostr/nutzap";
 import { Repo, Issues } from "@/components/nostr/repo";
 import { Highlight } from "@/components/nostr/highlight";
 import { Stream } from "@/components/nostr/stream";
@@ -261,13 +256,6 @@ const eventDetails: Record<
     preview: ZapPreview,
     detail: ZapDetail,
     reply: ZapReply,
-  },
-  [NDKKind.Nutzap]: {
-    noHeader: true,
-    className: "relative rounded-md bg-background/80 border-none my-0.5",
-    preview: NutzapPreview,
-    detail: NutzapDetail,
-    reply: NutzapReply,
   },
   [BOOK]: {
     preview: Book,

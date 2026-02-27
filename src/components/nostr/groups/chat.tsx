@@ -11,27 +11,20 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
 import { useInView } from "framer-motion";
 import {
-  HandCoins,
   Crown,
   Reply as ReplyIcon,
   SmilePlus,
   Copy,
   ShieldBan,
   Trash,
-  Check,
-  X,
 } from "lucide-react";
 import { NostrEvent, UnsignedEvent } from "nostr-tools";
 import { Avatar } from "@/components/nostr/avatar";
-import { User } from "@/components/nostr/user";
 import { ProfileDrawer } from "@/components/nostr/profile";
-import { NDKNutzap, NDKKind, NDKEvent } from "@nostr-dev-kit/ndk";
-import { NDKCashuWallet } from "@nostr-dev-kit/wallet";
+import { NDKKind, NDKEvent } from "@nostr-dev-kit/ndk";
 import { useSettings } from "@/lib/settings";
-import { formatShortNumber } from "@/lib/number";
 import { Badge } from "@/components/ui/badge";
 import { Name } from "@/components/nostr/name";
-import Amount from "@/components/amount";
 import { useCommunity, useFetchGroupParticipants } from "@/lib/nostr/groups";
 import { Zap } from "@/components/nostr/zap";
 import { validateZap } from "@/lib/nip-57";
@@ -57,7 +50,6 @@ import {
   deleteGroupEvent,
 } from "@/lib/messages";
 import { DELETE_GROUP } from "@/lib/kinds";
-import { Nutzap } from "@/components/nostr/nutzap";
 import { useTranslation } from "react-i18next";
 import {
   ContextMenu,
@@ -69,9 +61,6 @@ import {
   ContextMenuShortcut,
 } from "@/components/ui/context-menu";
 import { Reactions } from "@/components/nostr/reactions";
-import { useCashuWallet } from "@/lib/wallet";
-import { useNutzapStatus } from "@/lib/nutzaps";
-import { saveNutzap } from "@/lib/nutzaps";
 import { eventLink } from "@/lib/links";
 import { cn } from "@/lib/utils";
 import { useReact } from "@/lib/nostr/react";
@@ -343,346 +332,6 @@ function ChatZap({
   );
 }
 
-function ChatNutzap({
-  event,
-  group,
-  admins,
-  setReplyingTo,
-  scrollTo,
-  setScrollTo,
-  canDelete,
-  deleteEvent,
-  showReactions,
-}: ChatZapProps) {
-  // todo: gestures
-  const ndk = useNDK();
-  const ref = useRef<HTMLDivElement | null>(null);
-  const wallet = useCashuWallet();
-  const isInView = useInView(ref);
-  const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
-  const navigate = useNavigate();
-  const [isRedeeming, setIsRedeeming] = useState(false);
-  const nutzapStatus = useNutzapStatus(event.id);
-  const redeemed = nutzapStatus === "redeemed" || nutzapStatus === "spent";
-  const failed = nutzapStatus === "failed";
-  const pubkey = usePubkey();
-  const isMine = event.pubkey === pubkey;
-  const isToMe = event.tags.some((t) => t[0] === "p" && t[1] === pubkey);
-  const amIAdmin = pubkey && admins.includes(pubkey);
-  const relaySet = useRelaySet([group.relay]);
-  const { t } = useTranslation();
-  const [, copy] = useCopy();
-  const [settings] = useSettings();
-  const isMobile = useIsMobile();
-  const canSign = useCanSign();
-  const isFocused = scrollTo?.id === event.id;
-  const amount = event.tags.find((t) => t[0] === "amount")?.[1];
-  const unit = event.tags.find((t) => t[0] === "unit")?.[1];
-  const target = event.tags.find((t) => t[0] === "p")?.[1];
-  const isShownInline = event.content.trim() === "" && amount && target;
-  const react = useReact(event, group, t("chat.message.react.error"));
-
-  useEffect(() => {
-    if (isFocused && ref.current) {
-      ref.current.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }
-  }, [isFocused]);
-
-  async function onEmojiSelect(e: EmojiType) {
-    try {
-      await react(e);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setShowingEmojiPicker(false);
-    }
-  }
-
-  async function kick(e: NostrEvent) {
-    try {
-      const ev = new NDKEvent(ndk, {
-        kind: NDKKind.GroupAdminRemoveUser,
-        content: "",
-        tags: [
-          ...(group ? [["h", group.id, group.relay]] : []),
-          ["p", e.pubkey],
-        ],
-      } as NostrEvent);
-      await ev.publish(relaySet);
-      toast.success(t("chat.user.kick.success"));
-      if (group) {
-        saveGroupEvent(ev.rawEvent() as NostrEvent, group);
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error(t("chat.user.kick.error"));
-    }
-  }
-
-  async function redeem() {
-    setIsRedeeming(true);
-    try {
-      if (wallet instanceof NDKCashuWallet) {
-        const nutzap = NDKNutzap.from(new NDKEvent(ndk, event));
-        if (nutzap && nutzap.p2pk) {
-          const privkey = wallet.privkeys.get(nutzap.p2pk)?.privateKey;
-          if (!privkey) {
-            toast.error(t("nutzaps.redeem-error"));
-            return;
-          }
-
-          const cashuWallet = await wallet.getCashuWallet(nutzap.mint);
-          if (!cashuWallet) {
-            toast.error(t("nutzaps.redeem-error"));
-            return;
-          }
-
-          const amount = await wallet.redeemNutzaps([nutzap], privkey, {
-            mint: nutzap.mint,
-            proofs: nutzap.proofs,
-            cashuWallet,
-          });
-
-          toast.success(
-            t("nutzaps.redeem-success", {
-              amount: formatShortNumber(amount),
-            }),
-          );
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      saveNutzap(event, "failed");
-      toast.error(t("nutzaps.redeem-error"));
-    } finally {
-      setIsRedeeming(false);
-    }
-  }
-
-  function onNutzapReplyClick(ev: NostrEvent) {
-    // todo: use messageKinds here
-    if (ev.kind === NDKKind.Nutzap || ev.kind === NDKKind.GroupChat) {
-      setScrollTo?.(ev);
-    } else {
-      navigate(eventLink(ev, group));
-    }
-  }
-
-  return (
-    <>
-      <ContextMenu>
-        <ContextMenuTrigger asChild>
-          <div
-            className={`flex flex-row ${isMine ? "justify-end" : ""} w-full z-0 ${isFocused ? "bg-accent/30 rounded-md" : ""} ${isShownInline ? "items-center justify-center" : ""}`}
-          >
-            <motion.div
-              // Drag controls
-              drag={isMobile && !isMine && canSign ? "x" : false}
-              dragSnapToOrigin={true}
-              dragConstraints={{ left: 20, right: 20 }}
-              dragElastic={{ left: 0.2, right: 0.2 }}
-              onDragEnd={(_, info) => {
-                if (info.offset.x > 20) {
-                  setReplyingTo?.(event);
-                } else if (info.offset.x < -20) {
-                  setShowingEmojiPicker(true);
-                }
-              }}
-              ref={ref}
-              className={`z-0 border-none my-1 ${isShownInline ? "" : "max-w-[19rem] sm:max-w-sm md:max-w-md"}`}
-            >
-              <div className="flex flex-col gap-0">
-                <div className="flex flex-row gap-2 items-end">
-                  {isShownInline ? (
-                    <User
-                      pubkey={event.pubkey}
-                      classNames={{ avatar: "size-7" }}
-                    />
-                  ) : !isMine ? (
-                    <ProfileDrawer
-                      group={group}
-                      pubkey={event.pubkey}
-                      trigger={
-                        <Avatar pubkey={event.pubkey} className="size-7" />
-                      }
-                    />
-                  ) : null}
-                  {isShownInline ? (
-                    <div className="flex flex-row items-center gap-3">
-                      <Amount
-                        amount={Number(amount)}
-                        currency={unit}
-                        size="md"
-                      />
-                      <User pubkey={target} classNames={{ avatar: "size-7" }} />
-                    </div>
-                  ) : (
-                    <div
-                      className={cn(
-                        "flex flex-col gap-1 relative p-1 px-2 bg-background/80",
-                        isMine
-                          ? "rounded-tl-md rounded-tr-md rounded-bl-md rounded-br-none"
-                          : "rounded-tl-md rounded-tr-md rounded-br-md rounded-bl-none",
-                      )}
-                    >
-                      <Nutzap
-                        className={
-                          isMine
-                            ? "rounded-tl-md rounded-tr-md rounded-bl-md rounded-br-none"
-                            : "rounded-tl-md rounded-tr-md rounded-br-md rounded-bl-none"
-                        }
-                        event={event}
-                        group={group}
-                        showAuthor={false}
-                        animateGradient
-                        onReplyClick={onNutzapReplyClick}
-                        classNames={{
-                          singleCustomEmoji: isMine ? "ml-auto" : "",
-                          onlyEmojis: isMine ? "ml-auto" : "",
-                        }}
-                      />
-                      {showReactions ? (
-                        <Reactions
-                          event={event}
-                          relays={[group.relay]}
-                          kinds={[
-                            NDKKind.Nutzap,
-                            NDKKind.Zap,
-                            NDKKind.Reaction,
-                          ]}
-                          live={isInView}
-                        />
-                      ) : null}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem
-            className="cursor-pointer"
-            onClick={() => setReplyingTo?.(event)}
-          >
-            {t("chat.message.reply.action")}
-            <ContextMenuShortcut>
-              <ReplyIcon className="w-4 h-4" />
-            </ContextMenuShortcut>
-          </ContextMenuItem>
-          <ContextMenuItem
-            className="cursor-pointer"
-            onClick={() => setShowingEmojiPicker(true)}
-          >
-            {t("chat.message.react.action")}
-            <ContextMenuShortcut>
-              <SmilePlus className="w-4 h-4" />
-            </ContextMenuShortcut>
-          </ContextMenuItem>
-          {isToMe ? (
-            <ContextMenuItem
-              className="cursor-pointer"
-              disabled={isRedeeming || redeemed || failed}
-              onClick={redeem}
-            >
-              {failed
-                ? t("chat.message.redeem.failed")
-                : redeemed
-                  ? t("chat.message.redeem.redeemed")
-                  : t("chat.message.redeem.action")}
-              <ContextMenuShortcut>
-                {failed ? (
-                  <X className="w-4 h-4 text-red-300" />
-                ) : redeemed ? (
-                  <Check className="w-4 h-4 text-green-500" />
-                ) : (
-                  <HandCoins className="w-4 h-4" />
-                )}
-              </ContextMenuShortcut>
-            </ContextMenuItem>
-          ) : null}
-          <ContextMenuSeparator />
-          <ContextMenuItem
-            className="cursor-pointer"
-            onClick={() => copy(event.content)}
-          >
-            {t("chat.message.copy.action")}
-            <ContextMenuShortcut>
-              <Copy className="w-4 h-4" />
-            </ContextMenuShortcut>
-          </ContextMenuItem>
-          {amIAdmin && event.pubkey !== pubkey ? (
-            <>
-              <ContextMenuSeparator />
-              <ContextMenuLabel>{t("group.info.admin")}</ContextMenuLabel>
-              <ContextMenuItem
-                className="cursor-pointer"
-                onClick={() => kick(event)}
-              >
-                {t("chat.user.kick.action")}
-                <ContextMenuShortcut>
-                  <ShieldBan className="w-4 h-4" />
-                </ContextMenuShortcut>
-              </ContextMenuItem>
-              {deleteEvent ? (
-                <ContextMenuItem
-                  className="cursor-pointer"
-                  onClick={() => deleteEvent(event)}
-                >
-                  {t("chat.message.delete.action")}
-                  <ContextMenuShortcut>
-                    <Trash className="w-4 h-4 text-destructive" />
-                  </ContextMenuShortcut>
-                </ContextMenuItem>
-              ) : null}
-            </>
-          ) : deleteEvent && canDelete?.(event) ? (
-            <ContextMenuItem
-              className="cursor-pointer"
-              onClick={() => deleteEvent(event)}
-            >
-              {t("chat.message.delete.action")}
-              <ContextMenuShortcut>
-                <Trash className="w-4 h-4 text-destructive" />
-              </ContextMenuShortcut>
-            </ContextMenuItem>
-          ) : null}
-          {settings.devMode ? (
-            <>
-              <ContextMenuSeparator />
-              <ContextMenuLabel className="text-xs font-light">
-                {t("chat.debug")}
-              </ContextMenuLabel>
-              <ContextMenuItem
-                className="cursor-pointer"
-                onClick={() => console.log(event)}
-              >
-                Log
-              </ContextMenuItem>
-              {group ? (
-                <ContextMenuItem
-                  className="cursor-pointer"
-                  onClick={() => saveLastSeen(event, group)}
-                >
-                  {t("chat.message.save-as-last-seen")}
-                </ContextMenuItem>
-              ) : null}
-            </>
-          ) : null}
-        </ContextMenuContent>
-      </ContextMenu>
-      <LazyEmojiPicker
-        open={showingEmojiPicker}
-        onOpenChange={(open) => setShowingEmojiPicker(open)}
-        onEmojiSelect={onEmojiSelect}
-      />
-    </>
-  );
-}
-
 //function JoinGroup({ group }: { group: Group }) {
 //  const ndk = useNDK();
 //  const relaySet = useRelaySet([group.relay]);
@@ -859,16 +508,6 @@ export const GroupChat = forwardRef(
           deleteEvent={deleteEvent}
           messageKinds={[NDKKind.GroupChat]}
           components={{
-            [NDKKind.Nutzap]: ({ event, ...props }) => (
-              <ChatNutzap
-                key={event.id}
-                event={event}
-                group={group}
-                canDelete={canDelete}
-                deleteEvent={deleteEvent}
-                {...props}
-              />
-            ),
             [NDKKind.Zap]: ({ event, ...props }) => (
               <ChatZap
                 key={event.id}
@@ -1014,17 +653,6 @@ export const CommunityChat = forwardRef(
           deleteEvent={deleteEvent}
           messageKinds={[NDKKind.GroupChat]}
           components={{
-            [NDKKind.Nutzap]: ({ event, ...props }) => (
-              <ChatNutzap
-                key={event.id}
-                event={event}
-                group={group}
-                canDelete={canDelete}
-                deleteEvent={deleteEvent}
-                {...props}
-                showReactions
-              />
-            ),
             [NDKKind.Zap]: ({ event, ...props }) => (
               <ChatZap
                 key={event.id}

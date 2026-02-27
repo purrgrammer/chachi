@@ -33,7 +33,6 @@ import { usePubkey, useMintList } from "@/lib/account";
 import { cashuAtom } from "@/app/store";
 import { useRelays } from "@/lib/nostr";
 import { fetchMintInfo, fetchMintKeys } from "@/lib/cashu";
-import { useNutzapMonitor } from "@/lib/nutzaps";
 import { isRelayURL } from "@/lib/relay";
 import { getTokenEvents } from "@/lib/db";
 export type ChachiWallet =
@@ -83,8 +82,6 @@ export function useChachiWallet() {
   const [, setNDKWallets] = useAtom(ndkWalletsAtom);
   const [cashuWallet, setCashuWallet] = useAtom(cashuWalletAtom);
   const cashu = useAtomValue(cashuAtom);
-
-  useNutzapMonitor();
 
   useEffect(() => {
     Promise.allSettled(
