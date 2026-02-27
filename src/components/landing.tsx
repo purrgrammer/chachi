@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { TestimonialBubble } from "./testimonial-bubble";
 import { Login } from "@/components/nostr/login";
-import { CHACHI_PUBKEY, CHACHI_RELAYS } from "@/constants";
 import {
   MessageCircleHeart,
   Rocket,
@@ -15,7 +14,6 @@ import {
   DatabaseZap,
   HandCoins,
 } from "lucide-react";
-import Supporters from "./supporters";
 import { Button } from "./ui/button";
 
 const testimonials = [
@@ -297,7 +295,6 @@ export default function Landing() {
       </div>
       <Features />
       <Testimonials />
-      <Supporters pubkey={CHACHI_PUBKEY} relays={CHACHI_RELAYS} />
       <SourceCode />
       <footer className="bg-white text-black flex items-center justify-center text-background w-full py-12">
         <div className="flex flex-col max-w-xl">
