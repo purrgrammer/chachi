@@ -54,7 +54,6 @@ export default defineConfig({
           "nostr-vendor": [
             "@nostr-dev-kit/ndk",
             "@nostr-dev-kit/cache-dexie",
-            "@nostr-dev-kit/wallet",
             "nostr-tools",
           ],
           "ui-vendor": [

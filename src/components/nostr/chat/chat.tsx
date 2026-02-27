@@ -117,7 +117,6 @@ function Reply({
               youtube: false,
               events: false,
               hashtags: true,
-              ecash: false,
             }}
             className="line-clamp-1"
           >
@@ -295,7 +294,6 @@ function MessageContent({
       audio: true,
       emojis: true,
       urls: true,
-      ecash: true,
       reactions: false,
     },
     event.tags,
@@ -353,8 +351,7 @@ function MessageContent({
     fragments[0].type === "block" &&
     fragments[0].nodes.length === 1 &&
     (fragments[0].nodes[0]?.type === "event" ||
-      fragments[0].nodes[0]?.type === "address" ||
-      fragments[0].nodes[0].type === "ecash");
+      fragments[0].nodes[0]?.type === "address");
   const shouldHaveTransparentBackground =
     (isSingleCustomEmoji ||
       isOnlyEmojis ||

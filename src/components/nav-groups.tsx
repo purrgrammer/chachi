@@ -96,7 +96,6 @@ const LastMessagePreview = ({
           mentions: true,
           hashtags: true,
           events: false,
-          ecash: false,
           codeBlock: false,
           syntax: false,
           images: false,

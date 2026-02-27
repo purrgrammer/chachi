@@ -78,14 +78,12 @@ export function CommunityEditor({
   );
   const [newSectionName, setNewSectionName] = useState("");
   const [newSectionKinds, setNewSectionKinds] = useState<number[]>([]);
-  const [newSectionFee, setNewSectionFee] = useState<string>("");
   const [showAddSection, setShowAddSection] = useState(false);
   const [editingSection, setEditingSection] = useState<ContentSection | null>(
     null,
   );
   const [editSectionName, setEditSectionName] = useState("");
   const [editSectionKinds, setEditSectionKinds] = useState<number[]>([]);
-  const [editSectionFee, setEditSectionFee] = useState<string>("");
   const [isContentLoading, setIsContentLoading] = useState(false);
   const addSectionRef = useRef<HTMLDivElement>(null);
 
@@ -188,11 +186,6 @@ export function CommunityEditor({
         section.kinds.forEach((kind) => {
           event.tags.push(["k", kind.toString()]);
         });
-
-        // Add a fee tag if a fee is set
-        if (section.fee !== undefined) {
-          event.tags.push(["fee", section.fee.toString()]);
-        }
       });
 
       // Sign and publish the event
@@ -224,14 +217,9 @@ export function CommunityEditor({
       kinds: newSectionKinds,
     };
 
-    if (newSectionFee && !isNaN(Number(newSectionFee))) {
-      newSection.fee = Number(newSectionFee);
-    }
-
     setContentSections([...contentSections, newSection]);
     setNewSectionName("");
     setNewSectionKinds([]);
-    setNewSectionFee("");
     setEditingSection(null);
   }
 
@@ -245,7 +233,6 @@ export function CommunityEditor({
     setEditingSection(section);
     setEditSectionName(section.name);
     setEditSectionKinds([...section.kinds]);
-    setEditSectionFee(section.fee?.toString() || "");
   }
 
   function handleSaveEdit() {
@@ -256,7 +243,6 @@ export function CommunityEditor({
         return {
           name: editSectionName.trim(),
           kinds: editSectionKinds,
-          fee: editSectionFee ? Number(editSectionFee) : undefined,
         };
       }
       return section;
@@ -266,7 +252,6 @@ export function CommunityEditor({
     setEditingSection(null);
     setEditSectionName("");
     setEditSectionKinds([]);
-    setEditSectionFee("");
   }
 
   function toggleEditKindSelection(kind: number) {
@@ -299,9 +284,6 @@ export function CommunityEditor({
         section.kinds.forEach((kind) => {
           event.tags.push(["k", kind.toString()]);
         });
-        if (section.fee !== undefined) {
-          event.tags.push(["fee", section.fee.toString()]);
-        }
       });
 
       if (description) event.tags.push(["description", description]);
@@ -453,23 +435,6 @@ export function CommunityEditor({
 
                             <div>
                               <label className="text-sm font-medium mb-1 block">
-                                {t("community.edit.content_section.fee")} (
-                                {t("community.edit.content_section.optional")})
-                              </label>
-                              <Input
-                                value={editSectionFee}
-                                onChange={(e) =>
-                                  setEditSectionFee(e.target.value)
-                                }
-                                placeholder={t(
-                                  "community.edit.content_section.fee_placeholder",
-                                )}
-                                type="number"
-                              />
-                            </div>
-
-                            <div>
-                              <label className="text-sm font-medium mb-1 block">
                                 {t("community.edit.content_section.kinds")}
                               </label>
                               <div className="flex flex-col gap-3 mt-1">
@@ -560,16 +525,6 @@ export function CommunityEditor({
                                 </Button>
                               </div>
                             </div>
-                            {section.fee !== undefined && (
-                              <div className="text-sm text-muted-foreground">
-                                <Amount
-                                  amount={section.fee}
-                                  currency="USD"
-                                  size="sm"
-                                  className="gap-1"
-                                />
-                              </div>
-                            )}
                             <div className="flex flex-wrap gap-1.5 mt-1">
                               {section.kinds.map((kind) => {
                                 const kindInfo = ContentKinds.find(
@@ -627,21 +582,6 @@ export function CommunityEditor({
 
                       <div>
                         <label className="text-sm font-medium mb-1 block">
-                          {t("community.edit.content_section.fee")} (
-                          {t("community.edit.content_section.optional")})
-                        </label>
-                        <Input
-                          value={newSectionFee}
-                          onChange={(e) => setNewSectionFee(e.target.value)}
-                          placeholder={t(
-                            "community.edit.content_section.fee_placeholder",
-                          )}
-                          type="number"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-sm font-medium mb-1 block">
                           {t("community.edit.content_section.kinds")}
                         </label>
                         <div className="flex flex-col gap-3 mt-1">
@@ -689,7 +629,6 @@ export function CommunityEditor({
                             setShowAddSection(false);
                             setNewSectionName("");
                             setNewSectionKinds([]);
-                            setNewSectionFee("");
                           }}
                         >
                           {t("community.edit.cancel")}

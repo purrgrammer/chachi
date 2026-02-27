@@ -1,4 +1,3 @@
-import { validateZap } from "@/lib/nip-57-stub";
 import { NostrEvent } from "nostr-tools";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { useNDK } from "@/lib/ndk";
@@ -146,54 +145,7 @@ export function sortComments(
     if (!aIsAuthorReply && bIsAuthorReply) return 1;
 
     // If both are author replies or both aren't, proceed with the existing sorting logic
-    // Check if events are zaps
-    const aZapInfo = a.kind === NDKKind.Zap ? validateZap(a) : null;
-    const bZapInfo = b.kind === NDKKind.Zap ? validateZap(b) : null;
-
-    const aIsZap = Boolean(aZapInfo);
-    const bIsZap = Boolean(bZapInfo);
-
-    const aHasContent = aIsZap
-      ? Boolean(aZapInfo?.content.trim())
-      : a.content.trim().length > 0;
-    const bHasContent = bIsZap
-      ? Boolean(bZapInfo?.content.trim())
-      : b.content.trim().length > 0;
-
-    // Get zap amounts
-    const aAmount = aZapInfo?.amount || 0;
-    const bAmount = bZapInfo?.amount || 0;
-
-    // Case 1: One is a zap without content and the other is not
-    if (aIsZap && !aHasContent && (!bIsZap || bHasContent)) {
-      return 1; // Zap without content goes to the bottom
-    }
-    if (bIsZap && !bHasContent && (!aIsZap || aHasContent)) {
-      return -1; // Zap without content goes to the bottom
-    }
-
-    // Case 2: Both are zaps without content - sort by amount (higher first)
-    if (aIsZap && !aHasContent && bIsZap && !bHasContent) {
-      return bAmount - aAmount;
-    }
-
-    // Case 3: Both are zaps with content - sort by amount (higher first)
-    if (aIsZap && aHasContent && bIsZap && bHasContent) {
-      if (aAmount !== bAmount) {
-        return bAmount - aAmount;
-      }
-      // If same amount, fall through to chronological sort
-    }
-
-    // Case 4: One is a zap with content and the other is a regular post
-    if (aIsZap && aHasContent && !bIsZap) {
-      return -1; // Zap with content goes to the top
-    }
-    if (bIsZap && bHasContent && !aIsZap) {
-      return 1; // Zap with content goes to the top
-    }
-
-    // Default: chronological sort for all other cases
+    // Default: chronological sort
     return a.created_at - b.created_at;
   });
 }

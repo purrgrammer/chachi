@@ -95,16 +95,6 @@ export type HashtagFragment = {
   tag: string;
 };
 
-export type EcashFragment = {
-  type: "ecash";
-  token: string;
-};
-
-export type CashuRequestFragment = {
-  type: "cashu-request";
-  token: string;
-};
-
 export type CodeBlockFragment = {
   type: "codeBlock";
   code: string;
@@ -141,8 +131,6 @@ export type InlineFragment =
   | AudioFragment
   | EmojiFragment
   | HashtagFragment
-  | EcashFragment
-  | CashuRequestFragment
   | BoldFragment
   | ItalicFragment
   | MonospaceFragment;
@@ -159,7 +147,6 @@ function isRenderedAsBlock(fragment: Fragment): boolean {
     fragment.type === "block" ||
     fragment.type === "event" ||
     fragment.type === "address" ||
-    fragment.type === "ecash" ||
     fragment.type === "video" ||
     fragment.type === "youtube" ||
     fragment.type === "image" ||
@@ -290,16 +277,6 @@ function toNode(
     );
   }
 
-  if (fragment.type === "ecash") {
-    return (
-      <CashuToken
-        key={fragment.token}
-        token={fragment.token}
-        className={classNames.ecash}
-      />
-    );
-  }
-
   if (fragment.type === "codeBlock") {
     return (
       <LazyCodeBlock
@@ -339,10 +316,6 @@ function toNode(
         {fragment.text}
       </code>
     );
-  }
-
-  if (fragment.type === "cashu-request") {
-    return <CashuRequest token={fragment.token} className={classNames.ecash} />;
   }
 
   if (fragment.type === "text") {
@@ -386,7 +359,6 @@ export interface RichTextOptions {
   events?: boolean;
   urls?: boolean;
   hashtags?: boolean;
-  ecash?: boolean;
   images?: boolean;
   audio?: boolean;
   video?: boolean;
@@ -407,7 +379,6 @@ export interface RichTextClassnames {
   events?: string;
   urls?: string;
   hashtags?: string;
-  ecash?: string;
   spans?: string;
   paragraphs?: string;
   video?: string;
@@ -449,9 +420,6 @@ export function useRichText(
     if (options.hashtags) {
       result = extractHashtags(result);
     }
-    if (options.ecash) {
-      result = extractEcash(result);
-    }
 
     return result;
   }, [text, options, tags]);
@@ -478,12 +446,6 @@ export function Fragments({
   );
 }
 
-function extractEcash(fragments: Fragment[]): Fragment[] {
-  return extract(fragments, cashuRequestRegex, (s) => ({
-    type: "cashu-request",
-    token: s,
-  }));
-}
 
 const defaultOptions = {
   inline: false,
@@ -492,7 +454,6 @@ const defaultOptions = {
   events: true,
   urls: true,
   hashtags: true,
-  ecash: true,
   images: true,
   video: true,
   audio: true,
@@ -545,9 +506,6 @@ export function RichText({
     }
     if (opts.hashtags) {
       result = extractHashtags(result);
-    }
-    if (opts.ecash) {
-      result = extractEcash(result);
     }
 
     // flatten structure to avoid invalid DOM nesting
@@ -658,41 +616,6 @@ function toFragments(
     return nodes;
   };
 
-  // First, look for cashu tokens if enabled
-  if (options?.ecash !== false) {
-    const cashuMatches = Array.from(processedText.matchAll(cashuRegex));
-    if (cashuMatches.length > 0) {
-      const fragments: InlineFragment[] = [];
-      let lastCashuIndex = 0;
-
-      for (const match of cashuMatches) {
-        if (match.index! > lastCashuIndex) {
-          // Process text before the cashu token, including any emojis
-          const textBefore = processedText.substring(
-            lastCashuIndex,
-            match.index,
-          );
-          fragments.push(...processEmojiNodes(textBefore));
-        }
-
-        fragments.push({
-          type: "ecash",
-          token: match[1],
-        });
-
-        lastCashuIndex = match.index! + match[0].length;
-      }
-
-      if (lastCashuIndex < processedText.length) {
-        // Process remaining text, including any emojis
-        const textAfter = processedText.substring(lastCashuIndex);
-        fragments.push(...processEmojiNodes(textAfter));
-      }
-
-      return [{ type: "block", nodes: fragments }];
-    }
-  }
-
   // If syntax highlighting is disabled, just return the text with emojis processed
   if (!enableSyntax) {
     // If preserveNewlines is enabled, split by newlines
@@ -724,42 +647,6 @@ function toFragments(
   if (!enableCodeBlock) {
     // Process the text for formatting
     let syntaxProcessedText = processedText;
-
-    // First process cashu tokens
-    if (options?.ecash !== false) {
-      const cashuMatches = Array.from(syntaxProcessedText.matchAll(cashuRegex));
-      const fragments: InlineFragment[] = [];
-      let lastIndex = 0;
-
-      for (const match of cashuMatches) {
-        if (match.index! > lastIndex) {
-          // Use the processEmojiNodes helper to handle text before cashu token
-          fragments.push(
-            ...processEmojiNodes(
-              syntaxProcessedText.substring(lastIndex, match.index),
-            ),
-          );
-        }
-
-        fragments.push({
-          type: "ecash",
-          token: match[1],
-        });
-
-        lastIndex = match.index! + match[0].length;
-      }
-
-      if (lastIndex < syntaxProcessedText.length) {
-        // Use the processEmojiNodes helper to handle remaining text
-        fragments.push(
-          ...processEmojiNodes(syntaxProcessedText.substring(lastIndex)),
-        );
-      }
-
-      if (fragments.length > 0) {
-        return [{ type: "block", nodes: fragments }];
-      }
-    }
 
     // Apply bold formatting if enabled
     if (options?.bold !== false) {

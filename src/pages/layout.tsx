@@ -33,7 +33,6 @@ import { SidebarInset } from "@/components/ui/sidebar";
 import { fetchCommunity, useGroups } from "@/lib/nostr/groups";
 import { useGroupMessages } from "@/lib/nostr/chat";
 import { useSyncEmojiSets } from "@/lib/nostr/emojis";
-import { useChachiWallet } from "@/lib/wallet";
 import { RELATIONSHIP, COMMUNIKEY } from "@/lib/kinds";
 import { discoveryRelays } from "@/lib/relay";
 import { usePubkey } from "@/lib/account";
@@ -403,11 +402,9 @@ function useUserEvents({
   useGroupMessages(groupList.groups);
   // Emoji sets
   useSyncEmojiSets();
-  // Wallet
-  useChachiWallet();
 }
 
-const authRoutes = ["/dm", "/wallet", "/settings", "/zaps"];
+const authRoutes = ["/dm", "/settings"];
 
 function isAuthRoute(pathname: string) {
   return authRoutes.some((route) => pathname.startsWith(route));

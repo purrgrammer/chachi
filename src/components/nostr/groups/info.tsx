@@ -1,4 +1,4 @@
-import { Info, Crown, Server, CloudUpload, Landmark } from "lucide-react";
+import { Info, Crown, Server, CloudUpload } from "lucide-react";
 import { Avatar as NostrAvatar } from "@/components/nostr/avatar";
 import {
   Drawer,
@@ -25,7 +25,6 @@ import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import { RelayLink } from "../relay";
 import { BlossomLink } from "@/components/blossom";
-import { MintLink } from "@/components/mint-stub";
 
 function GroupPicture({
   picture,
@@ -181,22 +180,6 @@ function CommunityInfo({ group }: { group: Group }) {
         </div>
       ) : null}
 
-      {community?.mint ? (
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <Landmark className="size-4 text-muted-foreground" />
-            <h3 className="text-sm text-muted-foreground uppercase">
-              {t("community.mint.title")}
-            </h3>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <MintLink
-              url={community.mint}
-              classNames={{ icon: "size-4", name: "text-sm" }}
-            />
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

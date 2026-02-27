@@ -869,7 +869,6 @@ function AsReply({
           youtube: false,
           events: false,
           hashtags: true,
-          ecash: false,
         }}
         className="break-all line-clamp-1"
       >

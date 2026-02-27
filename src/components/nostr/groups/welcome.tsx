@@ -7,7 +7,6 @@ import {
   Pin,
   Server,
   CloudUpload,
-  Landmark,
   MapPin,
 
 } from "lucide-react";
@@ -27,7 +26,6 @@ import { Button } from "@/components/ui/button";
 import { useMyGroups } from "@/lib/groups";
 import { RelayLink } from "../relay";
 import { BlossomLink } from "@/components/blossom";
-import { MintLink } from "@/components/mint-stub";
 import { Badge } from "@/components/ui/badge";
 import { ContentKinds } from "@/lib/constants/kinds";
 import { useState, useMemo } from "react";
@@ -319,22 +317,6 @@ export default function Welcome({ community }: { community: Community }) {
                     classNames={{ icon: "size-4", name: "text-sm" }}
                   />
                 ))}
-              </div>
-            </div>
-          ) : null}
-          {community.mint ? (
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row items-center gap-1">
-                <Landmark className="size-4 text-muted-foreground" />
-                <h2 className="text-sm font-light uppercase text-muted-foreground">
-                  {t("groups.welcome.mint")}
-                </h2>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <MintLink
-                  url={community.mint}
-                  classNames={{ icon: "size-4", name: "text-sm" }}
-                />
               </div>
             </div>
           ) : null}

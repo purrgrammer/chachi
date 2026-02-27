@@ -1,7 +1,6 @@
 import { NostrEvent } from "nostr-tools";
 import {
   CloudUpload,
-  Landmark,
   MessagesSquare,
   Server,
   Castle,
@@ -21,7 +20,6 @@ import { useProfile } from "@/lib/nostr";
 import { useNavigate } from "react-router-dom";
 import { BlossomLink } from "@/components/blossom";
 import { RelayLink } from "../relay";
-import { MintLink } from "@/components/mint-stub";
 
 export function GroupPicture({
   group,
@@ -206,22 +204,6 @@ export function CommunityMetadata({
             </div>
           ) : null}
 
-          {community?.mint ? (
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <Landmark className="size-4 text-muted-foreground" />
-                <h3 className="text-sm text-muted-foreground uppercase">
-                  {t("community.mint.title")}
-                </h3>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <MintLink
-                  url={community.mint}
-                  classNames={{ icon: "size-4", name: "text-sm" }}
-                />
-              </div>
-            </div>
-          ) : null}
           <Button size="sm" onClick={openGroup}>
             <MessagesSquare /> {t("group.metadata.join-the-conversation")}
           </Button>
