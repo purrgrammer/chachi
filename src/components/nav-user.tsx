@@ -18,16 +18,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { WalletBalance } from "@/components/wallet";
 import { useAccount, useLogout } from "@/lib/account";
 import { useTranslation } from "react-i18next";
-import {
-  NDKWallet,
-  NDKCashuWallet,
-  NDKNWCWallet,
-  NDKWebLNWallet,
-} from "@nostr-dev-kit/wallet";
-import { useNDKWallets } from "@/lib/wallet";
 import { useAtomValue } from "jotai";
 import { communikeyAtom } from "@/app/store";
 
@@ -49,7 +41,6 @@ function UserInfo({ pubkey }: { pubkey: string }) {
 
 export function NavUser() {
   const { isMobile, open, openMobile, state } = useSidebar();
-  const [wallets] = useNDKWallets();
   const logout = useLogout();
   const account = useAccount();
   const navigate = useNavigate();
@@ -57,16 +48,6 @@ export function NavUser() {
   const isExpanded = state === "expanded" || open || openMobile;
   const { t } = useTranslation();
   const communikey = useAtomValue(communikeyAtom);
-
-  function openWallet(wallet: NDKWallet) {
-    if (wallet instanceof NDKNWCWallet && wallet.pairingCode) {
-      navigate(`/wallet/nwc/${encodeURIComponent(wallet.pairingCode)}`);
-    } else if (wallet instanceof NDKCashuWallet) {
-      navigate(`/wallet`);
-    } else if (wallet instanceof NDKWebLNWallet) {
-      navigate(`/wallet/webln`);
-    }
-  }
 
   return (
     <>
@@ -103,17 +84,6 @@ export function NavUser() {
                     {t("user.community")}
                   </DropdownMenuItem>
                 )}
-                {wallets.length > 0 ? (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuLabel>{t("user.wallets")}</DropdownMenuLabel>
-                    {wallets.map((wallet) => (
-                      <DropdownMenuItem onClick={() => openWallet(wallet)}>
-                        <WalletBalance wallet={wallet} size="sm" />
-                      </DropdownMenuItem>
-                    ))}
-                  </>
-                ) : null}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate("/settings")}>
                   <Settings className="text-muted-foreground size-4" />
