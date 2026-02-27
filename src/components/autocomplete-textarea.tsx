@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo, KeyboardEvent } from "react";
-import { validateZap, Zap } from '@/lib/nip-57-stub';
+import { validateZap } from '@/lib/nip-57-stub';
 import { Crown, Reply as ReplyIcon, X } from "lucide-react";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";

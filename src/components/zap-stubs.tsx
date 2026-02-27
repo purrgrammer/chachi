@@ -17,6 +17,10 @@ export function ZapReply() {
   return null;
 }
 
+export function Zap(_props?: any) {
+  return null;
+}
+
 export function ChatZap(_props?: any) {
   return null;
 }

@@ -1,7 +1,6 @@
 import { CashuToken, CashuRequest } from "@/components/zap-stubs";
 import { cashuRegex, cashuRequestRegex } from "@/lib/cashu-stub";
 import { useMemo } from "react";
-import { CashuToken } from "@/components/zap-stubs";
 import { nip19 } from "nostr-tools";
 import type {
   AddressPointer,

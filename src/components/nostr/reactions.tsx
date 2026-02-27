@@ -1,4 +1,3 @@
-import { useMintList } from "@/lib/cashu-stub";
 import { useState } from "react";
 import { validateZap, Zap } from '@/lib/nip-57-stub';
 import { NDKRelaySet, NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
@@ -314,23 +313,11 @@ export function Zaps({
   );
 }
 
-export function Nutzaps({
-  event,
-  className,
-  live,
-}: {
+export function Nutzaps(_props: {
   event: NostrEvent;
   className?: string;
   live?: boolean;
 }) {
-  const { data: mintList } = useMintList(event.pubkey);
-  return mintList ? (
-    <Reactions
-      event={event}
-      kinds={[NDKKind.Nutzap]}
-      relays={mintList.relays}
-      className={className}
-      live={live}
-    />
-  ) : null;
+  // Nutzaps have been removed
+  return null;
 }

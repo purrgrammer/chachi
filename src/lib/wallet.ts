@@ -1,8 +1,6 @@
 import { fetchMintInfo, fetchMintKeys } from "@/lib/cashu-stub";
 import { Zap, validateZapRequest } from "@/lib/nip-57-stub";
-import { fetchMintInfo, fetchMintKeys } from "@/lib/cashu-stub";
 import { useEffect, useState } from "react";
-import { Zap, validateZapRequest } from "@/lib/nip-57-stub";
 import { decode } from "light-bolt11-decoder";
 import { useQuery } from "@tanstack/react-query";
 import {

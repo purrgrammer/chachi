@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { validateZap, Zap } from '@/lib/nip-57-stub';
+import { validateZap } from '@/lib/nip-57-stub';
 import { Globe, MessageCircleQuestion } from "lucide-react";
 import { Link } from "react-router-dom";
 import { NDKKind } from "@nostr-dev-kit/ndk";

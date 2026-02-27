@@ -1,6 +1,5 @@
 import { LnAddress } from "@/components/zap-stubs";
 import { ReactNode, useMemo } from "react";
-import { LnAddress } from "@/components/zap-stubs";
 import {
   Drawer,
   DrawerContent,

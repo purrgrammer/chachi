@@ -1,6 +1,5 @@
 import { ChatZap } from "@/components/zap-stubs";
 import { useState } from "react";
-import { ChatZap } from "@/components/zap-stubs";
 import { NostrEvent } from "nostr-tools";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { Dialog, DialogContent } from "@/components/ui/dialog";

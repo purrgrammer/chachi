@@ -1,6 +1,5 @@
 import { validateZap } from "@/lib/nip-57-stub";
 import { NostrEvent } from "nostr-tools";
-import { validateZap } from "@/lib/nip-57-stub";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { useNDK } from "@/lib/ndk";
 import { useStream } from "@/lib/nostr";

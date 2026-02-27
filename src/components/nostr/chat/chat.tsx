@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from "react";
-import { validateZap, Zap } from '@/lib/nip-57-stub';
+import { validateZap } from '@/lib/nip-57-stub';
 import { motion, useInView } from "framer-motion";
 import { toast } from "sonner";
 import {
