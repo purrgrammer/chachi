@@ -1,7 +1,5 @@
 import { Reorder } from "framer-motion";
-import { validateZap, Zap } from '@/lib/nip-57-stub';
 import { useParams } from "react-router-dom";
-import { NostrEvent } from "nostr-tools";
 import { Avatar as NostrAvatar } from "@/components/nostr/avatar";
 import { useSortedGroups } from "@/lib/messages";
 import { useTranslation } from "react-i18next";
@@ -21,10 +19,8 @@ import {
   useUnreadMessages,
   //useUnreadMentions,
 } from "@/lib/messages";
-import type { Group, Event } from "@/lib/types";
+import type { Group } from "@/lib/types";
 import { NDKKind } from "@nostr-dev-kit/ndk";
-import { useMemo } from "react";
-import Amount from "@/components/amount-stub";
 
 interface MessageEvent {
   id: string;
@@ -34,62 +30,6 @@ interface MessageEvent {
   content: string;
   pubkey: string;
   tags: string[][];
-}
-
-function PaymentPreview({ group, zap }: { group: Group; zap: Zap }) {
-  return zap.content ? (
-    <div className="flex flex-row items-baseline gap-1 text-xs line-clamp-1 text-muted-foreground">
-      <span className="font-semibold">
-        <Name pubkey={zap.pubkey} short />
-      </span>
-      <LazyRichText
-        group={group}
-        className="leading-none line-clamp-1"
-        options={{
-          inline: true,
-          emojis: true,
-          mentions: true,
-          hashtags: true,
-          events: false,
-          ecash: false,
-          codeBlock: false,
-          syntax: false,
-          images: false,
-          video: false,
-          audio: false,
-          youtube: false,
-        }}
-        classNames={{
-          emojis: "pointer-events-none size-4 opacity-70",
-          spans: "break-all",
-          urls: "pointer-events-none",
-          mentions: "pointer-events-none",
-        }}
-        tags={zap.tags}
-      >
-        {zap.content}
-      </LazyRichText>
-    </div>
-  ) : (
-    <div className="flex flex-row items-center gap-1 text-xs line-clamp-1 text-muted-foreground">
-      <span className="font-semibold">
-        <Name pubkey={zap.pubkey} short />
-      </span>
-      <Amount amount={zap.amount} size="xs" />
-      <span className="font-semibold">
-        <Name pubkey={zap.p!} short />
-      </span>
-    </div>
-  );
-}
-
-function ZapPreview({ group, event }: { group: Group; event: Event }) {
-  const zap = useMemo(
-    () => validateZap(event as unknown as NostrEvent),
-    [event],
-  );
-  if (!zap) return null;
-  return <PaymentPreview group={group} zap={zap} />;
 }
 
 // todo: relationship
@@ -137,10 +77,6 @@ const LastMessagePreview = ({
         </span>
       </div>
     );
-  }
-
-  if (lastMessage.kind === NDKKind.Zap) {
-    return <ZapPreview group={group} event={lastMessage} />;
   }
 
   // todo: relationship

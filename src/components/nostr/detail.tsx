@@ -1,4 +1,3 @@
-import { ZapGoal, ZapPreview, ZapDetail, ZapReply } from "@/components/zap-stubs";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -82,19 +81,16 @@ import { useRelaySet, useRelays, useA } from "@/lib/nostr";
 import { useDirectReplies, useReplies } from "@/lib/nostr/comments";
 import { useGroupAdminsList } from "@/lib/nostr/groups";
 import { useOpenGroup, groupId } from "@/lib/groups";
-import { MintEventPreview, MintEventDetail } from "@/components/mint-stub";
 import {
   POLL,
   REPO,
   ISSUE,
   COMMENT,
-  GOAL,
   STREAM,
   CALENDAR,
   CALENDAR_EVENT,
   GIF_SET,
   BOOK,
-  CASHU_MINT,
   COMMUNIKEY,
   CODE_SNIPPET,
   WORKOUT,
@@ -176,10 +172,6 @@ const eventDetails: Record<
     preview: Post,
     detail: PostDetail,
   },
-  [GOAL]: {
-    preview: ZapGoal,
-    detail: ZapGoal,
-  },
   [NDKKind.Thread]: {
     preview: Post,
     detail: PostDetail,
@@ -249,13 +241,6 @@ const eventDetails: Record<
     preview: Image,
     detail: Image,
   },
-  [NDKKind.Zap]: {
-    noHeader: true,
-    className: "relative rounded-md bg-background/80 border-none my-0.5",
-    preview: ZapPreview,
-    detail: ZapDetail,
-    reply: ZapReply,
-  },
   [BOOK]: {
     preview: Book,
     detail: Book,
@@ -289,11 +274,6 @@ const eventDetails: Record<
     preview: WikiPreview,
     detail: WikiPreview,
     content: WikiDetail,
-  },
-  [CASHU_MINT]: {
-    noHeader: true,
-    preview: MintEventPreview,
-    detail: MintEventDetail,
   },
   [CODE_SNIPPET]: {
     preview: CodeSnippet,
@@ -1043,7 +1023,7 @@ export function ReplyEmbed({
         <Reactions
           event={event}
           relays={group ? [group.relay] : [...relays, ...userRelays]}
-          kinds={[NDKKind.Reaction, NDKKind.Zap, NDKKind.Nutzap]}
+          kinds={[NDKKind.Reaction]}
         />
       ) : null}
     </div>
@@ -1297,7 +1277,7 @@ export function FeedEmbed({
         <Reactions
           event={event}
           relays={group ? [group.relay] : [...relays, ...userRelays]}
-          kinds={[NDKKind.Zap, NDKKind.Nutzap, NDKKind.Reaction]}
+          kinds={[NDKKind.Reaction]}
         />
       ) : null}
     </div>
@@ -1537,7 +1517,7 @@ export function Embed({
           <Reactions
             event={event}
             relays={group ? [group.relay] : [...relays, ...userRelays]}
-            kinds={[NDKKind.Zap, NDKKind.Nutzap, NDKKind.Reaction]}
+            kinds={[NDKKind.Reaction]}
           />
         ) : null}
       </div>

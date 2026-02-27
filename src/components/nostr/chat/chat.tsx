@@ -1,5 +1,4 @@
 import { useMemo, useState, useEffect, useRef } from "react";
-import { validateZap } from '@/lib/nip-57-stub';
 import { motion, useInView } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -77,10 +76,7 @@ function Reply({
     relays: group ? [group.relay] : [],
   });
   const isAdmin = event?.pubkey ? admins.includes(event?.pubkey) : false;
-  const author =
-    event && event.kind === NDKKind.Zap
-      ? validateZap(event)?.pubkey || event?.pubkey
-      : event?.pubkey;
+  const author = event?.pubkey;
 
   const isGroupChat = event?.kind === NDKKind.GroupChat;
   const isText = event?.kind === NDKKind.Text;

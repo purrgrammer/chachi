@@ -1,22 +1,14 @@
 import { useState } from "react";
-import { validateZap, Zap } from '@/lib/nip-57-stub';
 import { NDKRelaySet, NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { Avatar } from "@/components/nostr/avatar";
-import { RichText } from "@/components/rich-text";
 import { Button } from "@/components/ui/button";
 import { useReactions } from "@/lib/nostr";
 import { useNDK } from "@/lib/ndk";
 import { usePubkey } from "@/lib/account";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn, groupBy } from "@/lib/utils";
 import { CUSTOM_EMOJI_CONTENT_REGEX } from "@/lib/emoji";
 import { useTranslation } from "react-i18next";
-import Amount from "@/components/amount-stub";
 
 function Reacters({
   reactions,
@@ -156,57 +148,6 @@ function Reaction({
   );
 }
 
-function ZapReaction({ zap }: { zap: Zap }) {
-  const me = usePubkey();
-  const iZapped = zap.pubkey === me;
-  return (
-    <div
-      className={`p-1 text-foreground bg-background/90 dark:bg-background/30 rounded-xl ${iZapped ? "bg-primary/20 dark:bg-primary/50" : ""} transition-color`}
-    >
-      <div className="flex flex-row items-center gap-1.5">
-        {zap.content ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <RichText
-                className="text-xs line-clamp-1"
-                tags={zap.tags}
-                options={{
-                  inline: true,
-                  events: false,
-                  ecash: false,
-                  video: false,
-                  images: false,
-                  audio: false,
-                }}
-              >
-                {zap.content.trim()}
-              </RichText>
-            </TooltipTrigger>
-            <TooltipContent>
-              <RichText
-                className="text-xs"
-                tags={zap.tags}
-                options={{
-                  inline: true,
-                  events: false,
-                  ecash: false,
-                  video: false,
-                  images: false,
-                  audio: false,
-                }}
-              >
-                {zap.content.trim()}
-              </RichText>
-            </TooltipContent>
-          </Tooltip>
-        ) : null}
-        <Amount amount={zap.amount} size="sm" />
-        <Avatar pubkey={zap.pubkey} className="size-4" />
-      </div>
-    </div>
-  );
-}
-
 function getOldestReaction(reactions: NostrEvent[]): NostrEvent | null {
   return reactions.reduce(
     (oldest, r) => {
@@ -228,13 +169,8 @@ export function ReactionsList({
   relays?: string[];
   className?: string;
 }) {
-  const zaps = events
-    .filter((r) => r.kind === NDKKind.Zap)
-    .map(validateZap)
-    .filter((z) => z !== null)
-    .sort((a, b) => b.amount - a.amount) as Zap[];
   const reactions = events.filter((r) => r.kind === NDKKind.Reaction);
-  const hasReactions = zaps.length > 0 || reactions.length > 0;
+  const hasReactions = reactions.length > 0;
 
   const byContent = groupBy(reactions, (r: NostrEvent) => {
     return r.content === "+" ? "👍" : r.content === "-" ? "👎" : r.content;
@@ -248,9 +184,6 @@ export function ReactionsList({
         className,
       )}
     >
-      {zaps.map((zap) => (
-        <ZapReaction key={zap.id} zap={zap} />
-      ))}
       {Object.entries(byContent)
         .sort((a, b) => {
           return (
@@ -291,33 +224,3 @@ export function Reactions({
   return <ReactionsList event={event} events={events} className={className} />;
 }
 
-export function Zaps({
-  event,
-  relays,
-  className,
-  live,
-}: {
-  event: NostrEvent;
-  relays?: string[];
-  className?: string;
-  live?: boolean;
-}) {
-  return (
-    <Reactions
-      event={event}
-      kinds={[NDKKind.Zap, NDKKind.Nutzap]}
-      relays={relays}
-      className={className}
-      live={live}
-    />
-  );
-}
-
-export function Nutzaps(_props: {
-  event: NostrEvent;
-  className?: string;
-  live?: boolean;
-}) {
-  // Nutzaps have been removed
-  return null;
-}

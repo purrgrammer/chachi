@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import { validateZap } from '@/lib/nip-57-stub';
 import { Globe, MessageCircleQuestion } from "lucide-react";
 import { Link } from "react-router-dom";
 import { NDKKind } from "@nostr-dev-kit/ndk";
@@ -76,11 +75,9 @@ export function Header({ event }: { event: NostrEvent }) {
     clientTag?.[3] && isRelayURL(clientTag[3]) ? clientTag[3] : null;
   const author = host
     ? host
-    : event.kind === NDKKind.Zap
-      ? validateZap(event)?.pubkey
-      : event.kind === TARGETED_PUBLICATION
-        ? event.tags.find((t) => t[0] === "p")?.[1] || event.pubkey
-        : event.pubkey;
+    : event.kind === TARGETED_PUBLICATION
+      ? event.tags.find((t) => t[0] === "p")?.[1] || event.pubkey
+      : event.pubkey;
   const publishedAt = event.tags.find((t) => t[0] === "published_at")?.[1];
   const startsAt = event.tags.find((t) => t[0] === "starts")?.[1];
   const timestamp = Number(publishedAt) || Number(startsAt) || event.created_at;

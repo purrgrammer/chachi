@@ -1,4 +1,3 @@
-import { ChatZap } from "@/components/zap-stubs";
 import { useState } from "react";
 import { NostrEvent } from "nostr-tools";
 import { NDKKind } from "@nostr-dev-kit/ndk";
@@ -68,13 +67,6 @@ export function Thread({
         {...props}
         group={isFromGroup ? group : undefined}
         relays={isFromGroup && group ? [group?.relay] : []}
-      />
-    ),
-    [NDKKind.Zap]: (props: ThreadComponentProps) => (
-      <ChatZap
-        key={props.event.id}
-        {...props}
-        group={isFromGroup ? group : undefined}
       />
     ),
   };

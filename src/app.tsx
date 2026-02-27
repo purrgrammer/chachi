@@ -23,7 +23,6 @@ const Group = lazy(() => import("@/pages/group"));
 const Event = lazy(() => import("@/pages/event"));
 const CommunityEvent = lazy(() => import("@/pages/community-event"));
 const Settings = lazy(() => import("@/pages/settings"));
-const Mint = lazy(() => import("@/pages/mint"));
 const Relay = lazy(() => import("@/pages/relay"));
 const Community = lazy(() => import("@/pages/community"));
 const CommunitySettings = lazy(() => import("@/pages/community-settings"));
@@ -139,10 +138,6 @@ const router = createBrowserRouter([
       {
         path: "/e/:nlink",
         element: <Event />,
-      },
-      {
-        path: "/mint/:url",
-        element: <Mint />,
       },
       // todo: remove this route, zaps will be on the notifications page
       {
