@@ -118,11 +118,26 @@ export function buildReactionEvent(
   content: string,
   target: NostrEvent,
   customEmojiTags: string[][] = [],
+  relay?: string,
 ): EventTemplate {
   const tags = [
     ...createEventReferenceTags(target),
     ...customEmojiTags,
   ];
+
+  // For group messages (NIP-29), copy the h-tag from the target event
+  const hTag = target.tags.find((t) => t[0] === "h");
+  if (hTag) {
+    // Ensure h-tag includes relay hint (NIP-29)
+    if (relay && !hTag[2]) {
+      // Add relay hint if not present
+      tags.push([hTag[0], hTag[1], relay]);
+    } else {
+      // Copy h-tag as-is (already has relay or no relay provided)
+      tags.push(hTag);
+    }
+  }
+
   return createEventTemplate(Kind.Reaction, content, tags);
 }
 
@@ -134,12 +149,13 @@ export function buildCustomEmojiReaction(
   emojiSrc: string,
   target: NostrEvent,
   emojiAddress?: string,
+  relay?: string,
 ): EventTemplate {
   const emojiTag = emojiAddress
     ? ["emoji", emojiName, emojiSrc, emojiAddress]
     : ["emoji", emojiName, emojiSrc];
 
-  return buildReactionEvent(`:${emojiName}:`, target, [emojiTag]);
+  return buildReactionEvent(`:${emojiName}:`, target, [emojiTag], relay);
 }
 
 // ============================================================================
@@ -373,6 +389,12 @@ export function buildZapRequestEvent(
 
   if (comment) {
     tags.push(["comment", comment]);
+  }
+
+  // For group messages (NIP-29), copy the h-tag from the target event
+  const hTag = target.tags.find((t) => t[0] === "h");
+  if (hTag) {
+    tags.push(hTag);
   }
 
   return createEventTemplate(Kind.ZapRequest, comment, tags);

@@ -39,7 +39,9 @@ export function usePublishReaction() {
         content,
         relays,
       });
-      const template = builders.buildReactionEvent(content, target);
+      // Pass the first relay as the h-tag relay hint
+      const relay = relays?.[0];
+      const template = builders.buildReactionEvent(content, target, [], relay);
       return publish(template, relays);
     },
     [publish],
@@ -71,6 +73,7 @@ export function usePublishEmojiReaction() {
         relays,
       });
       let template;
+      const relay = relays?.[0];
 
       if (emoji.src) {
         // Custom emoji with image
@@ -79,11 +82,12 @@ export function usePublishEmojiReaction() {
           emoji.src,
           target,
           emoji.address,
+          relay,
         );
       } else {
         // Standard emoji or shortcode
         const content = emoji.native || emoji.shortcodes || emoji.name;
-        template = builders.buildReactionEvent(content, target);
+        template = builders.buildReactionEvent(content, target, [], relay);
       }
 
       return publish(template, relays);

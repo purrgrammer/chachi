@@ -96,7 +96,8 @@ function Reaction({
   ) {
     try {
       setIsReacting(true);
-      const template = buildCustomEmojiReaction(emoji, img, event, address);
+      const relay = relays[0];
+      const template = buildCustomEmojiReaction(emoji, img, event, address, relay);
       await publish(template, relays);
     } catch (err) {
       console.error(err);
@@ -207,6 +208,6 @@ export function Reactions({
   live?: boolean;
 }) {
   const { events } = useReactions(event, kinds, relays, live);
-  return <ReactionsList event={event} events={events} className={className} />;
+  return <ReactionsList event={event} events={events} relays={relays} className={className} />;
 }
 

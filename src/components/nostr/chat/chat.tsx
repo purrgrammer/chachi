@@ -256,7 +256,8 @@ function MessageContent({
 }) {
   const { t } = useTranslation();
   const [settings] = useSettings();
-  const relay = group?.relay;
+  // Get relay from group or extract from event's h-tag
+  const relay = group?.relay || event.tags.find((t) => t[0] === "h")?.[2];
   const [showMessageActions, setShowMessageActions] = useState(false);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
   const publishRemoveUser = usePublishGroupRemoveUser();
@@ -536,13 +537,15 @@ function MessageContent({
                   </RichText>
                 )}
                 {isDeleted ? null : showReactions ? (
-                  <Reactions
-                    className="pt-1"
-                    event={event}
-                    relays={[...(relay ? [relay] : [])]}
-                    kinds={[Kind.Zap, Kind.Reaction]}
-                    live={isInView}
-                  />
+                  <div onPointerDown={(e) => e.stopPropagation()}>
+                    <Reactions
+                      className="pt-1"
+                      event={event}
+                      relays={[...(relay ? [relay] : [])]}
+                      kinds={[Kind.Zap, Kind.Reaction]}
+                      live={isInView}
+                    />
+                  </div>
                 ) : null}
                 <LazyEmojiPicker
                   open={showingEmojiPicker}
