@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Link as LinkIcon } from "lucide-react";
-import { NDKKind } from "@nostr-dev-kit/ndk";
+import * as Kind from "@/lib/nostr/kinds";
 import { NostrEvent } from "nostr-tools";
 import { User } from "@/components/nostr/user";
 import { cn } from "@/lib/utils";
@@ -31,7 +31,7 @@ function ArticleLink({ event }: { event: NostrEvent }) {
 
 function ARef({ author, tag }: { author?: string; tag: string[] }) {
   const { data: event } = useARef(tag);
-  return event && event?.kind === NDKKind.Article ? (
+  return event && event?.kind === Kind.Article ? (
     <ArticleLink event={event} />
   ) : author ? (
     <User

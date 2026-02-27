@@ -1,13 +1,9 @@
 import { useState, ReactNode } from "react";
-import { useAtomValue } from "jotai";
 import { toast } from "sonner";
 import { z } from "zod";
-import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Plus } from "lucide-react";
-import { NostrEvent } from "nostr-tools";
-import { groupsContentAtom } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -36,16 +32,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRelays, useRelaySet } from "@/lib/nostr";
+import { useRelays } from "@/lib/nostr";
 import { useCreateGroup, useEditGroup } from "@/lib/nostr/groups";
-import { getRelayHost, isRelayURL } from "@/lib/relay";
+import { getRelayHost } from "@/lib/relay";
 import { useAccount } from "@/lib/account";
 import { useMyGroups } from "@/lib/groups";
 import { randomId } from "@/lib/id";
-import { useNDK } from "@/lib/ndk";
 import { useNavigate } from "@/lib/navigation";
 import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
+import { usePublishSimpleGroupList } from "@/lib/nostr/publishing";
 
 const formSchema = z.object({
   name: z.string().min(1).max(140),
@@ -69,18 +65,16 @@ export function CreateGroupOnRelay({
   className?: string;
 }) {
   const { t } = useTranslation();
-  const ndk = useNDK();
   const [showDialog, setShowDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const groups = useMyGroups();
-  const groupsContent = useAtomValue(groupsContentAtom);
   const createGroup = useCreateGroup();
   const editGroup = useEditGroup();
   const account = useAccount();
   const canSign = account?.pubkey && !account.isReadOnly;
   const navigate = useNavigate();
   const userRelays = useRelays();
-  const relaySet = useRelaySet(userRelays.filter((r) => isRelayURL(r)));
+  const publishGroupList = usePublishSimpleGroupList();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -93,17 +87,7 @@ export function CreateGroupOnRelay({
   async function bookmarkGroup(group: Group) {
     try {
       const newGroups = [...groups, group];
-      const event = new NDKEvent(ndk, {
-        kind: NDKKind.SimpleGroupList,
-        content: groupsContent,
-        tags: newGroups.map((g) => [
-          "group",
-          g.id,
-          g.relay,
-          ...(g.isCommunity ? ["community"] : []),
-        ]),
-      } as NostrEvent);
-      await event.publish(relaySet);
+      await publishGroupList(newGroups, userRelays);
     } catch (err) {
       console.error(err);
       toast.error(t("group.bookmark.error"));

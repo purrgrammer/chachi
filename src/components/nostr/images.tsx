@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import type { ForwardedRef } from "react";
-import { NDKKind } from "@nostr-dev-kit/ndk";
+import * as Kind from "@/lib/nostr/kinds";
 import { Button } from "@/components/ui/button";
 import { ImageUp } from "lucide-react";
 import { NewImage } from "@/components/nostr/image";
@@ -17,14 +17,14 @@ export const GroupImages = forwardRef(
     const includeOpPublications = metadata?.isCommunity;
     const filter = [
       {
-        kinds: [NDKKind.Image],
+        kinds: [Kind.Image],
         "#h": [group.id],
         limit: 30,
       },
       ...(includeOpPublications
         ? [
             {
-              kinds: [NDKKind.Image],
+              kinds: [Kind.Image],
               authors: [group.id],
             },
           ]

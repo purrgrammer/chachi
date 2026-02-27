@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import type { ForwardedRef } from "react";
-import { NDKKind } from "@nostr-dev-kit/ndk";
+import * as Kind from "@/lib/nostr/kinds";
 import Feed from "@/components/nostr/feed";
 import { useGroup } from "@/lib/nostr/groups";
 import type { Group } from "@/lib/types";
@@ -14,14 +14,14 @@ export const GroupArticles = forwardRef(
     const includeOpPublications = metadata?.isCommunity;
     const filter = [
       {
-        kinds: [NDKKind.Article],
+        kinds: [Kind.Article],
         "#h": [group.id],
         limit: 100,
       },
       ...(includeOpPublications
         ? [
             {
-              kinds: [NDKKind.Article],
+              kinds: [Kind.Article],
               authors: [group.id],
             },
           ]

@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Send, Check, RefreshCw } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
-import { NDKEvent, NDKKind, NDKRelaySet } from "@nostr-dev-kit/ndk";
+import { NDKEvent } from "@nostr-dev-kit/ndk";
+import * as Kind from "@/lib/nostr/kinds";
 import { UploadFile } from "@/components/upload-file";
 import { GIFPicker } from "@/components/gif-picker";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import { useRequestedToJoin, useJoinRequest } from "@/lib/nostr/groups";
 import type { Group, Emoji } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import { useAddUnpublishedEvent } from "@/lib/unpublished";
+import { usePublishEvent } from "@/lib/nostr/publishing";
 
 function JoinRequest({ group, pubkey }: { group: Group; pubkey: string }) {
   const canSign = useCanSign();
@@ -96,10 +98,10 @@ export function ChatInput({
   children,
 }: {
   group?: Group;
-  kind: NDKKind;
+  kind: number;
   rootEvent?: NostrEvent;
   showReplyPreview?: boolean;
-  replyKind?: NDKKind;
+  replyKind?: number;
   pubkeys?: string[];
   replyingTo?: NostrEvent;
   setReplyingTo: (event: NostrEvent | undefined) => void;
@@ -121,6 +123,7 @@ export function ChatInput({
   const [message, setMessage] = useState("");
   const [customEmojis, setCustomEmojis] = useState<Emoji[]>([]);
   const addUnpublishedEvent = useAddUnpublishedEvent();
+  const publish = usePublishEvent();
 
   async function sendMessage(msg: string) {
     setIsPosting(true);
@@ -133,27 +136,24 @@ export function ChatInput({
       toast.error(t("send.error"));
       return;
     }
-    const relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
     const content = msg.trim();
     if (!content) {
       return;
     }
     if (content) {
-      const event = new NDKEvent(ndk, {
-        kind: replyingTo && replyKind ? replyKind : kind,
-        content,
-        tags,
-      } as NostrEvent);
+      // Build tags array
+      const eventTags = [...(tags || [])];
+
       if (replyingTo) {
-        if (replyingTo.kind === NDKKind.Text) {
+        if (replyingTo.kind === Kind.Text) {
           const root = replyingTo.tags.find((t) => t[3] === "root")?.[1];
           if (root && root !== replyingTo.id) {
-            event.tags.push(["e", root, group?.relay || "", "root"]);
-            event.tags.push(["e", replyingTo.id, group?.relay || "", "reply"]);
+            eventTags.push(["e", root, group?.relay || "", "root"]);
+            eventTags.push(["e", replyingTo.id, group?.relay || "", "reply"]);
           } else {
-            event.tags.push(["e", replyingTo.id, group?.relay || "", "root"]);
+            eventTags.push(["e", replyingTo.id, group?.relay || "", "root"]);
           }
-        } else if (replyKind === NDKKind.GenericReply) {
+        } else if (replyKind === Kind.GenericReply) {
           const replyEv = new NDKEvent(ndk, replyingTo);
           const rootTag = replyingTo.tags.find(
             (t) => t[0] === "E" || t[0] === "A",
@@ -164,37 +164,37 @@ export function ChatInput({
           if (rootEvent) {
             const ref = replyEv.tagReference();
             ref[0] = ref[0].toUpperCase();
-            event.tags.push(ref);
+            eventTags.push(ref);
           } else if (rootTag) {
-            event.tags.push(rootTag);
+            eventTags.push(rootTag);
           } else {
             const ref = replyEv.tagReference();
             ref[0] = ref[0].toUpperCase();
-            event.tags.push(ref);
+            eventTags.push(ref);
           }
           // Root event kind
           if (rootEvent) {
-            event.tags.push(["K", rootEvent.kind.toString()]);
+            eventTags.push(["K", rootEvent.kind.toString()]);
           } else if (rootKindTag) {
-            event.tags.push(rootKindTag);
+            eventTags.push(rootKindTag);
           } else {
-            event.tags.push(["K", String(replyEv.kind)]);
+            eventTags.push(["K", String(replyEv.kind)]);
           }
           // Root event pubkey
           if (rootEvent) {
-            event.tags.push(["P", rootEvent.pubkey]);
+            eventTags.push(["P", rootEvent.pubkey]);
           } else if (rootPTag) {
-            event.tags.push(rootPTag);
+            eventTags.push(rootPTag);
           } else {
-            event.tags.push(["P", String(replyEv.pubkey)]);
+            eventTags.push(["P", String(replyEv.pubkey)]);
           }
           // Reply event reference, kind and pubkey
-          event.tags.push(replyEv.tagReference());
-          event.tags.push(["k", String(replyEv.kind)]);
-          event.tags.push(["p", String(replyEv.pubkey)]);
+          eventTags.push(replyEv.tagReference());
+          eventTags.push(["k", String(replyEv.kind)]);
+          eventTags.push(["p", String(replyEv.pubkey)]);
           // todo: add missing pubkeys from thread
         } else {
-          event.tags.push([
+          eventTags.push([
             "q",
             replyingTo.id,
             group?.relay || "",
@@ -202,32 +202,41 @@ export function ChatInput({
           ]);
         }
       }
+
       if (customEmojis.length > 0) {
         customEmojis.forEach((e) => {
           if (e.image) {
             if (e.address) {
-              event.tags.push(["emoji", e.name, e.image, e.address]);
+              eventTags.push(["emoji", e.name, e.image, e.address]);
             } else {
-              event.tags.push(["emoji", e.name, e.image]);
+              eventTags.push(["emoji", e.name, e.image]);
             }
           }
         });
       }
+
+      // Create event template and publish
+      const template = {
+        kind: replyingTo && replyKind ? replyKind : kind,
+        content,
+        tags: eventTags,
+        created_at: Math.floor(Date.now() / 1000),
+      };
+
       try {
-        const result = await event.publish(relaySet);
-        if (result.size === 0) {
-          throw new Error("Failed to publish event");
-        }
-      } catch (err) {
-        console.error(err);
-        addUnpublishedEvent({ event, relays });
-        toast.error(t("send.error"));
-      } finally {
+        const publishedEvent = await publish(template, relays);
         setMessage("");
         setIsPosting(false);
         setReplyingTo(undefined);
         setCustomEmojis([]);
-        onNewMessage?.(event.rawEvent() as NostrEvent);
+        onNewMessage?.(publishedEvent);
+      } catch (err) {
+        console.error(err);
+        // For unpublished events, we still need NDKEvent for compatibility
+        const ndkEvent = new NDKEvent(ndk, template as NostrEvent);
+        addUnpublishedEvent({ event: ndkEvent, relays });
+        toast.error(t("send.error"));
+        setIsPosting(false);
       }
     }
   }

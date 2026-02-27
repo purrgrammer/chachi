@@ -1,14 +1,18 @@
 import { useState } from "react";
-import { NDKRelaySet, NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { Avatar } from "@/components/nostr/avatar";
 import { Button } from "@/components/ui/button";
 import { useReactions } from "@/lib/nostr";
-import { useNDK } from "@/lib/ndk";
 import { usePubkey } from "@/lib/account";
 import { cn, groupBy } from "@/lib/utils";
 import { CUSTOM_EMOJI_CONTENT_REGEX } from "@/lib/emoji";
 import { useTranslation } from "react-i18next";
+import * as Kind from "@/lib/nostr/kinds";
+import {
+  usePublishReaction,
+  usePublishEvent,
+  buildCustomEmojiReaction,
+} from "@/lib/nostr/publishing";
 
 function Reacters({
   reactions,
@@ -60,8 +64,9 @@ function Reaction({
   reactions: NostrEvent[];
   isCompact: boolean;
 }) {
-  const ndk = useNDK();
   const [isReacting, setIsReacting] = useState(false);
+  const publishReaction = usePublishReaction();
+  const publish = usePublishEvent();
   const isCustomEmoji = CUSTOM_EMOJI_CONTENT_REGEX.test(content);
   const emojiName = content.slice(1, -1);
   const emojiTag = reactions[0].tags.find(
@@ -75,16 +80,8 @@ function Reaction({
 
   async function react(content: string) {
     try {
-      const relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
       setIsReacting(true);
-      if (ndk) {
-        const e = new NDKEvent(ndk, {
-          kind: NDKKind.Reaction,
-          content,
-        } as NostrEvent);
-        e.tag(new NDKEvent(ndk, event));
-        await e.publish(relaySet);
-      }
+      await publishReaction(event, content, relays);
     } catch (err) {
       console.error(err);
     } finally {
@@ -99,19 +96,8 @@ function Reaction({
   ) {
     try {
       setIsReacting(true);
-      if (ndk) {
-        const relaySet = NDKRelaySet.fromRelayUrls(relays, ndk);
-        const emojiTag = address
-          ? ["emoji", emoji, img, address]
-          : ["emoji", emoji, img];
-        const e = new NDKEvent(ndk, {
-          kind: NDKKind.Reaction,
-          content: `:${emoji}:`,
-          tags: [emojiTag],
-        } as NostrEvent);
-        e.tag(new NDKEvent(ndk, event));
-        await e.publish(relaySet);
-      }
+      const template = buildCustomEmojiReaction(emoji, img, event, address);
+      await publish(template, relays);
     } catch (err) {
       console.error(err);
     } finally {
@@ -169,7 +155,7 @@ export function ReactionsList({
   relays?: string[];
   className?: string;
 }) {
-  const reactions = events.filter((r) => r.kind === NDKKind.Reaction);
+  const reactions = events.filter((r) => r.kind === Kind.Reaction);
   const hasReactions = reactions.length > 0;
 
   const byContent = groupBy(reactions, (r: NostrEvent) => {
@@ -210,13 +196,13 @@ export function ReactionsList({
 export function Reactions({
   event,
   relays = [],
-  kinds = [NDKKind.Reaction],
+  kinds = [Kind.Reaction],
   className,
   live,
 }: {
   event: NostrEvent;
   relays?: string[];
-  kinds?: NDKKind[];
+  kinds?: number[];
   className?: string;
   live?: boolean;
 }) {

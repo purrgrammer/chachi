@@ -2,23 +2,21 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { NostrEvent } from "nostr-tools";
 import { SmilePlus, RotateCw, Star, Check } from "lucide-react";
-import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
+import * as Kind from "@/lib/nostr/kinds";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { useNDK } from "@/lib/ndk";
 import { useCustomEmojis } from "@/lib/nostr/emojis";
-import { useRelays, useRelaySet } from "@/lib/nostr";
+import { useRelays } from "@/lib/nostr";
 import { useTranslation } from "react-i18next";
+import { usePublishEvent } from "@/lib/nostr/publishing";
 
 export default function EmojiSet({ event }: { event: NostrEvent }) {
   const { data: myEmojis } = useCustomEmojis();
   const relays = useRelays();
-  const relaySet = useRelaySet(relays);
-  const ndk = useNDK();
   const title = event.tags.find((t) => t[0] === "title")?.[1];
   const identifier = event.tags.find((t) => t[0] === "d")?.[1];
   const emojis = event.tags.filter((t) => t[0] === "emoji");
@@ -27,6 +25,7 @@ export default function EmojiSet({ event }: { event: NostrEvent }) {
   );
   const [isSaving, setIsSaving] = useState(false);
   const { t } = useTranslation();
+  const publish = usePublishEvent();
   async function toggleFavorite() {
     try {
       setIsSaving(true);
@@ -34,23 +33,24 @@ export default function EmojiSet({ event }: { event: NostrEvent }) {
       if (inCollection) {
         newTags = myEmojis
           .filter((s) => s.pubkey !== event.pubkey || s.name !== title)
-          .map((e) => ["a", `${NDKKind.EmojiSet}:${e.pubkey}:${e.name}`]);
+          .map((e) => ["a", `${Kind.EmojiSet}:${e.pubkey}:${e.name}`]);
       } else {
         const myEmojiTags = myEmojis.map((e) => [
           "a",
-          `${NDKKind.EmojiSet}:${e.pubkey}:${e.name}`,
+          `${Kind.EmojiSet}:${e.pubkey}:${e.name}`,
         ]);
         newTags = [
           ...myEmojiTags,
-          ["a", `${NDKKind.EmojiSet}:${event.pubkey}:${identifier}`],
+          ["a", `${Kind.EmojiSet}:${event.pubkey}:${identifier}`],
         ];
       }
-      const ev = new NDKEvent(ndk, {
-        kind: NDKKind.EmojiList,
+      const template = {
+        kind: Kind.EmojiList,
         content: "",
         tags: newTags,
-      } as NostrEvent);
-      await ev.publish(relaySet);
+        created_at: Math.floor(Date.now() / 1000),
+      };
+      await publish(template, relays);
     } catch (err) {
       console.error(err);
       toast.error(t("emoji.set.bookmark.error"));

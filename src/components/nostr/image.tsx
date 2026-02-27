@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { Video } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 //import { Blurhash } from "react-blurhash";
-import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
+import * as Kind from "@/lib/nostr/kinds";
 import { RichText } from "@/components/rich-text";
 import {
   Dialog,
@@ -16,14 +16,13 @@ import { UploadImage } from "@/components/upload-image";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useNDK } from "@/lib/ndk";
-import { useRelaySet } from "@/lib/nostr";
 import { useCanSign } from "@/lib/account";
 import { Button } from "@/components/ui/button";
 import Gallery from "@/components/gallery";
 import { blobToImeta, parseImeta, UploadedBlob } from "@/lib/media";
 import type { Group, Emoji } from "@/lib/types";
 import { useTranslation } from "react-i18next";
+import { usePublishEvent } from "@/lib/nostr/publishing";
 
 export function NewImage({
   group,
@@ -34,14 +33,13 @@ export function NewImage({
   children?: ReactNode;
   onSuccess?: (ev: NostrEvent) => void;
 }) {
-  const ndk = useNDK();
   const ref = useRef<HTMLImageElement | null>(null);
   const [customEmoji, setCustomEmoji] = useState<Emoji[]>([]);
   const [showDialog, setShowDialog] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
   const [blob, setBlob] = useState<UploadedBlob | null>(null);
-  const relaySet = useRelaySet([group.relay]);
   const [title, setTitle] = useState("");
+  const publish = usePublishEvent();
   const [description, setDescription] = useState("");
   const canSign = useCanSign();
   const { t } = useTranslation();
@@ -59,25 +57,31 @@ export function NewImage({
     if (!blob) return;
     try {
       setIsPosting(true);
-      const ev = new NDKEvent(ndk, {
-        kind: NDKKind.Image,
+      const tags: string[][] = [
+        ["h", group.id, group.relay],
+        ...(group.id === "_" ? [["-"]] : []),
+        // todo: fallbacks, size
+        ...(title ? [["title", title]] : []),
+      ];
+      if (blob.type) {
+        tags.push(blobToImeta(blob), ["m", blob.type]);
+      }
+      if (blob.sha256) {
+        tags.push(["x", blob.sha256]);
+      }
+      // todo: hashtags, location, geohash, language
+      customEmoji.filter((e) => e.image).forEach((e) => {
+        tags.push(["emoji", e.name, e.image!]);
+      });
+      const template = {
+        kind: Kind.Image,
         content: description.trim(),
-        tags: [
-          ["h", group.id, group.relay],
-          ...(group.id === "_" ? [["-"]] : []),
-          // todo: fallbacks, size
-          ...(title ? [["title", title]] : []),
-          blobToImeta(blob),
-          ["m", blob.type],
-          ["x", blob.sha256],
-          // todo: hashtags, location, geohash, language
-          ...customEmoji.map((e) => ["emoji", e.name, e.image] as string[]),
-        ],
-      } as NostrEvent);
-      await ev.sign();
-      await ev.publish(relaySet);
+        tags,
+        created_at: Math.floor(Date.now() / 1000),
+      };
+      const publishedEvent = await publish(template, [group.relay]);
       toast.success(t("image.publish.success"));
-      onSuccess?.(ev.rawEvent() as NostrEvent);
+      onSuccess?.(publishedEvent);
       onOpenChange(false);
     } catch (err) {
       console.error(err);

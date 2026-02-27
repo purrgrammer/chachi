@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { NostrEvent } from "nostr-tools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Settings, Trash } from "lucide-react";
-import { NDKEvent } from "@nostr-dev-kit/ndk";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -45,15 +43,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRelaySet } from "@/lib/nostr";
 import { useEditGroup } from "@/lib/nostr/groups";
 import { useCanSign } from "@/lib/account";
 import type { GroupMetadata } from "@/lib/types";
-import { useNDK } from "@/lib/ndk";
 import { useBookmarkGroup } from "@/components/nostr/groups/bookmark";
 import { saveGroupEvent } from "@/lib/messages";
 import { DELETE_GROUP } from "@/lib/kinds";
 import { useTranslation } from "react-i18next";
+import { usePublishEvent } from "@/lib/nostr/publishing";
 
 export function EditGroup({ group }: { group: GroupMetadata }) {
   const [open, setOpen] = useState(false);
@@ -82,8 +79,7 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
     resetOptions: { keepDefaultValues: true },
   });
   const { isBookmarked, unbookmarkGroup } = useBookmarkGroup(group);
-  const relaySet = useRelaySet([group.relay]);
-  const ndk = useNDK();
+  const publish = usePublishEvent();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -104,16 +100,17 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
       setIsLoading(true);
       toast.success(t("group.delete.success"));
       setOpen(false);
-      const ev = new NDKEvent(ndk, {
+      const template = {
         kind: DELETE_GROUP,
         content: "",
         tags: [["h", group.id, group.relay]],
-      } as NostrEvent);
-      await ev.publish(relaySet);
+        created_at: Math.floor(Date.now() / 1000),
+      };
+      const publishedEvent = await publish(template, [group.relay]);
       if (isBookmarked) {
         unbookmarkGroup();
       }
-      saveGroupEvent(ev.rawEvent() as NostrEvent, group);
+      saveGroupEvent(publishedEvent, group);
       navigate("/");
     } catch (err) {
       console.error(err);

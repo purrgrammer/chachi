@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NostrEvent } from "nostr-tools";
-import { NDKKind } from "@nostr-dev-kit/ndk";
+import * as Kind from "@/lib/nostr/kinds";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Chat } from "@/components/nostr/chat/chat";
 import { ChatInput } from "@/components/nostr/chat/input";
@@ -96,9 +96,9 @@ export function Thread({
               group={isFromGroup ? group : undefined}
               admins={admins}
               messageKinds={[
-                NDKKind.GroupChat,
-                NDKKind.Text,
-                NDKKind.GenericReply,
+                Kind.GroupChat,
+                Kind.Text,
+                Kind.GenericReply,
               ]}
               canDelete={canDelete}
               deleteEvent={deleteEvent}
@@ -115,10 +115,10 @@ export function Thread({
           <div className="sticky bottom-0 z-10 bg-background border-t">
             <ChatInput
               kind={
-                root.kind === NDKKind.Text ? NDKKind.Text : NDKKind.GenericReply
+                root.kind === Kind.Text ? Kind.Text : Kind.GenericReply
               }
               replyKind={
-                root.kind === NDKKind.Text ? NDKKind.Text : NDKKind.GenericReply
+                root.kind === Kind.Text ? Kind.Text : Kind.GenericReply
               }
               group={isFromGroup ? group : undefined}
               rootEvent={root}

@@ -10,8 +10,6 @@ import {
   Info,
 } from "lucide-react";
 import { toast } from "sonner";
-import { NDKEvent } from "@nostr-dev-kit/ndk";
-import { NostrEvent } from "nostr-tools";
 import { useTranslation } from "react-i18next";
 import { Reorder } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -32,12 +30,12 @@ import {
   CommunityFormValues,
   createCommunityEvent,
 } from "@/components/nostr/groups/community-form";
-import { useNDK } from "@/lib/ndk";
-import { useRelays, useRelaySet } from "@/lib/nostr";
+import { useRelays } from "@/lib/nostr";
 import { isRelayURL } from "@/lib/relay";
 import type { Community } from "@/lib/types";
 import { ContentKinds, ContentCategoryGroups } from "@/lib/constants/kinds";
 import { COMMUNIKEY } from "@/lib/kinds";
+import { usePublishEvent } from "@/lib/nostr/publishing";
 import { MapPicker } from "@/components/map-picker";
 import { PigeonMiniMap } from "@/components/map-pigeon-minimap";
 
@@ -59,7 +57,6 @@ export function CommunityEditor({
   community?: Community;
 }) {
   const { t } = useTranslation();
-  const ndk = useNDK();
   const [isLoading, setIsLoading] = useState(false);
   const userRelays = useRelays();
   const userRelaysFiltered = userRelays.filter((r) => isRelayURL(r));
@@ -70,7 +67,7 @@ export function CommunityEditor({
   const allRelays = Array.from(
     new Set([...userRelaysFiltered, ...communityRelays]),
   );
-  const relaySet = useRelaySet(allRelays);
+  const publish = usePublishEvent();
 
   // Content section states
   const [contentSections, setContentSections] = useState<ContentSection[]>(
@@ -148,8 +145,7 @@ export function CommunityEditor({
     try {
       setIsLoading(true);
       const event = createCommunityEvent(values, pubkey);
-      const ndkEvent = new NDKEvent(ndk, event as NostrEvent);
-      await ndkEvent.publish(relaySet);
+      await publish(event, allRelays);
       toast.success(t("community.edit.success"));
     } catch (err) {
       console.error(err);
@@ -168,28 +164,32 @@ export function CommunityEditor({
 
     try {
       setIsContentLoading(true);
-      // Create a base event for the content sections
-      const event = new NDKEvent(ndk, {
-        kind: COMMUNIKEY,
-        tags: [["r", community.relay]],
-      } as NostrEvent);
-      community.backupRelays?.forEach((r) => event.tags.push(["r", r]));
-      community.blossom?.forEach((r) => event.tags.push(["blossom", r]));
-      if (community.mint) event.tags.push(["mint", community.mint, "cashu"]);
+
+      // Build tags array
+      const tags: string[][] = [["r", community.relay]];
+      community.backupRelays?.forEach((r) => tags.push(["r", r]));
+      community.blossom?.forEach((r) => tags.push(["blossom", r]));
+      if (community.mint) tags.push(["mint", community.mint, "cashu"]);
 
       // For each content section, add the appropriate tags
       contentSections.forEach((section) => {
         // Add a content tag with the section name
-        event.tags.push(["content", section.name]);
+        tags.push(["content", section.name]);
 
         // Add a k tag for each kind
         section.kinds.forEach((kind) => {
-          event.tags.push(["k", kind.toString()]);
+          tags.push(["k", kind.toString()]);
         });
       });
 
-      // Sign and publish the event
-      await event.publish(relaySet);
+      // Create and publish event
+      const template = {
+        kind: COMMUNIKEY,
+        content: "",
+        tags,
+        created_at: Math.floor(Date.now() / 1000),
+      };
+      await publish(template, allRelays);
       toast.success(t("community.edit.content_section.success"));
     } catch (err) {
       console.error("Error saving content sections:", err);
@@ -267,30 +267,34 @@ export function CommunityEditor({
 
     try {
       setIsMetadataLoading(true);
-      const event = new NDKEvent(ndk, {
-        kind: COMMUNIKEY,
-        tags: [["r", community.relay]],
-      } as NostrEvent);
 
-      community.backupRelays?.forEach((r) => event.tags.push(["r", r]));
+      // Build tags array
+      const tags: string[][] = [["r", community.relay]];
 
-      community.blossom?.forEach((r) => event.tags.push(["blossom", r]));
-
-      if (community.mint) event.tags.push(["mint", community.mint, "cashu"]);
+      community.backupRelays?.forEach((r) => tags.push(["r", r]));
+      community.blossom?.forEach((r) => tags.push(["blossom", r]));
+      if (community.mint) tags.push(["mint", community.mint, "cashu"]);
 
       // Note: Using the `contentSections` state ensures the latest order is saved
       contentSections.forEach((section) => {
-        event.tags.push(["content", section.name]);
+        tags.push(["content", section.name]);
         section.kinds.forEach((kind) => {
-          event.tags.push(["k", kind.toString()]);
+          tags.push(["k", kind.toString()]);
         });
       });
 
-      if (description) event.tags.push(["description", description]);
-      if (location) event.tags.push(["location", location]);
-      if (geohash) event.tags.push(["g", geohash]);
+      if (description) tags.push(["description", description]);
+      if (location) tags.push(["location", location]);
+      if (geohash) tags.push(["g", geohash]);
 
-      await event.publish(relaySet);
+      // Create and publish event
+      const template = {
+        kind: COMMUNIKEY,
+        content: "",
+        tags,
+        created_at: Math.floor(Date.now() / 1000),
+      };
+      await publish(template, allRelays);
       toast.success(t("community.edit.metadata.success"));
     } catch (err) {
       console.error("Error saving metadata:", err);

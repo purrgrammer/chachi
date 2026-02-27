@@ -26,6 +26,10 @@ import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import { TARGETED_PUBLICATION } from "@/lib/kinds";
 import { debounce } from "lodash";
+import {
+  usePublishEvent,
+  createEventReferenceTags,
+} from "@/lib/nostr/publishing";
 import { useMyGroups } from "@/lib/groups";
 import {
   Card,
@@ -51,6 +55,7 @@ export function NewPublication({
   onSuccess?: (ev: NostrEvent) => void;
 }) {
   const ndk = useNDK();
+  const publish = usePublishEvent();
   const [inputValue, setInputValue] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
@@ -254,34 +259,40 @@ export function NewPublication({
 
       setIsPosting(true);
 
-      const ev = new NDKEvent(ndk, {
+      // Get event reference tags from the fetched event
+      const eventRefTags = createEventReferenceTags(
+        fetchedEvent.rawEvent() as NostrEvent,
+      );
+
+      const template = {
         kind: TARGETED_PUBLICATION,
         content: "",
         tags: [
           ["d", fetchedEvent.id],
           ["k", fetchedEvent.kind!.toString()],
           ["p", fetchedEvent.pubkey],
-          fetchedEvent.tagReference(),
+          ...eventRefTags,
           ...selectedCommunities.map((community) => [
             "h",
             community.id,
             community.relay,
           ]),
         ],
-      } as NostrEvent);
+        created_at: Math.floor(Date.now() / 1000),
+      };
 
       // Create a relay set from all selected communities and outbox relays
       const targetRelays = [
         ...new Set(selectedCommunities.map((c) => c.relay).concat(userRelays)),
       ];
-      const publicationRelaySet =
-        targetRelays.length > 0
-          ? NDKRelaySet.fromRelayUrls(targetRelays, ndk)
-          : NDKRelaySet.fromRelayUrls(userRelays, ndk);
 
-      await ev.publish(publicationRelaySet);
+      const publishedEvent = await publish(
+        template,
+        targetRelays.length > 0 ? targetRelays : userRelays,
+      );
+
       toast.success(t("community.targeted-publication.success"));
-      onSuccess?.(ev.rawEvent() as NostrEvent);
+      onSuccess?.(publishedEvent);
       onOpenChange(false);
     } catch (err) {
       console.error(err);

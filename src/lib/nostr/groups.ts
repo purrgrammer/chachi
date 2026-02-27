@@ -485,6 +485,10 @@ export function useCreateGroup() {
   const account = useAccount();
 
   return async (id: string, relay: string): Promise<Group> => {
+    console.log("[useCreateGroup]", {
+      groupId: id,
+      relay,
+    });
     if (!account || account.isReadOnly) throw new Error("Can't sign events");
 
     const relaySet = NDKRelaySet.fromRelayUrls([relay], ndk);
@@ -494,6 +498,7 @@ export function useCreateGroup() {
       tags: [["h", id]],
     } as NostrEvent);
     await create.publish(relaySet);
+    console.log("[useCreateGroup] Published successfully");
     return { id, relay };
   };
 }
@@ -503,6 +508,15 @@ export function useEditGroup() {
   const account = useAccount();
 
   return async (metadata: GroupMetadata) => {
+    console.log("[useEditGroup]", {
+      groupId: metadata.id,
+      relay: metadata.relay,
+      metadata: {
+        name: metadata.name,
+        visibility: metadata.visibility,
+        access: metadata.access,
+      },
+    });
     if (!account || account.isReadOnly) throw new Error("Can't edit group");
     const { id, relay } = metadata;
     const relaySet = NDKRelaySet.fromRelayUrls([relay], ndk);
@@ -533,6 +547,7 @@ export function useEditGroup() {
     }
 
     await edit.publish(relaySet);
+    console.log("[useEditGroup] Published successfully");
 
     // Store the updated group info in the database
     await saveGroupInfo({ id, relay }, metadata);
@@ -570,6 +585,11 @@ export function useJoinRequest(group: Group) {
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
   return async (inviteCode?: string) => {
+    console.log("[useJoinRequest]", {
+      groupId: group.id,
+      relay: group.relay,
+      hasInviteCode: !!inviteCode,
+    });
     const tags = [["h", group.id]];
 
     // Add invite code if provided
@@ -583,6 +603,7 @@ export function useJoinRequest(group: Group) {
       tags,
     } as NostrEvent);
     await event.publish(relaySet);
+    console.log("[useJoinRequest] Published successfully");
 
     // Refresh group participants after join request
     // Wait a bit for the relay to process the request
@@ -600,7 +621,12 @@ export function useLeaveRequest(group: Group) {
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
   return async () => {
+    console.log("[useLeaveRequest]", {
+      groupId: group.id,
+      relay: group.relay,
+    });
     if (isRelayGroup(group)) {
+      console.log("[useLeaveRequest] Skipping - relay groups can't be left");
       return; // Can't leave relay groups
     }
 
@@ -610,6 +636,7 @@ export function useLeaveRequest(group: Group) {
       tags: [["h", group.id]],
     } as NostrEvent);
     await event.publish(relaySet);
+    console.log("[useLeaveRequest] Published successfully");
 
     // Refresh group participants after leave request
     setTimeout(() => {
@@ -626,6 +653,11 @@ export function useAddUser(group: Group) {
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
   return async (pubkey: string): Promise<NostrEvent> => {
+    console.log("[useAddUser]", {
+      groupId: group.id,
+      relay: group.relay,
+      pubkey,
+    });
     const event = new NDKEvent(ndk, {
       kind: NDKKind.GroupAdminAddUser,
       content: "",
@@ -635,6 +667,7 @@ export function useAddUser(group: Group) {
       ],
     } as NostrEvent);
     await event.publish(relaySet);
+    console.log("[useAddUser] Published successfully");
 
     // Invalidate the group participants query to refresh the data
     queryClient.invalidateQueries({
@@ -649,6 +682,11 @@ export function useRemoveUser(group: Group) {
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
   return async (pubkey: string): Promise<NostrEvent> => {
+    console.log("[useRemoveUser]", {
+      groupId: group.id,
+      relay: group.relay,
+      pubkey,
+    });
     const event = new NDKEvent(ndk, {
       kind: NDKKind.GroupAdminRemoveUser,
       content: "",
@@ -658,6 +696,7 @@ export function useRemoveUser(group: Group) {
       ],
     } as NostrEvent);
     await event.publish(relaySet);
+    console.log("[useRemoveUser] Published successfully");
 
     // Invalidate the group participants query to refresh the data
     queryClient.invalidateQueries({
@@ -672,6 +711,11 @@ export function useDeleteEvent(group: Group) {
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
   return async (ev: NostrEvent) => {
+    console.log("[useDeleteEvent]", {
+      groupId: group.id,
+      relay: group.relay,
+      targetEventId: ev.id,
+    });
     const ndkEvent = new NDKEvent(ndk, ev);
     const event = new NDKEvent(ndk, {
       kind: 9005 as NDKKind,
@@ -680,6 +724,7 @@ export function useDeleteEvent(group: Group) {
     } as NostrEvent);
     event.tag(ndkEvent);
     await event.publish(relaySet);
+    console.log("[useDeleteEvent] Published successfully");
     return event.rawEvent() as NostrEvent;
   };
 }
@@ -691,6 +736,12 @@ export function useCreateInviteCode(group: Group) {
   const relaySet = useRelaySet([group.relay]);
   return async (expiresAt?: number): Promise<string> => {
     const code = randomCode();
+    console.log("[useCreateInviteCode]", {
+      groupId: group.id,
+      relay: group.relay,
+      code,
+      expiresAt,
+    });
     const event = new NDKEvent(ndk, {
       kind: 9009 as NDKKind,
       content: "",
@@ -701,6 +752,7 @@ export function useCreateInviteCode(group: Group) {
       ],
     } as NostrEvent);
     await event.publish(relaySet);
+    console.log("[useCreateInviteCode] Published successfully");
     return code;
   };
 }
@@ -748,6 +800,11 @@ export function useRevokeInviteCode(group: Group) {
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
   return async (code: string): Promise<NostrEvent> => {
+    console.log("[useRevokeInviteCode]", {
+      groupId: group.id,
+      relay: group.relay,
+      code,
+    });
     const event = new NDKEvent(ndk, {
       kind: 5 as NDKKind, // deletion event
       content: `Revoked invite code: ${code}`,
@@ -757,6 +814,7 @@ export function useRevokeInviteCode(group: Group) {
       ],
     } as NostrEvent);
     await event.publish(relaySet);
+    console.log("[useRevokeInviteCode] Published successfully");
     return event.rawEvent() as NostrEvent;
   };
 }
@@ -840,6 +898,12 @@ export function useAddAdmin(group: Group) {
     pubkey: string,
     role: string = "admin",
   ): Promise<NostrEvent> => {
+    console.log("[useAddAdmin]", {
+      groupId: group.id,
+      relay: group.relay,
+      pubkey,
+      role,
+    });
     const event = new NDKEvent(ndk, {
       kind: 9000 as NDKKind, // put-user moderation event
       content: "",
@@ -849,6 +913,7 @@ export function useAddAdmin(group: Group) {
       ],
     } as NostrEvent);
     await event.publish(relaySet);
+    console.log("[useAddAdmin] Published successfully");
     queryClient.invalidateQueries({
       queryKey: [GROUP_PARTICIPANTS, groupId(group)],
     });
@@ -860,6 +925,11 @@ export function useRemoveAdmin(group: Group) {
   const ndk = useNDK();
   const relaySet = useRelaySet([group.relay]);
   return async (pubkey: string): Promise<NostrEvent> => {
+    console.log("[useRemoveAdmin]", {
+      groupId: group.id,
+      relay: group.relay,
+      pubkey,
+    });
     const event = new NDKEvent(ndk, {
       kind: 9001 as NDKKind, // remove-user moderation event
       content: "",
@@ -869,6 +939,7 @@ export function useRemoveAdmin(group: Group) {
       ],
     } as NostrEvent);
     await event.publish(relaySet);
+    console.log("[useRemoveAdmin] Published successfully");
     queryClient.invalidateQueries({
       queryKey: [GROUP_PARTICIPANTS, groupId(group)],
     });

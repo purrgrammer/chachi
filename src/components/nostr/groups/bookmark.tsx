@@ -1,16 +1,19 @@
 import { useState } from "react";
 import { useAtomValue } from "jotai";
 import { toast } from "sonner";
-import { NostrEvent } from "nostr-tools";
 import { Bookmark, BookmarkCheck, DoorOpen } from "lucide-react";
-import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
-import { groupsAtom, groupsContentAtom } from "@/app/store";
+import { groupsAtom } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import { Group } from "@/lib/types";
 import { isRelayURL } from "@/lib/relay";
 import { fetchLatest, useRelays, useRelaySet } from "@/lib/nostr";
 import { useLeaveRequest } from "@/lib/nostr/groups";
 import { useAccount, usePubkey } from "@/lib/account";
+import {
+  usePublishSimpleGroupList,
+  usePublishEvent,
+} from "@/lib/nostr/publishing";
+import { useNDK } from "@/lib/ndk";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,7 +31,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useNDK } from "@/lib/ndk";
 import { useTranslation } from "react-i18next";
 import { RELATIONSHIP } from "@/lib/kinds";
 import { groupId } from "@/lib/groups";
@@ -73,16 +75,16 @@ export function useBookmarkGroup(group: Group) {
   const ndk = useNDK();
   const groups = useAtomValue(groupsAtom);
   const isBookmarked = groups.find((g) => groupId(g) === groupId(group));
-  const groupsContent = useAtomValue(groupsContentAtom);
   const userRelays = useRelays();
   const relaySet = useRelaySet(userRelays.filter((r) => isRelayURL(r)));
   const pubkey = usePubkey();
+  const publishGroupList = usePublishSimpleGroupList();
+  const publish = usePublishEvent();
 
   async function bookmarkGroup() {
     if (!pubkey || !relaySet) return;
     try {
       const newGroups = [...groups, group];
-      let event: NDKEvent;
       if (group.isCommunity) {
         const existing = await fetchLatest(
           ndk,
@@ -93,7 +95,7 @@ export function useBookmarkGroup(group: Group) {
           },
           relaySet,
         );
-        event = new NDKEvent(ndk, {
+        const template = {
           kind: RELATIONSHIP,
           content: "",
           tags: [
@@ -101,15 +103,12 @@ export function useBookmarkGroup(group: Group) {
             ["d", group.id],
             ["n", "follow"],
           ],
-        } as NostrEvent);
+          created_at: Math.floor(Date.now() / 1000),
+        };
+        await publish(template, userRelays.filter((r) => isRelayURL(r)));
       } else {
-        event = new NDKEvent(ndk, {
-          kind: NDKKind.SimpleGroupList,
-          content: groupsContent,
-          tags: newGroups.map((g) => ["group", g.id, g.relay]),
-        } as NostrEvent);
+        await publishGroupList(newGroups, userRelays.filter((r) => isRelayURL(r)));
       }
-      await event.publish(relaySet);
       //setGroups(newGroups);
     } catch (err) {
       console.error(err);
@@ -121,7 +120,6 @@ export function useBookmarkGroup(group: Group) {
     if (!pubkey || !relaySet) return;
     try {
       const newGroups = groups.filter((g) => groupId(g) !== groupId(group));
-      let event: NDKEvent;
       if (group.isCommunity) {
         const existing = await fetchLatest(
           ndk,
@@ -132,22 +130,19 @@ export function useBookmarkGroup(group: Group) {
           },
           relaySet,
         );
-        event = new NDKEvent(ndk, {
+        const template = {
           kind: RELATIONSHIP,
           content: "",
           tags: [
             ...(existing ? existing.tags.filter((t) => t[1] !== "follow") : []),
             ["d", group.id],
           ],
-        } as NostrEvent);
+          created_at: Math.floor(Date.now() / 1000),
+        };
+        await publish(template, userRelays.filter((r) => isRelayURL(r)));
       } else {
-        event = new NDKEvent(ndk, {
-          kind: NDKKind.SimpleGroupList,
-          content: groupsContent,
-          tags: newGroups.map((g) => ["group", g.id, g.relay]),
-        } as NostrEvent);
+        await publishGroupList(newGroups, userRelays.filter((r) => isRelayURL(r)));
       }
-      await event.publish(relaySet);
       //setGroups(newGroups);
     } catch (err) {
       console.error(err);

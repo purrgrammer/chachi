@@ -2,13 +2,10 @@ import { useState, ReactNode } from "react";
 import { useAtomValue } from "jotai";
 import { toast } from "sonner";
 import { z } from "zod";
-import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Plus, Castle, Server } from "lucide-react";
-import { NostrEvent } from "nostr-tools";
 import {
-  groupsContentAtom,
   relaysAtom,
   mediaServersAtom,
   mintsAtom,
@@ -41,7 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRelays, useRelaySet } from "@/lib/nostr";
+import { useRelays } from "@/lib/nostr";
 import { useCreateGroup, useEditGroup } from "@/lib/nostr/groups";
 import { nip29Relays, getRelayHost, isRelayURL } from "@/lib/relay";
 import {
@@ -52,11 +49,11 @@ import {
 import { useAccount, usePubkey } from "@/lib/account";
 import { useMyGroups } from "@/lib/groups";
 import { randomId } from "@/lib/id";
-import { useNDK } from "@/lib/ndk";
 import { useNavigate } from "@/lib/navigation";
 import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import { User } from "@/components/nostr/user";
+import { usePublishEvent, usePublishSimpleGroupList } from "@/lib/nostr/publishing";
 
 function normalizeRelayUrl(url: string): string {
   if (!url) return "";
@@ -92,13 +89,11 @@ export function CreateGroup({
   className?: string;
 }) {
   const { t } = useTranslation();
-  const ndk = useNDK();
   const [showDialog, setShowDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [groupType, setGroupType] = useState<GroupType>(null);
   const [useCustomRelay, setUseCustomRelay] = useState(false);
   const groups = useMyGroups();
-  const groupsContent = useAtomValue(groupsContentAtom);
   const userRelaysData = useAtomValue(relaysAtom);
   const mediaServers = useAtomValue(mediaServersAtom);
   const userMints = useAtomValue(mintsAtom);
@@ -109,7 +104,8 @@ export function CreateGroup({
   const canSign = account?.pubkey && !account.isReadOnly;
   const navigate = useNavigate();
   const userRelays = useRelays();
-  const relaySet = useRelaySet(userRelays.filter((r) => isRelayURL(r)));
+  const publish = usePublishEvent();
+  const publishGroupList = usePublishSimpleGroupList();
 
   const userRelayUrls = userRelaysData
     .filter((relay) => relay.url && isRelayURL(relay.url))
@@ -136,17 +132,7 @@ export function CreateGroup({
   async function bookmarkGroup(group: Group) {
     try {
       const newGroups = [...groups, group];
-      const event = new NDKEvent(ndk, {
-        kind: NDKKind.SimpleGroupList,
-        content: groupsContent,
-        tags: newGroups.map((g) => [
-          "group",
-          g.id,
-          g.relay,
-          ...(g.isCommunity ? ["community"] : []),
-        ]),
-      } as NostrEvent);
-      await event.publish(relaySet);
+      await publishGroupList(newGroups, userRelays);
     } catch (err) {
       console.error(err);
       toast.error(t("group.bookmark.error"));
@@ -183,8 +169,7 @@ export function CreateGroup({
     try {
       setIsLoading(true);
       const event = createCommunityEvent(values, userPubkey);
-      const ndkEvent = new NDKEvent(ndk, event);
-      await ndkEvent.publish(relaySet);
+      await publish(event, userRelays);
 
       const id = userPubkey;
       const relay = normalizeRelayUrl(values.relay);

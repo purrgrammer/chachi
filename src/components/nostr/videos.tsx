@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import type { ForwardedRef } from "react";
 import { Video } from "lucide-react";
-import { NDKKind } from "@nostr-dev-kit/ndk";
+import * as Kind from "@/lib/nostr/kinds";
 import { Button } from "@/components/ui/button";
 import Feed from "@/components/nostr/feed";
 import { NewVideo } from "@/components/nostr/video";
@@ -18,14 +18,14 @@ export const GroupVideos = forwardRef(
     const includeOpPublications = metadata?.isCommunity;
     const filter = [
       {
-        kinds: [NDKKind.HorizontalVideo, NDKKind.VerticalVideo],
+        kinds: [Kind.HorizontalVideo, Kind.VerticalVideo],
         "#h": [group.id],
         limit: 50,
       },
       ...(includeOpPublications
         ? [
             {
-              kinds: [NDKKind.HorizontalVideo, NDKKind.VerticalVideo],
+              kinds: [Kind.HorizontalVideo, Kind.VerticalVideo],
               authors: [group.id],
             },
           ]

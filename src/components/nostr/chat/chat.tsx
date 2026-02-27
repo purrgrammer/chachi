@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import type { NostrEvent } from "nostr-tools";
 import { Button } from "@/components/ui/button";
-import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
+import * as Kind from "@/lib/nostr/kinds";
 import { cn } from "@/lib/utils";
 import { ProfileDrawer } from "@/components/nostr/profile";
 import { Separator } from "@/components/ui/separator";
@@ -42,9 +42,8 @@ import { Name } from "@/components/nostr/name";
 import { Reactions } from "@/components/nostr/reactions";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCopy } from "@/lib/hooks";
-import { useNDK } from "@/lib/ndk";
 import { Avatar } from "@/components/nostr/avatar";
-import { useEvent, useRelaySet } from "@/lib/nostr";
+import { useEvent } from "@/lib/nostr";
 import { usePubkey, useCanSign } from "@/lib/account";
 import type { Emoji as EmojiType } from "@/components/emoji-picker";
 import { LazyEmojiPicker } from "@/components/lazy/LazyEmojiPicker";
@@ -55,6 +54,7 @@ import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import { groupByDay, formatDay } from "@/lib/chat";
 import { useReact } from "@/lib/nostr/react";
+import { usePublishGroupRemoveUser } from "@/lib/nostr/publishing";
 
 function Reply({
   group,
@@ -78,9 +78,9 @@ function Reply({
   const isAdmin = event?.pubkey ? admins.includes(event?.pubkey) : false;
   const author = event?.pubkey;
 
-  const isGroupChat = event?.kind === NDKKind.GroupChat;
-  const isText = event?.kind === NDKKind.Text;
-  const isGenericReply = event?.kind === NDKKind.GenericReply;
+  const isGroupChat = event?.kind === Kind.GroupChat;
+  const isText = event?.kind === Kind.Text;
+  const isGenericReply = event?.kind === Kind.GenericReply;
 
   if (!(isGroupChat || isText || isGenericReply)) {
     return null;
@@ -257,10 +257,9 @@ function MessageContent({
   const { t } = useTranslation();
   const [settings] = useSettings();
   const relay = group?.relay;
-  const ndk = useNDK();
-  const relaySet = useRelaySet(group ? [group.relay] : []);
   const [showMessageActions, setShowMessageActions] = useState(false);
   const [showingEmojiPicker, setShowingEmojiPicker] = useState(false);
+  const publishRemoveUser = usePublishGroupRemoveUser();
 //   const [showingZapDialog, setShowingZapDialog] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
   const lastSeenRef = useRef<HTMLDivElement | null>(null);
@@ -408,19 +407,10 @@ function MessageContent({
 
   async function kick(e: NostrEvent) {
     try {
-      const ev = new NDKEvent(ndk, {
-        kind: NDKKind.GroupAdminRemoveUser,
-        content: "",
-        tags: [
-          ...(group ? [["h", group.id, group.relay]] : []),
-          ["p", e.pubkey],
-        ],
-      } as NostrEvent);
-      await ev.publish(relaySet);
+      if (!group) return;
+      const publishedEvent = await publishRemoveUser(group, [e.pubkey]);
       toast.success(t("chat.user.kick.success"));
-      if (group) {
-        saveGroupEvent(ev.rawEvent() as NostrEvent, group);
-      }
+      saveGroupEvent(publishedEvent, group);
     } catch (err) {
       console.error(err);
       toast.error(t("chat.user.kick.error"));
@@ -550,7 +540,7 @@ function MessageContent({
                     className="pt-1"
                     event={event}
                     relays={[...(relay ? [relay] : [])]}
-                    kinds={[NDKKind.Zap, NDKKind.Reaction]}
+                    kinds={[Kind.Zap, Kind.Reaction]}
                     live={isInView}
                   />
                 ) : null}
@@ -731,7 +721,7 @@ interface ChatProps extends MotionProps {
   group?: Group;
   events: NostrEvent[];
   admins: string[];
-  messageKinds: NDKKind[];
+  messageKinds: number[];
   canDelete?: (event: NostrEvent) => boolean;
   deleteEvent?: (event: NostrEvent) => void;
   components?: Record<
@@ -787,7 +777,7 @@ export function Chat({
   // todo: check admin events against relay pubkey
   const { t } = useTranslation();
   const groupedMessages = groupByDay(events);
-  const lastMessage = events.filter((e) => e.kind === NDKKind.GroupChat).at(0);
+  const lastMessage = events.filter((e) => e.kind === Kind.GroupChat).at(0);
   const me = usePubkey();
 
   useEffect(() => {

@@ -2,7 +2,7 @@ import { useState, useRef, ReactNode } from "react";
 import { toast } from "sonner";
 import { Video } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
-import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
+import * as Kind from "@/lib/nostr/kinds";
 import {
   Dialog,
   DialogContent,
@@ -14,14 +14,13 @@ import { UploadVideo } from "@/components/upload-video";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useNDK } from "@/lib/ndk";
-import { useRelaySet } from "@/lib/nostr";
 import { useCanSign } from "@/lib/account";
 import { Button } from "@/components/ui/button";
 import { randomId } from "@/lib/id";
 import { getImetaValue, blobToImeta, UploadedBlob } from "@/lib/media";
 import type { Group, Emoji } from "@/lib/types";
 import { useTranslation } from "react-i18next";
+import { usePublishEvent } from "@/lib/nostr/publishing";
 
 export function NewVideo({
   group,
@@ -32,7 +31,6 @@ export function NewVideo({
   children?: ReactNode;
   onSuccess?: (ev: NostrEvent) => void;
 }) {
-  const ndk = useNDK();
   const ref = useRef<HTMLVideoElement | null>(null);
   // todo: video recordings
   const [customEmoji, setCustomEmoji] = useState<Emoji[]>([]);
@@ -41,11 +39,11 @@ export function NewVideo({
   const [blob, setBlob] = useState<UploadedBlob | null>(null);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
-  const relaySet = useRelaySet(group ? [group.relay] : []);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const canSign = useCanSign();
   const { t } = useTranslation();
+  const publish = usePublishEvent();
 
   function onOpenChange(open: boolean) {
     if (!open) {
@@ -69,24 +67,31 @@ export function NewVideo({
     if (!blob) return;
     try {
       setIsPosting(true);
-      const ev = new NDKEvent(ndk, {
-        kind: height > width ? NDKKind.VerticalVideo : NDKKind.HorizontalVideo,
+      const tags: string[][] = [
+        ["d", randomId()],
+        ...(group ? [["h", group.id, group.relay]] : []),
+        ...(group?.id === "_" ? [["-"]] : []),
+        // todo: fallbacks, size
+        ...(title ? [["title", title]] : []),
+      ];
+      if (blob.url) {
+        tags.push(blobToImeta(blob), ["url", blob.url]);
+      }
+      if (blob.type) {
+        tags.push(["m", blob.type]);
+      }
+      customEmoji.filter((e) => e.image).forEach((e) => {
+        tags.push(["emoji", e.name, e.image!]);
+      });
+      const template = {
+        kind: height > width ? Kind.VerticalVideo : Kind.HorizontalVideo,
         content: description.trim(),
-        tags: [
-          ["d", randomId()],
-          ...(group ? [["h", group.id, group.relay]] : []),
-          ...(group?.id === "_" ? [["-"]] : []),
-          // todo: fallbacks, size
-          ...(title ? [["title", title]] : []),
-          blobToImeta(blob),
-          ["url", blob.url],
-          ["m", blob.type],
-          ...customEmoji.map((e) => ["emoji", e.name, e.image] as string[]),
-        ],
-      } as NostrEvent);
-      await ev.publish(relaySet);
+        tags,
+        created_at: Math.floor(Date.now() / 1000),
+      };
+      const publishedEvent = await publish(template, group ? [group.relay] : []);
       toast.success(t("video.publish.success"));
-      onSuccess?.(ev.rawEvent() as NostrEvent);
+      onSuccess?.(publishedEvent);
       onOpenChange(false);
     } catch (err) {
       console.error(err);

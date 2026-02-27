@@ -20,7 +20,7 @@ import {
   //useUnreadMentions,
 } from "@/lib/messages";
 import type { Group } from "@/lib/types";
-import { NDKKind } from "@nostr-dev-kit/ndk";
+import * as Kind from "@/lib/nostr/kinds";
 
 interface MessageEvent {
   id: string;
@@ -42,7 +42,7 @@ const LastMessagePreview = ({
 }) => {
   const { t } = useTranslation();
 
-  if (lastMessage.kind === NDKKind.GroupAdminAddUser) {
+  if (lastMessage.kind === Kind.GroupAdminAddUser) {
     const pubkey =
       lastMessage.tags.find((t) => t[0] === "p")?.[1] || lastMessage.pubkey;
     const role = lastMessage.tags.find((t) => t[0] === "p")?.[2];
@@ -64,7 +64,7 @@ const LastMessagePreview = ({
     );
   }
 
-  if (lastMessage.kind === NDKKind.GroupAdminRemoveUser) {
+  if (lastMessage.kind === Kind.GroupAdminRemoveUser) {
     const pubkey =
       lastMessage.tags.find((t) => t[0] === "p")?.[1] || lastMessage.pubkey;
     return (

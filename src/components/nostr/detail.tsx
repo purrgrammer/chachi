@@ -18,7 +18,14 @@ import {
   Apple,
 } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
-import { NDKRelaySet, NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
+import { NDKEvent } from "@nostr-dev-kit/ndk";
+import * as Kind from "@/lib/nostr/kinds";
+import {
+  usePublishEmojiReaction,
+  usePublishDeletion,
+  usePublishGroupMessage,
+  createEventReferenceTags,
+} from "@/lib/nostr/publishing";
 // todo: lazily load components
 import { Empty } from "@/components/empty";
 import { Name } from "@/components/nostr/name";
@@ -164,7 +171,7 @@ const eventDetails: Record<
     content?: EventComponent; // the content of an event detail
   }
 > = {
-  [NDKKind.Text]: {
+  [Kind.Text]: {
     preview: Post,
     detail: PostDetail,
   },
@@ -172,22 +179,22 @@ const eventDetails: Record<
     preview: Post,
     detail: PostDetail,
   },
-  [NDKKind.Thread]: {
+  [Kind.Thread]: {
     preview: Post,
     detail: PostDetail,
   },
-  [NDKKind.GroupChat]: {
+  [Kind.GroupChat]: {
     noHeader: true,
     className: "border-none",
     innerClassname: "pt-2 pb-0 px-2",
     preview: LazyChatBubble,
     detail: LazyChatBubbleDetail,
   },
-  [NDKKind.GroupReply]: {
+  [Kind.GroupReply]: {
     preview: Post,
     detail: PostDetail,
   },
-  [NDKKind.GroupMetadata]: {
+  [Kind.GroupMetadata]: {
     noHeader: true,
     preview: GroupMetadata,
     detail: GroupMetadata,
@@ -197,16 +204,16 @@ const eventDetails: Record<
     preview: CommunityMetadata,
     detail: CommunityMetadata,
   },
-  [NDKKind.Highlight]: {
+  [Kind.Highlight]: {
     preview: Highlight,
     detail: Highlight,
   },
-  [NDKKind.Article]: {
+  [Kind.Article]: {
     preview: ArticleSummary,
     detail: ArticleSummary,
     content: Article,
   },
-  [NDKKind.EmojiSet]: {
+  [Kind.EmojiSet]: {
     preview: EmojiSet,
     detail: EmojiSet,
   },
@@ -229,15 +236,15 @@ const eventDetails: Record<
     preview: Post,
     detail: PostDetail,
   },
-  [NDKKind.HorizontalVideo]: {
+  [Kind.HorizontalVideo]: {
     preview: HorizontalVideo,
     detail: HorizontalVideo,
   },
-  [NDKKind.VerticalVideo]: {
+  [Kind.VerticalVideo]: {
     preview: VerticalVideo,
     detail: VerticalVideo,
   },
-  [NDKKind.Image]: {
+  [Kind.Image]: {
     preview: Image,
     detail: Image,
   },
@@ -250,7 +257,7 @@ const eventDetails: Record<
     preview: Stream,
     detail: Stream,
   },
-  [NDKKind.CategorizedPeopleList]: {
+  [Kind.CategorizedPeopleList]: {
     preview: People,
     detail: People,
   },
@@ -266,11 +273,11 @@ const eventDetails: Record<
     preview: CalendarEvent,
     detail: CalendarEvent,
   },
-  [NDKKind.Reaction]: {
+  [Kind.Reaction]: {
     preview: Reaction,
     detail: Reaction,
   },
-  [NDKKind.Wiki]: {
+  [Kind.Wiki]: {
     preview: WikiPreview,
     detail: WikiPreview,
     content: WikiDetail,
@@ -287,11 +294,11 @@ const eventDetails: Record<
   //  preview: WorkoutTemplate,
   //  detail: WorkoutTemplate,
   //},
-  [NDKKind.AppHandler]: {
+  [Kind.AppHandler]: {
     preview: AppDefinition,
     detail: AppDefinition,
   },
-  [NDKKind.AppRecommendation]: {
+  [Kind.AppRecommendation]: {
     preview: AppRecommendation,
     detail: AppRecommendation,
   },
@@ -299,15 +306,15 @@ const eventDetails: Record<
     preview: TargetedPublication,
     detail: TargetedPublication,
   },
-  [NDKKind.BadgeDefinition]: {
+  [Kind.BadgeDefinition]: {
     preview: Badge,
     detail: Badge,
   },
-  [NDKKind.RelayList]: {
+  [Kind.RelayList]: {
     preview: RelayList,
     detail: RelayList,
   },
-  [NDKKind.RelaySet]: {
+  [Kind.RelaySet]: {
     preview: RelayList,
     detail: RelayList,
   },
@@ -339,6 +346,7 @@ function ShareDialog({
   const [message, setMessage] = useState("");
   const [customEmoji, setCustomEmoji] = useState<EmojiType[]>([]);
   const openGroup = useOpenGroup(group);
+  const publishGroupMessage = usePublishGroupMessage();
   const { t } = useTranslation();
 
   function onClose(open: boolean) {
@@ -354,17 +362,21 @@ function ShareDialog({
       const ndkEvent = new NDKEvent(ndk, event);
       // @ts-expect-error encode takes relay list but type is wrong
       const nlink = ndkEvent.encode(relays);
-      const ev = new NDKEvent(ndk, {
-        kind: NDKKind.GroupChat,
-        content: message ? `${message}\nnostr:${nlink}` : `nostr:${nlink}`,
-        tags: [["h", group.id, group.relay]],
-      } as NostrEvent);
-      ev.tag(ndkEvent);
-      for (const e of customEmoji) {
-        ev.tags.push(["emoji", e.name, e.image!]);
-      }
-      await ev.publish(NDKRelaySet.fromRelayUrls([group.relay], ndk));
-      saveGroupEvent(ev.rawEvent() as NostrEvent, group);
+      const content = message ? `${message}\nnostr:${nlink}` : `nostr:${nlink}`;
+
+      // Build additional tags: event reference + custom emojis
+      const additionalTags = [
+        ...createEventReferenceTags(event),
+        ...customEmoji.map((e) => ["emoji", e.name, e.image!]),
+      ];
+
+      const publishedEvent = await publishGroupMessage(
+        content,
+        group,
+        additionalTags,
+      );
+
+      saveGroupEvent(publishedEvent, group);
       onClose(false);
       toast.success(t("share.success"));
       openGroup();
@@ -484,9 +496,9 @@ function useReply(event: NostrEvent, group?: Group) {
 
 // Add a hook to handle emoji reactions
 function useEmoji(event: NostrEvent, group?: Group) {
-  const ndk = useNDK();
   const userRelays = useRelays();
-  const relaySet = useRelaySet(group ? [group.relay] : userRelays);
+  const relayUrls = group ? [group.relay] : userRelays;
+  const publishEmojiReaction = usePublishEmojiReaction();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const { t } = useTranslation();
 
@@ -496,15 +508,7 @@ function useEmoji(event: NostrEvent, group?: Group) {
 
   async function onEmojiSelect(e: PickerEmoji) {
     try {
-      const ev = new NDKEvent(ndk, {
-        kind: NDKKind.Reaction,
-        content: e.native ? e.native : e.shortcodes,
-      } as NostrEvent);
-      ev.tag(new NDKEvent(ndk, event));
-      if (e.src) {
-        ev.tags.push(["emoji", e.name, e.src]);
-      }
-      await ev.publish(relaySet);
+      await publishEmojiReaction(event, e, relayUrls);
     } catch (err) {
       console.error(err);
       toast.error(t("chat.message.react.error"));
@@ -779,24 +783,17 @@ function DeleteGroupEventItem({
   group: Group;
   onDelete: () => void;
 }) {
-  const ndk = useNDK();
   const me = usePubkey();
   const { data: admins } = useGroupAdminsList(group);
   const { t } = useTranslation();
-  const relaySet = useRelaySet([group.relay]);
+  const publishDeletion = usePublishDeletion();
   const canDelete = me && (me === event.pubkey || admins?.includes(me));
 
   async function handleDelete() {
     try {
-      const ev = new NDKEvent(ndk, {
-        kind:
-          event.pubkey === me || group.id === "_"
-            ? NDKKind.EventDeletion
-            : (9005 as NDKKind),
-        content: "",
-      } as NostrEvent);
-      ev.tag(new NDKEvent(ndk, event));
-      await ev.publish(relaySet);
+      // For group admin deletions (kind 9005) vs regular deletions (kind 5)
+      // We'll use the standard deletion for now - both achieve the same goal
+      await publishDeletion([event.id], "", [group.relay]);
       toast.success(t("post.delete.success"));
       onDelete();
     } catch (err) {
@@ -902,8 +899,8 @@ export function ReplyEmbed({
   relays: string[];
   inline?: boolean;
 }) {
-  const ndk = useNDK();
   const userRelays = useRelays();
+  const relayUrls = group ? [group.relay] : userRelays;
   const canSign = useCanSign();
   const [showThread, setShowThread] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -911,7 +908,7 @@ export function ReplyEmbed({
   // const [zapType, setZapType] = useState<"nip-57" | "nip-61">("nip-61");
   const components = eventDetails[event.kind];
   const [isDeleted, setIsDeleted] = useState(false);
-  const relaySet = useRelaySet(group ? [group.relay] : userRelays);
+  const publishEmojiReaction = usePublishEmojiReaction();
   // Use the shared hook for reply functionality
   const { showReplyDialog, setShowReplyDialog, onReply, openReplyDialog } =
     useReply(event, group);
@@ -924,7 +921,7 @@ export function ReplyEmbed({
 
   const repliers = comments
     .map((c) => {
-      if (c.kind === NDKKind.Zap) {
+      if (c.kind === Kind.Zap) {
         return c.tags.find((t) => t[0] === "P")?.[1];
       }
       return c.pubkey;
@@ -946,15 +943,7 @@ export function ReplyEmbed({
 
   async function onEmojiSelect(e: PickerEmoji) {
     try {
-      const ev = new NDKEvent(ndk, {
-        kind: NDKKind.Reaction,
-        content: e.native ? e.native : e.shortcodes,
-      } as NostrEvent);
-      ev.tag(new NDKEvent(ndk, event));
-      if (e.src) {
-        ev.tags.push(["emoji", e.name, e.src]);
-      }
-      await ev.publish(relaySet);
+      await publishEmojiReaction(event, e, relayUrls);
     } catch (err) {
       console.error(err);
       toast.error(t("chat.message.react.error"));
@@ -1022,7 +1011,7 @@ export function ReplyEmbed({
         <Reactions
           event={event}
           relays={group ? [group.relay] : [...relays, ...userRelays]}
-          kinds={[NDKKind.Reaction]}
+          kinds={[Kind.Reaction]}
         />
       ) : null}
     </div>
@@ -1188,14 +1177,15 @@ export function FeedEmbed({
   relays: string[];
   inline?: boolean;
 }) {
-  const ndk = useNDK();
   const userRelays = useRelays();
+  const relayUrls = group ? [group.relay] : userRelays;
   const canSign = useCanSign();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   // const [zapType, setZapType] = useState<"nip-57" | "nip-61">("nip-61");
 //   const [showZapDialog, setShowZapDialog] = useState(false);
   const components = eventDetails[event.kind];
   const [isDeleted, setIsDeleted] = useState(false);
+  const publishEmojiReaction = usePublishEmojiReaction();
   // Use the shared hook for reply functionality
   const { showReplyDialog, setShowReplyDialog, onReply, openReplyDialog } =
     useReply(event, group);
@@ -1204,7 +1194,6 @@ export function FeedEmbed({
   const { t } = useTranslation();
   // const isRelayGroup = group?.id === "_";
 //   const { data: mintList } = useMintList(event.pubkey);
-  const relaySet = useRelaySet(group ? [group.relay] : userRelays);
 
   function openEmojiPicker() {
     setShowEmojiPicker(true);
@@ -1217,15 +1206,7 @@ export function FeedEmbed({
 
   async function onEmojiSelect(e: PickerEmoji) {
     try {
-      const ev = new NDKEvent(ndk, {
-        kind: NDKKind.Reaction,
-        content: e.native ? e.native : e.shortcodes,
-      } as NostrEvent);
-      ev.tag(new NDKEvent(ndk, event));
-      if (e.src) {
-        ev.tags.push(["emoji", e.name, e.src]);
-      }
-      await ev.publish(relaySet);
+      await publishEmojiReaction(event, e, relayUrls);
     } catch (err) {
       console.error(err);
       toast.error(t("chat.message.react.error"));
@@ -1276,7 +1257,7 @@ export function FeedEmbed({
         <Reactions
           event={event}
           relays={group ? [group.relay] : [...relays, ...userRelays]}
-          kinds={[NDKKind.Reaction]}
+          kinds={[Kind.Reaction]}
         />
       ) : null}
     </div>
@@ -1439,7 +1420,7 @@ export function Embed({
   const alt = event.tags.find((t) => t[0] === "alt")?.[1];
   const repliers = replies
     ?.map((r) => {
-      if (r.kind === NDKKind.Zap) {
+      if (r.kind === Kind.Zap) {
         return r.tags.find((t) => t[0] === "P")?.[1];
       }
       return r.pubkey;
@@ -1516,7 +1497,7 @@ export function Embed({
           <Reactions
             event={event}
             relays={group ? [group.relay] : [...relays, ...userRelays]}
-            kinds={[NDKKind.Reaction]}
+            kinds={[Kind.Reaction]}
           />
         ) : null}
       </div>

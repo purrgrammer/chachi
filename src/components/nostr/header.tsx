@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Globe, MessageCircleQuestion } from "lucide-react";
 import { Link } from "react-router-dom";
-import { NDKKind } from "@nostr-dev-kit/ndk";
+import * as Kind from "@/lib/nostr/kinds";
 import { NostrEvent } from "nostr-tools";
 import { formatRelativeTime } from "@/lib/time";
 import { ModeratedCommunityName } from "@/components/nostr/moderated-communities";
@@ -68,7 +68,7 @@ export function Header({ event }: { event: NostrEvent }) {
   const clientTag = event.tags.find((t) => t[0] === "client");
   const clientName = clientTag?.[1];
   const clientAddress =
-    clientTag?.[2] && clientTag[2].startsWith(`${NDKKind.AppHandler}:`)
+    clientTag?.[2] && clientTag[2].startsWith(`${Kind.AppHandler}:`)
       ? clientTag[2]
       : null;
   const clientRelay =

@@ -22,21 +22,21 @@ import {
   SupportedKinds,
   ContentCategoryGroups,
 } from "@/lib/constants/kinds";
-import type { NDKKind } from "@nostr-dev-kit/ndk";
+// import * as Kind from "@/lib/nostr/kinds";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
 interface FeedControlsProps {
-  kinds: NDKKind[];
-  onKindsChange?: (kinds: NDKKind[]) => void;
+  kinds: number[];
+  onKindsChange?: (kinds: number[]) => void;
   live: boolean;
   onLiveChange: (live: boolean) => void;
-  supportedKinds?: NDKKind[];
+  supportedKinds?: number[];
   // External state management props (optional)
-  tempKinds?: NDKKind[];
+  tempKinds?: number[];
   filterChanged?: boolean;
   isPopoverOpen?: boolean;
   setIsPopoverOpen?: (open: boolean) => void;
-  onKindToggle?: (kind: NDKKind, checked: boolean) => void;
+  onKindToggle?: (kind: number, checked: boolean) => void;
   onClearKinds?: () => void;
   onSelectAllKinds?: () => void;
   onSaveFilters?: () => void;
@@ -61,7 +61,7 @@ export function FeedControls({
   const { t } = useTranslation();
 
   // Use external state if provided, otherwise use internal state
-  const [internalTempKinds, setInternalTempKinds] = useState<NDKKind[]>(kinds);
+  const [internalTempKinds, setInternalTempKinds] = useState<number[]>(kinds);
   const [internalFilterChanged, setInternalFilterChanged] = useState(false);
   const [internalIsPopoverOpen, setInternalIsPopoverOpen] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
@@ -87,7 +87,7 @@ export function FeedControls({
     }
   }, [tempKinds, kinds, externalFilterChanged]);
 
-  const handleKindToggle = (kind: NDKKind, checked: boolean) => {
+  const handleKindToggle = (kind: number, checked: boolean) => {
     if (onKindToggle) {
       onKindToggle(kind, checked);
     } else {
@@ -136,7 +136,7 @@ export function FeedControls({
     });
   };
 
-  const handleSelectAllInCategory = (categoryKinds: NDKKind[]) => {
+  const handleSelectAllInCategory = (categoryKinds: number[]) => {
     const availableCategoryKinds = categoryKinds.filter((kind) =>
       supportedKinds.includes(kind),
     );
@@ -156,7 +156,7 @@ export function FeedControls({
     }
   };
 
-  const handleClearCategory = (categoryKinds: NDKKind[]) => {
+  const handleClearCategory = (categoryKinds: number[]) => {
     const newKinds = tempKinds.filter((kind) => !categoryKinds.includes(kind));
 
     if (onKindToggle) {
@@ -344,8 +344,8 @@ export function FeedControls({
 }
 
 interface ActiveFilterBadgesProps {
-  kinds: NDKKind[];
-  onRemoveKind: (kind: NDKKind) => void;
+  kinds: number[];
+  onRemoveKind: (kind: number) => void;
 }
 
 export function ActiveFilterBadges({

@@ -1,7 +1,8 @@
 import type { NostrEvent } from "nostr-tools";
 import { useEffect, useState } from "react";
+import { NDKSubscriptionCacheUsage } from "@nostr-dev-kit/ndk";
 import { Embed } from "@/components/nostr/detail";
-import { NDKKind, NDKSubscriptionCacheUsage } from "@nostr-dev-kit/ndk";
+import * as Kind from "@/lib/nostr/kinds";
 import { useRelaySet } from "@/lib/nostr";
 import { useNDK } from "@/lib/ndk";
 import { POST_APPROVAL, MODERATED_COMMUNITY } from "@/lib/kinds";
@@ -17,9 +18,9 @@ function useApprovedPosts(community: ModeratedCommunity) {
   const ndk = useNDK();
   const [posts, setPosts] = useState<NostrEvent[]>([]);
   const postKinds = [
-    String(NDKKind.Text),
-    String(NDKKind.Article),
-    String(NDKKind.Thread),
+    String(Kind.Text),
+    String(Kind.Article),
+    String(Kind.Thread),
   ];
   const relaySet = useRelaySet(community.relays);
   const fetchOptions = {
@@ -45,7 +46,7 @@ function useApprovedPosts(community: ModeratedCommunity) {
           [
             // moderator's posts
             {
-              kinds: [NDKKind.Text, NDKKind.Article, NDKKind.Thread],
+              kinds: [Kind.Text, Kind.Article, Kind.Thread],
               "#a": [
                 `${MODERATED_COMMUNITY}:${community.pubkey}:${community.id}`,
               ],

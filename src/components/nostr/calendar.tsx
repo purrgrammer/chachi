@@ -17,14 +17,16 @@ import { formatDateTime } from "@/lib/time";
 //import { MiniMap } from "@/components/map-minimap";
 import type { Group } from "@/lib/types";
 import { useReactions, useRelayList, useARef, useARefs } from "@/lib/nostr";
-import { NDKEvent, NDKRelaySet } from "@nostr-dev-kit/ndk";
 import { RSVP } from "@/lib/kinds";
 import { NameList } from "./name-list";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { usePubkey } from "@/lib/account";
-import { useNDK } from "@/lib/ndk";
 import { CALENDAR, CALENDAR_EVENT } from "@/lib/kinds";
+import {
+  usePublishEvent,
+  createEventReferenceTags,
+} from "@/lib/nostr/publishing";
 
 function CalendarLink({ aRef }: { aRef: string }) {
   const { t } = useTranslation();
@@ -60,7 +62,7 @@ export function CalendarEvent({
   group?: Group;
   className?: string;
 }) {
-  const ndk = useNDK();
+  const publish = usePublishEvent();
   const [isPublishing, setIsPublishing] = useState(false);
   const pubkey = usePubkey();
   const { t } = useTranslation();
@@ -126,18 +128,19 @@ export function CalendarEvent({
       setIsPublishing(true);
       // todo: did we rsvp already?
       const d = myRsvp?.tags.find((t) => t[0] === "d")?.[1];
-      const relaySet = NDKRelaySet.fromRelayUrls(
-        group ? [group.relay] : [],
-        ndk,
-      );
-      const ev = new NDKEvent(ndk, {
+      const eventRefTags = createEventReferenceTags(event);
+      const template = {
         kind: RSVP,
         content: "",
-        tags: [...(d ? [["d", d]] : []), ["status", status]],
-      } as NostrEvent);
-      ev.tag(new NDKEvent(ndk, event));
-      await ev.publish(relaySet);
-      console.log("RSVP", d, ev);
+        tags: [
+          ...(d ? [["d", d]] : []),
+          ["status", status],
+          ...eventRefTags,
+        ],
+        created_at: Math.floor(Date.now() / 1000),
+      };
+      const publishedEvent = await publish(template, group ? [group.relay] : []);
+      console.log("RSVP", d, publishedEvent);
     } catch (err) {
       console.error(err);
     } finally {

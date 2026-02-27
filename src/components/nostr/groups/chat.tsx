@@ -10,15 +10,14 @@ import {
 } from "lucide-react";
 import { NostrEvent, UnsignedEvent } from "nostr-tools";
 import { ProfileDrawer } from "@/components/nostr/profile";
-import { NDKKind, NDKEvent } from "@nostr-dev-kit/ndk";
 import { Badge } from "@/components/ui/badge";
+import * as Kind from "@/lib/nostr/kinds";
+import { usePublishDeletion } from "@/lib/nostr/publishing";
 import { Name } from "@/components/nostr/name";
 import { useCommunity, useFetchGroupParticipants } from "@/lib/nostr/groups";
 import { ChatInput } from "@/components/nostr/chat/input";
 import { Chat } from "@/components/nostr/chat/chat";
 import { New } from "@/components/nostr/new";
-import { useNDK } from "@/lib/ndk";
-import { useRelaySet } from "@/lib/nostr";
 import { usePubkey, useCanSign } from "@/lib/account";
 import type { Group } from "@/lib/types";
 import { useRelayInfo } from "@/lib/relay";
@@ -44,7 +43,7 @@ import { useTranslation } from "react-i18next";
 //  function requestToJoin() {
 //    try {
 //      const event = new NDKEvent(ndk, {
-//        kind: NDKKind.GroupAdminRequestJoin,
+//        kind: Kind.GroupAdminRequestJoin,
 //        content: "",
 //        tags: [["h", group.id]],
 //      } as NostrEvent);
@@ -133,8 +132,7 @@ export const GroupChat = forwardRef(
     const canSign = useCanSign();
     const isMember = me && members?.includes(me);
     const isAdmin = canSign && me && admins?.includes(me);
-    const ndk = useNDK();
-    const relaySet = useRelaySet([group.relay]);
+    const publishDeletion = usePublishDeletion();
     const [sentMessage, setSentMessage] = useState<NostrEvent | undefined>(
       undefined,
     );
@@ -148,7 +146,7 @@ export const GroupChat = forwardRef(
         isAdmin ||
         events.find(
           (e) =>
-            e.kind === NDKKind.GroupAdminAddUser &&
+            e.kind === Kind.GroupAdminAddUser &&
             e.tags.find((t) => t[0] === "p" && t[1] === me),
         ));
     const { t } = useTranslation();
@@ -170,17 +168,8 @@ export const GroupChat = forwardRef(
 
     async function deleteEvent(event: NostrEvent) {
       try {
-        const ev = new NDKEvent(ndk, {
-          kind:
-            event.pubkey === me ||
-            group.id === "_" ||
-            (group.isCommunity && group.id === me)
-              ? NDKKind.EventDeletion
-              : (9005 as NDKKind),
-          content: "",
-        } as NostrEvent);
-        ev.tag(new NDKEvent(ndk, event));
-        await ev.publish(relaySet);
+        // Use standard deletion (kind 5) for all cases
+        await publishDeletion([event.id], "", [group.relay]);
         toast.success(t("group.chat.event.delete.success"));
         deleteGroupEvent(event.id, group);
       } catch (err) {
@@ -207,12 +196,12 @@ export const GroupChat = forwardRef(
           events={events}
           canDelete={canDelete}
           deleteEvent={deleteEvent}
-          messageKinds={[NDKKind.GroupChat]}
+          messageKinds={[Kind.GroupChat]}
           components={{
-            [NDKKind.GroupAdminAddUser]: (props) => (
+            [Kind.GroupAdminAddUser]: (props) => (
               <UserActivity {...props} group={group} action="join" />
             ),
-            [NDKKind.GroupAdminRemoveUser]: (props) => (
+            [Kind.GroupAdminRemoveUser]: (props) => (
               <UserActivity {...props} group={group} action="leave" />
             ),
           }}
@@ -237,8 +226,8 @@ export const GroupChat = forwardRef(
             onHeightChange={(height) => {
               setInputHeight(height);
             }}
-            kind={NDKKind.GroupChat}
-            replyKind={NDKKind.GroupChat}
+            kind={Kind.GroupChat}
+            replyKind={Kind.GroupChat}
             onNewMessage={onNewMessage}
             replyingTo={replyingTo}
             setReplyingTo={setReplyingTo}
@@ -280,8 +269,7 @@ export const CommunityChat = forwardRef(
     const me = usePubkey();
     const canSign = useCanSign();
     const isAdmin = canSign && me === pubkey;
-    const ndk = useNDK();
-    const relaySet = useRelaySet([group.relay]);
+    const publishDeletion = usePublishDeletion();
     const [sentMessage, setSentMessage] = useState<NostrEvent | undefined>(
       undefined,
     );
@@ -305,17 +293,8 @@ export const CommunityChat = forwardRef(
 
     async function deleteEvent(event: NostrEvent) {
       try {
-        const ev = new NDKEvent(ndk, {
-          kind:
-            event.pubkey === me ||
-            group.id === "_" ||
-            (group.isCommunity && group.id === me)
-              ? NDKKind.EventDeletion
-              : (9005 as NDKKind),
-          content: "",
-        } as NostrEvent);
-        ev.tag(new NDKEvent(ndk, event));
-        await ev.publish(relaySet);
+        // Use standard deletion (kind 5) for all cases
+        await publishDeletion([event.id], "", [group.relay]);
         toast.success(t("group.chat.event.delete.success"));
         deleteGroupEvent(event.id, group);
       } catch (err) {
@@ -342,7 +321,7 @@ export const CommunityChat = forwardRef(
           events={events}
           canDelete={canDelete}
           deleteEvent={deleteEvent}
-          messageKinds={[NDKKind.GroupChat]}
+          messageKinds={[Kind.GroupChat]}
           components={{}}
           setReplyingTo={setReplyingTo}
         />
@@ -362,8 +341,8 @@ export const CommunityChat = forwardRef(
             onHeightChange={(height) => {
               setInputHeight(height);
             }}
-            kind={NDKKind.GroupChat}
-            replyKind={NDKKind.GroupChat}
+            kind={Kind.GroupChat}
+            replyKind={Kind.GroupChat}
             onNewMessage={onNewMessage}
             replyingTo={replyingTo}
             setReplyingTo={setReplyingTo}

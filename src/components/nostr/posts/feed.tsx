@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import type { ForwardedRef } from "react";
 import { Megaphone } from "lucide-react";
-import { NDKKind } from "@nostr-dev-kit/ndk";
+import * as Kind from "@/lib/nostr/kinds";
 import { Button } from "@/components/ui/button";
 import Feed from "@/components/nostr/feed";
 import { NewPost } from "@/components/new-post";
@@ -18,14 +18,14 @@ export const GroupPosts = forwardRef(
     const includeOpPublications = metadata?.isCommunity;
     const filter = [
       {
-        kinds: [NDKKind.Thread],
+        kinds: [Kind.Thread],
         "#h": [group.id],
         limit: 50,
       },
       ...(includeOpPublications
         ? [
             {
-              kinds: [NDKKind.Text, NDKKind.Thread],
+              kinds: [Kind.Text, Kind.Thread],
               authors: [group.id],
               limit: 50,
             },

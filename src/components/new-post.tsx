@@ -13,19 +13,18 @@ import {
 } from "@/components/ui/dialog";
 import { UploadFile } from "@/components/upload-file";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
-import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
-import { useNDK } from "@/lib/ndk";
-import { useRelaySet } from "@/lib/nostr";
+import * as Kind from "@/lib/nostr/kinds";
 import { useCanSign } from "@/lib/account";
 import type { UploadedBlob } from "@/lib/media";
 import { Embed } from "@/components/nostr/detail";
 import type { Group, Emoji } from "@/lib/types";
 import { useTranslation } from "react-i18next";
+import { usePublishEvent } from "@/lib/nostr/publishing";
 
 export function NewPost({
   group,
   children,
-  kind = NDKKind.Thread,
+  kind = Kind.Thread,
   action = "Post",
   //TODO add translation
   title = "New post",
@@ -33,7 +32,7 @@ export function NewPost({
   onSucess,
 }: {
   group: Group;
-  kind?: NDKKind;
+  kind?: number;
   children?: React.ReactNode;
   action?: string;
   title?: string;
@@ -45,10 +44,9 @@ export function NewPost({
   const [message, setMessage] = useState("");
   const [customEmoji, setCustomEmoji] = useState<Emoji[]>([]);
   const [blobs, setBlobs] = useState<UploadedBlob[]>([]);
-  const ndk = useNDK();
-  const relaySet = useRelaySet([group.relay]);
   const canSign = useCanSign();
   const { t } = useTranslation();
+  const publish = usePublishEvent();
   console.log("BLOBS", blobs);
 
   function onFileUpload(blob: UploadedBlob) {
@@ -60,21 +58,26 @@ export function NewPost({
     try {
       setIsPosting(true);
       if (message.trim()) {
-        const ev = new NDKEvent(ndk, {
-          kind,
-          content: message.trim(),
-          tags: [
-            ["h", group.id, group.relay],
-            ...(group.id === "_" ? [["-"]] : []),
-          ],
-        } as NostrEvent);
+        // Build tags array
+        const tags: string[][] = [
+          ["h", group.id, group.relay],
+          ...(group.id === "_" ? [["-"]] : []),
+        ];
         // todo: 1111 replies
         for (const e of customEmoji) {
-          ev.tags.push(["emoji", e.name, e.image!]);
+          tags.push(["emoji", e.name, e.image!]);
         }
         // todo: imeta tags
-        await ev.publish(relaySet);
-        onSucess?.(ev.rawEvent() as NostrEvent);
+
+        // Create and publish event
+        const template = {
+          kind,
+          content: message.trim(),
+          tags,
+          created_at: Math.floor(Date.now() / 1000),
+        };
+        const publishedEvent = await publish(template, [group.relay]);
+        onSucess?.(publishedEvent);
         setShowDialog(false);
         setMessage("");
         toast.success(t("post.success"));

@@ -16,15 +16,13 @@ import { UploadFile } from "@/components/upload-file";
 import { RichText } from "@/components/rich-text";
 import { AutocompleteTextarea } from "@/components/autocomplete-textarea";
 import { DatePicker } from "@/components/date-picker";
-import { NDKEvent } from "@nostr-dev-kit/ndk";
-import { useNDK } from "@/lib/ndk";
-import { useRelaySet } from "@/lib/nostr";
 import { useCanSign } from "@/lib/account";
 import { randomId } from "@/lib/id";
 import { POLL } from "@/lib/kinds";
 import { dedupeBy } from "@/lib/utils";
 import type { Group, Emoji } from "@/lib/types";
 import { useTranslation } from "react-i18next";
+import { usePublishEvent } from "@/lib/nostr/publishing";
 
 export function NewPoll({
   group,
@@ -44,8 +42,7 @@ export function NewPoll({
   const [message, setMessage] = useState("");
   const [options, setOptions] = useState<string[][]>([]);
   const [customEmoji, setCustomEmoji] = useState<Emoji[]>([]);
-  const ndk = useNDK();
-  const relaySet = useRelaySet([group.relay]);
+  const publish = usePublishEvent();
   const canSign = useCanSign();
   const endsAtIsValid = endsAt ? Number(endsAt) > Date.now() / 1000 : true;
   const { t } = useTranslation();
@@ -54,24 +51,31 @@ export function NewPoll({
     try {
       setIsPosting(true);
       if (message.trim()) {
-        const ev = new NDKEvent(ndk, {
+        const tags = [
+          ["h", group.id, group.relay],
+          ...(group.id === "_" ? [["-"]] : []),
+          ["relay", group.relay],
+          ...options,
+          ["polltype", isMultiChoice ? "multiplechoice" : "singlechoice"],
+        ];
+
+        if (endsAt) {
+          tags.push(["endsAt", endsAt]);
+        }
+
+        for (const e of dedupeBy(customEmoji, "name")) {
+          tags.push(["emoji", e.name, e.image!]);
+        }
+
+        const template = {
           kind: POLL,
           content: message.trim(),
-          tags: [
-            ["h", group.id, group.relay],
-            ...(group.id === "_" ? [["-"]] : []),
-            ["relay", group.relay],
-            ...options,
-            ["polltype", isMultiChoice ? "multiplechoice" : "singlechoice"],
-          ],
-        } as NostrEvent);
-        if (endsAt) {
-          ev.tags.push(["endsAt", endsAt]);
-        }
-        for (const e of dedupeBy(customEmoji, "name")) {
-          ev.tags.push(["emoji", e.name, e.image!]);
-        }
-        await ev.publish(relaySet);
+          tags,
+          created_at: Math.floor(Date.now() / 1000),
+        };
+
+        const publishedEvent = await publish(template, [group.relay]);
+
         setShowDialog(false);
         setIsMultiChoice(false);
         setMessage("");
@@ -79,7 +83,7 @@ export function NewPoll({
         setCustomEmoji([]);
         setEndsAt("");
         toast.success(t("poll.create.success"));
-        onSuccess?.(ev.rawEvent() as NostrEvent);
+        onSuccess?.(publishedEvent);
       }
     } catch (err) {
       console.error(err);

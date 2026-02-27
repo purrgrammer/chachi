@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Code, Globe, Tags, Layers } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
 import { useTranslation } from "react-i18next";
-import { NDKKind } from "@nostr-dev-kit/ndk";
+import * as Kind from "@/lib/nostr/kinds";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Avatar as NostrAvatar } from "@/components/nostr/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +21,7 @@ export function AppRecommendation({
 }) {
   const { t } = useTranslation();
   const appRef = event.tags.find(
-    (t) => t[0] === "a" && t[1]?.startsWith(`${NDKKind.AppHandler}:`),
+    (t) => t[0] === "a" && t[1]?.startsWith(`${Kind.AppHandler}:`),
   )?.[1];
   if (!appRef) {
     return null;

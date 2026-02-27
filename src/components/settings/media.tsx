@@ -8,9 +8,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAtom } from "jotai";
 import { mediaServerListAtom } from "@/app/store";
-import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
-import { NostrEvent } from "nostr-tools";
-import { useNDK } from "@/lib/ndk";
+import { usePublishBlossomList } from "@/lib/nostr/publishing";
 
 function MediaServer({
   server,
@@ -65,19 +63,13 @@ function MediaServerList({
   const { t } = useTranslation();
   const [mediaServerList, setMediaServerList] = useAtom(mediaServerListAtom);
   const [isSaving, setIsSaving] = useState(false);
-  const ndk = useNDK();
+  const publishBlossomList = usePublishBlossomList();
 
   async function saveMediaServerList(servers: string[]) {
     try {
       setIsSaving(true);
-      const event = new NDKEvent(ndk, {
-        kind: NDKKind.BlossomList,
-        content: "",
-        tags: servers.map((server) => ["server", server]),
-      } as NostrEvent);
-      await event.sign();
-      await event.publish();
-      console.log("SAVE MEDIA SERVER LIST", servers, event.rawEvent());
+      const publishedEvent = await publishBlossomList(servers);
+      console.log("SAVE MEDIA SERVER LIST", servers, publishedEvent);
     } catch (err) {
       console.error(err);
     } finally {
