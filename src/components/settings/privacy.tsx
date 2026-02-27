@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Shield, VenetianMask, Trash2 } from "lucide-react";
+import { Shield, Trash2 } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -130,7 +130,6 @@ function RelayAuthPreferences() {
 }
 
 export function Privacy() {
-  const { t } = useTranslation();
   const form = useForm<z.infer<typeof privacySchema>>({
     resolver: zodResolver(privacySchema),
     defaultValues: {},
@@ -146,18 +145,7 @@ export function Privacy() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col gap-3"
       >
-        <div className="flex flex-col gap-1.5">
-          <div className="flex flex-row gap-1 items-center flex-wrap">
-            <VenetianMask className="size-4 text-muted-foreground" />
-            <h4 className="text-sm uppercase font-light text-muted-foreground">
-              {t("settings.privacy.title")}
-            </h4>
-          </div>
-        </div>
-
-        <div className="mt-3">
-          <RelayAuthPreferences />
-        </div>
+        <RelayAuthPreferences />
       </form>
     </Form>
   );
