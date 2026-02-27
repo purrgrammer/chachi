@@ -1,24 +1,13 @@
 import Dexie, { Table } from "dexie";
 import NDKCacheAdapterDexie from "@nostr-dev-kit/cache-dexie";
-import { NDKCashuToken, NDKEvent } from "@nostr-dev-kit/ndk";
+import { NDKEvent } from "@nostr-dev-kit/ndk";
 import { Event, Group, GroupMetadata, Community, EmojiSet } from "./types";
 import { groupId } from "./groups";
-//import { Transaction } from "@/lib/wallet";
 
 // TODO: tweak cache sizes
 export const cache = new NDKCacheAdapterDexie({
   dbName: "ndk",
 });
-
-export interface TokenEvent {
-  id: string;
-  kind: number;
-  created_at: number;
-  content: string;
-  pubkey: string;
-  tags: string[][];
-  sig: string;
-}
 
 export interface LastSeen {
   group: string;
@@ -47,66 +36,20 @@ export interface GroupParticipants {
   admins: string[];
 }
 
-//interface TX extends Transaction {
-//
-//}
-
-export type NutzapStatus = "redeemed" | "spent" | "failed";
-
-export interface Nutzap {
-  id: string;
-  group?: string;
-  kind: number;
-  created_at: number;
-  content: string;
-  pubkey: string;
-  tags: string[][];
-  sig: string;
-  status?: NutzapStatus;
-  txId?: string;
-  claimedAt?: number;
-}
-
-export interface PrivateEvent {
-  id: string;
-  gift: string;
-  group: string;
-  kind: number;
-  created_at: number;
-  content: string;
-  pubkey: string;
-  tags: string[][];
-}
-
 export interface LastSeenSyncMeta {
   key: string; // singleton key, always "sync"
   lastProcessedTimestamp: number; // last remote event timestamp we processed
   lastPublishedTimestamp: number; // last event timestamp we published
 }
 
-export interface DMGroupSummary {
-  id: string; // group id (sorted concatenated pubkeys)
-  pubkeys: string[]; // participant pubkeys (excluding current user for display)
-  lastMessageAt: number; // timestamp of last non-reaction message
-  lastMessageContent: string; // preview text
-  lastMessagePubkey: string; // who sent last message
-  lastMessageTags: string[][]; // tags for rich text rendering
-  senderPubkeys: string[]; // all pubkeys who have sent messages in this group
-}
-
 class ChachiDatabase extends Dexie {
   events!: Table<Event>;
   lastSeen!: Table<LastSeen>;
-  tokenEvents!: Table<TokenEvent>;
   groupInfo!: Table<GroupInfo>;
   groupParticipants!: Table<GroupParticipants>;
-  //transactions!: Table<Transaction>;
-  nutzaps!: Table<Nutzap>;
   community!: Table<Community>;
-  dms!: Table<PrivateEvent>;
   emojiSets!: Table<EmojiSet>;
   lastSeenSyncMeta!: Table<LastSeenSyncMeta>;
-  dmGroups!: Table<DMGroupSummary>;
 
   constructor(name: string) {
     super(name);
@@ -123,53 +66,25 @@ class ChachiDatabase extends Dexie {
       emojiSets: "&address",
       lastSeenSyncMeta: "&key",
     });
-    this.version(16)
-      .stores({
-        dmGroups: "&id,lastMessageAt,*senderPubkeys",
-      })
-      .upgrade(async (tx) => {
-        // Build dmGroups summary from existing DMs
-        const dms = tx.table<PrivateEvent>("dms");
-        const dmGroups = tx.table<DMGroupSummary>("dmGroups");
-
-        const groupMap = new Map<string, DMGroupSummary>();
-
-        await dms.each((dm) => {
-          const existing = groupMap.get(dm.group);
-          const isReaction = dm.kind === 7; // NDKKind.Reaction
-
-          if (existing) {
-            if (!existing.senderPubkeys.includes(dm.pubkey)) {
-              existing.senderPubkeys.push(dm.pubkey);
-            }
-            if (!isReaction && dm.created_at > existing.lastMessageAt) {
-              existing.lastMessageAt = dm.created_at;
-              existing.lastMessageContent = dm.content;
-              existing.lastMessagePubkey = dm.pubkey;
-              existing.lastMessageTags = dm.tags;
-            }
-          } else {
-            const pubkeys: string[] = [];
-            for (let i = 0; i < dm.group.length; i += 64) {
-              pubkeys.push(dm.group.slice(i, i + 64));
-            }
-            groupMap.set(dm.group, {
-              id: dm.group,
-              pubkeys,
-              lastMessageAt: isReaction ? 0 : dm.created_at,
-              lastMessageContent: isReaction ? "" : dm.content,
-              lastMessagePubkey: isReaction ? "" : dm.pubkey,
-              lastMessageTags: isReaction ? [] : dm.tags,
-              senderPubkeys: [dm.pubkey],
-            });
-          }
-        });
-
-        const summaries = Array.from(groupMap.values());
-        if (summaries.length > 0) {
-          await dmGroups.bulkPut(summaries);
-        }
-      });
+    this.version(16).stores({
+      dmGroups: "&id,lastMessageAt,*senderPubkeys",
+    });
+    // Version 17: Remove wallet/payment/DM tables (keep lastSeenSyncMeta for group chat)
+    this.version(17).stores({
+      events:
+        "&id,created_at,group,[group+kind],[group+kind+created_at],[group+created_at]",
+      lastSeen: "[group+kind],created_at,[group+created_at]",
+      groupInfo: "[id+relay]",
+      groupParticipants: "&group",
+      community: "&pubkey",
+      emojiSets: "&address",
+      lastSeenSyncMeta: "&key",
+      // Removed tables: nutzaps, tokenEvents, dms, dmGroups
+      nutzaps: null,
+      tokenEvents: null,
+      dms: null,
+      dmGroups: null,
+    });
   }
 }
 const db = new ChachiDatabase("chachi");
@@ -180,17 +95,6 @@ export function getUnpublishedEvents() {
   return cache
     .getUnpublishedEvents()
     .then((events: { event: NDKEvent }[]) => events.map((e) => e.event));
-}
-
-export function getTokenEvents(pubkey: string) {
-  return db.tokenEvents
-    .where("[pubkey+created_at]")
-    .between([pubkey, Dexie.minKey], [pubkey, Dexie.maxKey])
-    .toArray();
-}
-
-export function saveTokenEvent(token: NDKCashuToken) {
-  db.tokenEvents.put(token.rawEvent() as TokenEvent);
 }
 
 export async function saveGroupInfo(
