@@ -542,7 +542,7 @@ function MessageContent({
                       className="pt-1"
                       event={event}
                       relays={[...(relay ? [relay] : [])]}
-                      kinds={[Kind.Zap, Kind.Reaction]}
+                      kinds={[Kind.Reaction]}
                       live={isInView}
                     />
                   </div>
