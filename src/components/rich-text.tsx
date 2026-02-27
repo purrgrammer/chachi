@@ -1,4 +1,7 @@
+import { CashuToken, CashuRequest } from "@/components/zap-stubs";
+import { cashuRegex, cashuRequestRegex } from "@/lib/cashu-stub";
 import { useMemo } from "react";
+import { CashuToken } from "@/components/zap-stubs";
 import { nip19 } from "nostr-tools";
 import type {
   AddressPointer,
@@ -9,7 +12,6 @@ import { Event, Address } from "@/components/nostr/event";
 import { Image } from "@/components/image";
 import { Audio } from "@/components/audio";
 import { Video } from "@/components/video";
-import { CashuRequest, CashuToken } from "@/components/cashu";
 import { Mention } from "@/components/nostr/mention";
 import { Emoji } from "@/components/emoji";
 import { Hashtag } from "@/components/hashtag";
@@ -18,7 +20,6 @@ import { isImageLink, isVideoLink, isAudioLink } from "@/lib/string";
 import type { Group } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { LazyCodeBlock } from "@/components/lazy-code-block";
-import { cashuRegex, cashuRequestRegex } from "@/lib/cashu";
 import { RelayLink } from "@/components/nostr/relay";
 
 // todo: blossom link fallbacks

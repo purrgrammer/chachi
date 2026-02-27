@@ -21,7 +21,7 @@ import { useProfile } from "@/lib/nostr";
 import { useNavigate } from "react-router-dom";
 import { BlossomLink } from "@/components/blossom";
 import { RelayLink } from "../relay";
-import { MintLink } from "@/components/mint";
+import { MintLink } from "@/components/mint-stub";
 
 export function GroupPicture({
   group,

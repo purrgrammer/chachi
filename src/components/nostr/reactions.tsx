@@ -1,4 +1,6 @@
+import { useMintList } from "@/lib/cashu-stub";
 import { useState } from "react";
+import { validateZap, Zap } from '@/lib/nip-57-stub';
 import { NDKRelaySet, NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { Avatar } from "@/components/nostr/avatar";
@@ -12,12 +14,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { validateZap, Zap } from "@/lib/nip-57";
 import { cn, groupBy } from "@/lib/utils";
 import { CUSTOM_EMOJI_CONTENT_REGEX } from "@/lib/emoji";
-import { useMintList } from "@/lib/cashu";
 import { useTranslation } from "react-i18next";
-import Amount from "@/components/amount";
+import Amount from "@/components/amount-stub";
 
 function Reacters({
   reactions,

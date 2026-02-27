@@ -1,4 +1,8 @@
+import { fetchMintInfo, fetchMintKeys } from "@/lib/cashu-stub";
+import { Zap, validateZapRequest } from "@/lib/nip-57-stub";
+import { fetchMintInfo, fetchMintKeys } from "@/lib/cashu-stub";
 import { useEffect, useState } from "react";
+import { Zap, validateZapRequest } from "@/lib/nip-57-stub";
 import { decode } from "light-bolt11-decoder";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -28,11 +32,9 @@ import {
   NDKNWCWallet,
 } from "@nostr-dev-kit/wallet";
 import { useNDK, useNWCNDK } from "@/lib/ndk";
-import { Zap, validateZapRequest } from "@/lib/nip-57";
 import { usePubkey, useMintList } from "@/lib/account";
 import { cashuAtom } from "@/app/store";
 import { useRelays } from "@/lib/nostr";
-import { fetchMintInfo, fetchMintKeys } from "@/lib/cashu";
 import { isRelayURL } from "@/lib/relay";
 import { getTokenEvents } from "@/lib/db";
 export type ChachiWallet =

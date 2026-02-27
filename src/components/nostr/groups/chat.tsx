@@ -1,3 +1,4 @@
+import { ChatZap } from "@/components/zap-stubs";
 import React, {
   useState,
   useEffect,
@@ -5,6 +6,8 @@ import React, {
   forwardRef,
   ForwardedRef,
 } from "react";
+import { ChatZap } from "@/components/zap-stubs";
+import { validateZap, Zap } from '@/lib/nip-57-stub';
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -26,8 +29,6 @@ import { useSettings } from "@/lib/settings";
 import { Badge } from "@/components/ui/badge";
 import { Name } from "@/components/nostr/name";
 import { useCommunity, useFetchGroupParticipants } from "@/lib/nostr/groups";
-import { Zap } from "@/components/nostr/zap";
-import { validateZap } from "@/lib/nip-57";
 import { ChatInput } from "@/components/nostr/chat/input";
 import type { Emoji as EmojiType } from "@/components/emoji-picker";
 import { LazyEmojiPicker } from "@/components/lazy/LazyEmojiPicker";

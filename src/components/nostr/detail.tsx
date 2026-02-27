@@ -1,4 +1,6 @@
+import { ZapGoal, ZapPreview, ZapDetail, ZapReply } from "@/components/zap-stubs";
 import { useState } from "react";
+import { ZapGoal, ZapPreview, ZapDetail, ZapReply } from "@/components/zap-stubs";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -55,7 +57,6 @@ import {
   GroupName,
   GroupPicture,
 } from "@/components/nostr/groups/metadata";
-import { ZapPreview, ZapDetail, ZapReply } from "@/components/nostr/zap";
 import { Repo, Issues } from "@/components/nostr/repo";
 import { Highlight } from "@/components/nostr/highlight";
 import { Stream } from "@/components/nostr/stream";
@@ -82,7 +83,7 @@ import { useRelaySet, useRelays, useA } from "@/lib/nostr";
 import { useDirectReplies, useReplies } from "@/lib/nostr/comments";
 import { useGroupAdminsList } from "@/lib/nostr/groups";
 import { useOpenGroup, groupId } from "@/lib/groups";
-import { MintEventPreview, MintEventDetail } from "@/components/mint";
+import { MintEventPreview, MintEventDetail } from "@/components/mint-stub";
 import {
   POLL,
   REPO,
@@ -136,7 +137,6 @@ import { useTranslation } from "react-i18next";
 import AudioNote from "@/components/nostr/audio-note";
 import { LazyCodeBlock } from "@/components/lazy-code-block";
 import { NameList } from "@/components/nostr//name-list";
-import { ZapGoal } from "./zap-goal";
 import { Workout } from "./workout";
 import {
   useMyRecommendedApps,

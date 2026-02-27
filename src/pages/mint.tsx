@@ -1,6 +1,6 @@
 import { Landmark } from "lucide-react";
 import { Header } from "@/components/header";
-import { MintName, MintIcon, Mint } from "@/components/mint";
+import { MintName, MintIcon, Mint } from "@/components/mint-stub";
 import { useParams } from "react-router-dom";
 
 export default function MintPage() {

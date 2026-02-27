@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from "react";
+import { validateZap, Zap } from '@/lib/nip-57-stub';
 import { motion, useInView } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -41,7 +42,6 @@ import {
 import { Name } from "@/components/nostr/name";
 import { Reactions } from "@/components/nostr/reactions";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { validateZap } from "@/lib/nip-57";
 import { useCopy } from "@/lib/hooks";
 import { useNDK } from "@/lib/ndk";
 import { Avatar } from "@/components/nostr/avatar";

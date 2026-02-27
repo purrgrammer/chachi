@@ -1,9 +1,10 @@
+import { validateZap } from "@/lib/nip-57-stub";
 import { NostrEvent } from "nostr-tools";
+import { validateZap } from "@/lib/nip-57-stub";
 import { NDKEvent, NDKKind } from "@nostr-dev-kit/ndk";
 import { useNDK } from "@/lib/ndk";
 import { useStream } from "@/lib/nostr";
 import type { Group } from "@/lib/types";
-import { validateZap } from "@/lib/nip-57";
 
 export function useReplies(event: NostrEvent, group?: Group, live = true) {
   const ndk = useNDK();

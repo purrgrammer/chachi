@@ -1,11 +1,11 @@
 import { useTranslation } from "react-i18next";
+import { validateZap, Zap } from '@/lib/nip-57-stub';
 import { Globe, MessageCircleQuestion } from "lucide-react";
 import { Link } from "react-router-dom";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { NostrEvent } from "nostr-tools";
 import { formatRelativeTime } from "@/lib/time";
 import { ModeratedCommunityName } from "@/components/nostr/moderated-communities";
-import { validateZap } from "@/lib/nip-57";
 import { User } from "@/components/nostr/user";
 import { CommunityList } from "@/components/nostr/community-list";
 import { useRelays, useA } from "@/lib/nostr";

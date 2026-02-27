@@ -1,10 +1,11 @@
+import { ChatZap } from "@/components/zap-stubs";
 import { useState } from "react";
+import { ChatZap } from "@/components/zap-stubs";
 import { NostrEvent } from "nostr-tools";
 import { NDKKind } from "@nostr-dev-kit/ndk";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Chat } from "@/components/nostr/chat/chat";
 import { ChatInput } from "@/components/nostr/chat/input";
-import { ChatZap } from "@/components/nostr/chat/zap";
 import { useGroupAdminsList } from "@/lib/nostr/groups";
 import { usePubkey } from "@/lib/account";
 import type { Group } from "@/lib/types";

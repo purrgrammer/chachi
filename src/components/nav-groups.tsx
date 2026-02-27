@@ -1,4 +1,5 @@
 import { Reorder } from "framer-motion";
+import { validateZap, Zap } from '@/lib/nip-57-stub';
 import { useParams } from "react-router-dom";
 import { NostrEvent } from "nostr-tools";
 import { Avatar as NostrAvatar } from "@/components/nostr/avatar";
@@ -22,9 +23,8 @@ import {
 } from "@/lib/messages";
 import type { Group, Event } from "@/lib/types";
 import { NDKKind } from "@nostr-dev-kit/ndk";
-import { validateZap, Zap } from "@/lib/nip-57";
 import { useMemo } from "react";
-import Amount from "@/components/amount";
+import Amount from "@/components/amount-stub";
 
 interface MessageEvent {
   id: string;

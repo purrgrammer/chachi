@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button";
 import { useMyGroups } from "@/lib/groups";
 import { RelayLink } from "../relay";
 import { BlossomLink } from "@/components/blossom";
-import { MintLink } from "@/components/mint";
+import { MintLink } from "@/components/mint-stub";
 import { Badge } from "@/components/ui/badge";
 import { ContentKinds } from "@/lib/constants/kinds";
 import { useState, useMemo } from "react";

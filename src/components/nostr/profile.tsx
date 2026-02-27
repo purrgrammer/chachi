@@ -1,4 +1,6 @@
+import { LnAddress } from "@/components/zap-stubs";
 import { ReactNode, useMemo } from "react";
+import { LnAddress } from "@/components/zap-stubs";
 import {
   Drawer,
   DrawerContent,
@@ -8,7 +10,6 @@ import {
 import { User } from "@/components/nostr/user";
 import { useProfile, useRelayList } from "@/lib/nostr";
 import { RichText } from "@/components/rich-text";
-import { LnAddress } from "@/components/ln";
 import type { Group as GroupType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useCopy } from "@/lib/hooks";

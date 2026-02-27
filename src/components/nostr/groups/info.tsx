@@ -25,7 +25,7 @@ import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import { RelayLink } from "../relay";
 import { BlossomLink } from "@/components/blossom";
-import { MintLink } from "@/components/mint";
+import { MintLink } from "@/components/mint-stub";
 
 function GroupPicture({
   picture,
