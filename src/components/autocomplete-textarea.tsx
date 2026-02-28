@@ -286,6 +286,7 @@ export function AutocompleteTextarea({
     <div className="w-full p-2 relative transition-height">
       <Textarea
         ref={ref}
+        autoFocus
         className={cn(
           `text-md focus-visible:outline-none focus:ring-ring focus-visible:ring-ring w-full p-1 px-3 resize-none ${isAutocompleting || isAutocompletingEmoji || reply ? "rounded-b-xl rounded-t-none ring ring-ring ring-1" : "rounded-xl"}`,
           className,
