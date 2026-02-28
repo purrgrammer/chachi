@@ -4,8 +4,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Plus, BookLock, PenOff, EyeOff, ShieldOff } from "lucide-react";
-import { NostrEvent } from "nostr-tools";
-import { groupsContentAtom } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,15 +25,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadImage } from "@/components/upload-image";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useRelays, useRelaySet } from "@/lib/nostr";
+import { useRelays } from "@/lib/nostr";
 import { useCreateGroup, useEditGroup } from "@/lib/nostr/groups";
 import { getRelayHost } from "@/lib/relay";
 import { useAccount } from "@/lib/account";

@@ -5,7 +5,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Plus, Castle, Server, BookLock, PenOff, EyeOff, ShieldOff } from "lucide-react";
-import { NostrEvent } from "nostr-tools";
 import {
   relaysAtom,
   mediaServersAtom,

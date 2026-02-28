@@ -515,8 +515,10 @@ export function useEditGroup() {
       relay: metadata.relay,
       metadata: {
         name: metadata.name,
-        visibility: metadata.visibility,
-        access: metadata.access,
+        isPrivate: metadata.isPrivate,
+        isRestricted: metadata.isRestricted,
+        isHidden: metadata.isHidden,
+        isClosed: metadata.isClosed,
       },
     });
     if (!account || account.isReadOnly) throw new Error("Can't edit group");

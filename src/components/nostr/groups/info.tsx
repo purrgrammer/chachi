@@ -3,7 +3,6 @@ import {
   Crown,
   Server,
   CloudUpload,
-  Landmark,
   BookLock,
   PenOff,
   EyeOff,

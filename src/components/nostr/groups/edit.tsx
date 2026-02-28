@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Settings, Trash, BookLock, PenOff, EyeOff, ShieldOff } from "lucide-react";
-import { NDKEvent } from "@nostr-dev-kit/ndk";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -37,15 +36,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadImage } from "@/components/upload-image";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useRelaySet } from "@/lib/nostr";
 import { useEditGroup } from "@/lib/nostr/groups";
 import { useCanSign } from "@/lib/account";
 import type { GroupMetadata } from "@/lib/types";
