@@ -1,10 +1,10 @@
-import { useRef, useState } from "react";
-import { toast } from "sonner";
-import { RotateCw, Paperclip, FileLock } from "lucide-react";
+import { useState } from "react";
+import { Paperclip, FileLock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useUpload, UploadedBlob } from "@/lib/media";
+import { UploadedBlob } from "@/lib/media";
 import { useTranslation } from "react-i18next";
+import { UploadServerDialog } from "@/components/upload-server-dialog";
+import { useAccount } from "@/lib/account";
 
 type ButtonProps = React.ComponentProps<typeof Button>;
 
@@ -13,109 +13,121 @@ interface UploadFileProps extends ButtonProps {
 }
 
 export function UploadFile({ onUpload, ...props }: UploadFileProps) {
-  const [isUploading, setIsUploading] = useState<boolean>(false);
-  const { upload, canSign } = useUpload();
-  const ref = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const account = useAccount();
+  const canSign = account?.pubkey && !account.isReadOnly;
   const { t } = useTranslation();
 
-  function handleClick() {
-    ref.current?.click();
-  }
-
-  async function selectFile(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    uploadFile(file);
+
+    setSelectedFile(file);
+    setDialogOpen(true);
+
+    // Reset input to allow re-selecting same file
+    e.target.value = "";
   }
 
-  async function uploadFile(file: File) {
-    try {
-      setIsUploading(true);
-      const blob = await upload(file);
-      onUpload(blob);
-    } catch (err) {
-      console.error(err);
-      toast.error(t("file.upload.error"));
-    } finally {
-      setIsUploading(false);
-    }
+  function handleDialogClose() {
+    setDialogOpen(false);
+    setSelectedFile(null);
+  }
+
+  function handleUploadComplete(blob: UploadedBlob) {
+    onUpload(blob);
+    handleDialogClose();
   }
 
   return (
-    <Button
-      disabled={!canSign || isUploading}
-      variant="action"
-      size="icon"
-      onClick={handleClick}
-      aria-label={t("aria.upload-file")}
-      {...props}
-    >
-      {isUploading ? (
-        <RotateCw className="animate-spin text-muted-foreground" />
-      ) : (
-        <Paperclip className="text-muted-foreground" />
-      )}
-      <Input
-        noIcons
+    <>
+      <input
         type="file"
+        id="file-upload"
         className="hidden"
-        ref={ref}
-        onChange={selectFile}
+        onChange={handleFileSelect}
+        disabled={!canSign}
       />
-    </Button>
+
+      <Button
+        disabled={!canSign}
+        variant="action"
+        size="icon"
+        onClick={() => document.getElementById("file-upload")?.click()}
+        aria-label={t("aria.upload-file")}
+        {...props}
+      >
+        <Paperclip className="text-muted-foreground" />
+      </Button>
+
+      <UploadServerDialog
+        open={dialogOpen}
+        file={selectedFile}
+        onOpenChange={setDialogOpen}
+        onUpload={handleUploadComplete}
+        uploadType="file"
+      />
+    </>
   );
 }
 
 export function UploadEncryptedFile({ onUpload, ...props }: UploadFileProps) {
-  const [isUploading, setIsUploading] = useState<boolean>(false);
-  const { upload, canSign } = useUpload();
-  const ref = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const account = useAccount();
+  const canSign = account?.pubkey && !account.isReadOnly;
   const { t } = useTranslation();
 
-  function handleClick() {
-    ref.current?.click();
-  }
-
-  async function selectFile(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    uploadFile(file);
+
+    setSelectedFile(file);
+    setDialogOpen(true);
+
+    // Reset input to allow re-selecting same file
+    e.target.value = "";
   }
 
-  async function uploadFile(file: File) {
-    try {
-      setIsUploading(true);
-      const blob = await upload(file);
-      onUpload(blob);
-    } catch (err) {
-      console.error(err);
-      toast.error(t("file.upload.error"));
-    } finally {
-      setIsUploading(false);
-    }
+  function handleDialogClose() {
+    setDialogOpen(false);
+    setSelectedFile(null);
+  }
+
+  function handleUploadComplete(blob: UploadedBlob) {
+    onUpload(blob);
+    handleDialogClose();
   }
 
   return (
-    <Button
-      disabled={!canSign || isUploading}
-      variant="action"
-      size="icon"
-      onClick={handleClick}
-      aria-label={t("aria.upload-file")}
-      {...props}
-    >
-      {isUploading ? (
-        <RotateCw className="animate-spin text-muted-foreground" />
-      ) : (
-        <FileLock className="text-muted-foreground" />
-      )}
-      <Input
-        noIcons
+    <>
+      <input
         type="file"
+        id="encrypted-file-upload"
         className="hidden"
-        ref={ref}
-        onChange={selectFile}
+        onChange={handleFileSelect}
+        disabled={!canSign}
       />
-    </Button>
+
+      <Button
+        disabled={!canSign}
+        variant="action"
+        size="icon"
+        onClick={() => document.getElementById("encrypted-file-upload")?.click()}
+        aria-label={t("aria.upload-file")}
+        {...props}
+      >
+        <FileLock className="text-muted-foreground" />
+      </Button>
+
+      <UploadServerDialog
+        open={dialogOpen}
+        file={selectedFile}
+        onOpenChange={setDialogOpen}
+        onUpload={handleUploadComplete}
+        uploadType="file"
+      />
+    </>
   );
 }

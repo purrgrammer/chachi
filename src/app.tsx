@@ -6,7 +6,6 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
@@ -186,7 +185,6 @@ export default function App() {
               />
             </ThemeProvider>
           </SidebarProvider>
-          <ReactQueryDevtools initialIsOpen={false} position="bottom" />
         </QueryClientProvider>
       </NDKContext.Provider>
     </Provider>

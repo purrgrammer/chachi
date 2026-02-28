@@ -1,10 +1,10 @@
-import { useRef, useState } from "react";
-import { toast } from "sonner";
-import { RotateCw, Video, FileVideo } from "lucide-react";
+import { useState } from "react";
+import { Video, FileVideo } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useUpload, UploadedBlob } from "@/lib/media";
+import { UploadedBlob } from "@/lib/media";
 import { useTranslation } from "react-i18next";
+import { UploadServerDialog } from "@/components/upload-server-dialog";
+import { useAccount } from "@/lib/account";
 
 type ButtonProps = React.ComponentProps<typeof Button>;
 
@@ -13,60 +13,71 @@ interface UploadVideoProps extends ButtonProps {
 }
 
 export function UploadVideo({ onUpload, ...props }: UploadVideoProps) {
-  const [isUploading, setIsUploading] = useState<boolean>(false);
-  const { upload, canSign } = useUpload();
-  const ref = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const account = useAccount();
+  const canSign = account?.pubkey && !account.isReadOnly;
   const { t } = useTranslation();
 
-  function handleClick() {
-    ref.current?.click();
-  }
-
-  async function selectFile(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    uploadFile(file);
+
+    setSelectedFile(file);
+    setDialogOpen(true);
+
+    // Reset input to allow re-selecting same file
+    e.target.value = "";
   }
 
-  async function uploadFile(file: File) {
-    try {
-      setIsUploading(true);
-      const blob = await upload(file);
-      onUpload(blob);
-    } catch (err) {
-      console.error(err);
-      toast.error(t("file.upload.error"));
-    } finally {
-      setIsUploading(false);
-    }
+  function handleDialogClose() {
+    setDialogOpen(false);
+    setSelectedFile(null);
+  }
+
+  function handleUploadComplete(blob: UploadedBlob) {
+    onUpload(blob);
+    handleDialogClose();
   }
 
   return (
-    <div className="flex flex-row gap-2 justify-center items-center space-around">
-      <Button
-        disabled={!canSign || isUploading}
-        variant="action"
-        onClick={handleClick}
-        size="huge"
-        className="border"
-        aria-label={t("aria.upload-video")}
-        {...props}
-      >
-        {isUploading ? <RotateCw className="animate-spin" /> : <FileVideo />}
-        <span>{t("video.upload")}</span>
-        <Input
-          noIcons
-          accept="video/*"
+    <>
+      <div className="flex flex-row gap-2 justify-center items-center space-around">
+        <input
           type="file"
+          id="video-upload"
           className="hidden"
-          ref={ref}
-          onChange={selectFile}
+          accept="video/*"
+          onChange={handleFileSelect}
+          disabled={!canSign}
         />
-      </Button>
-      <Button disabled variant="action" size="huge" className="border">
-        <Video />
-        <span>{t("video.record")}</span>
-      </Button>
-    </div>
+
+        <Button
+          disabled={!canSign}
+          variant="action"
+          onClick={() => document.getElementById("video-upload")?.click()}
+          size="huge"
+          className="border"
+          aria-label={t("aria.upload-video")}
+          {...props}
+        >
+          <FileVideo />
+          <span>{t("video.upload")}</span>
+        </Button>
+
+        <Button disabled variant="action" size="huge" className="border">
+          <Video />
+          <span>{t("video.record")}</span>
+        </Button>
+      </div>
+
+      <UploadServerDialog
+        open={dialogOpen}
+        file={selectedFile}
+        onOpenChange={setDialogOpen}
+        onUpload={handleUploadComplete}
+        uploadType="video"
+      />
+    </>
   );
 }

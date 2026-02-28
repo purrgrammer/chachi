@@ -1,10 +1,10 @@
-import { useRef, useState } from "react";
-import { toast } from "sonner";
-import { RotateCw, ImagePlus } from "lucide-react";
+import { useState } from "react";
+import { ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { UploadedBlob, useUpload } from "@/lib/media";
+import { UploadedBlob } from "@/lib/media";
 import { useTranslation } from "react-i18next";
+import { UploadServerDialog } from "@/components/upload-server-dialog";
+import { useAccount } from "@/lib/account";
 
 interface UploadImageProps {
   defaultImage?: string;
@@ -12,59 +12,67 @@ interface UploadImageProps {
 }
 
 export function UploadImage({ defaultImage, onUpload }: UploadImageProps) {
-  const [isUploading, setIsUploading] = useState<boolean>(false);
   const [image, setImage] = useState<string | undefined>(defaultImage);
-  const { upload, canSign } = useUpload();
-  const ref = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const account = useAccount();
+  const canSign = account?.pubkey && !account.isReadOnly;
   const { t } = useTranslation();
 
-  function handleClick() {
-    ref.current?.click();
-  }
-
-  async function selectImage(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    uploadImage(file);
+
+    setSelectedFile(file);
+    setDialogOpen(true);
+
+    // Reset input to allow re-selecting same file
+    e.target.value = "";
   }
 
-  async function uploadImage(file: File) {
-    try {
-      setIsUploading(true);
-      const blob = await upload(file);
-      setImage(blob.url);
-      onUpload(blob);
-    } catch (err) {
-      console.error(err);
-      toast.error(t("image.upload.error"));
-    } finally {
-      setIsUploading(false);
-    }
+  function handleDialogClose() {
+    setDialogOpen(false);
+    setSelectedFile(null);
+  }
+
+  function handleUploadComplete(blob: UploadedBlob) {
+    setImage(blob.url);
+    onUpload(blob);
+    handleDialogClose();
   }
 
   return (
-    <Button
-      disabled={!canSign || isUploading}
-      className={`bg-accent hover:bg-accent hover:text-foreground size-24 rounded-full text-muted-foreground [&_svg]:size-10 ${image ? "p-0" : ""} gap-0`}
-      onClick={handleClick}
-      type="button"
-      aria-label={t("aria.upload-image")}
-    >
-      {image ? (
-        <img src={image} className="object-cover rounded-full size-24" />
-      ) : (
-        <>
-          {isUploading ? <RotateCw className="animate-spin" /> : <ImagePlus />}
-        </>
-      )}
-      <Input
-        noIcons
-        accept="image/*"
+    <>
+      <input
         type="file"
+        id="image-upload"
         className="hidden"
-        ref={ref}
-        onChange={selectImage}
+        accept="image/*"
+        onChange={handleFileSelect}
+        disabled={!canSign}
       />
-    </Button>
+
+      <Button
+        disabled={!canSign}
+        className={`bg-accent hover:bg-accent hover:text-foreground size-24 rounded-full text-muted-foreground [&_svg]:size-10 ${image ? "p-0" : ""} gap-0`}
+        onClick={() => document.getElementById("image-upload")?.click()}
+        type="button"
+        aria-label={t("aria.upload-image")}
+      >
+        {image ? (
+          <img src={image} className="object-cover rounded-full size-24" />
+        ) : (
+          <ImagePlus />
+        )}
+      </Button>
+
+      <UploadServerDialog
+        open={dialogOpen}
+        file={selectedFile}
+        onOpenChange={setDialogOpen}
+        onUpload={handleUploadComplete}
+        uploadType="image"
+      />
+    </>
   );
 }

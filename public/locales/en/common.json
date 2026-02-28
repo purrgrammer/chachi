@@ -571,7 +571,15 @@
   },
   "file": {
     "upload": {
-      "error": "Couldn't upload file"
+      "error": "Couldn't upload file",
+      "dialog": {
+        "title": "Upload File",
+        "select_servers": "Select upload destination(s):",
+        "no_servers_selected": "At least one server must be selected to upload.",
+        "uploading": "Uploading...",
+        "upload_button": "Upload",
+        "cancel_button": "Cancel"
+      }
     }
   },
   "copy": {
@@ -650,13 +658,19 @@
       "placeholder": "Add a description"
     },
     "upload": {
-      "error": "Couldn't upload image"
+      "error": "Couldn't upload image",
+      "dialog": {
+        "title": "Upload Image"
+      }
     }
   },
   "video": {
     "post": "Post a video",
     "upload": "Upload",
     "record": "Record",
+    "upload-dialog": {
+      "title": "Upload Video"
+    },
     "publish": {
       "success": "Video posted",
       "error": "Failed to post video"
