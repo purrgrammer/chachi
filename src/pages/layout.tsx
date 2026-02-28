@@ -404,12 +404,6 @@ function useUserEvents({
   useSyncEmojiSets();
 }
 
-const authRoutes = ["/dm", "/settings"];
-
-function isAuthRoute(pathname: string) {
-  return authRoutes.some((route) => pathname.startsWith(route));
-}
-
 function NostrSync({ children }: { children: ReactNode }) {
   const loginMethod = localStorage.getItem("login-method");
   const [isLoggingIn, setIsLoggingIn] = useState(
@@ -435,7 +429,9 @@ function NostrSync({ children }: { children: ReactNode }) {
   if (isLoggingIn) {
     return <LoadingScreen />;
   }
-  if (isAuthRoute(location.pathname) && !pubkey) {
+  // Show landing page only on home route when not logged in
+  // Other routes (groups, profiles, etc.) are viewable without login
+  if (!pubkey && location.pathname === "/") {
     return <Landing />;
   }
   return children;

@@ -12,7 +12,7 @@ import {
   MessageCircle,
   Drum,
   DatabaseZap,
-  HandCoins,
+  Smile,
 } from "lucide-react";
 import { Button } from "./ui/button";
 
@@ -200,10 +200,10 @@ function Features() {
       icon: <MessageCircle className="size-6 text-muted-foreground" />,
     },
     {
-      key: "payments",
-      title: t("landing.features.payments"),
-      description: t("landing.features.payments-desc"),
-      icon: <HandCoins className="size-6 text-muted-foreground" />,
+      key: "custom-emoji",
+      title: t("landing.features.custom-emoji"),
+      description: t("landing.features.custom-emoji-desc"),
+      icon: <Smile className="size-6 text-muted-foreground" />,
     },
     {
       key: "content",
