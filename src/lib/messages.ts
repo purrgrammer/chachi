@@ -298,7 +298,7 @@ export function useSortedGroups() {
   // Create stable identifier for groups array
   const groupIds = useMemo(
     () => groups.map(g => g.id).sort().join(','),
-    [groups.length]
+    [groups]
   );
 
   return useLiveQuery(

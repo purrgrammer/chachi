@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAtomValue } from "jotai";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Bookmark, BookmarkCheck, DoorOpen } from "lucide-react";
 import { groupsAtom } from "@/app/store";
@@ -45,8 +46,9 @@ export function ConfirmGroupLeaveDialog({
   onCancel: () => void;
 }) {
   const { t } = useTranslation();
+
   return (
-    <AlertDialog open={open}>
+    <AlertDialog open={open} onOpenChange={(isOpen) => !isOpen && onCancel()}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
@@ -57,7 +59,7 @@ export function ConfirmGroupLeaveDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onCancel}>
+          <AlertDialogCancel>
             {t("group.leave.confirmation.cancel")}
           </AlertDialogCancel>
           <AlertDialogAction onClick={onConfirm}>
@@ -155,6 +157,8 @@ export function useBookmarkGroup(group: Group) {
 
 export function BookmarkGroup({ group }: { group: Group }) {
   const [confirmLeave, setConfirmLeave] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
   const account = useAccount();
   const { isBookmarked, bookmarkGroup, unbookmarkGroup } =
     useBookmarkGroup(group);
@@ -163,9 +167,10 @@ export function BookmarkGroup({ group }: { group: Group }) {
   async function leaveGroup() {
     try {
       await sendLeaveRequest();
-      unbookmarkGroup();
+      await unbookmarkGroup();
       toast.success(t("group.leave.success"));
       setConfirmLeave(false);
+      navigate('/');
     } catch (err) {
       console.error(err);
       toast.error(t("group.leave.error"));
@@ -183,13 +188,12 @@ export function BookmarkGroup({ group }: { group: Group }) {
         onConfirm={leaveGroup}
         onCancel={() => setConfirmLeave(false)}
       />
-      <DropdownMenu>
+      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
             size="icon"
-            aria-label="Unbookmark group"
-            onClick={unbookmarkGroup}
+            aria-label="Group actions"
           >
             {isBookmarked ? (
               <BookmarkCheck className="size-5" />
@@ -201,9 +205,14 @@ export function BookmarkGroup({ group }: { group: Group }) {
         <DropdownMenuContent className="w-56">
           <DropdownMenuGroup>
             <DropdownMenuItem
-              onClick={() =>
-                isBookmarked ? unbookmarkGroup() : bookmarkGroup()
-              }
+              onClick={async () => {
+                if (isBookmarked) {
+                  await unbookmarkGroup();
+                  navigate('/');
+                } else {
+                  await bookmarkGroup();
+                }
+              }}
             >
               {isBookmarked ? (
                 <Bookmark className="size-5" />
@@ -216,7 +225,10 @@ export function BookmarkGroup({ group }: { group: Group }) {
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-destructive dark:bg-destructive dark:text-destructive-foreground"
-              onClick={() => setConfirmLeave(true)}
+              onClick={() => {
+                setMenuOpen(false);
+                setConfirmLeave(true);
+              }}
             >
               <DoorOpen className="size-5" />
               {t("group.leave.trigger")}
