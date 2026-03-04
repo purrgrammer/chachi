@@ -456,10 +456,10 @@ function GroupSearch() {
             {filteredGroups.map((g) => (
               <motion.div
                 key={groupId(g)}
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15, ease: [0.215, 0.61, 0.355, 1] }}
               >
                 <GroupSearchResult group={g} search={search} />
               </motion.div>

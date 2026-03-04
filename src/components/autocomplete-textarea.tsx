@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useMemo, KeyboardEvent } from "react";
 import { Crown, Reply as ReplyIcon, X } from "lucide-react";
 import { NostrEvent } from "nostr-tools";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { npubEncode } from "nostr-tools/nip19";
 import { Avatar } from "@/components/nostr/avatar";
 import { Autocomplete } from "@/components/autocomplete";
@@ -35,24 +35,17 @@ function ReplyPreview({
   reply: NostrEvent;
   setReplyingTo?: (event: NostrEvent | undefined) => void;
 }) {
+  const shouldReduceMotion = useReducedMotion();
   const author = reply.pubkey;
   return (
     <motion.div
-      initial={{
-        height: 0,
-        top: 0,
-        opacity: 0,
-      }}
-      animate={{
-        height: "32px",
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2, ease: [0.215, 0.61, 0.355, 1] }}
+      style={{
         top: `-${32 - topOffset}px`,
         width: width + 2,
-        opacity: 1,
-      }}
-      exit={{
-        height: 0,
-        top: 0,
-        opacity: 0,
       }}
       className="flex flex-row items-center gap-2 p-1 pl-2 absolute border-l border-t border-r rounded-t-lg outline-none ring-1 ring-ring left-2 right-2 h-8 bg-background"
     >

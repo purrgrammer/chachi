@@ -1,9 +1,10 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { RefreshCw, AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export const ErrorPage = () => {
   const { t } = useTranslation();
+  const shouldReduceMotion = useReducedMotion();
 
   const handleReload = () => {
     window.location.reload();
@@ -15,12 +16,10 @@ export const ErrorPage = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{
-        opacity: 1,
-      }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, ease: "easeInOut" }}
+      initial={shouldReduceMotion ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 0.2 } }}
+      transition={{ duration: 0.3, ease: [0.215, 0.61, 0.355, 1] }}
       style={{
         position: "fixed",
         top: 0,

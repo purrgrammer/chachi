@@ -1,6 +1,6 @@
 import { forwardRef, useState } from "react";
 import type { ForwardedRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ReactNode } from "react";
 import { NDKFilter } from "@nostr-dev-kit/ndk";
 import { FeedEmbed } from "@/components/nostr/detail";
@@ -50,6 +50,7 @@ const Feed = forwardRef(
     ref: ForwardedRef<HTMLDivElement | null>,
   ) => {
     const { t } = useTranslation();
+    const shouldReduceMotion = useReducedMotion();
     const [shouldShowOlder, setShouldShowOlder] = useState(false);
     const relays =
       outboxRelays.length > 0 ? outboxRelays : group ? [group.relay] : [];
@@ -79,8 +80,10 @@ const Feed = forwardRef(
                   (event) => (
                     <motion.div
                       key={event.id}
-                      initial={{ scale: 0.2 }}
-                      animate={{ scale: 1 }}
+                      initial={shouldReduceMotion ? false : { opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, transition: { duration: 0.15 } }}
+                      transition={{ duration: 0.2, ease: [0.215, 0.61, 0.355, 1] }}
                     >
                       <FeedEmbed
                         event={event}

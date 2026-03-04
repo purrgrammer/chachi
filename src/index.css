@@ -283,6 +283,15 @@
     animation: animatedgradient 6s ease-in-out alternate infinite;
     background-size: 300% 300%;
   }
+  @media (prefers-reduced-motion: reduce) {
+    .border-animated-gradient::before,
+    .text-gradient,
+    .bg-animated-gradient,
+    .text-animated-gradient {
+      animation: none;
+    }
+  }
+
   mark {
     color: hsl(var(--accent-foreground));
     background: hsl(var(--accent));

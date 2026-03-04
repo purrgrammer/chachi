@@ -1,6 +1,6 @@
 import { CircleSlash2 } from "lucide-react";
 import type { ReactNode, KeyboardEvent } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function Autocomplete<T>({
@@ -18,6 +18,7 @@ export function Autocomplete<T>({
   renderItem: (item: T) => ReactNode;
   onSelect: (item: T) => void;
 }) {
+  const shouldReduceMotion = useReducedMotion();
   const hasNoResults = items.length === 0;
   const height = Math.min(hasNoResults ? 32 : items.length * 32, 140);
   const top = height > 0 ? height - 12 : 0;
@@ -30,34 +31,26 @@ export function Autocomplete<T>({
   return (
     <motion.div
       className={`z-50 bg-background rounded-t-md ring-1 ring-ring left-2 right-[4rem] sm:right-2 absolute`}
-      initial={{
-        height: 0,
-        width: width,
-        top: 0,
-        opacity: 0,
-      }}
-      animate={{
-        width: width + 2,
+      style={{
         height: `${height}px`,
+        width: width + 2,
         top: `-${top + topOffset}px`,
-        opacity: 1,
+        transformOrigin: "bottom",
       }}
-      exit={{
-        width: width,
-        height: 0,
-        top: 0,
-        opacity: 0,
-      }}
+      initial={shouldReduceMotion ? false : { opacity: 0, scaleY: 0.8 }}
+      animate={{ opacity: 1, scaleY: 1 }}
+      exit={{ opacity: 0, scaleY: 0.8 }}
+      transition={{ duration: 0.15, ease: [0.215, 0.61, 0.355, 1] }}
     >
       <ScrollArea className="h-full">
         {hasNoResults ? (
           <motion.div
             key="no-results"
             className="flex items-center gap-2 p-2 h-[32px] justify-center text-muted-foreground text-sm"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "32px", opacity: 1 }}
-            exit={{ height: 0, opacity: 0, overflow: "hidden" }}
-            transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.215, 0.61, 0.355, 1] }}
           >
             <CircleSlash2 className="size-3" />
             <span>Nothing found</span>
@@ -68,10 +61,10 @@ export function Autocomplete<T>({
             key={getKey(item)}
             tabIndex={0}
             className="flex items-center p-2 h-[32px] cursor-pointer hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground focus:outline-none transition-colors"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "32px", opacity: 1 }}
-            exit={{ height: 0, opacity: 0, overflow: "hidden" }}
-            transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.215, 0.61, 0.355, 1] }}
             onClick={() => onSelect(item)}
             onKeyDown={(e) => onKeyDown(e, item)}
           >
@@ -98,6 +91,7 @@ export function NewAutocomplete<T>({
   renderItem: (item: T) => ReactNode;
   onSelect: (item: T) => void;
 }) {
+  const shouldReduceMotion = useReducedMotion();
   const items = getItems();
   const hasNoResults = items.length === 0;
   const height = Math.min(hasNoResults ? 32 : items.length * 32, 140);
@@ -111,34 +105,26 @@ export function NewAutocomplete<T>({
   return (
     <motion.div
       className={`z-50 bg-background rounded-t-md ring-1 ring-ring left-2 right-[4rem] sm:right-2 absolute`}
-      initial={{
-        height: 0,
-        width: width,
-        top: 0,
-        opacity: 0,
-      }}
-      animate={{
-        width: width + 2,
+      style={{
         height: `${height}px`,
+        width: width + 2,
         top: `-${top + topOffset}px`,
-        opacity: 1,
+        transformOrigin: "bottom",
       }}
-      exit={{
-        width: width,
-        height: 0,
-        top: 0,
-        opacity: 0,
-      }}
+      initial={shouldReduceMotion ? false : { opacity: 0, scaleY: 0.8 }}
+      animate={{ opacity: 1, scaleY: 1 }}
+      exit={{ opacity: 0, scaleY: 0.8 }}
+      transition={{ duration: 0.15, ease: [0.215, 0.61, 0.355, 1] }}
     >
       <ScrollArea className="h-full">
         {hasNoResults ? (
           <motion.div
             key="no-results"
             className="flex items-center gap-2 p-2 h-[32px] justify-center text-muted-foreground text-sm"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "32px", opacity: 1 }}
-            exit={{ height: 0, opacity: 0, overflow: "hidden" }}
-            transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.215, 0.61, 0.355, 1] }}
           >
             <CircleSlash2 className="size-3" />
             <span>Nothing found</span>
@@ -149,10 +135,10 @@ export function NewAutocomplete<T>({
             key={getKey(item)}
             tabIndex={0}
             className="flex items-center p-2 h-[32px] cursor-pointer hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground focus:outline-none transition-colors"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "32px", opacity: 1 }}
-            exit={{ height: 0, opacity: 0, overflow: "hidden" }}
-            transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.215, 0.61, 0.355, 1] }}
             onClick={() => onSelect(item)}
             onKeyDown={(e) => onKeyDown(e, item)}
           >
