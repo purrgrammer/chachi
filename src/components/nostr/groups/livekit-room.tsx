@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import {
   LiveKitRoom,
+  RoomAudioRenderer,
   useTracks,
   useParticipants,
   useConnectionState,
@@ -55,7 +56,6 @@ function Spinner({ label }: { label?: string }) {
 
 function ParticipantTile({ identity }: { identity: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const tracks = useTracks(
     [Track.Source.Camera, Track.Source.Microphone],
     { onlySubscribed: false },
@@ -71,7 +71,6 @@ function ParticipantTile({ identity }: { identity: string }) {
     (t) => t.source === Track.Source.Microphone,
   );
 
-  const isLocal = audioTrack?.participant.isLocal;
   const isSpeaking = audioTrack?.participant.isSpeaking;
   const hasVideo =
     videoTrack?.publication?.track && !videoTrack.publication.isMuted;
@@ -87,17 +86,6 @@ function ParticipantTile({ identity }: { identity: string }) {
       track.detach(el);
     };
   }, [videoTrack?.publication?.track, videoTrack?.publication?.isMuted]);
-
-  // Attach/detach audio track for remote participants
-  useEffect(() => {
-    const el = audioRef.current;
-    const track = audioTrack?.publication?.track;
-    if (!el || !track || isLocal || audioTrack?.publication?.isMuted) return;
-    track.attach(el);
-    return () => {
-      track.detach(el);
-    };
-  }, [audioTrack?.publication?.track, audioTrack?.publication?.isMuted, isLocal]);
 
   return (
     <div
@@ -125,7 +113,6 @@ function ParticipantTile({ identity }: { identity: string }) {
         <Name pubkey={identity} short />
         {isMuted ? <MicOff className="size-3 text-red-400" /> : null}
       </div>
-      {!isLocal ? <audio ref={audioRef} autoPlay /> : null}
     </div>
   );
 }
@@ -410,6 +397,7 @@ export function LivekitRoomView({ group }: { group: Group }) {
       data-lk-theme="default"
       className="flex flex-col flex-1 bg-background"
     >
+      <RoomAudioRenderer />
       <RoomView />
     </LiveKitRoom>
   );
