@@ -20,6 +20,7 @@ import {
   //useUnreadMentions,
 } from "@/lib/messages";
 import type { Group } from "@/lib/types";
+import { Video } from "lucide-react";
 import * as Kind from "@/lib/nostr/kinds";
 
 interface MessageEvent {
@@ -263,8 +264,11 @@ function GroupItem({ group }: { group: Group }) {
           ) : null}
         </div>
         <div className="flex flex-col">
-          <h3 className="line-clamp-1">
+          <h3 className="line-clamp-1 flex items-center gap-1">
             {metadata?.name || group.id.slice(0, 8)}
+            {metadata?.isLivekit ? (
+              <Video className="size-3 text-muted-foreground shrink-0" />
+            ) : null}
           </h3>
           {lastMessage ? (
             <LastMessagePreview lastMessage={lastMessage} group={group} />

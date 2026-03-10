@@ -45,6 +45,7 @@ import { saveGroupEvent } from "@/lib/messages";
 import { DELETE_GROUP } from "@/lib/kinds";
 import { useTranslation } from "react-i18next";
 import { usePublishEvent } from "@/lib/nostr/publishing";
+import { GroupTypeSelector, groupTypeFromFlags, flagsFromGroupType } from "@/components/nostr/groups/group-type-selector";
 
 export function EditGroup({ group }: { group: GroupMetadata }) {
   const [open, setOpen] = useState(false);
@@ -67,6 +68,8 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
     isRestricted: z.boolean().default(false),
     isHidden: z.boolean().default(false),
     isClosed: z.boolean().default(false),
+    isLivekit: z.boolean().default(false),
+    isNoText: z.boolean().default(false),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -123,7 +126,7 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
           <Settings className="size-6" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[85dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t("group.edit.title")}</DialogTitle>
         </DialogHeader>
@@ -303,6 +306,15 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
                 )}
               />
             </div>
+            <GroupTypeSelector
+              value={groupTypeFromFlags(form.watch("isLivekit"), form.watch("isNoText"))}
+              onChange={(type) => {
+                const flags = flagsFromGroupType(type);
+                form.setValue("isLivekit", flags.isLivekit);
+                form.setValue("isNoText", flags.isNoText);
+              }}
+              disabled={isLoading}
+            />
             <div className="flex flex-row justify-between mt-4">
               <AlertDialog>
                 <AlertDialogTrigger>

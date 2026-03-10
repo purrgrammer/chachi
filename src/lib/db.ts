@@ -33,6 +33,10 @@ export interface GroupInfo {
   isHidden?: boolean;
   /** closed: join requests are ignored (invite-only) */
   isClosed?: boolean;
+  /** livekit: group supports audio/video rooms */
+  isLivekit?: boolean;
+  /** no-text: group is AV-only (no text chat) */
+  isNoText?: boolean;
   isCommunity?: boolean;
 }
 
@@ -120,6 +124,8 @@ export async function saveGroupInfo(
       isRestricted: metadata.isRestricted,
       isHidden: metadata.isHidden,
       isClosed: metadata.isClosed,
+      isLivekit: metadata.isLivekit,
+      isNoText: metadata.isNoText,
       isCommunity: metadata.isCommunity,
     });
   } catch (error) {

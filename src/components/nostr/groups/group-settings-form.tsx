@@ -63,6 +63,7 @@ import {
 } from "@/lib/hooks/useProfileAutocomplete";
 import type { Group, GroupMetadata, GroupInviteCode } from "@/lib/types";
 import { getRelayHost } from "@/lib/relay";
+import { GroupTypeSelector, groupTypeFromFlags, flagsFromGroupType } from "@/components/nostr/groups/group-type-selector";
 
 export function GroupEditor({
   group,
@@ -86,6 +87,8 @@ export function GroupEditor({
   );
   const [isHidden, setIsHidden] = useState(metadata?.isHidden || false);
   const [isClosed, setIsClosed] = useState(metadata?.isClosed || false);
+  const [isLivekit, setIsLivekit] = useState(metadata?.isLivekit || false);
+  const [isNoText, setIsNoText] = useState(metadata?.isNoText || false);
   const [isPrivacyLoading, setIsPrivacyLoading] = useState(false);
 
   // Members tab states
@@ -154,6 +157,8 @@ export function GroupEditor({
       setIsRestricted(metadata.isRestricted || false);
       setIsHidden(metadata.isHidden || false);
       setIsClosed(metadata.isClosed || false);
+      setIsLivekit(metadata.isLivekit || false);
+      setIsNoText(metadata.isNoText || false);
     }
   }, [metadata]);
 
@@ -178,6 +183,8 @@ export function GroupEditor({
         isRestricted,
         isHidden,
         isClosed,
+        isLivekit,
+        isNoText,
       };
 
       await editGroup(updatedMetadata);
@@ -215,6 +222,8 @@ export function GroupEditor({
         isRestricted,
         isHidden,
         isClosed,
+        isLivekit,
+        isNoText,
       };
 
       await editGroup(updatedMetadata);
@@ -684,7 +693,17 @@ export function GroupEditor({
                   onCheckedChange={setIsClosed}
                 />
               </div>
+
             </div>
+
+            <GroupTypeSelector
+              value={groupTypeFromFlags(isLivekit, isNoText)}
+              onChange={(type) => {
+                const flags = flagsFromGroupType(type);
+                setIsLivekit(flags.isLivekit);
+                setIsNoText(flags.isNoText);
+              }}
+            />
           </div>
 
           <Button

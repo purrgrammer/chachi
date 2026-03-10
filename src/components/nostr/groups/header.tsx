@@ -5,6 +5,7 @@ import {
   EyeOff,
   ShieldOff,
   Settings,
+  Video,
 } from "lucide-react";
 import { useGroup, useFetchGroupParticipants } from "@/lib/nostr/groups";
 import { GroupInfo } from "@/components/nostr/groups/info";
@@ -136,6 +137,25 @@ export function GroupHeader({ group }: { group: Group }) {
                   </TooltipTrigger>
                   <TooltipContent>
                     {t("group.metadata.closed.content")}
+                  </TooltipContent>
+                </Tooltip>
+              ) : null}
+              {metadata?.isLivekit ? (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className="flex gap-1.5 items-center">
+                      <Video className="size-3 text-muted-foreground" />
+                      <span className="hidden text-xs sm:block">
+                        {metadata?.isNoText
+                          ? t("group.metadata.notext.trigger")
+                          : t("group.metadata.livekit.trigger")}
+                      </span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {metadata?.isNoText
+                      ? t("group.metadata.notext.content")
+                      : t("group.metadata.livekit.content")}
                   </TooltipContent>
                 </Tooltip>
               ) : null}

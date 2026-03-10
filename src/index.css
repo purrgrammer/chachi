@@ -388,3 +388,19 @@ em-emoji-picker {
 }
 em-emoji-picker[data-theme="dark"] {
 }
+
+/* Override LiveKit component theme to match site background */
+[data-lk-theme],
+[data-lk-theme="default"] {
+  --lk-bg: hsl(var(--background)) !important;
+  --lk-bg2: hsl(var(--muted)) !important;
+  --lk-bg3: hsl(var(--accent)) !important;
+  --lk-fg: hsl(var(--foreground)) !important;
+  --lk-border-color: hsl(var(--border)) !important;
+  --lk-control-bg: hsl(var(--background)) !important;
+  --lk-control-hover-bg: hsl(var(--accent)) !important;
+  background-color: hsl(var(--background)) !important;
+}
+.lk-room-container {
+  background-color: hsl(var(--background)) !important;
+}

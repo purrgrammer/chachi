@@ -231,6 +231,8 @@ export function buildGroupAdminEditMetadataEvent(
     picture?: string;
     visibility?: "public" | "private";
     access?: "open" | "closed";
+    livekit?: boolean;
+    noText?: boolean;
   },
 ): EventTemplate {
   const tags: string[][] = [["h", groupId]];
@@ -250,6 +252,9 @@ export function buildGroupAdminEditMetadataEvent(
   } else if (metadata.access === "open") {
     tags.push(["open"]);
   }
+
+  if (metadata.livekit) tags.push(["livekit"]);
+  if (metadata.noText) tags.push(["no-text"]);
 
   return createEventTemplate(Kind.GroupAdminEditMetadata, "", tags);
 }

@@ -95,6 +95,10 @@ const router = createBrowserRouter([
         element: <Group tab="images" />,
       },
       {
+        path: "/room/:host",
+        element: <Group tab="room" />,
+      },
+      {
         path: ":host/e/:nlink",
         element: <Event />,
       },
@@ -125,6 +129,10 @@ const router = createBrowserRouter([
       {
         path: "/images/:host/:id",
         element: <Group tab="images" />,
+      },
+      {
+        path: "/room/:host/:id",
+        element: <Group tab="room" />,
       },
       {
         path: ":host/:id/e/:nlink",

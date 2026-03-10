@@ -105,6 +105,21 @@
     }
   },
   "group": {
+    "type": {
+      "title": "Group Type",
+      "chat": {
+        "label": "Chat",
+        "description": "Text-based group chat"
+      },
+      "chat-av": {
+        "label": "Chat + Audio/Video",
+        "description": "Text chat with an audio/video room"
+      },
+      "av-only": {
+        "label": "Audio/Video Only",
+        "description": "Audio/video room without text chat"
+      }
+    },
     "hosted": {
       "by": "Hosted by ",
       "and": " and "
@@ -209,6 +224,14 @@
         "closed": {
           "label": "Closed",
           "description": "Join requests are ignored (invite-only)"
+        },
+        "livekit": {
+          "label": "Audio/Video Room",
+          "description": "Enable audio and video rooms powered by LiveKit"
+        },
+        "notext": {
+          "label": "AV Only",
+          "description": "Audio/video only, no text chat"
         },
         "submit": {
           "trigger": "Create",
@@ -316,6 +339,14 @@
         "trigger": "Closed",
         "content": "Join requests are ignored (invite-only)"
       },
+      "livekit": {
+        "trigger": "Audio/Video",
+        "content": "This group supports audio and video rooms"
+      },
+      "notext": {
+        "trigger": "AV Only",
+        "content": "This is an audio/video only room (no text chat)"
+      },
       "join-the-conversation": "Join the conversation",
       "map_picker": {
         "title": "Select Location",
@@ -368,6 +399,10 @@
         "hidden_description": "Relay hides group metadata from non-members",
         "closed": "Closed",
         "closed_description": "Join requests are ignored (invite-only)",
+        "livekit": "Audio/Video Room",
+        "livekit_description": "Enable audio and video rooms for this group",
+        "notext": "AV Only",
+        "notext_description": "Audio/video only, no text chat",
         "save": "Save Privacy Settings",
         "saving": "Saving...",
         "success": "Group privacy settings updated successfully",
@@ -603,7 +638,8 @@
       "videos": "Videos",
       "image": "Image",
       "images": "Images",
-      "community": "Community"
+      "community": "Community",
+      "room": "Room"
     }
   },
   "post": {
@@ -763,6 +799,18 @@
     "leaderboard": "Leaderboard"
   },
   "back": "Back",
+  "livekit": {
+    "join": "Join Room",
+    "leave": "Leave",
+    "connecting": "Connecting...",
+    "error": "You need to be logged in to join the room",
+    "token-error": "Failed to connect to the room",
+    "no-participants": "No one is in the room yet",
+    "mute-mic": "Mute microphone",
+    "unmute-mic": "Unmute microphone",
+    "enable-camera": "Enable camera",
+    "disable-camera": "Disable camera"
+  },
   "wallet": {
     "title": "Incoming payment",
     "ecash": {

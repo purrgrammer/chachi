@@ -138,6 +138,8 @@ function groupMetadata(ev: NDKEvent, id: string, relay: string) {
     isRestricted: ev.tags.some((t) => t[0] === "restricted"),
     isHidden: ev.tags.some((t) => t[0] === "hidden"),
     isClosed: ev.tags.some((t) => t[0] === "closed"),
+    isLivekit: ev.tags.some((t) => t[0] === "livekit"),
+    isNoText: ev.tags.some((t) => t[0] === "no-text"),
     pubkey: ev.pubkey,
   } as GroupMetadata;
 }
@@ -231,6 +233,8 @@ export async function fetchGroupMetadata(ndk: NDK, group: Group) {
           isRestricted: ev.tags.some((t) => t[0] === "restricted"),
           isHidden: ev.tags.some((t) => t[0] === "hidden"),
           isClosed: ev.tags.some((t) => t[0] === "closed"),
+          isLivekit: ev.tags.some((t) => t[0] === "livekit"),
+          isNoText: ev.tags.some((t) => t[0] === "no-text"),
           nlink: nip19.naddrEncode({
             kind: NDKKind.GroupMetadata,
             pubkey: ev.pubkey,
@@ -543,6 +547,8 @@ export function useEditGroup() {
     if (metadata.isRestricted) edit.tags.push(["restricted"]);
     if (metadata.isHidden) edit.tags.push(["hidden"]);
     if (metadata.isClosed) edit.tags.push(["closed"]);
+    if (metadata.isLivekit) edit.tags.push(["livekit"]);
+    if (metadata.isNoText) edit.tags.push(["no-text"]);
 
     await edit.publish(relaySet);
     console.log("[useEditGroup] Published successfully");
