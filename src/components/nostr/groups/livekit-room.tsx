@@ -31,8 +31,10 @@ import { usePubkey, useCanSign } from "@/lib/account";
 import {
   useRequestedToJoin,
   useJoinRequest,
-  useGroupParticipants,
+  useFetchGroupParticipants,
 } from "@/lib/nostr/groups";
+import { queryClient, GROUP_PARTICIPANTS } from "@/lib/query";
+import { groupId } from "@/lib/groups";
 import { useBookmarkGroup } from "@/components/nostr/groups/bookmark";
 import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
@@ -329,7 +331,9 @@ function PreJoinLobby({
 export function LivekitRoomView({ group }: { group: Group }) {
   const { t } = useTranslation();
   const pubkey = usePubkey();
-  const { members, admins } = useGroupParticipants(group);
+  const { data: participants } = useFetchGroupParticipants(group);
+  const members = participants?.members ?? [];
+  const admins = participants?.admins ?? [];
   const [joinOpts, setJoinOpts] = useState<{ audio: boolean; video: boolean } | null>(null);
   const wantsToJoin = joinOpts !== null;
   const { data: tokenData, error: tokenError, isLoading } = useLivekitToken(group, wantsToJoin);
@@ -340,6 +344,17 @@ export function LivekitRoomView({ group }: { group: Group }) {
       : pubkey
         ? members.includes(pubkey) || admins.includes(pubkey)
         : false;
+
+  // Poll for membership changes when user is not yet a member
+  useEffect(() => {
+    if (isMember) return;
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({
+        queryKey: [GROUP_PARTICIPANTS, groupId(group)],
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isMember, group]);
 
   const handleDisconnected = useCallback(() => {
     setJoinOpts(null);
