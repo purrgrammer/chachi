@@ -88,7 +88,6 @@ export function GroupEditor({
   const [isHidden, setIsHidden] = useState(metadata?.isHidden || false);
   const [isClosed, setIsClosed] = useState(metadata?.isClosed || false);
   const [isLivekit, setIsLivekit] = useState(metadata?.isLivekit || false);
-  const [isNoText, setIsNoText] = useState(metadata?.isNoText || false);
   const [isPrivacyLoading, setIsPrivacyLoading] = useState(false);
 
   // Members tab states
@@ -158,7 +157,6 @@ export function GroupEditor({
       setIsHidden(metadata.isHidden || false);
       setIsClosed(metadata.isClosed || false);
       setIsLivekit(metadata.isLivekit || false);
-      setIsNoText(metadata.isNoText || false);
     }
   }, [metadata]);
 
@@ -184,7 +182,6 @@ export function GroupEditor({
         isHidden,
         isClosed,
         isLivekit,
-        isNoText,
       };
 
       await editGroup(updatedMetadata);
@@ -223,7 +220,6 @@ export function GroupEditor({
         isHidden,
         isClosed,
         isLivekit,
-        isNoText,
       };
 
       await editGroup(updatedMetadata);
@@ -697,11 +693,10 @@ export function GroupEditor({
             </div>
 
             <GroupTypeSelector
-              value={groupTypeFromFlags(isLivekit, isNoText)}
+              value={groupTypeFromFlags(isLivekit)}
               onChange={(type) => {
                 const flags = flagsFromGroupType(type);
                 setIsLivekit(flags.isLivekit);
-                setIsNoText(flags.isNoText);
               }}
             />
           </div>

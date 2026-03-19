@@ -1,31 +1,27 @@
-import { MessageSquare, Video, Radio } from "lucide-react";
+import { MessageSquare, Video } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "react-i18next";
 
-export type GroupType = "chat" | "chat-av" | "av-only";
+export type GroupType = "chat" | "chat-av";
 
-export function groupTypeFromFlags(isLivekit?: boolean, isNoText?: boolean): GroupType {
-  if (isLivekit && isNoText) return "av-only";
+export function groupTypeFromFlags(isLivekit?: boolean): GroupType {
   if (isLivekit) return "chat-av";
   return "chat";
 }
 
-export function flagsFromGroupType(type: GroupType): { isLivekit: boolean; isNoText: boolean } {
+export function flagsFromGroupType(type: GroupType): { isLivekit: boolean } {
   switch (type) {
-    case "av-only":
-      return { isLivekit: true, isNoText: true };
     case "chat-av":
-      return { isLivekit: true, isNoText: false };
+      return { isLivekit: true };
     default:
-      return { isLivekit: false, isNoText: false };
+      return { isLivekit: false };
   }
 }
 
 const options: { value: GroupType; icon: typeof MessageSquare; labelKey: string; descKey: string }[] = [
   { value: "chat", icon: MessageSquare, labelKey: "group.type.chat.label", descKey: "group.type.chat.description" },
   { value: "chat-av", icon: Video, labelKey: "group.type.chat-av.label", descKey: "group.type.chat-av.description" },
-  { value: "av-only", icon: Radio, labelKey: "group.type.av-only.label", descKey: "group.type.av-only.description" },
 ];
 
 export function GroupTypeSelector({

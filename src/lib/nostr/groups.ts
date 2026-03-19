@@ -25,6 +25,7 @@ import { nip29Relays, discoveryRelays, isRelayURL } from "@/lib/relay";
 import { useAccount } from "@/lib/account";
 import { useRelayInfo, fetchRelayInfo } from "@/lib/relay";
 import { LEAVE_REQUEST, COMMUNIKEY } from "@/lib/kinds";
+import { GroupLivekitParticipants } from "@/lib/nostr/kinds";
 import type {
   Group,
   GroupMembers,
@@ -41,6 +42,7 @@ import {
   CLOSE_GROUPS,
   GROUP_METADATA,
   GROUP_PARTICIPANTS,
+  LIVEKIT_PARTICIPANTS,
 } from "@/lib/query";
 import {
   getGroupInfo,
@@ -1050,6 +1052,36 @@ export async function fetchCommunity(ndk: NDK, pubkey: string) {
     location: info.tagValue("location"),
     geohash: info.tagValue("g"),
   } as Community;
+}
+
+export function useLivekitParticipants(group: Group, enabled: boolean = true) {
+  const ndk = useNDK();
+  return useQuery({
+    queryKey: [LIVEKIT_PARTICIPANTS, groupId(group)],
+    queryFn: async () => {
+      if (!isNIP29Group(group)) return [];
+      const relaySet = NDKRelaySet.fromRelayUrls([group.relay], ndk);
+      const event = await ndk.fetchEvent(
+        {
+          kinds: [GroupLivekitParticipants as NDKKind],
+          "#d": [group.id],
+        },
+        {
+          closeOnEose: true,
+          groupable: false,
+          cacheUsage: NDKSubscriptionCacheUsage.ONLY_RELAY,
+        },
+        relaySet,
+      );
+      if (!event) return [];
+      return event.tags
+        .filter((t) => t[0] === "participant")
+        .map((t) => t[1])
+        .filter(Boolean);
+    },
+    enabled,
+    refetchInterval: 30_000,
+  });
 }
 
 export function useCommunity(pubkey: string) {

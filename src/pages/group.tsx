@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useRef, useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
@@ -19,11 +19,11 @@ import { groupId } from "@/lib/groups";
 import { normalizeRelayFromParam } from "@/lib/relay";
 import { useGroup } from "@/lib/nostr/groups";
 
-const LazyLivekitRoom = lazy(
-  () => import("@/components/nostr/groups/livekit-room").then((m) => ({ default: m.LivekitRoomView })),
+const LazyLivekitBar = lazy(
+  () => import("@/components/nostr/groups/livekit-room").then((m) => ({ default: m.LivekitBar })),
 );
 
-type GroupTab = "chat" | "posts" | "videos" | "images" | "polls" | "room";
+type GroupTab = "chat" | "posts" | "videos" | "images" | "polls";
 
 export default function GroupPage({ tab }: { tab?: GroupTab }) {
   const navigate = useNavigate();
@@ -35,10 +35,30 @@ export default function GroupPage({ tab }: { tab?: GroupTab }) {
   const { data: metadata } = useGroup(group);
 
   const isLivekit = metadata?.isLivekit;
-  const isNoText = metadata?.isNoText;
 
-  // For AV-only groups, default to room tab; otherwise default to chat
-  const effectiveTab = tab ?? (isLivekit && isNoText ? "room" : "chat");
+  const effectiveTab = tab ?? "chat";
+
+  // Track LiveKit bar height so chat can adjust
+  const livekitBarRef = useRef<HTMLDivElement>(null);
+  const [livekitBarHeight, setLivekitBarHeight] = useState(0);
+
+  const updateBarHeight = useCallback(() => {
+    if (livekitBarRef.current) {
+      setLivekitBarHeight(livekitBarRef.current.offsetHeight);
+    }
+  }, []);
+
+  useEffect(() => {
+    const el = livekitBarRef.current;
+    if (!el) {
+      setLivekitBarHeight(0);
+      return;
+    }
+    const observer = new ResizeObserver(updateBarHeight);
+    observer.observe(el);
+    updateBarHeight();
+    return () => observer.disconnect();
+  }, [isLivekit, updateBarHeight]);
 
   function onValueChange(value: string) {
     if (group.id === "_") {
@@ -51,24 +71,6 @@ export default function GroupPage({ tab }: { tab?: GroupTab }) {
   // todo: error handling
 
   const { t } = useTranslation();
-
-  // AV-only groups: show only the LiveKit room
-  if (isLivekit && isNoText) {
-    return (
-      <div className="flex flex-col h-[100dvh]">
-        <GroupHeader group={group} />
-        <Suspense
-          fallback={
-            <div className="flex flex-1 items-center justify-center p-8">
-              <Loader2 className="size-6 animate-spin text-muted-foreground" />
-            </div>
-          }
-        >
-          <LazyLivekitRoom group={group} />
-        </Suspense>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -88,12 +90,24 @@ md:w-[calc(100dvw-18rem)]
           {/*<TabsTrigger value="articles">Articles</TabsTrigger>
            */}
           <TabsTrigger value="polls">{t("content.type.polls")}</TabsTrigger>
-          {isLivekit ? (
-            <TabsTrigger value="room">{t("content.type.room")}</TabsTrigger>
-          ) : null}
         </TabsList>
         <TabsContent asChild value="chat">
-          <GroupChat key={groupId(group)} group={group} />
+          <div>
+            {isLivekit ? (
+              <div ref={livekitBarRef}>
+                <Suspense
+                  fallback={
+                    <div className="flex items-center justify-center p-2 border-b">
+                      <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                    </div>
+                  }
+                >
+                  <LazyLivekitBar group={group} />
+                </Suspense>
+              </div>
+            ) : null}
+            <GroupChat key={groupId(group)} group={group} extraHeight={livekitBarHeight} />
+          </div>
         </TabsContent>
         <TabsContent asChild value="posts">
           <GroupPosts key={groupId(group)} group={group} />
@@ -112,19 +126,6 @@ md:w-[calc(100dvw-18rem)]
         <TabsContent asChild value="polls">
           <GroupPolls key={groupId(group)} group={group} />
         </TabsContent>
-        {isLivekit ? (
-          <TabsContent value="room" className="flex flex-col flex-1">
-            <Suspense
-              fallback={
-                <div className="flex flex-1 items-center justify-center p-8">
-                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
-                </div>
-              }
-            >
-              <LazyLivekitRoom group={group} />
-            </Suspense>
-          </TabsContent>
-        ) : null}
       </Tabs>
     </>
   );

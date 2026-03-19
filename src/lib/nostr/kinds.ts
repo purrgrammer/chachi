@@ -90,6 +90,7 @@ export const GroupAdminRequestJoin = 9021;
 export const GroupMetadata = 39000;
 export const GroupAdmins = 39001;
 export const GroupMembers = 39002;
+export const GroupLivekitParticipants = 39004;
 
 // List kinds
 export const SimpleGroupList = 10009;

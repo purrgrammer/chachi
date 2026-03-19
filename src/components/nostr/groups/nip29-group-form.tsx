@@ -32,7 +32,6 @@ export const nip29FormSchema = z.object({
   isHidden: z.boolean().default(false),
   isClosed: z.boolean().default(false),
   isLivekit: z.boolean().default(false),
-  isNoText: z.boolean().default(false),
 });
 
 export type Nip29FormValues = z.infer<typeof nip29FormSchema>;
@@ -46,7 +45,6 @@ export const nip29FormDefaults: Nip29FormValues = {
   isHidden: false,
   isClosed: false,
   isLivekit: false,
-  isNoText: false,
 };
 
 export function useNip29Form(defaults?: Partial<Nip29FormValues>) {
@@ -238,11 +236,10 @@ export function Nip29GroupForm({
           />
         </div>
         <GroupTypeSelector
-          value={groupTypeFromFlags(form.watch("isLivekit"), form.watch("isNoText"))}
+          value={groupTypeFromFlags(form.watch("isLivekit"))}
           onChange={(type) => {
             const flags = flagsFromGroupType(type);
             form.setValue("isLivekit", flags.isLivekit);
-            form.setValue("isNoText", flags.isNoText);
           }}
           disabled={isLoading}
         />

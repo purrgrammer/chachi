@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { toast } from "sonner";
 import {
   LiveKitRoom,
   RoomAudioRenderer,
@@ -7,11 +6,10 @@ import {
   useParticipants,
   useConnectionState,
   useLocalParticipant,
-  TrackToggle,
   DisconnectButton,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Track, ConnectionState, createLocalVideoTrack } from "livekit-client";
+import { Track, ConnectionState } from "livekit-client";
 import {
   Video,
   VideoOff,
@@ -20,41 +18,43 @@ import {
   PhoneOff,
   Phone,
   Loader2,
-  AlertCircle,
-  Users,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/nostr/avatar";
 import { Name } from "@/components/nostr/name";
 import { useLivekitToken } from "@/lib/livekit";
-import { usePubkey, useCanSign } from "@/lib/account";
-import {
-  useRequestedToJoin,
-  useJoinRequest,
-  useFetchGroupParticipants,
-} from "@/lib/nostr/groups";
-import { queryClient, GROUP_PARTICIPANTS } from "@/lib/query";
-import { groupId } from "@/lib/groups";
-import { useBookmarkGroup } from "@/components/nostr/groups/bookmark";
+import { usePubkey } from "@/lib/account";
+import { useLivekitParticipants } from "@/lib/nostr/groups";
 import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 
-function Spinner({ label }: { label?: string }) {
-  const shouldReduceMotion = useReducedMotion();
+const pubkeyFromIdentity = (id: string) => id.slice(0, 64);
+
+// --- Compact bar components (used when LiveKit is inline above chat) ---
+
+function CompactParticipantAvatar({ identity }: { identity: string }) {
+  const pubkey = pubkeyFromIdentity(identity);
+  const tracks = useTracks(
+    [Track.Source.Microphone],
+    { onlySubscribed: false },
+  );
+  const audioTrack = tracks.find(
+    (t) => t.participant.identity === identity && t.source === Track.Source.Microphone,
+  );
+  const isSpeaking = audioTrack?.participant.isSpeaking;
+
   return (
-    <div className="flex flex-col items-center justify-center gap-3 p-8">
-      <Loader2
-        className={`size-8 text-muted-foreground ${!shouldReduceMotion ? "animate-spin" : ""}`}
-      />
-      {label ? (
-        <span className="text-sm text-muted-foreground">{label}</span>
-      ) : null}
+    <div className={`relative shrink-0 ${isSpeaking ? "ring-2 ring-primary rounded-full" : ""}`}>
+      <Avatar pubkey={pubkey} className="size-8" />
     </div>
   );
 }
 
-function ParticipantTile({ identity }: { identity: string }) {
+function CompactParticipantTile({ identity }: { identity: string }) {
+  const pubkey = pubkeyFromIdentity(identity);
   const videoRef = useRef<HTMLVideoElement>(null);
   const tracks = useTracks(
     [Track.Source.Camera, Track.Source.Microphone],
@@ -76,7 +76,6 @@ function ParticipantTile({ identity }: { identity: string }) {
     videoTrack?.publication?.track && !videoTrack.publication.isMuted;
   const isMuted = !audioTrack?.publication?.track || audioTrack.publication.isMuted;
 
-  // Attach/detach video track properly
   useEffect(() => {
     const el = videoRef.current;
     const track = videoTrack?.publication?.track;
@@ -102,290 +101,190 @@ function ParticipantTile({ identity }: { identity: string }) {
           muted={videoTrack.participant.isLocal}
         />
       ) : (
-        <div className="flex flex-col items-center gap-2">
-          <Avatar pubkey={identity} className="size-16" />
+        <div className="flex flex-col items-center gap-1">
+          <Avatar pubkey={pubkey} className="size-10" />
           <span className="text-xs text-muted-foreground">
-            <Name pubkey={identity} short />
+            <Name pubkey={pubkey} short />
           </span>
         </div>
       )}
-      <div className="absolute bottom-1 left-1 bg-black/60 rounded px-1.5 py-0.5 text-xs text-white flex items-center gap-1">
-        <Name pubkey={identity} short />
-        {isMuted ? <MicOff className="size-3 text-red-400" /> : null}
+      <div className="absolute bottom-0.5 left-0.5 bg-black/60 rounded px-1 py-0.5 text-[10px] text-white flex items-center gap-0.5">
+        <Name pubkey={pubkey} short />
+        {isMuted ? <MicOff className="size-2.5 text-red-400" /> : null}
       </div>
     </div>
   );
 }
 
-function RoomView() {
+function CompactRoomView() {
   const { t } = useTranslation();
   const participants = useParticipants();
   const connectionState = useConnectionState();
   const { localParticipant } = useLocalParticipant();
+  const [expanded, setExpanded] = useState(false);
 
   if (connectionState === ConnectionState.Connecting) {
-    return <Spinner label={t("livekit.connecting")} />;
+    return (
+      <div className="flex items-center justify-center gap-2 px-3 py-2 border-b bg-muted/30 min-h-12">
+        <Loader2 className="size-4 animate-spin text-muted-foreground" />
+        <span className="text-sm text-muted-foreground">{t("livekit.connecting")}</span>
+      </div>
+    );
   }
 
   if (connectionState === ConnectionState.Disconnected) {
     return null;
   }
 
-  const remoteParticipants = participants.filter((p) => !p.isLocal);
-
   return (
-    <div className="flex flex-col flex-1 p-2">
-      <div className="flex flex-col flex-1 items-center justify-center">
-        {remoteParticipants.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-2 p-8 text-muted-foreground">
-            <Users className="size-8" />
-            <span className="text-sm">{t("livekit.no-participants")}</span>
-          </div>
-        ) : null}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 w-full">
+    <div className="border-b bg-muted/30">
+      {expanded ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 p-2">
           {participants.map((p) => (
-            <ParticipantTile key={p.identity} identity={p.identity} />
+            <CompactParticipantTile key={p.identity} identity={p.identity} />
           ))}
         </div>
-      </div>
-
-      <div className="flex items-center justify-center gap-2 p-2 border-t mt-auto">
-        <TrackToggle
-          source={Track.Source.Microphone}
-          showIcon={false}
-          className="inline-flex items-center justify-center rounded-md text-sm font-medium h-9 w-9 border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-        >
-          {localParticipant.isMicrophoneEnabled ? (
-            <Mic className="size-4" />
-          ) : (
-            <MicOff className="size-4 text-red-500" />
-          )}
-        </TrackToggle>
-        <TrackToggle
-          source={Track.Source.Camera}
-          showIcon={false}
-          className="inline-flex items-center justify-center rounded-md text-sm font-medium h-9 w-9 border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-        >
-          {localParticipant.isCameraEnabled ? (
-            <Video className="size-4" />
-          ) : (
-            <VideoOff className="size-4 text-red-500" />
-          )}
-        </TrackToggle>
-        <DisconnectButton className="inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-3 bg-destructive text-destructive-foreground hover:bg-destructive/90">
-          <PhoneOff className="size-4 mr-1" />
-          {t("livekit.leave")}
-        </DisconnectButton>
-      </div>
-    </div>
-  );
-}
-
-function JoinGroupGate({
-  group,
-  pubkey,
-}: {
-  group: Group;
-  pubkey: string;
-}) {
-  const { t } = useTranslation();
-  const canSign = useCanSign();
-  const { events } = useRequestedToJoin(group, pubkey);
-  const joinRequest = useJoinRequest(group);
-  const { isBookmarked, bookmarkGroup } = useBookmarkGroup(group);
-  const [requested, setRequested] = useState(events.length > 0);
-
-  async function sendJoinRequest() {
-    try {
-      await joinRequest();
-      toast.success(t("chat.join.request.success"));
-      setRequested(true);
-      if (!isBookmarked) {
-        await bookmarkGroup();
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error(t("chat.join.request.error"));
-    }
-  }
-
-  if (!canSign) return null;
-
-  return (
-    <div className="flex flex-col items-center justify-center gap-3 p-8">
-      <Users className="size-10 text-muted-foreground" />
-      <p className="text-sm text-muted-foreground text-center">
-        {t("group.metadata.join-the-conversation")}
-      </p>
-      <Button onClick={sendJoinRequest} disabled={requested}>
-        {requested ? t("chat.join.request.pending") : t("chat.join.request.action")}
-      </Button>
-    </div>
-  );
-}
-
-function VideoPreview({ enabled, pubkey }: { enabled: boolean; pubkey: string }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const trackRef = useRef<Awaited<ReturnType<typeof createLocalVideoTrack>> | null>(null);
-
-  useEffect(() => {
-    if (!enabled) return;
-
-    let stopped = false;
-    createLocalVideoTrack().then((t) => {
-      if (stopped) {
-        t.stop();
-        return;
-      }
-      trackRef.current = t;
-      if (videoRef.current) t.attach(videoRef.current);
-    });
-
-    return () => {
-      stopped = true;
-      if (trackRef.current) {
-        trackRef.current.stop();
-        trackRef.current = null;
-      }
-    };
-  }, [enabled]);
-
-  if (!enabled) {
-    return (
-      <div className="w-64 h-36 sm:w-80 sm:h-48 rounded-lg bg-muted flex flex-col items-center justify-center gap-2">
-        <Avatar pubkey={pubkey} className="size-16" />
-        <span className="text-sm text-muted-foreground">
-          <Name pubkey={pubkey} short />
-        </span>
-      </div>
-    );
-  }
-
-  return (
-    <video
-      ref={videoRef}
-      autoPlay
-      playsInline
-      muted
-      className="w-64 h-36 sm:w-80 sm:h-48 rounded-lg bg-muted object-cover"
-      style={{ transform: "scaleX(-1)" }}
-    />
-  );
-}
-
-function PreJoinLobby({
-  onJoin,
-  pubkey,
-}: {
-  onJoin: (opts: { audio: boolean; video: boolean }) => void;
-  pubkey: string;
-}) {
-  const { t } = useTranslation();
-  const [audio, setAudio] = useState(false);
-  const [video, setVideo] = useState(false);
-
-  return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-6 p-8">
-      <VideoPreview enabled={video} pubkey={pubkey} />
-      <div className="flex items-center gap-3">
-        <Button
+      ) : null}
+      <div className="flex items-center gap-2 px-3 py-2">
+        <button
           type="button"
-          variant={audio ? "default" : "outline"}
-          size="icon"
-          onClick={() => setAudio((v) => !v)}
-          aria-label={audio ? t("livekit.mute-mic") : t("livekit.unmute-mic")}
+          onClick={() => setExpanded((v) => !v)}
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground flex-1 min-w-0"
         >
-          {audio ? <Mic className="size-4" /> : <MicOff className="size-4" />}
-        </Button>
-        <Button
-          type="button"
-          variant={video ? "default" : "outline"}
-          size="icon"
-          onClick={() => setVideo((v) => !v)}
-          aria-label={video ? t("livekit.disable-camera") : t("livekit.enable-camera")}
-        >
-          {video ? <Video className="size-4" /> : <VideoOff className="size-4" />}
-        </Button>
+          <div className="flex -space-x-1.5 shrink-0">
+            {participants.slice(0, 4).map((p) => (
+              <CompactParticipantAvatar key={p.identity} identity={p.identity} />
+            ))}
+          </div>
+          {participants.length > 4 ? (
+            <span className="text-xs">+{participants.length - 4}</span>
+          ) : null}
+          {expanded ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+        </button>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant={localParticipant.isMicrophoneEnabled ? "default" : "outline"}
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => localParticipant.setMicrophoneEnabled(!localParticipant.isMicrophoneEnabled)}
+          >
+            {localParticipant.isMicrophoneEnabled ? (
+              <Mic className="size-3.5" />
+            ) : (
+              <MicOff className="size-3.5" />
+            )}
+          </Button>
+          <Button
+            type="button"
+            variant={localParticipant.isCameraEnabled ? "default" : "outline"}
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => localParticipant.setCameraEnabled(!localParticipant.isCameraEnabled)}
+          >
+            {localParticipant.isCameraEnabled ? (
+              <Video className="size-3.5" />
+            ) : (
+              <VideoOff className="size-3.5" />
+            )}
+          </Button>
+          <DisconnectButton className="inline-flex items-center justify-center rounded-md text-sm font-medium h-8 w-8 bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <PhoneOff className="size-3.5" />
+          </DisconnectButton>
+        </div>
       </div>
-      <Button onClick={() => onJoin({ audio, video })} size="lg">
-        <Phone className="size-4 mr-2" />
-        {t("livekit.join")}
-      </Button>
     </div>
   );
 }
 
-export function LivekitRoomView({ group }: { group: Group }) {
+export function LivekitBar({ group }: { group: Group }) {
   const { t } = useTranslation();
   const pubkey = usePubkey();
-  const { data: participants } = useFetchGroupParticipants(group);
-  const members = participants?.members ?? [];
-  const admins = participants?.admins ?? [];
+  const shouldReduceMotion = useReducedMotion();
+  const [audio, setAudio] = useState(true);
+  const [video, setVideo] = useState(false);
   const [joinOpts, setJoinOpts] = useState<{ audio: boolean; video: boolean } | null>(null);
   const wantsToJoin = joinOpts !== null;
   const { data: tokenData, error: tokenError, isLoading } = useLivekitToken(group, wantsToJoin);
-
-  const isMember =
-    !members.length && !admins.length
-      ? true // If no participant data, allow (open group)
-      : pubkey
-        ? members.includes(pubkey) || admins.includes(pubkey)
-        : false;
-
-  // Poll for membership changes when user is not yet a member
-  useEffect(() => {
-    if (isMember) return;
-    const interval = setInterval(() => {
-      queryClient.invalidateQueries({
-        queryKey: [GROUP_PARTICIPANTS, groupId(group)],
-      });
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [isMember, group]);
+  const { data: liveParticipants } = useLivekitParticipants(group, !wantsToJoin);
+  const maxAvatars = 3;
 
   const handleDisconnected = useCallback(() => {
     setJoinOpts(null);
   }, []);
 
-  if (!pubkey) {
+  if (!pubkey) return null;
+
+  // Not in call: compact join bar with audio/video toggles
+  if (!wantsToJoin) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-muted-foreground">
-        <AlertCircle className="size-8" />
-        <span className="text-sm">{t("livekit.error")}</span>
+      <div className="flex items-center gap-2 px-3 py-2 border-b bg-muted/30">
+        {liveParticipants && liveParticipants.length > 0 ? (
+          <>
+            <div className="flex -space-x-1.5">
+              {liveParticipants.slice(0, maxAvatars).map((pk) => (
+                <Avatar key={pk} pubkey={pk} className="size-6 ring-2 ring-background" />
+              ))}
+            </div>
+            <span className="text-sm text-muted-foreground flex-1">
+              {t("livekit.participants-in-room", { count: liveParticipants.length })}
+            </span>
+          </>
+        ) : (
+          <span className="text-sm text-muted-foreground flex-1">
+            {t("content.type.room")}
+          </span>
+        )}
+        <Button
+          type="button"
+          variant={audio ? "default" : "outline"}
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => setAudio((v) => !v)}
+          aria-label={audio ? t("livekit.mute-mic") : t("livekit.unmute-mic")}
+        >
+          {audio ? <Mic className="size-3.5" /> : <MicOff className="size-3.5" />}
+        </Button>
+        <Button
+          type="button"
+          variant={video ? "default" : "outline"}
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => setVideo((v) => !v)}
+          aria-label={video ? t("livekit.disable-camera") : t("livekit.enable-camera")}
+        >
+          {video ? <Video className="size-3.5" /> : <VideoOff className="size-3.5" />}
+        </Button>
+        <Button className="h-8 px-3 text-sm" onClick={() => setJoinOpts({ audio, video })}>
+          <Phone className="size-3.5 mr-1.5" />
+          {t("livekit.join")}
+        </Button>
       </div>
     );
   }
 
-  if (!isMember) {
-    return <JoinGroupGate group={group} pubkey={pubkey} />;
-  }
-
-  // Pre-join lobby — pick audio/video before entering
-  if (!wantsToJoin) {
-    return <PreJoinLobby onJoin={setJoinOpts} pubkey={pubkey} />;
-  }
-
-  // Fetching token after user clicked join
+  // Fetching token
   if (isLoading) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center">
-        <Spinner label={t("livekit.connecting")} />
+      <div className="flex items-center justify-center gap-2 px-3 py-2 border-b bg-muted/30 min-h-12">
+        <Loader2 className={`size-4 text-muted-foreground ${shouldReduceMotion ? "" : "animate-spin"}`} />
+        <span className="text-sm text-muted-foreground">{t("livekit.connecting")}</span>
       </div>
     );
   }
 
   if (tokenError || !tokenData) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-muted-foreground">
-        <AlertCircle className="size-8" />
-        <span className="text-sm">{t("livekit.token-error")}</span>
-        <Button variant="outline" onClick={() => setJoinOpts(null)}>
+      <div className="flex items-center gap-2 px-3 py-2 border-b bg-muted/30 min-h-12">
+        <span className="text-sm text-muted-foreground flex-1">{t("livekit.token-error")}</span>
+        <Button className="h-8 px-3 text-sm" variant="outline" onClick={() => setJoinOpts(null)}>
           {t("back")}
         </Button>
       </div>
     );
   }
 
+  // In call: LiveKitRoom wrapping compact view
   return (
     <LiveKitRoom
       serverUrl={tokenData.url}
@@ -395,10 +294,9 @@ export function LivekitRoomView({ group }: { group: Group }) {
       video={joinOpts.video}
       onDisconnected={handleDisconnected}
       data-lk-theme="default"
-      className="flex flex-col flex-1 bg-background"
     >
       <RoomAudioRenderer />
-      <RoomView />
+      <CompactRoomView />
     </LiveKitRoom>
   );
 }

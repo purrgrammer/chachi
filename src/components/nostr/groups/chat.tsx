@@ -117,7 +117,7 @@ function UserActivity({
 }
 
 export const GroupChat = forwardRef(
-  ({ group }: { group: Group }, ref: ForwardedRef<HTMLDivElement | null>) => {
+  ({ group, extraHeight = 0 }: { group: Group; extraHeight?: number }, ref: ForwardedRef<HTMLDivElement | null>) => {
     // todo: load older messages when scrolling up
     const { data: participants } = useFetchGroupParticipants(group);
     const { data: metadata } = useGroup(group);
@@ -132,7 +132,7 @@ export const GroupChat = forwardRef(
     // heights
     const [inputHeight, setInputHeight] = useState(34);
     const headerHeight = 96;
-    const nonChatHeight = inputHeight + headerHeight;
+    const nonChatHeight = inputHeight + headerHeight + extraHeight;
     const me = usePubkey();
     const canSign = useCanSign();
     const isMember = me && members?.includes(me);

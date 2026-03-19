@@ -19,6 +19,7 @@ export const GROUPS = "groups";
 export const CLOSE_GROUPS = "close-groups";
 export const GROUP_METADATA = "group-metadata";
 export const GROUP_PARTICIPANTS = "group-participants";
+export const LIVEKIT_PARTICIPANTS = "livekit-participants";
 export const LNURL = "lnurl";
 export const WALLET_INFO = "wallet-info";
 export const WALLET_BALANCE = "wallet-balance";

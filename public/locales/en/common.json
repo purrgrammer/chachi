@@ -114,10 +114,6 @@
       "chat-av": {
         "label": "Chat + Audio/Video",
         "description": "Text chat with an audio/video room"
-      },
-      "av-only": {
-        "label": "Audio/Video Only",
-        "description": "Audio/video room without text chat"
       }
     },
     "hosted": {
@@ -809,7 +805,8 @@
     "mute-mic": "Mute microphone",
     "unmute-mic": "Unmute microphone",
     "enable-camera": "Enable camera",
-    "disable-camera": "Disable camera"
+    "disable-camera": "Disable camera",
+    "participants-in-room": "{{count}} in room"
   },
   "wallet": {
     "title": "Incoming payment",

@@ -13,8 +13,6 @@ export async function checkRelayLivekitSupport(
   relayUrl: string,
 ): Promise<boolean> {
   try {
-    // TODO: Make this check actually work when we settle on livekit support detection
-    return relayUrl.includes("pyramid.fiatjaf.com");
     const baseUrl = relayToHttpUrl(relayUrl);
     const res = await fetch(`${baseUrl}/.well-known/nip29/livekit`, {
       method: "GET",
