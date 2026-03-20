@@ -256,6 +256,7 @@ export function CreateGroup({
           form={form}
           onSubmit={onSubmit}
           isLoading={isLoading}
+          relayUrl={relayValue}
           relaySection={
             <FormItem>
               <FormLabel className="flex items-center gap-1.5">

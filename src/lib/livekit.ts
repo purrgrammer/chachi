@@ -3,15 +3,14 @@ import { getEventHash, EventTemplate } from "nostr-tools";
 import { useNDK } from "@/lib/ndk";
 import { useAccount } from "@/lib/account";
 import { HTTPAuth } from "@/lib/nostr/kinds";
+import { LIVEKIT_TOKEN } from "@/lib/query";
 import type { Group } from "@/lib/types";
 
 function relayToHttpUrl(relayUrl: string): string {
   return relayUrl.replace(/^wss:\/\//, "https://").replace(/^ws:\/\//, "http://").replace(/\/$/, "");
 }
 
-export async function checkRelayLivekitSupport(
-  relayUrl: string,
-): Promise<boolean> {
+async function checkRelayLivekitSupport(relayUrl: string): Promise<boolean> {
   try {
     const baseUrl = relayToHttpUrl(relayUrl);
     const res = await fetch(`${baseUrl}/.well-known/nip29/livekit`, {
@@ -21,6 +20,15 @@ export async function checkRelayLivekitSupport(
   } catch {
     return false;
   }
+}
+
+export function useRelayLivekitSupport(relayUrl: string | undefined) {
+  return useQuery({
+    queryKey: ["relay-livekit-support", relayUrl],
+    queryFn: () => checkRelayLivekitSupport(relayUrl!),
+    enabled: !!relayUrl,
+    staleTime: 5 * 60 * 1000,
+  });
 }
 
 interface LivekitTokenResponse {
@@ -76,7 +84,7 @@ export function useLivekitToken(group: Group, enabled: boolean = true) {
   const pubkey = account?.pubkey;
 
   return useQuery({
-    queryKey: ["livekit-token", group.relay, group.id],
+    queryKey: [LIVEKIT_TOKEN, group.relay, group.id],
     queryFn: async () => {
       if (!pubkey || !ndk.signer) throw new Error("Not logged in");
       return fetchLivekitToken(group.relay, group.id, ndk.signer, pubkey);

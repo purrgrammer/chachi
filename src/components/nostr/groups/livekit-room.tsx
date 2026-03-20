@@ -31,21 +31,16 @@ import { useLivekitParticipants } from "@/lib/nostr/groups";
 import type { Group } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 
-const pubkeyFromIdentity = (id: string) => id.slice(0, 64);
+const HEX64_RE = /^[0-9a-f]{64}/;
+function pubkeyFromIdentity(id: string): string {
+  const match = id.match(HEX64_RE);
+  return match ? match[0] : id;
+}
 
 // --- Compact bar components (used when LiveKit is inline above chat) ---
 
-function CompactParticipantAvatar({ identity }: { identity: string }) {
+function CompactParticipantAvatar({ identity, isSpeaking }: { identity: string; isSpeaking?: boolean }) {
   const pubkey = pubkeyFromIdentity(identity);
-  const tracks = useTracks(
-    [Track.Source.Microphone],
-    { onlySubscribed: false },
-  );
-  const audioTrack = tracks.find(
-    (t) => t.participant.identity === identity && t.source === Track.Source.Microphone,
-  );
-  const isSpeaking = audioTrack?.participant.isSpeaking;
-
   return (
     <div className={`relative shrink-0 ${isSpeaking ? "ring-2 ring-primary rounded-full" : ""}`}>
       <Avatar pubkey={pubkey} className="size-8" />
@@ -122,6 +117,10 @@ function CompactRoomView() {
   const connectionState = useConnectionState();
   const { localParticipant } = useLocalParticipant();
   const [expanded, setExpanded] = useState(false);
+  const micTracks = useTracks([Track.Source.Microphone], { onlySubscribed: false });
+  const speakingIdentities = new Set(
+    micTracks.filter((t) => t.participant.isSpeaking).map((t) => t.participant.identity),
+  );
 
   if (connectionState === ConnectionState.Connecting) {
     return (
@@ -153,7 +152,7 @@ function CompactRoomView() {
         >
           <div className="flex -space-x-1.5 shrink-0">
             {participants.slice(0, 4).map((p) => (
-              <CompactParticipantAvatar key={p.identity} identity={p.identity} />
+              <CompactParticipantAvatar key={p.identity} identity={p.identity} isSpeaking={speakingIdentities.has(p.identity)} />
             ))}
           </div>
           {participants.length > 4 ? (

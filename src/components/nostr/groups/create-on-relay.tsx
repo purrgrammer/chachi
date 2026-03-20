@@ -118,6 +118,7 @@ export function CreateGroupOnRelay({
           form={form}
           onSubmit={onSubmit}
           isLoading={isLoading}
+          relayUrl={relay}
           relaySection={
             <FormItem>
               <FormLabel>{t("group.create.form.relay.label")}</FormLabel>

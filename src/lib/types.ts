@@ -21,8 +21,6 @@ export interface GroupMetadata extends Group {
   isClosed?: boolean;
   /** livekit: group supports audio/video rooms */
   isLivekit?: boolean;
-  /** no-text: group is AV-only (no text chat) */
-  isNoText?: boolean;
   nlink?: string;
 }
 

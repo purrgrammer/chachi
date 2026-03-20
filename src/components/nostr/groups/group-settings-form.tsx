@@ -64,6 +64,7 @@ import {
 import type { Group, GroupMetadata, GroupInviteCode } from "@/lib/types";
 import { getRelayHost } from "@/lib/relay";
 import { GroupTypeSelector, groupTypeFromFlags, flagsFromGroupType } from "@/components/nostr/groups/group-type-selector";
+import { useRelayLivekitSupport } from "@/lib/livekit";
 
 export function GroupEditor({
   group,
@@ -73,6 +74,7 @@ export function GroupEditor({
   metadata: GroupMetadata;
 }) {
   const { t } = useTranslation();
+  const { data: livekitSupported } = useRelayLivekitSupport(group.relay);
 
   // Information tab states
   const [name, setName] = useState(metadata?.name || "");
@@ -698,6 +700,7 @@ export function GroupEditor({
                 const flags = flagsFromGroupType(type);
                 setIsLivekit(flags.isLivekit);
               }}
+              livekitSupported={livekitSupported}
             />
           </div>
 

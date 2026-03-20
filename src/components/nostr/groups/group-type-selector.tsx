@@ -28,12 +28,21 @@ export function GroupTypeSelector({
   value,
   onChange,
   disabled,
+  livekitSupported,
 }: {
   value: GroupType;
   onChange: (value: GroupType) => void;
   disabled?: boolean;
+  /** When false, the chat-av option is hidden. When undefined (loading), it's shown but disabled. */
+  livekitSupported?: boolean;
 }) {
   const { t } = useTranslation();
+
+  const visibleOptions = livekitSupported === false
+    ? options.filter((o) => o.value !== "chat-av")
+    : options;
+
+  if (visibleOptions.length <= 1) return null;
 
   return (
     <div className="space-y-3">
@@ -46,7 +55,7 @@ export function GroupTypeSelector({
         disabled={disabled}
         className="grid gap-2"
       >
-        {options.map(({ value: optValue, icon: Icon, labelKey, descKey }) => (
+        {visibleOptions.map(({ value: optValue, icon: Icon, labelKey, descKey }) => (
           <label
             key={optValue}
             className={`flex items-center gap-3 rounded-lg border p-3 cursor-pointer transition-colors ${

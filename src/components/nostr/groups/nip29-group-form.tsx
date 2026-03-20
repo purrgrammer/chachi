@@ -21,6 +21,7 @@ import {
   groupTypeFromFlags,
   flagsFromGroupType,
 } from "@/components/nostr/groups/group-type-selector";
+import { useRelayLivekitSupport } from "@/lib/livekit";
 import { useTranslation } from "react-i18next";
 
 export const nip29FormSchema = z.object({
@@ -60,14 +61,17 @@ export function Nip29GroupForm({
   isLoading,
   relaySection,
   footer,
+  relayUrl,
 }: {
   form: UseFormReturn<Nip29FormValues>;
   onSubmit: (values: Nip29FormValues) => void;
   isLoading: boolean;
   relaySection?: ReactNode;
   footer: ReactNode;
+  relayUrl?: string;
 }) {
   const { t } = useTranslation();
+  const { data: livekitSupported } = useRelayLivekitSupport(relayUrl);
 
   return (
     <Form {...form}>
@@ -242,6 +246,7 @@ export function Nip29GroupForm({
             form.setValue("isLivekit", flags.isLivekit);
           }}
           disabled={isLoading}
+          livekitSupported={livekitSupported}
         />
         {footer}
       </form>

@@ -225,10 +225,6 @@
           "label": "Audio/Video Room",
           "description": "Enable audio and video rooms powered by LiveKit"
         },
-        "notext": {
-          "label": "AV Only",
-          "description": "Audio/video only, no text chat"
-        },
         "submit": {
           "trigger": "Create",
           "success": "Group created",
@@ -339,10 +335,6 @@
         "trigger": "Audio/Video",
         "content": "This group supports audio and video rooms"
       },
-      "notext": {
-        "trigger": "AV Only",
-        "content": "This is an audio/video only room (no text chat)"
-      },
       "join-the-conversation": "Join the conversation",
       "map_picker": {
         "title": "Select Location",
@@ -397,8 +389,6 @@
         "closed_description": "Join requests are ignored (invite-only)",
         "livekit": "Audio/Video Room",
         "livekit_description": "Enable audio and video rooms for this group",
-        "notext": "AV Only",
-        "notext_description": "Audio/video only, no text chat",
         "save": "Save Privacy Settings",
         "saving": "Saving...",
         "success": "Group privacy settings updated successfully",

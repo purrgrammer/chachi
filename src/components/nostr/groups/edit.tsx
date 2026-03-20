@@ -46,12 +46,14 @@ import { DELETE_GROUP } from "@/lib/kinds";
 import { useTranslation } from "react-i18next";
 import { usePublishEvent } from "@/lib/nostr/publishing";
 import { GroupTypeSelector, groupTypeFromFlags, flagsFromGroupType } from "@/components/nostr/groups/group-type-selector";
+import { useRelayLivekitSupport } from "@/lib/livekit";
 
 export function EditGroup({ group }: { group: GroupMetadata }) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const canSign = useCanSign();
   const editGroup = useEditGroup();
+  const { data: livekitSupported } = useRelayLivekitSupport(group.relay);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -312,6 +314,7 @@ export function EditGroup({ group }: { group: GroupMetadata }) {
                 form.setValue("isLivekit", flags.isLivekit);
               }}
               disabled={isLoading}
+              livekitSupported={livekitSupported}
             />
             <div className="flex flex-row justify-between mt-4">
               <AlertDialog>
